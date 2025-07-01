@@ -1,42 +1,3 @@
-.message_formating{
-  white-space: pre-wrap;
-}
-.floating-date-label {
-    position: sticky;
-    top: 0;
-    background-color: #fafafa;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: bold;
-    border-radius: 5px;
-    display: none;
-    z-index: 100;
-    width: fit-content;
-    margin: 0 auto;
-}
-.chat-date-label{
-  background-color: #fafafa;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 5px;
-}
-.highlighted {
-    background-color: #fffa91 !important;
-    transition: background-color 0.5s ease;
-}
-.reply-preview {
-  padding:5px 10px;
-  border-left:3px solid #007bff;
-  margin-bottom:5px;font-size:12px;
-  cursor:pointer
-}
-.chat-time {
-    text-align: right;
-    font-size: 11px;
-    color: #999;
-    margin-top: 5px;
-}
 /* Product Card */
   .field-selected-primary {
     background-color: #d1e7dd;
@@ -357,13 +318,6 @@ cursor: pointer;
     color: #1e293b;
 }
 
-.new-chat-badge{
-  background: green;
-  color: white;
-  padding: 2px;
-  border-radius: 3px;
-  box-shadow: black 5px 2px;
-}
 .chat-item:hover {
     background-color: #1e293b;
     color: #ffffff;
@@ -374,11 +328,7 @@ cursor: pointer;
     color: #ffffff;
     cursor: pointer;
 }
-.new-chat{
-    background-color: green;
-    color: #ffffff;
-    cursor: pointer;
-}
+
 .whatsapp-chat-interface {
     box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
     height: 550px;
@@ -901,8 +851,24 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
   transform: translateY(-2px);
 }
 
-.open-customizer { margin-bottom:200px !important;}
+.open-customizer, .content { margin-bottom:200px !important;}
 .v-logo{margin-bottom: 10px  !important;}
+.out-form, .out-form .form-control{
+  color: #FFF !important;
+  background-color: unset !important;
+}
+.box-shadow-bg{
+  box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;
+  backdrop-filter: saturate(125%) blur(10px);
+  background: unset  !important;
+  color: wheat !important;
+  padding: 10px !important;
+}
+#dealModal{
+  background-color: rgba(0, 0, 0, 0.5); /* fade to semi-black */
+  box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;
+  backdrop-filter: saturate(125%) blur(10px);
+}
 
 /* /////////////////Media Query//////////////// */
 @media (min-width: 768px) {

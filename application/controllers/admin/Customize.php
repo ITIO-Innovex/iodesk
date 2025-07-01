@@ -48,8 +48,7 @@ class Customize extends AdminController
                 'smtp_email',
                 'smtp_username',
                 'smtp_password',
-                'smtp_charset',
-                'smtp_bcc',
+
             ];
             $smtp_settings_save = [];
             foreach ($smtp_fields as $field) {

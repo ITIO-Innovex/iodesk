@@ -53,8 +53,8 @@
 	</div>
 	
 	</div>
-    <div class="screen-options-btn">
-        <i class="fa-solid fa-user  menu-icon tw-mx-2" title="Profile"></i>
+    <div class="screen-options-btn box-shadow-bg">
+        <i class="fa-solid fa-user  menu-icon tw-mx-2 fa-2x" title="View Profile"></i>
     </div>
     <div class="content">
         <div class="row">
