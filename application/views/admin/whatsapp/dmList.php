@@ -241,7 +241,7 @@ socket.on('error', (error) => {
     $(document).ready(function() {
     const source = "crm";
     const userType = <?= is_super() ? '1' : (is_admin() ? '2' : '3') ?>; // 1 for super admin, 2 for admin, 3 for staff
-    const companyId = <?= is_super() ? '0' : (is_admin() ? get_staff_company_id() : '0') ?>; // 0 for super admin, admin's company ID, or 0 for staff
+    const companyId = <?= is_super() ? '0' : get_staff_company_id() ?>; // 0 for super admin, admin's company ID, or 0 for staff
     $.ajax({
         url: `${waURL}/api/configuration/fetch/`,
         method: 'POST',

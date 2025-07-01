@@ -541,7 +541,7 @@ socket.on('error', (error) => {
 function getConfigurations(callback){
     const source = "crm";
     const userType = <?= is_super() ? '1' : (is_admin() ? '2' : '3') ?>; // 1 for super admin, 2 for admin, 3 for staff
-    const companyId = <?= is_super() ? '0' : (is_admin() ? get_staff_company_id() : '0') ?>; // 0 for super admin, admin's company ID, or 0 for staff
+    const companyId = <?= is_super() ? '0' : get_staff_company_id() ?>; // 0 for super admin, admin's company ID, or 0 for staff
     $.ajax({
         url: `${waURL}/api/configuration/fetch/`,
         method: 'POST',
@@ -725,19 +725,17 @@ function setupChatSocketListener(chatId){
 	socket.on('chat-' + chatId, (data)=>{
 	console.log(data);//Checking.
 	var type = data.type;
-	var messageData = data.messageToInsert;//getting message body
+	var messageData = data.messageContentToInsert;//getting message body
 	var data ; // Initializing empty variable'
 	//Check if message is sent or status
 	if(type=='received'){
-const formattedTime = messageData.time
-        ? new Date(messageData.time * 1000).toLocaleTimeString(undefined, {
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-            })
-        : '';
-
- 
+        const formattedTime = messageData.time
+                ? new Date(messageData.time * 1000).toLocaleTimeString(undefined, {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                    })
+                : '';
         if(messageData.message_content != 4){
 	    data = '<div id='+messageData.message_id+' class="incoming-message">'+messageData.message_body+'<div class="chat-time">'+formattedTime+'</div></div>';
 	    //Appending chat data to UI
