@@ -78,6 +78,8 @@ $config['dkim_selector']       = '';                       // DKIM selector.
 $config['dkim_passphrase']     = '';                       // DKIM passphrase, used if your key is encrypted.
 $config['dkim_identity']       = '';                       // DKIM Identity, usually the email address used as the source of the email.
 
+if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']&&$_SESSION['staff_company_id']<>1){
 if (file_exists(APPPATH . 'config/my_email.php')) {
     include_once(APPPATH . 'config/my_email.php');
+}
 }

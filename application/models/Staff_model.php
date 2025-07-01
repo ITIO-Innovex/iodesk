@@ -1040,4 +1040,8 @@ class Staff_model extends App_Model
 			}
 			
 	}
+	public function get_smtp_details($company_id)
+    {
+	   return $company_id;
+	}
 }

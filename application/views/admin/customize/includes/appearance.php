@@ -74,7 +74,7 @@
     <div class="col-md-12">SMTP Settings</h4>
         <hr class="hr-panel-separator" />
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="smtp_encryption"><?php echo _l('SMTP email encryption'); ?></label>
                     <select name="settings[smtp_encryption]" class="form-control">
@@ -92,7 +92,7 @@
                     <input type="text" name="settings[smtp_port]" class="form-control" value="<?php echo isset($smtp_settings['smtp_port']) ? e($smtp_settings['smtp_port']) : ''; ?>" placeholder="587" />
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="smtp_email"><?php echo _l('SMTP Email'); ?></label>
                     <input type="email" name="settings[smtp_email]" class="form-control" value="<?php echo isset($smtp_settings['smtp_email']) ? e($smtp_settings['smtp_email']) : ''; ?>" placeholder="noreply@example.com" />
@@ -106,7 +106,7 @@
                     <input type="password" name="settings[smtp_password]" class="form-control" value="<?php echo isset($smtp_settings['smtp_password']) ? e($smtp_settings['smtp_password']) : ''; ?>" placeholder="SMTP Password" />
                 </div>
             </div>
-            <div class="col-md-4">
+            <?php /*?><div class="col-md-4">
                 <div class="form-group">
                     <label for="smtp_charset"><?php echo _l('SMTP Charset'); ?></label>
                     <input type="text" name="settings[smtp_charset]" class="form-control" value="<?php echo isset($smtp_settings['smtp_charset']) ? e($smtp_settings['smtp_charset']) : 'utf-8'; ?>" placeholder="utf-8" />
@@ -115,7 +115,7 @@
                     <label for="smtp_bcc"><?php echo _l('SMTP bcc all emails to'); ?></label>
                     <input type="email" name="settings[smtp_bcc]" class="form-control" value="<?php echo isset($smtp_settings['smtp_bcc']) ? e($smtp_settings['smtp_bcc']) : ''; ?>" placeholder="bcc@example.com" />
                 </div>
-            </div>
+            </div><?php */?>
         </div>
     </div>
 </div>
@@ -126,7 +126,7 @@
         <h4 class="bold mt-4"><?php echo _l('lead_setting'); ?></h4>
         <hr class="hr-panel-separator" />
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="automatically_assign_to_staff"><?php echo _l('automatically_assign_to_staff'); ?></label>
                     <select name="automatically_assign_to_staff" class="form-control">
@@ -135,7 +135,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="lead_auto_assign_to_staff"><?php echo _l('lead_auto_assign_to_staff'); ?></label>
                     <select name="lead_auto_assign_to_staff" class="form-control">

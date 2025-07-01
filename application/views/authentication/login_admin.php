@@ -3,7 +3,7 @@
 
 <body class="login_admin" style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1502.jpg');?>)  !important; " >
 
-    <div class="tw-max-w-md tw-mx-auto tw-pt-24 authentication-form-wrapper tw-relative tw-z-20">
+    <div class="tw-max-w-md tw-mx-auto tw-pt-24 authentication-form-wrapper tw-relative tw-z-20 out-form">
         <div class="company-logo text-center"><?php echo get_company_logo(get_admin_uri() . '/', '!tw-mt-0')?></div>
         <div class=" tw-mx-2 sm:tw-mx-6 tw-py-6 tw-px-6 sm:tw-px-8 tw-shadow tw-rounded-lg" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
 <h1 class="tw-text-2xl tw-text-white text-center tw-font-semibold"><?php echo _l('admin_auth_login_heading');?></h1>

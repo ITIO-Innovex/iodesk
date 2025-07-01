@@ -227,7 +227,7 @@ unset($data['id']);
         $data['roles']         = $this->roles_model->get();
         $data['user_notes']    = $this->misc_model->get_notes($id, 'staff');
         $data['departments']   = $this->departments_model->get();
-        $data['title']         = $title."AAAAAA";
+        $data['title']         = $title;
 
         $this->load->view('admin/staff/company', $data);
     }
