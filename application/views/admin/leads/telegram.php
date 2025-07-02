@@ -2,8 +2,8 @@
 <?php init_head(); ?>
 
 <div id="wrapper">
-	<div class="content">
-		<div class="row card-wa-configuration ">
+	<div class="content" style="margin-bottom:200px;">
+		<div class="row card-wa-configuration " style="margin-bottom:200px;">
 			<div class="col-md-3 wa-side-bar-col">
 				<div class="whatsapp-side-bar">
 					<div class="sidebar-header">
