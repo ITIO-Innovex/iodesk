@@ -110,7 +110,8 @@ foreach ($rResult as $aRow) {
         }
         $row[] = $_data;
     }
-    $row[] = '<a href="" onclick="assignMail(' . $aRow['staffid'] . '); return false;" >Button</a>';
+    $row[] = '';
+	/*<a href="" onclick="assignMail(' . $aRow['staffid'] . '); return false;" >Button</a>*/
 
     $row['DT_RowClass'] = 'has-row-options';
 

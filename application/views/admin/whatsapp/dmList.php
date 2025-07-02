@@ -1,8 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <div id="wrapper">
-    <div class="content">
-        <div class="row">
+<div class="content" style="margin-bottom:200px;">
+        <div class="row" style="margin-bottom:200px;">
             <div class="col-sm-12">
                 <div class="card-wa-configuration">
                     <div class="card-body">
