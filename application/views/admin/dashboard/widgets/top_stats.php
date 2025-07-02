@@ -257,7 +257,7 @@
             <div class="top_stats_wrapper">
 <?php
 $this->db->from(db_prefix() . 'projects');
-if (!is_admin()) {$this->db->where('addedfrom', get_staff_user_id());}
+//if (!is_admin()) {$this->db->where('addedfrom', get_staff_user_id());}
 $year = $_GET['year'] ?? date('Y');
 ?>
                 <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">

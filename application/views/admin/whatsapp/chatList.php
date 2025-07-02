@@ -1,8 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <div id="wrapper">
-    <div class="content">
-        <div class="row">
+    <div class="content" style="margin-bottom:200px;">
+        <div class="row" style="margin-bottom:200px;">
             <div class="col-sm-12">
                 <div class="card-wa-configuration">
                     <div class="card-body">
@@ -101,7 +101,7 @@
                                                                 <span class="input-group-btn">
                                                                     <div class="btn-group dropup">
                                                                         <button class="btn wa-drop-btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                                                            <i class="fa fa-paperclip fa-3x" aria-hidden="true"></i>
                                                                         </button>
                                                                         <ul class="dropdown-menu">
                                                                             <li><a href="#" id="textMessageOption">Text Message</a></li>
@@ -130,7 +130,7 @@
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-sm-2">
+                                                        <div class="col-sm-2 tw-pt-3">
                                                             <button  type="submit" class="btn  wa-btn" id="sendMessageBtn">
                                                               <svg xmlns="http://www.w3.org/2000/svg" style="padding-top:3.5px" viewBox="0 0 50 25" width="50" height="24" fill="white"><path d="M2 21v-7l11-2-11-2V3l21 9-21 9z"/></svg>
                                                             </button>
