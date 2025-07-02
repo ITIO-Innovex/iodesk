@@ -1,5 +1,5 @@
 <?php
-// Include the database configuration file
+// Include the database configuration file added
 require_once "application/config/db.php";
 
 // Check if we received the 'telegram_message' parameter
