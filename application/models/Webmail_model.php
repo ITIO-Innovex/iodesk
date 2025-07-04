@@ -163,7 +163,7 @@ class Webmail_model extends App_Model
 	
 	public function getemaillist($id = '', $where = [])
     {
-        $this->db->select('id,mailer_email,');
+        $this->db->select('MAX(`id`) AS id,mailer_email,');
         $this->db->where($where);
 		
 		          if (!is_super()) {
@@ -177,8 +177,8 @@ class Webmail_model extends App_Model
         $this->db->order_by('id', 'asc');
 		$this->db->group_by('mailer_email');
 		//$this->db->limit(1);
-         return $this->db->get(db_prefix() . 'webmail_setup')->result_array();
-		// echo $this->db->last_query();
+          return $this->db->get(db_prefix() . 'webmail_setup')->result_array();
+		 //echo $this->db->last_query();exit;
     }
 	
 	 public function webmailsetup($id = '', $where = [])
