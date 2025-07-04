@@ -14,7 +14,8 @@ class Telegram extends AdminController
     {
         // Fetch all Telegram configurations
         $data['configurationData'] = $this->telegram_model->getAllTelegramConfigurations();
-        $data['departmentData'] = $this->leads_model->getAdminAllDepartments();
+        $adminCompanyId = get_staff_company_id();
+        $data['departmentData'] = $this->leads_model->getAdminAllDepartments($adminCompanyId);
         $data['title'] = 'Telegram-Configuration';
         $this->load->view('admin/telegram/configuration', $data);
     }
