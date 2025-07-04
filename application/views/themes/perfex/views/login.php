@@ -1,20 +1,20 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 
-<div class="mtop40">
-    <div class="company-logo text-center">
+<div class="mtop40" >
+    <div class="company-logo text-center  out-form">
 <?php echo get_company_logo(get_admin_uri() . '/', 'navbar-brand logo v-logo')?>			</div>
-    <div class="col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2">
+    <div class="col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2 " >
         <?php echo form_open($this->uri->uri_string(), ['class' => 'login-form']); ?>
         <?php hooks()->do_action('clients_login_form_start'); ?>
-        <div class="panel_s">
-            <div class="panel-body">
+        <div class="panel_s box-shadow-bg" >
+            <div class="panel-body out-form">
 <h1 class="tw-font-semibold text-center mt-0 pt-0">
             <?php
          echo _l(get_option('allow_registration') == 1 ? 'clients_login_heading_register' : 'clients_login_heading_no_register');
          ?>
         </h1>
                 <?php if (!is_language_disabled()) { ?>
-                <div class="form-group">
+                <?php /*?><div class="form-group">
                     <label for="language" class="control-label"><?php echo _l('language'); ?>
                     </label>
                     <select name="language" id="language" class="form-control selectpicker"
@@ -29,17 +29,17 @@
                         </option>
                         <?php } ?>
                     </select>
-                </div>
+                </div><?php */?>
                 <?php } ?>
 
                 <div class="form-group">
-                    <label for="email"><?php echo _l('clients_login_email'); ?></label>
+                    <label for="email" class="tw-text-white"><?php echo _l('clients_login_email'); ?></label>
                     <input type="text" autofocus="true" class="form-control" name="email" id="email">
                     <?php echo form_error('email'); ?>
                 </div>
 
                 <div class="form-group">
-                    <label for="password"><?php echo _l('clients_login_password'); ?></label>
+                    <label for="password" class="tw-text-white"><?php echo _l('clients_login_password'); ?></label>
                     <input type="password" class="form-control" name="password" id="password">
                     <?php echo form_error('password'); ?>
                 </div>
@@ -51,7 +51,7 @@
 
                 <div class="checkbox">
                     <input type="checkbox" name="remember" id="remember">
-                    <label for="remember">
+                    <label for="remember"  class="tw-text-white">
                         <?php echo _l('clients_login_remember'); ?>
                     </label>
                 </div>
@@ -66,7 +66,7 @@
                     </a>
                     <?php } ?>
                 </div>
-                <a href="<?php echo site_url('authentication/forgot_password'); ?>">
+                <a href="<?php echo site_url('authentication/forgot_password'); ?>" class="tw-text-white">
                     <?php echo _l('customer_forgot_password'); ?>
                 </a>
                 <?php hooks()->do_action('clients_login_form_end'); ?>
