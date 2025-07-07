@@ -17,7 +17,7 @@ class Import_leads extends App_import
 
     public function __construct()
     {
-        $this->notImportableFields = hooks()->apply_filters('not_importable_leads_fields', ['id', 'assigned', 'dateadded', 'last_status_change', 'addedfrom', 'leadorder', 'date_converted', 'lost', 'junk', 'is_imported_from_email_integration', 'email_integration_uid', 'is_public', 'dateassigned', 'client_id', 'lastcontact', 'last_lead_status', 'from_form_id', 'default_language', 'hash']);
+        $this->notImportableFields = hooks()->apply_filters('not_importable_leads_fields', ['id', 'assigned', 'dateadded', 'last_status_change', 'addedfrom', 'leadorder', 'date_converted', 'lost', 'junk', 'is_imported_from_email_integration', 'email_integration_uid', 'is_public', 'dateassigned', 'client_id', 'lastcontact', 'last_lead_status', 'from_form_id', 'default_language', 'hash', 'company_id']);
 
         $uniqueValidationFields = json_decode(get_option('lead_unique_validation'));
 
@@ -91,6 +91,10 @@ class Import_leads extends App_import
 
                     if (!isset($insert['addedfrom'])) {
                         $insert['addedfrom'] = get_staff_user_id();
+                    }
+					
+					if (!isset($insert['company_id'])) {
+                        $insert['company_id'] = get_staff_company_id();
                     }
 
                     if ($this->ci->input->post('responsible')) {

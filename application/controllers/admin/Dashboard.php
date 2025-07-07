@@ -114,4 +114,10 @@ class Dashboard extends AdminController
         $data['tickets_report'] = (new app\services\TicketsReportByStaff())->filterBy($type);
         $this->load->view('admin/dashboard/widgets/tickets_report_table', $data);
     }
+	
+	public function testemail()
+    {
+        $this->dashboard_model->testemail();
+		redirect(admin_url('dashboard'));
+    }
 }

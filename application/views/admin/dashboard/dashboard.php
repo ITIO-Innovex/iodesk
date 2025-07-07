@@ -64,7 +64,8 @@
 		</div>
 		<?php }else{ ?>
 		<div class="col-md-12 mtop20">
-		<a href="<?php echo admin_url('staff');?>" class="fancy-btn"><i class="fa-solid fa-users menu-icon"></i> Add New Staff</a>
+<a href="<?php echo admin_url('staff');?>" class="fancy-btn"><i class="fa-solid fa-users menu-icon"></i> Add New Staff</a>
+<a href="<?php echo admin_url('dashboard/testemail');?>" class="fancy-btn hide"><i class="fa-solid fa-users menu-icon"></i> Test Email</a>
 		</div>
 		<?php } ?>
             <?php //$this->load->view('admin/includes/alerts'); ?>
