@@ -19,10 +19,13 @@ class Telegram extends AdminController
         $data['title'] = 'Telegram-Configuration';
         $this->load->view('admin/telegram/configuration', $data);
     }
-    public function add_configuration()
+   public function add_update_configuration()
     {
         if ($this->input->post()) {
             $data = $this->input->post();
+            $id = isset($data['id']) && !empty($data['id']) ? $data['id'] : null;
+
+            // Type-based logic
             if (isset($data['type']) && $data['type'] == 1) {
                 $data['staff_ids'] = '';
             } elseif (isset($data['type']) && $data['type'] == 2) {
@@ -30,52 +33,68 @@ class Telegram extends AdminController
             } else {
                 $data['department_id'] = 0;
                 $data['staff_ids'] = '';
+                set_alert('warning', 'Please select a type');
                 redirect(admin_url('telegram/configuration'));
-                set_alert('warning','Please select a type');
             }
+
             if (isset($data['department_id']) && $data['department_id'] == 0) {
                 $data['department_id'] = '';
-                set_alert('warning','Please select a department');
-            }
-            // Check if the name or username already exists
-            $existingConfig = $this->telegram_model->getTelegramConfigurationByNameOrUsername($data['telegram_name'], $data['telegram_username']);
-            if ($existingConfig) {
-                set_alert('warning', 'Configuration with this name or username already exists.');
+                set_alert('warning', 'Please select a department');
                 redirect(admin_url('telegram/configuration'));
             }
-            // Delete the webhook if it exists
-            $url = "https://api.telegram.org/bot" . $data['telegram_token'] . "/deleteWebhook";
-            // Make the API call to delete the webhook
-            $ch = curl_init($url);
+
+            // Webhook setup (always fresh)
+            $deleteUrl = "https://api.telegram.org/bot" . $data['telegram_token'] . "/deleteWebhook";
+            $ch = curl_init($deleteUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response = curl_exec($ch);
+            $deleteResponse = curl_exec($ch);
             curl_close($ch);
-            // Check if the response indicates success
-            if ($response === false) {
+            if ($deleteResponse === false) {
                 set_alert('danger', 'Failed to delete existing webhook.');
                 redirect(admin_url('telegram/configuration'));
             }
-            // Add new webhook URL
+
             $webhookUrl = base_url('import-telegram.php?bot=' . urlencode($data['telegram_name']));
-            $url = "https://api.telegram.org/bot" . $data['telegram_token'] . "/setWebhook?url=" . urlencode($webhookUrl);
-            // Make the API call to set the webhook
-            $ch = curl_init($url);
+            $setUrl = "https://api.telegram.org/bot" . $data['telegram_token'] . "/setWebhook?url=" . urlencode($webhookUrl);
+            $ch = curl_init($setUrl);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response = curl_exec($ch);
+            $setResponse = curl_exec($ch);
             curl_close($ch);
-            if ($response === false) {
+            if ($setResponse === false) {
                 set_alert('danger', 'Failed to set webhook.');
                 redirect(admin_url('telegram/configuration'));
-            }   
-            $data['webhook'] = $webhookUrl;
-           $addConfig = $this->telegram_model->addTelegramConfiguration($data);
-           if ($addConfig) {
-            set_alert('success', 'Configuration added successfully.');
-            redirect(admin_url('telegram/configuration'));
-            } else {
-                redirect(admin_url('telegram/configuration'));
             }
-        } 
+
+            $data['webhook'] = $webhookUrl;
+
+            // Decide: Update or Insert
+            if ($id) {
+                // Update existing config
+                $update = $this->telegram_model->updateTelegramConfiguration($id, $data);
+                if ($update) {
+                    set_alert('success', 'Configuration updated successfully.');
+                } else {
+                    set_alert('warning', 'Failed to update configuration.');
+                }
+            } else {
+                // Check for duplicates by username or name
+                $existingConfig = $this->telegram_model->getTelegramConfigurationByNameOrUsername($data['telegram_name'], $data['telegram_username']);
+                if ($existingConfig) {
+                    set_alert('warning', 'A configuration with this name or username already exists.');
+                    redirect(admin_url('telegram/configuration'));
+                }
+
+                // Insert new config
+                $add = $this->telegram_model->addTelegramConfiguration($data);
+                if ($add) {
+                    set_alert('success', 'Configuration added successfully.');
+                } else {
+                    set_alert('danger', 'Failed to add configuration.');
+                }
+            }
+
+            redirect(admin_url('telegram/configuration'));
+        }
     }
     public function delete_configuration($id)
     {

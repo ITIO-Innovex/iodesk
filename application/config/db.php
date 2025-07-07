@@ -41,7 +41,7 @@ if(!defined('APP_DB_HOSTNAME')) define('APP_DB_HOSTNAME', 'localhost');
 
 if (strpos($_SERVER["HTTP_HOST"], "localhost") !== false){
 
-	if(!defined('APP_BASE_URL')) define('APP_BASE_URL', 'http://localhost/crm/');
+	if(!defined('APP_BASE_URL')) define('APP_BASE_URL', 'http://localhost/iodesk');
 
 	/**
 	 * The username used to connect to the database
@@ -56,25 +56,25 @@ if (strpos($_SERVER["HTTP_HOST"], "localhost") !== false){
 	/**
 	 * The name of the database you want to connect to
 	 */
-	if(!defined('APP_DB_NAME')) define('APP_DB_NAME', 'it_crm_db');
+	if(!defined('APP_DB_NAME')) define('APP_DB_NAME', 'xeyso_iodesk_crm');
 }
 else
 {
-	define('APP_BASE_URL', 'https://xeyso.com/crm');
+	define('APP_BASE_URL', 'https://my.itio.in');
 	/**
 	 * The username used to connect to the database
 	 */
-	if(!defined('APP_DB_USERNAME')) define('APP_DB_USERNAME', 'xeyso_iodesk_crm');
+	if(!defined('APP_DB_USERNAME')) define('APP_DB_USERNAME', 'itio_crm');
 	
 	/**
 	 * The password used to connect to the database
 	 */
-	if(!defined('APP_DB_PASSWORD')) define('APP_DB_PASSWORD', 'IBILk=zhrCT2');
+	if(!defined('APP_DB_PASSWORD')) define('APP_DB_PASSWORD', 'Itio@crm123');
 	
 	/**
 	 * The name of the database you want to connect to
 	 */
-	if(!defined('APP_DB_NAME')) define('APP_DB_NAME', 'xeyso_iodesk_crm');
+	if(!defined('APP_DB_NAME')) define('APP_DB_NAME', 'itio_crm');
 }
 $conn=mysqli_connect(APP_DB_HOSTNAME,APP_DB_USERNAME,APP_DB_PASSWORD,APP_DB_NAME);
 /**
