@@ -719,14 +719,14 @@ function app_init_admin_sidebar_menu_items()
         'position' => 10,
         'badge'    => [],
     ]);
-	if (staff_can('view',  'email_templates')) {
+	//if (staff_can('view',  'email_templates')) {
         $CI->app_menu->add_setup_menu_item('email-templates', [
             'href'     => admin_url('emails'),
             'name'     => _l('acs_email_templates'),
             'position' => 40,
             'badge'    => [],
         ]);
-    }
+   // }
 
 		
 
