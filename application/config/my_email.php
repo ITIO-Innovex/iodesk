@@ -30,6 +30,9 @@ if(isset($settings['smtp_encryption'])&&$settings['smtp_encryption']&&isset($set
 			$config['smtp_port']    = trim($settings['smtp_port']);
 			$config['smtp_crypto']  = trim($settings['smtp_encryption']);
 			
+			$_SESSION['staff_fromemai']=$settings['smtp_email'];
+			$_SESSION['staff_company']=get_staff_company_name($company_id);
+			
 		}
 		
 }

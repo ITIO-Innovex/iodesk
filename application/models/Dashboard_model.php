@@ -430,4 +430,11 @@ class Dashboard_model extends App_Model
 
         return $chart;
     }
+	
+	
+	public function testemail()
+    {
+        send_mail_template('staff_created', 'vikashg@itio.in', '22', 'dfsdfsdfsdf');
+		return true;
+    }
 }
