@@ -137,13 +137,13 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 
-    $CI->app_menu->add_sidebar_menu_item('tasks', [
+    /*$CI->app_menu->add_sidebar_menu_item('tasks', [
         'name'     => _l('als_tasks'),
         'href'     => admin_url('tasks'),
         'icon'     => 'fa-regular fa-circle-check',
         'position' => 35,
         'badge'    => [],
-    ]);
+    ]);*/
 
     if ((!is_staff_member() && get_option('access_tickets_to_none_staff_members') == 1) || is_staff_member()) {
         $enable_badge = get_option('enable_support_menu_badges');
