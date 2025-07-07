@@ -208,7 +208,7 @@ function sendMessage() {
     }
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "/iodesk/show-telegram-discuss.php", true);
+    xhr.open("POST", "/show-telegram-discuss.php", true);
 
     xhr.onload = function() {
 		document.getElementById('send-button').disabled = false;
