@@ -262,7 +262,7 @@ if(isset($chat_id)&&$chat_id)
 	function fetchData() {
 		$.ajax({
 			type: "POST",
-			url: "/iodesk/show-telegram-discuss.php",
+			url: "/show-telegram-discuss.php",
 			data: { chat_id: chat_id,telegram_token: telegram_token }
 		}).done(function(data) {
 			$('#message-container').html(data); // Update the content of the message container
