@@ -1,5 +1,6 @@
 <?php
 require_once "application/config/db.php";
+$companyId = 0;
 
 // Start logging
 file_put_contents(__DIR__ . '/telegram_webhook.log', "\n=== Webhook Triggered at " . date('Y-m-d H:i:s') . " ===\n", FILE_APPEND);
@@ -22,6 +23,9 @@ if (mysqli_num_rows($res) > 0) {
     $row = mysqli_fetch_assoc($res);
     $token = $row['telegram_token'];
     $botId = $row['id'];
+	if($botId == 5){
+		$companyId = 8;
+	}
     file_put_contents(__DIR__ . '/telegram_webhook.log', "Token Found: $token (Bot ID: $botId)\n", FILE_APPEND);
 } else {
     $token = "default-token-here";
@@ -89,8 +93,8 @@ if (isset($web_data->message->chat->id)) {
 
         } else {
             // Step 6: Insert new lead
-            $sqlLeadInsert = "INSERT INTO `it_crm_leads` (`name`, `dateadded`, `description`, `client_id`, `SkypeInfo`, `source`, `status`, `telegram_bot_id`) 
-                VALUES ('$name', NOW(), '$text', '$chat_id', '$username', 4, 2, '$botId')";
+            $sqlLeadInsert = "INSERT INTO `it_crm_leads` (`name`, `dateadded`, `description`, `client_id`, `SkypeInfo`, `source`, `status`, `telegram_bot_id`,`company_id`) 
+                VALUES ('$name', NOW(), '$text', '$chat_id', '$username', 4, 2, '$botId', '$companyId')";
             file_put_contents(__DIR__ . '/telegram_webhook.log', "Attempting lead insert:\n$sqlLeadInsert\n", FILE_APPEND);
 
             if (mysqli_query($conn, $sqlLeadInsert)) {
