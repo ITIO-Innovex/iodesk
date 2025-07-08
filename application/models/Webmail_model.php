@@ -409,28 +409,18 @@ foreach ($folders as $folder) {
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
 //// Fetch Emails
-      /*$pg=floor($last_email_id / 50) +1;
+      $pg=floor($last_email_id / 20) +1;
 	  $messages = $mailbox->query()
-    ->all()->limit($limit = 50, $page = $pg)
+    ->all()->limit($limit = 20, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
-    });*/
-
-
-try {	
-	$messages = $mailbox->query()
-    ->all()
-    ->limit(20) // fetch recent messages
-    ->get()
-    ->filter(fn($msg) => $msg->getUid() > $last_email_id);
+    });
 
 
 
 //print_r($messages);exit;
 foreach ($messages as $message) {
-
-
 
     $data['subject'] = $message->getSubject();
     $data['date'] = $message->getDate(); //->format('Y-m-d H:i:s')
@@ -495,11 +485,6 @@ foreach ($messages as $message) {
 		//echo $this->db->last_query();exit;
  
 }
-
-} catch (\Webklex\PHPIMAP\Exceptions\GetMessagesFailedException $e) {
-    echo "IMAP Exception: " . $e->getMessage();
-}
-
 //exit;	  
  //echo $folder." -> ". $cnt;
 	  
