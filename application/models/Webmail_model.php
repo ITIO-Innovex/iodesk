@@ -409,92 +409,82 @@ foreach ($folders as $folder) {
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
 //// Fetch Emails
-     $pg=floor($last_email_id / 20) +1;
-	 /*  $messages = $mailbox->query()
-    ->all()->limit($limit = 20, $page = $pg)
+//echo  $last_email_id."============>";exit;
+      $pg=floor($last_email_id / 50) +1;
+	  $messages = $mailbox->query()
+    ->all()->limit($limit = 50, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
-    });*/
+    });
 
-try {
-    $messages = $mailbox->query()
-        ->all()
-        ->limit($limit = 20, $page = $pg)
-        ->get()
-        ->filter(function($message) use ($last_email_id) {
-            return $message->getUid() > $last_email_id;
-        });
 
-		//print_r($messages);exit;
-		foreach ($messages as $message) {
+
+//print_r($messages);exit;
+foreach ($messages as $message) {
+
+    $data['subject'] = $message->getSubject();
+    $data['date'] = $message->getDate(); //->format('Y-m-d H:i:s')
+    $data['body'] = $message->getHtmlBody() ?? '';
+	if($data['body']==""){$data['body'] = $message->getTextBody() ?? ''; }
+	$data['uniqid'] = $message->uid;
+	$data['messageid'] = $message->getMessageId();
+	
+	
+	 // From
+    $from = $message->getFrom(); // Returns array of Address objects
+    $data['from_email'] = $from[0]->mail ?? '';
+    $data['from_name']  = $from[0]->personal ?? '';
+	//print_r($from);
+	//echo "<br><br>";
+	// To
+  
+	
+    $to_list = $message->getTo(); // Returns array of Address objects
+    $data['to_emails'] = $to_list[0]->mail ?? '';
+   
+	
+	
+   
+    $cc_list = $message->getCc(); // Returns array of Address objects
+    $data['cc_emails'] = $cc_list[0]->mail ?? '';
+	
+	
+  
+    // BCC
+	$bcc_list = $message->getBcc(); // Returns array of Address objects
+    $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+
+
+    // Handle attachments
+    $attachments_paths = [];
+    $data['isattachments']=0;
+	$uid=uniqid();
+	$attachmentDir = 'attachments';
+	$filePath = $attachmentDir . '/' . $uid;
+    foreach ($message->getAttachments() as $attachment) {
+    $attachments = $message->getAttachments();
 		
-			$data['subject'] = $message->getSubject();
-			$data['date'] = $message->getDate(); //->format('Y-m-d H:i:s')
-			$data['body'] = $message->getHtmlBody() ?? '';
-			if($data['body']==""){$data['body'] = $message->getTextBody() ?? ''; }
-			$data['uniqid'] = $message->uid;
-			$data['messageid'] = $message->getMessageId();
-			
-			
-			 // From
-			$from = $message->getFrom(); // Returns array of Address objects
-			$data['from_email'] = $from[0]->mail ?? '';
-			$data['from_name']  = $from[0]->personal ?? '';
-			//print_r($from);
-			//echo "<br><br>";
-			// To
-		  
-			
-			$to_list = $message->getTo(); // Returns array of Address objects
-			$data['to_emails'] = $to_list[0]->mail ?? '';
-		   
-			
-			
-		   
-			$cc_list = $message->getCc(); // Returns array of Address objects
-			$data['cc_emails'] = $cc_list[0]->mail ?? '';
-			
-			
-		  
-			// BCC
-			$bcc_list = $message->getBcc(); // Returns array of Address objects
-			$data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+		// Create directory if it doesn't exist
+					
+		foreach ($attachments as $attachment) {
 		
-		
-			// Handle attachments
-			$attachments_paths = [];
-			$data['isattachments']=0;
-			$uid=uniqid();
-			$attachmentDir = 'attachments';
-			$filePath = $attachmentDir . '/' . $uid;
-			foreach ($message->getAttachments() as $attachment) {
-			$attachments = $message->getAttachments();
+		if (!file_exists($filePath)) {
+		mkdir($filePath, 0777, true);
+		}	
 				
-				// Create directory if it doesn't exist
-							
-				foreach ($attachments as $attachment) {
-				
-				if (!file_exists($filePath)) {
-				mkdir($filePath, 0777, true);
-				}	
-						
-				$fileName = $attachment->name;
-				// Save the attachment
-				$attachment->save($filePath);
-				$data['isattachments']=1;
-				$attachments_paths[] = $filePath."/".$fileName;
-				}
-				$data['attachments'] = implode(',', $attachments_paths);//exit;
-		 }
-		 $cnt++;
-				$this->db->insert(db_prefix() . 'emails', $data);
-				//echo $this->db->last_query();exit;
-		 
+		$fileName = $attachment->name;
+		// Save the attachment
+		$attachment->save($filePath);
+		$data['isattachments']=1;
+		$attachments_paths[] = $filePath."/".$fileName;
 		}
-
-} catch (\Webklex\PHPIMAP\Exceptions\GetMessagesFailedException $e) {
-    echo "IMAP ERROR: " . $e->getMessage();exit;
+		$data['attachments'] = implode(',', $attachments_paths);//exit;
+ }
+ $cnt++;
+		$this->db->insert(db_prefix() . 'emails', $data);
+		//echo $this->db->last_query();exit;
+ 
 }
 //exit;	  
  //echo $folder." -> ". $cnt;

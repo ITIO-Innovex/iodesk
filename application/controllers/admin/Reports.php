@@ -24,8 +24,12 @@ class Reports extends AdminController
     /* No access on this url */
     public function index()
     {
-        redirect(admin_url());
+        $data['title']  = "Reports";
+        $this->load->view('admin/reports/home', $data);
     }
+	
+	
+	
 
     /* See knowledge base article reports*/
     public function knowledge_base_articles()
@@ -1215,6 +1219,17 @@ class Reports extends AdminController
     public function leads_monthly_report($month)
     {
         echo json_encode($this->reports_model->leads_monthly_report($month));
+    }
+
+    /**
+     * Expected Sales Report
+     */
+    public function expected_sales()
+    {
+        $this->load->model('leads_model');
+        $data['title'] = 'Expected Sales Report';
+        $data['deal_statuses'] = $this->leads_model->get_deal_status();
+        $this->load->view('admin/reports/expected_sales', $data);
     }
 
     private function distinct_taxes($rel_type)
