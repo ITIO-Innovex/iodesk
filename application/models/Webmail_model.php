@@ -409,8 +409,8 @@ foreach ($folders as $folder) {
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
 //// Fetch Emails
-     /* $pg=floor($last_email_id / 20) +1;
-	  $messages = $mailbox->query()
+     $pg=floor($last_email_id / 20) +1;
+	 /*  $messages = $mailbox->query()
     ->all()->limit($limit = 20, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
@@ -420,7 +420,7 @@ foreach ($folders as $folder) {
 try {
     $messages = $mailbox->query()
         ->all()
-        ->limit(20) // Fetch latest 20 messages
+        ->limit($limit = 20, $page = $pg)
         ->get()
         ->filter(function($message) use ($last_email_id) {
             return $message->getUid() > $last_email_id;
