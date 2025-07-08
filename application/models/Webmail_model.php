@@ -420,7 +420,7 @@ foreach ($folders as $folder) {
 try {
     $messages = $mailbox->query()
         ->all()
-        ->limit(200) // Fetch latest 200 messages
+        ->limit(20) // Fetch latest 20 messages
         ->get()
         ->filter(function($message) use ($last_email_id) {
             return $message->getUid() > $last_email_id;
