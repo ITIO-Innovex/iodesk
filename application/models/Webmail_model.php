@@ -421,13 +421,11 @@ foreach ($folders as $folder) {
 try {	
 	$messages = $mailbox->query()
     ->all()
-    ->limit(50) // fetch recent messages
+    ->limit(20) // fetch recent messages
     ->get()
     ->filter(fn($msg) => $msg->getUid() > $last_email_id);
 
-if ($messages->isEmpty()) {
-        echo "No messages found.";exit;
-    }
+
 
 //print_r($messages);exit;
 foreach ($messages as $message) {
