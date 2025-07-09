@@ -67,11 +67,11 @@ echo '<option value="' . $iid . '" selected>' . $leadsrs[0]['name'] .' - '.$lead
                     </div>
                 </div>
 				
-				<?php $contactid=$this->invoices_model->get_contact_id_from_leadid($leadid);?>
+				<?php $contactid=$this->invoices_model->get_contact_id_from_leadid($leadid); echo $leadid;?>
 				<div class="f_client_id">
                     <div class="form-group select-placeholder">
                         <label for="clientid" class="control-label"><?php echo _l('invoice_select_customer'); ?></label>
-                        <select id="clientid" name="clientid" data-live-search="true" data-width="100%" class="ajax-search<?php if (isset($invoice) && empty($invoice->clientid)) {
+                        <select id="clientid" name="clientid"  data-width="100%" class="ajax-search<?php if (isset($invoice) && empty($invoice->clientid)) {
                 echo ' customer-removed';
             } ?>" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>">
                             <?php echo $selected = (isset($invoice) ? $invoice->clientid : $contactid);

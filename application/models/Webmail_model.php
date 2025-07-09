@@ -410,13 +410,19 @@ foreach ($folders as $folder) {
 	 
 //// Fetch Emails
 //echo  $last_email_id."============>";exit;
-      $pg=floor($last_email_id / 50) +1;
+      
+	  
+	  
+try {
+     $pg=floor($last_email_id / 10) +1;	  
 	  $messages = $mailbox->query()
-    ->all()->limit($limit = 50, $page = $pg)
+    ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
     });
+	
+	
 
 
 
@@ -485,6 +491,11 @@ foreach ($messages as $message) {
 		$this->db->insert(db_prefix() . 'emails', $data);
 		//echo $this->db->last_query();exit;
  
+}
+
+} catch (\Webklex\PHPIMAP\Exceptions\GetMessagesFailedException $e) {
+    log_message('error', 'Failed to get messages: ' . $e->getMessage());
+    $messages = collect(); // fallback to empty collection
 }
 //exit;	  
  //echo $folder." -> ". $cnt;

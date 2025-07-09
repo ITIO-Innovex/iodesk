@@ -129,14 +129,14 @@ function app_init_admin_sidebar_menu_items()
     //     ]);
     // }
 
-    $CI->app_menu->add_sidebar_menu_item('projects', [
+    /*$CI->app_menu->add_sidebar_menu_item('projects', [
         'name'     => _l('projects'),
         'href'     => admin_url('projects'),
         'icon'     => 'fa-solid fa-chart-gantt',
         'position' => 30,
         'badge'    => [],
     ]);
-
+*/
     /*$CI->app_menu->add_sidebar_menu_item('tasks', [
         'name'     => _l('als_tasks'),
         'href'     => admin_url('tasks'),
