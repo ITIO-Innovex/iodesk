@@ -22,7 +22,7 @@ class Payments_model extends App_Model
         $this->db->order_by(db_prefix() . 'invoicepaymentrecords.id', 'asc');
         $this->db->where(db_prefix() . 'invoicepaymentrecords.id', $id);
 		if(!is_super()){
-		$this->db->where(db_prefix() .'invoicepaymentrecords.company_id', get_staff_company_id());
+		$this->db->where('company_id', get_staff_company_id());
 		}
         $payment = $this->db->get(db_prefix() . 'invoicepaymentrecords')->row();
         if (!$payment) {
@@ -48,33 +48,34 @@ class Payments_model extends App_Model
      * @return array
      */
     public function get_invoice_payments($invoiceid)
-    {
-        $this->db->select('*,' . db_prefix() . 'invoicepaymentrecords.id as paymentid');
-        $this->db->join(db_prefix() . 'payment_modes', db_prefix() . 'payment_modes.id = ' . db_prefix() . 'invoicepaymentrecords.paymentmode', 'left');
-        $this->db->order_by(db_prefix() . 'invoicepaymentrecords.id', 'asc');
-        $this->db->where('invoiceid', $invoiceid);
-		if(!is_super()){
-		$this->db->where('company_id', get_staff_company_id());
-		}
-        $payments = $this->db->get(db_prefix() . 'invoicepaymentrecords')->result_array();
-        // Since version 1.0.1
-        $this->load->model('payment_modes_model');
-        $payment_gateways = $this->payment_modes_model->get_payment_gateways(true);
-        $i                = 0;
-        foreach ($payments as $payment) {
-            if (is_null($payment['id'])) {
-                foreach ($payment_gateways as $gateway) {
-                    if ($payment['paymentmode'] == $gateway['id']) {
-                        $payments[$i]['id']   = $gateway['id'];
-                        $payments[$i]['name'] = $gateway['name'];
+        {
+            $this->db->select('*,' . db_prefix() . 'invoicepaymentrecords.id as paymentid');
+            $this->db->join(db_prefix() . 'payment_modes', db_prefix() . 'payment_modes.id = ' . db_prefix() . 'invoicepaymentrecords.paymentmode', 'left');
+            $this->db->order_by(db_prefix() . 'invoicepaymentrecords.id', 'asc');
+            $this->db->where(db_prefix() . 'invoicepaymentrecords.invoiceid', $invoiceid);
+            if (!is_super()) {
+                $this->db->where(db_prefix() . 'invoicepaymentrecords.company_id', get_staff_company_id());
+            }
+            $payments = $this->db->get(db_prefix() . 'invoicepaymentrecords')->result_array();
+
+            $this->load->model('payment_modes_model');
+            $payment_gateways = $this->payment_modes_model->get_payment_gateways(true);
+            $i = 0;
+            foreach ($payments as $payment) {
+                if (is_null($payment['id'])) {
+                    foreach ($payment_gateways as $gateway) {
+                        if ($payment['paymentmode'] == $gateway['id']) {
+                            $payments[$i]['id']   = $gateway['id'];
+                            $payments[$i]['name'] = $gateway['name'];
+                        }
                     }
                 }
+                $i++;
             }
-            $i++;
+
+            return $payments;
         }
 
-        return $payments;
-    }
 
     /**
      * Process invoice payment offline or online
