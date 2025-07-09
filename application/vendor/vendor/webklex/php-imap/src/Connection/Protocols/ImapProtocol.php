@@ -772,7 +772,12 @@ class ImapProtocol extends Protocol {
         } elseif (is_array($from) && count($from) === 1) {
             $set = $from[0] . ':' . $from[0];
         } elseif ($to === null) {
+            //$set = $from . ':' . $from;
+			if (is_array($from)) {
+            $set = implode(',', $from) . ':' . implode(',', $from);
+            } else {
             $set = $from . ':' . $from;
+            }
         } elseif ($to == INF) {
             $set = $from . ':*';
         } else {
