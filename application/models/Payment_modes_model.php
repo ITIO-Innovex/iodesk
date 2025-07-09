@@ -80,8 +80,19 @@ class Payment_modes_model extends App_Model
         if ($include_inactive !== true) {
             $this->db->where('active', 1);
         }
+		
+		          if (!is_super()) {
+				  $this->db->where('company_id', get_staff_company_id());
+				  }else{
+		          if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		          $this->db->where('company_id', $_SESSION['super_view_company_id']);
+	              }
+				  }
 
         $modes = $this->db->get(db_prefix() . 'payment_modes')->result_array();
+		//echo $this->db->last_query();exit;
+		
+		
         $modes = array_merge($modes, $this->get_payment_gateways($include_inactive));
 
         return $modes;

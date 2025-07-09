@@ -19,7 +19,7 @@ return $txt;
 <?php if (is_admin()) {  ?>
 <div class="tw-mb-2 sm:tw-mb-2" title="Update AI API KEY">
 <a class="btn btn-primar" onclick="edit_key(); return false;" style="float:right">
-<i class="fa fa-cog menu-icon tw-mr-1"></i></a>
+<i class="fa fa-cog menu-icon tw-mr-1 fa-2x tw-text-neutral-400"></i></a>
 
 </div>
 <div class="clearfix tw-mb-2"></div>
@@ -107,12 +107,12 @@ return $txt;
 				
                  
 <div class="table-responsive">
-<span>All fields is required</span>
+<span style=" float:right"><a href="https://platform.openai.com/api-keys" title="Generate API KEY" target="_blank">https://platform.openai.com/api-keys</a></span>
   <table class="table table-bordered roles no-margin">
     <tbody>
 	
       <tr data-name="bulk_pdf_exporter">
-        <td><?php echo render_input('apikey', 'Name','', 'text', ['required' => 'true']); ?></td>
+        <td><?php echo render_input('apikey', 'Chatgtp API Key','', 'text', ['required' => 'true']); ?></td>
       </tr>
 
 </tbody>
