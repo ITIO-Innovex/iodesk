@@ -22,7 +22,7 @@ class Payments_model extends App_Model
         $this->db->order_by(db_prefix() . 'invoicepaymentrecords.id', 'asc');
         $this->db->where(db_prefix() . 'invoicepaymentrecords.id', $id);
 		if(!is_super()){
-		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where(db_prefix() .'company_master.company_id', get_staff_company_id());
 		}
         $payment = $this->db->get(db_prefix() . 'invoicepaymentrecords')->row();
         if (!$payment) {
@@ -54,7 +54,7 @@ class Payments_model extends App_Model
         $this->db->order_by(db_prefix() . 'invoicepaymentrecords.id', 'asc');
         $this->db->where('invoiceid', $invoiceid);
 		if(!is_super()){
-		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where(db_prefix() .'company_master.company_id', get_staff_company_id());
 		}
         $payments = $this->db->get(db_prefix() . 'invoicepaymentrecords')->result_array();
         // Since version 1.0.1
@@ -466,7 +466,7 @@ class Payments_model extends App_Model
             'invoiceid' => $invoiceid,
         ]);
         $this->db->where('id', $id);
-		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where(db_prefix() .'company_master.company_id', get_staff_company_id());
         $this->db->delete(db_prefix() . 'invoicepaymentrecords');
         if ($this->db->affected_rows() > 0) {
             update_invoice_status($invoiceid);
