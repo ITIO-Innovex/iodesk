@@ -1,4 +1,5 @@
 application/logs
+attachments/
 
 # Ignore all .log files
 *.log

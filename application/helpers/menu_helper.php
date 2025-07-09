@@ -387,7 +387,6 @@ function app_init_admin_sidebar_menu_items()
 
     if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
         $CI->app_menu->add_sidebar_menu_item('reports', [
-            'collapse' => true,
             'name'     => _l('als_reports'),
             'href'     => admin_url('reports'),
             'icon'     => 'fa-regular fa-chart-bar',
@@ -396,7 +395,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
-    if (staff_can('view-timesheets', 'reports')) {
+   /* if (staff_can('view-timesheets', 'reports')) {
         $CI->app_menu->add_sidebar_children_item('reports', [
             'slug'     => 'timesheets-reports',
             'name'     => _l('timesheets_overview'),
@@ -404,9 +403,9 @@ function app_init_admin_sidebar_menu_items()
             'position' => 25,
             'badge'    => [],
         ]);
-    }
+    }*/
 
-    if (staff_can('view',  'reports')) {
+    /*if (staff_can('view',  'reports')) {
         $CI->app_menu->add_sidebar_children_item('reports', [
             'slug'     => 'sales-reports',
             'name'     => _l('als_reports_sales_submenu'),
@@ -442,7 +441,7 @@ function app_init_admin_sidebar_menu_items()
             'position' => 30,
             'badge'    => [],
         ]);
-    }
+    }*/
 
     // Setup menu
 	if(get_staff_user_id()==1 && empty($_SESSION['super_view_company_id'])){

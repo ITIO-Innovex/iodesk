@@ -409,6 +409,7 @@ foreach ($folders as $folder) {
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
 //// Fetch Emails
+//echo  $last_email_id."============>";exit;
       $pg=floor($last_email_id / 50) +1;
 	  $messages = $mailbox->query()
     ->all()->limit($limit = 50, $page = $pg)
