@@ -194,6 +194,20 @@ $route['admin/leads/discussion/(:num)?'] = 'admin/leads/discussion/$1';
 //for discussion via webchats
 $route['admin/leads/webchat/(:num)?'] = 'admin/leads/webchat/$1';
 
+// Add these for deal stage management
+$route['admin/leads/dealstage'] = 'admin/leads/dealstage';
+$route['admin/leads/delete_deal_stage/(:num)'] = 'admin/leads/delete_deal_stage/$1';
+$route['admin/leads/toggle_deal_stage_status/(:num)'] = 'admin/leads/toggle_deal_stage_status/$1';
+
+// Reports routes
+$route['admin/reports/leads_by_stage'] = 'admin/reports/leads_by_stage';
+$route['admin/reports/leads_by_source'] = 'admin/reports/leads_by_source';
+$route['admin/reports/leads_by_country'] = 'admin/reports/leads_by_country';
+$route['admin/reports/leads_by_country_details'] = 'admin/reports/leads_by_country_details';
+$route['admin/reports/deals_by_company'] = 'admin/reports/deals_by_company';
+$route['admin/reports/activity_by_staff'] = 'admin/reports/activity_by_staff';
+$route['admin/reports/sales_by_payments'] = 'admin/reports/sales_by_payments';
+
 if (file_exists(APPPATH . 'config/my_routes.php')) {
     include_once(APPPATH . 'config/my_routes.php');
 }

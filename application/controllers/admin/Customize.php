@@ -17,6 +17,10 @@ class Customize extends AdminController
         if (staff_cant('view', 'settings')) {
             access_denied('settings');
         }
+		
+		if(is_super()){
+		redirect(admin_url('settings'), 'refresh');
+		}
 
         $company_id = get_staff_company_id();
         $company = $this->staff_model->getcompany($company_id);

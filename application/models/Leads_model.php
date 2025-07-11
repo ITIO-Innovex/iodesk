@@ -2432,4 +2432,9 @@ $diffInHours = round($diffInSeconds / 3600);
 
 
 }
+
+    public function get_deal_stage()
+    {
+        return $this->db->select('*')->get('it_crm_deals_stage')->result_array();
+    }
 }

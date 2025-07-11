@@ -2047,4 +2047,64 @@ class Leads extends AdminController
             ]);
         }
     }
+
+    /* View Deal Stage */
+    public function deal_stage()
+    {
+        if (!is_admin()) {
+            access_denied('Deal Stage');
+        }
+        $data['stages'] = $this->leads_model->get_deal_stage();
+        $data['title']    = 'Deal Stage';
+        $this->load->view('admin/leads/deal_stage', $data);
+    }
+
+    // Add/Edit Deal Stage
+    public function dealstage()
+    {
+        if (!is_admin()) {
+            access_denied('Deal Stage');
+        }
+        $id = $this->input->post('id');
+        $data = [
+            'stage' => $this->input->post('name'),
+            'color' => $this->input->post('color'),
+            'statusorder' => $this->input->post('statusorder'),
+            'status' => $this->input->post('status') == '1' ? 1 : 0,
+        ];
+        if ($id) {
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_deals_stage', $data);
+            set_alert('success', 'Deal stage updated successfully');
+        } else {
+            $this->db->insert('it_crm_deals_stage', $data);
+            set_alert('success', 'Deal stage added successfully');
+        }
+        redirect(admin_url('leads/deal_stage'));
+    }
+
+    // Delete Deal Stage
+    public function delete_deal_stage($id)
+    {
+        if (!is_admin()) {
+            access_denied('Deal Stage');
+        }
+        $this->db->where('id', $id);
+        $this->db->delete('it_crm_deals_stage');
+        set_alert('success', 'Deal stage deleted successfully');
+        redirect(admin_url('leads/deal_stage'));
+    }
+
+    // Toggle Deal Stage Status (AJAX)
+    public function toggle_deal_stage_status($id)
+    {
+        if (!is_admin()) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $new_status = $this->input->post('status') == 1 ? 1 : 0;
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_deals_stage', ['status' => $new_status]);
+        echo json_encode(['success' => true, 'new_status' => $new_status]);
+    }
 }

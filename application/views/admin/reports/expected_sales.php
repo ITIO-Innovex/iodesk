@@ -5,6 +5,7 @@
     
 <div id="wrapper">
   <div class="content">
+  <?php $this->load->view('admin/reports/includes/menu'); ?>
     <div class="row">
       <div class="col-md-12">
         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center">
