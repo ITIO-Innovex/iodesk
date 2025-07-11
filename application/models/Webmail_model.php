@@ -172,7 +172,7 @@ class Webmail_model extends App_Model
 		          if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 		          $this->db->where('company_id', $_SESSION['super_view_company_id']);
 	              }
-		}
+		          }
 
         $this->db->order_by('id', 'asc');
 		$this->db->group_by('mailer_email');

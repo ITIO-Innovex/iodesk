@@ -4069,4 +4069,9 @@ $lang['select_staff'] = 'Select Staff';
 
 $lang['yes'] = 'Yes';
 $lang['no'] = 'No';
+
+// Leads by Stage Report
+$lang['no_leads_found_for_selected_period'] = 'No leads found for the selected period';
+$lang['percentage'] = 'Percentage';
+$lang['leads_source_table_name'] = 'Source Name';
 ?>

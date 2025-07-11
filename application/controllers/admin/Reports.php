@@ -1232,6 +1232,191 @@ class Reports extends AdminController
         $this->load->view('admin/reports/expected_sales', $data);
     }
 
+    /**
+     * Leads by Stage Report
+     */
+    public function leads_by_stage()
+    {
+        $this->load->model('leads_model');
+        $data['title'] = 'Leads by Stage Report';
+        $data['statuses'] = $this->leads_model->get_status();
+        
+        // Get period from URL parameter
+        $period = $this->input->get('period') ?: 'this_month';
+        $data['selected_period'] = $period;
+        
+        // Get leads data for the selected period
+        $data['leads_by_stage_data'] = $this->reports_model->get_leads_by_stage_data($period);
+        
+        $this->load->view('admin/reports/leads_by_stage', $data);
+    }
+
+    /**
+     * Leads by Source Report
+     */
+    public function leads_by_source()
+    {
+        $this->load->model('leads_model');
+        $data['title'] = 'Leads by Source Report';
+        $data['sources'] = $this->leads_model->get_source();
+        
+        // Get period from URL parameter
+        $period = $this->input->get('period') ?: 'this_month';
+        $data['selected_period'] = $period;
+        
+        // Get leads data for the selected period
+        $data['leads_by_source_data'] = $this->reports_model->get_leads_by_source_data($period);
+        
+        $this->load->view('admin/reports/leads_by_source', $data);
+    }
+
+    /**
+     * Leads by Country Report
+     */
+    public function leads_by_country()
+    {
+        $this->load->model('leads_model');
+        $data['title'] = 'Leads by Country Report';
+        // Get period from URL parameter
+        $period = $this->input->get('period') ?: 'this_month';
+        $data['selected_period'] = $period;
+        // Get leads data for the selected period
+        $data['leads_by_country_data'] = $this->reports_model->get_leads_by_country_data($period);
+        $this->load->view('admin/reports/leads_by_country', $data);
+    }
+
+    /**
+     * AJAX: Get leads for a specific country and period
+     */
+    public function leads_by_country_details()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+        $country_id = $this->input->get('country_id');
+        $period = $this->input->get('period') ?: 'this_month';
+        $leads = $this->reports_model->get_leads_for_country($country_id, $period);
+        echo json_encode(['success' => true, 'leads' => $leads]);
+        die();
+    }
+
+    /**
+     * Deals by Company Report
+     */
+    public function deals_by_company()
+    {
+        $this->load->model('leads_model');
+        $data['title'] = 'Deals by Company Report';
+        $period = $this->input->get('period') ?: 'this_month';
+        $data['selected_period'] = $period;
+        $data['deals_by_company_data'] = $this->reports_model->get_deals_by_company_data($period);
+        $this->load->view('admin/reports/deals_by_company', $data);
+    }
+
+    /**
+     * Deals by Status Report
+     */
+    public function deals_by_status()
+    {
+        $this->load->model('leads_model');
+        $data['title'] = 'Deals by Status Report';
+        $data['deal_statuses'] = $this->leads_model->get_deal_status();
+        $period = $this->input->get('period') ?: 'this_month';
+        $data['selected_period'] = $period;
+        $data['deals_by_status_data'] = $this->reports_model->get_deals_by_status_data($period);
+        $this->load->view('admin/reports/deals_by_status', $data);
+    }
+
+    /**
+     * Deals by Staff Report
+     */
+    public function deals_by_staff()
+    {
+        $this->load->model('leads_model');
+        $this->load->model('staff_model');
+        $data['title'] = 'Deals by Staff Report';
+        $period = $this->input->get('period') ?: 'this_month';
+        $data['selected_period'] = $period;
+        $data['deals_by_staff_data'] = $this->reports_model->get_deals_by_staff_data($period);
+        $data['deals_by_staff_status_table'] = $this->reports_model->get_deals_by_staff_status_table($period);
+        //$data['staff_list'] = $this->staff_model->get('', ['active' => 1]);
+        //$data['deal_statuses'] = ['New', 'Documentation', 'UW', 'Final Invoice'];
+        $this->load->view('admin/reports/deals_by_staff', $data);
+    }
+
+    /**
+     * Sales by Invoice Report
+     */
+    public function sales_by_invoice()
+    {
+        $this->load->model('invoices_model');
+        $this->load->model('clients_model');
+        $data['title'] = 'Sales by Invoice Report';
+        
+        // Get period from URL parameter, default to 'all'
+        $period = $this->input->get('period') ?: 'all';
+        $data['selected_period'] = $period;
+        
+        $data['status_distribution'] = $this->reports_model->get_invoice_status_distribution($period);
+        $data['approver_status_distribution'] = $this->reports_model->get_invoice_approver_status_distribution($period);
+        $data['invoice_table'] = $this->reports_model->get_invoice_table_data($period);
+        $this->load->view('admin/reports/sales_by_invoice', $data);
+    }
+
+    /**
+     * Invoice by Staff Report
+     */
+    public function invoice_by_staff()
+    {
+        $this->load->model('staff_model');
+        $data['title'] = 'Invoice by Staff Report';
+        
+        // Get period from URL parameter, default to 'all'
+        $period = $this->input->get('period') ?: 'all';
+        $data['selected_period'] = $period;
+        
+        $data['invoices_by_staff_data'] = $this->reports_model->get_invoices_by_staff_data($period);
+        $data['invoices_by_staff_status_table'] = $this->reports_model->get_invoices_by_staff_status_table($period);
+        $data['staff_list'] = $this->staff_model->get('', ['active' => 1]);
+        $data['invoice_statuses'] = ['Unpaid', 'Paid', 'Partially Paid', 'Overdue', 'Cancelled'];
+        $this->load->view('admin/reports/invoice_by_staff', $data);
+    }
+
+    /**
+     * Activity by Staff Report
+     */
+    public function activity_by_staff()
+    {
+        $this->load->model('staff_model');
+        $data['title'] = 'Activity by Staff Report';
+        
+        // Get period from URL parameter, default to 'all'
+        $period = $this->input->get('period') ?: 'all';
+        $data['selected_period'] = $period;
+        
+        $data['activity_by_staff_data'] = $this->reports_model->get_activity_by_staff_data($period);
+        $data['activity_by_staff_table'] = $this->reports_model->get_activity_by_staff_table($period);
+        $data['staff_list'] = $this->staff_model->get('', ['active' => 1]);
+        $this->load->view('admin/reports/activity_by_staff', $data);
+    }
+
+    /**
+     * Sales by Payments Report
+     */
+    public function sales_by_payments()
+    {
+        $data['title'] = 'Sales by Payments Report';
+        
+        // Get period from URL parameter, default to 'all'
+        $period = $this->input->get('period') ?: 'all';
+        $data['selected_period'] = $period;
+        
+        $data['sales_by_payments_data'] = $this->reports_model->get_sales_by_payments_data($period);
+        $data['sales_by_payments_table'] = $this->reports_model->get_sales_by_payments_table($period);
+        $data['base_currency'] = get_base_currency();
+        $this->load->view('admin/reports/sales_by_payments', $data);
+    }
+
     private function distinct_taxes($rel_type)
     {
         return $this->db->query('SELECT DISTINCT taxname,taxrate FROM ' . db_prefix() . "item_tax WHERE rel_type='" . $rel_type . "' ORDER BY taxname ASC")->result_array();

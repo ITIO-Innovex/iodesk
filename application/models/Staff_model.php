@@ -394,7 +394,9 @@ class Staff_model extends App_Model
         }
 		//echo "===========>>>";exit;
 		if(is_super()){
-		//$this->db->where('staffid', $id);
+		          if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		          $this->db->where('company_id', $_SESSION['super_view_company_id']);
+	              }
 		}elseif(is_admin()){
 		$this->db->where('company_id', $companyid);
 		}else{
@@ -403,8 +405,8 @@ class Staff_model extends App_Model
         $this->db->order_by('firstname', 'desc');
 		
 		//echo $this->db->get_compiled_select();
-        return $this->db->get(db_prefix() . 'staff')->result_array();
-		//print_r($xx);exit;
+        $res= $this->db->get(db_prefix() . 'staff')->result_array();
+		return $res;//exit;
 		//echo $this->db->last_query();exit;//return
     }
 

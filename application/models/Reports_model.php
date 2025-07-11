@@ -600,7 +600,211 @@ class Reports_model extends App_Model
 
     public function get_distinct_payments_years()
     {
-        return $this->db->query('SELECT DISTINCT(YEAR(date)) as year FROM ' . db_prefix() . 'invoicepaymentrecords')->result_array();
+        return $this->db->query('SELECT DISTINCT(YEAR(date)) as year FROM ' . db_prefix() . 'invoicepaymentrecords ORDER BY year DESC')->result_array();
+    }
+
+    /**
+     * Get leads by stage data for different periods
+     * @param string $period
+     * @return array
+     */
+    public function get_leads_by_stage_data($period = 'this_month')
+    {
+        $this->load->model('leads_model');
+        $statuses = $this->leads_model->get_status();
+        $data = [];
+        // Set date conditions based on period
+        switch ($period) {
+            case 'this_week':
+                $date_start = date('Y-m-d', strtotime('monday this week'));
+                $date_end = date('Y-m-d', strtotime('sunday this week'));
+                break;
+            case 'last_week':
+                $date_start = date('Y-m-d', strtotime('monday last week'));
+                $date_end = date('Y-m-d', strtotime('sunday last week'));
+                break;
+            case 'last_month':
+                $month = date('n', strtotime('last month'));
+                $year = date('Y', strtotime('last month'));
+                break;
+            case 'current_year':
+                $year = date('Y');
+                break;
+            case 'all':
+                // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $month = date('n');
+                $year = date('Y');
+                break;
+        }
+        foreach ($statuses as $status) {
+            $this->db->select('COUNT(*) as total');
+            $this->db->from(db_prefix() . 'leads');
+            $this->db->where('status', $status['id']);
+            // Date filter
+            if (isset($date_start) && isset($date_end)) {
+                $this->db->where('DATE(dateadded) >=', $date_start);
+                $this->db->where('DATE(dateadded) <=', $date_end);
+            } elseif (isset($month) && isset($year)) {
+                $this->db->where('MONTH(dateadded)', $month);
+                $this->db->where('YEAR(dateadded)', $year);
+            } elseif (isset($year)) {
+                $this->db->where('YEAR(dateadded)', $year);
+            }
+            // Add company filter
+            if (!is_super()) {
+                $this->db->where('company_id', get_staff_company_id());
+            } else {
+                if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                }
+            }
+            $result = $this->db->get()->row();
+            $data[] = [
+                'status_name' => $status['name'],
+                'status_color' => $status['color'],
+                'total' => $result->total,
+                'status_id' => $status['id']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get leads by source data for different periods
+     * @param string $period
+     * @return array
+     */
+    public function get_leads_by_source_data($period = 'this_month')
+    {
+        $this->load->model('leads_model');
+        $sources = $this->leads_model->get_source();
+        $data = [];
+        // Set date conditions based on period
+        switch ($period) {
+            case 'this_week':
+                $date_start = date('Y-m-d', strtotime('monday this week'));
+                $date_end = date('Y-m-d', strtotime('sunday this week'));
+                break;
+            case 'last_week':
+                $date_start = date('Y-m-d', strtotime('monday last week'));
+                $date_end = date('Y-m-d', strtotime('sunday last week'));
+                break;
+            case 'last_month':
+                $month = date('n', strtotime('last month'));
+                $year = date('Y', strtotime('last month'));
+                break;
+            case 'current_year':
+                $year = date('Y');
+                break;
+            case 'all':
+                // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $month = date('n');
+                $year = date('Y');
+                break;
+        }
+        // Get data for each source
+        foreach ($sources as $source) {
+            $this->db->select('COUNT(*) as total');
+            $this->db->from(db_prefix() . 'leads');
+            $this->db->where('source', $source['id']);
+            // Date filter
+            if (isset($date_start) && isset($date_end)) {
+                $this->db->where('DATE(dateadded) >=', $date_start);
+                $this->db->where('DATE(dateadded) <=', $date_end);
+            } elseif (isset($month) && isset($year)) {
+                $this->db->where('MONTH(dateadded)', $month);
+                $this->db->where('YEAR(dateadded)', $year);
+            } elseif (isset($year)) {
+                $this->db->where('YEAR(dateadded)', $year);
+            }
+            // Add company filter
+            if (!is_super()) {
+                $this->db->where('company_id', get_staff_company_id());
+            } else {
+                if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                }
+            }
+            $result = $this->db->get()->row();
+            $data[] = [
+                'source_name' => $source['name'],
+                'source_color' => $source['color'] ?? '#757575',
+                'total' => $result->total,
+                'source_id' => $source['id']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get leads by country data for different periods
+     * @param string $period
+     * @return array
+     */
+    public function get_leads_by_country_data($period = 'this_month')
+    {
+        $this->load->model('leads_model');
+        $data = [];
+        // Set date conditions based on period
+        switch ($period) {
+            case 'this_week':
+                $this->db->where('DATE(dateadded) >=', date('Y-m-d', strtotime('monday this week')));
+                $this->db->where('DATE(dateadded) <=', date('Y-m-d', strtotime('sunday this week')));
+                break;
+            case 'last_week':
+                $this->db->where('DATE(dateadded) >=', date('Y-m-d', strtotime('monday last week')));
+                $this->db->where('DATE(dateadded) <=', date('Y-m-d', strtotime('sunday last week')));
+                break;
+            case 'last_month':
+                $this->db->where('MONTH(dateadded)', date('n', strtotime('last month')));
+                $this->db->where('YEAR(dateadded)', date('Y', strtotime('last month')));
+                break;
+            case 'current_year':
+                $this->db->where('YEAR(dateadded)', date('Y'));
+                break;
+            case 'all':
+                // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $this->db->where('MONTH(dateadded)', date('n'));
+                $this->db->where('YEAR(dateadded)', date('Y'));
+                break;
+        }
+        // Add company filter
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            }
+        }
+        $this->db->select('country, COUNT(*) as total');
+        $this->db->from(db_prefix() . 'leads');
+        $this->db->group_by('country');
+        $this->db->having('total > 0');
+        $this->db->order_by('total', 'DESC');
+        $results = $this->db->get()->result_array();
+        // Optionally, get country names from a helper or config
+        foreach ($results as $row) {
+            $country_id = $row['country'];
+            $country_name = 'Unknown';
+            if (isset($country_id) && $country_id) {
+                $country_name = get_country_name($country_id);
+            }
+            $data[] = [
+                'country_id' => $country_id,
+                'country_name' => $country_name,
+                'total' => $row['total']
+            ];
+        }
+        return $data;
     }
 
     public function get_distinct_customer_invoices_years()
@@ -626,5 +830,729 @@ class Reports_model extends App_Model
         }
 
         return $refunds_amount;
+    }
+
+    /**
+     * Get leads for a specific country and period
+     * @param int $country_id
+     * @param string $period
+     * @return array
+     */
+    public function get_leads_for_country($country_id, $period = 'this_month')
+    {
+        $this->load->model('leads_model');
+        // Set date conditions based on period
+        $date_condition = '';
+        switch ($period) {
+            case 'this_week':
+                $date_condition = " AND DATE(dateadded) >= '" . date('Y-m-d', strtotime('monday this week')) . "' AND DATE(dateadded) <= '" . date('Y-m-d', strtotime('sunday this week')) . "'";
+                break;
+            case 'last_week':
+                $date_condition = " AND DATE(dateadded) >= '" . date('Y-m-d', strtotime('monday last week')) . "' AND DATE(dateadded) <= '" . date('Y-m-d', strtotime('sunday last week')) . "'";
+                break;
+            case 'last_month':
+                $date_condition = " AND MONTH(dateadded) = " . date('n', strtotime('last month')) . " AND YEAR(dateadded) = " . date('Y', strtotime('last month'));
+                break;
+            case 'current_year':
+                $date_condition = " AND YEAR(dateadded) = " . date('Y');
+                break;
+            case 'all':
+                $date_condition = ""; // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $date_condition = " AND MONTH(dateadded) = " . date('n') . " AND YEAR(dateadded) = " . date('Y');
+                break;
+        }
+        // Add company filter
+        $company_filter = '';
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        } elseif (is_admin()) {
+            $company_filter = ' AND company_id = ' . get_staff_company_id();
+        } else {
+            $company_filter = ' AND company_id = ' . get_staff_company_id() . ' AND assigned = ' . get_staff_user_id();
+        }
+        $sql = "SELECT id, name, email, status, dateadded FROM " . db_prefix() . "leads WHERE country = " . (int)$country_id . " " . $date_condition . $company_filter . " ORDER BY dateadded DESC";
+        $results = $this->db->query($sql)->result_array();
+        // Optionally, get status names
+        $statuses = $this->leads_model->get_status();
+        $status_map = [];
+        foreach ($statuses as $s) {
+            $status_map[$s['id']] = $s['name'];
+        }
+        foreach ($results as &$lead) {
+            $lead['status_name'] = isset($status_map[$lead['status']]) ? $status_map[$lead['status']] : '';
+            $lead['dateadded'] = _dt($lead['dateadded']);
+        }
+        return $results;
+    }
+
+    /**
+     * Get deals by company data for different periods
+     * @param string $period
+     * @return array
+     */
+    public function get_deals_by_company_data($period = 'this_month')
+    {
+        $this->load->model('leads_model');
+        $data = [];
+        // Set date conditions based on period
+        switch ($period) {
+            case 'this_week':
+                $this->db->where('DATE(dateadded) >=', date('Y-m-d', strtotime('monday this week')));
+                $this->db->where('DATE(dateadded) <=', date('Y-m-d', strtotime('sunday this week')));
+                break;
+            case 'last_week':
+                $this->db->where('DATE(dateadded) >=', date('Y-m-d', strtotime('monday last week')));
+                $this->db->where('DATE(dateadded) <=', date('Y-m-d', strtotime('sunday last week')));
+                break;
+            case 'last_month':
+                $this->db->where('MONTH(dateadded)', date('n', strtotime('last month')));
+                $this->db->where('YEAR(dateadded)', date('Y', strtotime('last month')));
+                break;
+            case 'current_year':
+                $this->db->where('YEAR(dateadded)', date('Y'));
+                break;
+            case 'all':
+                // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $this->db->where('MONTH(dateadded)', date('n'));
+                $this->db->where('YEAR(dateadded)', date('Y'));
+                break;
+        }
+        // Add company filter
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            }
+        }
+        $this->db->select('company_id, COUNT(*) as total');
+        $this->db->from(db_prefix() . 'leads');
+        $this->db->where('is_deal', 1);
+        $this->db->group_by('company_id');
+        $this->db->having('total > 0');
+        $this->db->order_by('total', 'DESC');
+        $results = $this->db->get()->result_array();
+		//print_r($results);
+		//echo $this->db->last_query();exit;
+        // Optionally, get company names
+        foreach ($results as $row) {
+            $company_id = $row['company_id'];
+            $company_name = get_staff_company_name($company_id);
+            // Try to get company name from leads_model if available
+            
+            $data[] = [
+                'company_id' => $company_id,
+                'company_name' => $company_name,
+                'total' => $row['total']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get deals by status data for different periods
+     * @param string $period
+     * @return array
+     */
+    public function get_deals_by_status_data($period = 'this_month')
+    {
+        $this->load->model('leads_model');
+        $statuses = $this->leads_model->get_deal_status();
+        $data = [];
+        // Set date conditions based on period
+        $date_condition = '';
+        switch ($period) {
+            case 'this_week':
+                $date_condition = " AND DATE(dateadded) >= '" . date('Y-m-d', strtotime('monday this week')) . "' AND DATE(dateadded) <= '" . date('Y-m-d', strtotime('sunday this week')) . "'";
+                break;
+            case 'last_week':
+                $date_condition = " AND DATE(dateadded) >= '" . date('Y-m-d', strtotime('monday last week')) . "' AND DATE(dateadded) <= '" . date('Y-m-d', strtotime('sunday last week')) . "'";
+                break;
+            case 'last_month':
+                $date_condition = " AND MONTH(dateadded) = " . date('n', strtotime('last month')) . " AND YEAR(dateadded) = " . date('Y', strtotime('last month'));
+                break;
+            case 'current_year':
+                $date_condition = " AND YEAR(dateadded) = " . date('Y');
+                break;
+            case 'all':
+                $date_condition = ""; // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $date_condition = " AND MONTH(dateadded) = " . date('n') . " AND YEAR(dateadded) = " . date('Y');
+                break;
+        }
+        // Get data for each deal status
+        foreach ($statuses as $status) {
+            $this->db->select('COUNT(*) as total');
+            $this->db->from(db_prefix() . 'leads');
+            $this->db->where('deal_status', $status['id']);
+            $this->db->where('is_deal', 1);
+            //$this->db->where('lost', 0); // Exclude lost deals
+            //$this->db->where('junk', 0); // Exclude junk deals
+            
+            // Add company filter
+            if (!is_super()) {
+                $this->db->where('company_id', get_staff_company_id());
+            } else {
+                if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                }
+            }
+            
+            // Apply date filter
+            if ($period != 'all') {
+                switch ($period) {
+                    case 'this_month':
+                        $this->db->where('dateadded >=', date('Y-m-01'));
+                        break;
+                    case 'last_month':
+                        $this->db->where('dateadded >=', date('Y-m-01', strtotime('last month')));
+                        $this->db->where('dateadded <', date('Y-m-01'));
+                        break;
+                    case 'this_week':
+                        $this->db->where('dateadded >=', date('Y-m-d', strtotime('monday this week')));
+                        break;
+                    case 'last_week':
+                        $this->db->where('dateadded >=', date('Y-m-d', strtotime('monday last week')));
+                        $this->db->where('dateadded <', date('Y-m-d', strtotime('monday this week')));
+                        break;
+                    case 'current_year':
+                        $this->db->where('dateadded >=', date('Y-01-01'));
+                        break;
+                }
+            }
+            
+            $result = $this->db->get()->row();
+            $data[] = [
+                'status_name' => $status['name'],
+                'status_color' => $status['color'],
+                'total' => $result->total,
+                'status_id' => $status['id']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get deals count by staff for the selected period
+     */
+    public function get_deals_by_staff_data($period = 'this_month')
+    {
+        $this->load->model('staff_model');
+        $data = [];
+        // Set date conditions based on period
+        switch ($period) {
+            case 'this_week':
+                $this->db->where('DATE(dateadded) >=', date('Y-m-d', strtotime('monday this week')));
+                $this->db->where('DATE(dateadded) <=', date('Y-m-d', strtotime('sunday this week')));
+                break;
+            case 'last_week':
+                $this->db->where('DATE(dateadded) >=', date('Y-m-d', strtotime('monday last week')));
+                $this->db->where('DATE(dateadded) <=', date('Y-m-d', strtotime('sunday last week')));
+                break;
+            case 'last_month':
+                $this->db->where('MONTH(dateadded)', date('n', strtotime('last month')));
+                $this->db->where('YEAR(dateadded)', date('Y', strtotime('last month')));
+                break;
+            case 'current_year':
+                $this->db->where('YEAR(dateadded)', date('Y'));
+                break;
+            case 'all':
+                // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $this->db->where('MONTH(dateadded)', date('n'));
+                $this->db->where('YEAR(dateadded)', date('Y'));
+                break;
+        }
+        // Add company filter
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            }
+        }
+        $this->db->select('assigned, COUNT(*) as total');
+        $this->db->from(db_prefix() . 'leads');
+        $this->db->where('is_deal', 1);
+        $this->db->group_by('assigned');
+        $this->db->having('total > 0');
+        $this->db->order_by('total', 'DESC');
+        $results = $this->db->get()->result_array();
+        foreach ($results as $row) {
+            $staff = $this->staff_model->get($row['assigned']);
+            $staff_name = $staff ? $staff->full_name : 'Unknown';
+            $data[] = [
+                'staff_id' => $row['assigned'],
+                'staff_name' => $staff_name,
+                'total' => $row['total']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get deals by staff and status for the table
+     */
+    public function get_deals_by_staff_status_table($period = 'this_month')
+    {
+        $data = [];
+        // Set date conditions based on period
+        $date_condition = '';
+        switch ($period) {
+            case 'this_week':
+                $date_condition = " AND DATE(dateadded) >= '" . date('Y-m-d', strtotime('monday this week')) . "' AND DATE(dateadded) <= '" . date('Y-m-d', strtotime('sunday this week')) . "'";
+                break;
+            case 'last_week':
+                $date_condition = " AND DATE(dateadded) >= '" . date('Y-m-d', strtotime('monday last week')) . "' AND DATE(dateadded) <= '" . date('Y-m-d', strtotime('sunday last week')) . "'";
+                break;
+            case 'last_month':
+                $date_condition = " AND MONTH(dateadded) = " . date('n', strtotime('last month')) . " AND YEAR(dateadded) = " . date('Y', strtotime('last month'));
+                break;
+            case 'current_year':
+                $date_condition = " AND YEAR(dateadded) = " . date('Y');
+                break;
+            case 'all':
+                $date_condition = ""; // No date filter for all time
+                break;
+            case 'this_month':
+            default:
+                $date_condition = " AND MONTH(dateadded) = " . date('n') . " AND YEAR(dateadded) = " . date('Y');
+                break;
+        }
+        // Get all staff with at least one assigned deal
+        $sql = "SELECT assigned FROM " . db_prefix() . "leads WHERE is_deal=1 " . $date_condition . " GROUP BY assigned";
+        $staffs = $this->db->query($sql)->result_array();
+		//print_r($staffs);exit;
+        foreach ($staffs as $s) {
+           $staff_id = $s['assigned'];
+            
+            
+                $this->db->select('assigned,
+    COUNT(CASE WHEN deal_status = 1 THEN 1 END) AS status_new,
+    COUNT(CASE WHEN deal_status = 2 THEN 1 END) AS status_doc,
+    COUNT(CASE WHEN deal_status = 3 THEN 1 END) AS status_uw,
+    COUNT(CASE WHEN deal_status = 4 THEN 1 END) AS status_fin');
+                $this->db->from(db_prefix() . 'leads');
+                $this->db->where('assigned', $staff_id);
+                $this->db->where('is_deal', 1);
+                $where_clause = '1=1' . $date_condition;
+                $this->db->where($where_clause);
+                $result = $this->db->get()->row();
+				
+				$data[$staff_id] = $result;
+				//echo $this->db->last_query();exit;
+				
+          
+        }
+		//print_r($data);exit;
+        return $data;
+    }
+
+    /**
+     * Get invoice status distribution for pie chart
+     */
+    public function get_invoice_status_distribution($period = 'all')
+    {
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT status, COUNT(*) as total FROM " . db_prefix() . "invoices WHERE 1=1 " . $where_clause . $company_filter . " GROUP BY status";
+        $results = $this->db->query($sql)->result_array();
+        // Map status code to label
+        $status_labels = [
+            1 => 'Unpaid',
+            2 => 'Paid',
+            3 => 'Partially Paid',
+            4 => 'Overdue',
+            5 => 'Cancelled',
+        ];
+        $data = [];
+        foreach ($results as $row) {
+            $label = isset($status_labels[$row['status']]) ? $status_labels[$row['status']] : 'Unknown';
+            $data[] = [
+                'label' => $label,
+                'total' => $row['total']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get invoice approver_status distribution for pie chart
+     */
+    public function get_invoice_approver_status_distribution($period = 'all')
+    {
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT approver_status, COUNT(*) as total FROM " . db_prefix() . "invoices WHERE 1=1 " . $where_clause . $company_filter . " GROUP BY approver_status";
+        $results = $this->db->query($sql)->result_array();
+        // Map approver_status code to label (customize as needed)
+        $status_labels = [
+            0 => 'Not Set',
+            1 => 'Pending',
+            2 => 'Approved',
+            3 => 'Rejected',
+        ];
+        $data = [];
+        foreach ($results as $row) {
+            $label = isset($status_labels[$row['approver_status']]) ? $status_labels[$row['approver_status']] : 'Unknown';
+            $data[] = [
+                'label' => $label,
+                'total' => $row['total']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get invoice table data for the report
+     */
+    public function get_invoice_table_data($period = 'all')
+    {
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT id, clientid, status, approver_status, date, total FROM " . db_prefix() . "invoices WHERE 1=1 " . $where_clause . $company_filter . " ORDER BY date DESC";
+        $results = $this->db->query($sql)->result_array();
+        // Map status code to label
+        $status_labels = [
+            1 => 'Unpaid',
+            2 => 'Paid',
+            3 => 'Partially Paid',
+            4 => 'Overdue',
+            5 => 'Cancelled',
+        ];
+        $approver_labels = [
+            0 => 'Not Set',
+            1 => 'Pending',
+            2 => 'Approved',
+            3 => 'Rejected',
+        ];
+        $this->load->model('clients_model');
+        foreach ($results as &$row) {
+            $row['status_label'] = isset($status_labels[$row['status']]) ? $status_labels[$row['status']] : 'Unknown';
+            $row['approver_status_label'] = isset($approver_labels[$row['approver_status']]) ? $approver_labels[$row['approver_status']] : 'Unknown';
+            $client = $this->clients_model->get($row['clientid']);
+            $row['client_name'] = $client ? $client->company : 'Unknown';
+        }
+        return $results;
+    }
+
+    /**
+     * Get invoices count by staff
+     */
+    public function get_invoices_by_staff_data($period = 'all')
+    {
+        $this->load->model('staff_model');
+        $data = [];
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT addedfrom, COUNT(*) as total FROM " . db_prefix() . "invoices WHERE 1=1 " . $where_clause . $company_filter . " GROUP BY addedfrom HAVING total > 0 ORDER BY total DESC";
+        $results = $this->db->query($sql)->result_array();
+        foreach ($results as $row) {
+            $staff = $this->staff_model->get($row['addedfrom']);
+            $staff_name = $staff ? $staff->full_name : 'Unknown';
+            $data[] = [
+                'staff_id' => $row['addedfrom'],
+                'staff_name' => $staff_name,
+                'total' => $row['total']
+            ];
+        }
+        return $data;
+    }
+
+    /**
+     * Get invoices by staff and status for the table
+     */
+    public function get_invoices_by_staff_status_table($period = 'all')
+    {
+        $statuses = [1 => 'Unpaid', 2 => 'Paid', 3 => 'Partially Paid', 4 => 'Overdue', 5 => 'Cancelled'];
+        $data = [];
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT addedfrom FROM " . db_prefix() . "invoices WHERE 1=1 " . $where_clause . $company_filter . " GROUP BY addedfrom";
+        $staffs = $this->db->query($sql)->result_array();
+        foreach ($staffs as $s) {
+            $staff_id = $s['addedfrom'];
+            $data[$staff_id] = array_fill_keys($statuses, 0);
+            foreach ($statuses as $status_code => $status_label) {
+                $this->db->select('COUNT(*) as total');
+                $this->db->from(db_prefix() . 'invoices');
+                $this->db->where('addedfrom', $staff_id);
+                $this->db->where('status', $status_code);
+                
+                // Add company filter
+                if (!is_super()) {
+                    $this->db->where('company_id', get_staff_company_id());
+                } else {
+                    if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                        $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                    }
+                }
+                
+                // Add period filter using raw SQL
+                if ($period != 'all') {
+                    switch ($period) {
+                        case 'this_month':
+                            $this->db->where('date >=', date('Y-m-01'));
+                            break;
+                        case 'last_month':
+                            $this->db->where('date >=', date('Y-m-01', strtotime('last month')));
+                            $this->db->where('date <', date('Y-m-01'));
+                            break;
+                        case 'this_week':
+                            $this->db->where('date >=', date('Y-m-d', strtotime('monday this week')));
+                            break;
+                        case 'last_week':
+                            $this->db->where('date >=', date('Y-m-d', strtotime('monday last week')));
+                            $this->db->where('date <', date('Y-m-d', strtotime('monday this week')));
+                            break;
+                        case 'current_year':
+                            $this->db->where('date >=', date('Y-01-01'));
+                            break;
+                    }
+                }
+                $result = $this->db->get()->row();
+                $data[$staff_id][$status_label] = $result->total;
+            }
+        }
+        return $data;
+    }
+
+    /**
+     * Get activity log count by staff for chart
+     */
+    public function get_activity_by_staff_data($period = 'all')
+    {
+        $this->db->select('staffid, COUNT(*) as activity_count');
+        $this->db->from('it_crm_activity_log');
+        $this->db->where('staffid IS NOT NULL', null, false);
+        
+        // Add company filter
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            }
+        }
+        
+        // Add period filter
+        if ($period != 'all') {
+            switch ($period) {
+                case 'this_month':
+                    $this->db->where('date >=', date('Y-m-01'));
+                    break;
+                case 'last_month':
+                    $this->db->where('date >=', date('Y-m-01', strtotime('last month')));
+                    $this->db->where('date <', date('Y-m-01'));
+                    break;
+                case 'this_week':
+                    $this->db->where('date >=', date('Y-m-d', strtotime('monday this week')));
+                    break;
+                case 'last_week':
+                    $this->db->where('date >=', date('Y-m-d', strtotime('monday last week')));
+                    $this->db->where('date <', date('Y-m-d', strtotime('monday this week')));
+                    break;
+                case 'current_year':
+                    $this->db->where('date >=', date('Y-01-01'));
+                    break;
+            }
+        }
+        
+        $this->db->group_by('staffid');
+        $result = $this->db->get()->result_array();
+        return $result;
+    }
+
+    /**
+     * Get activity log details by staff for table
+     */
+    public function get_activity_by_staff_table($period = 'all')
+    {
+        $this->db->select('staffid, COUNT(*) as activity_count, MAX(date) as last_activity');
+        $this->db->from('it_crm_activity_log');
+        $this->db->where('staffid IS NOT NULL', null, false);
+        
+        // Add company filter
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            }
+        }
+        
+        // Add period filter
+        if ($period != 'all') {
+            switch ($period) {
+                case 'this_month':
+                    $this->db->where('date >=', date('Y-m-01'));
+                    break;
+                case 'last_month':
+                    $this->db->where('date >=', date('Y-m-01', strtotime('last month')));
+                    $this->db->where('date <', date('Y-m-01'));
+                    break;
+                case 'this_week':
+                    $this->db->where('date >=', date('Y-m-d', strtotime('monday this week')));
+                    break;
+                case 'last_week':
+                    $this->db->where('date >=', date('Y-m-d', strtotime('monday last week')));
+                    $this->db->where('date <', date('Y-m-d', strtotime('monday this week')));
+                    break;
+                case 'current_year':
+                    $this->db->where('date >=', date('Y-01-01'));
+                    break;
+            }
+        }
+        
+        $this->db->group_by('staffid');
+        $result = $this->db->get()->result_array();
+        return $result;
+    }
+
+    /**
+     * Helper function to build WHERE clause for period filtering
+     */
+    private function get_period_where_clause($period)
+    {
+        switch ($period) {
+            case 'this_month':
+                return "AND date >= DATE_FORMAT(NOW(), '%Y-%m-01')";
+            case 'last_month':
+                return "AND date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND date < DATE_FORMAT(NOW(), '%Y-%m-01')";
+            case 'this_week':
+                return "AND date >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)";
+            case 'last_week':
+                return "AND date >= DATE_SUB(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 1 WEEK) AND date < DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)";
+            case 'current_year':
+                return "AND date >= DATE_FORMAT(NOW(), '%Y-01-01')";
+            case 'all':
+            default:
+                return "";
+        }
+    }
+
+    /**
+     * Get sales by payment methods for chart
+     */
+    public function get_sales_by_payments_data($period = 'all')
+    {
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND ' . db_prefix() . 'invoicepaymentrecords.company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND ' . db_prefix() . 'invoicepaymentrecords.company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT 
+                    COALESCE(" . db_prefix() . "payment_modes.name, 'Unknown') as payment_method,
+                    COUNT(*) as payment_count, 
+                    SUM(" . db_prefix() . "invoicepaymentrecords.amount) as total_amount 
+                FROM " . db_prefix() . "invoicepaymentrecords 
+                LEFT JOIN " . db_prefix() . "payment_modes ON " . db_prefix() . "payment_modes.id = " . db_prefix() . "invoicepaymentrecords.paymentmode
+                WHERE 1=1 " . $where_clause . $company_filter . " 
+                GROUP BY " . db_prefix() . "invoicepaymentrecords.paymentmode 
+                ORDER BY total_amount DESC";
+        $result = $this->db->query($sql)->result_array();
+        return $result;
+    }
+
+    /**
+     * Get sales by payment methods for table
+     */
+    public function get_sales_by_payments_table($period = 'all')
+    {
+        $where_clause = $this->get_period_where_clause($period);
+        
+        // Add company filter
+        $company_filter = '';
+        if (!is_super()) {
+            $company_filter = ' AND ' . db_prefix() . 'invoicepaymentrecords.company_id = ' . get_staff_company_id();
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $company_filter = ' AND ' . db_prefix() . 'invoicepaymentrecords.company_id = ' . $_SESSION['super_view_company_id'];
+            }
+        }
+        
+        $sql = "SELECT 
+                    COALESCE(" . db_prefix() . "payment_modes.name, 'Unknown') as payment_method,
+                    COUNT(*) as payment_count, 
+                    SUM(" . db_prefix() . "invoicepaymentrecords.amount) as total_amount,
+                    AVG(" . db_prefix() . "invoicepaymentrecords.amount) as avg_amount, 
+                    MIN(" . db_prefix() . "invoicepaymentrecords.date) as first_payment, 
+                    MAX(" . db_prefix() . "invoicepaymentrecords.date) as last_payment
+                FROM " . db_prefix() . "invoicepaymentrecords 
+                LEFT JOIN " . db_prefix() . "payment_modes ON " . db_prefix() . "payment_modes.id = " . db_prefix() . "invoicepaymentrecords.paymentmode
+                WHERE 1=1 " . $where_clause . $company_filter . " 
+                GROUP BY " . db_prefix() . "invoicepaymentrecords.paymentmode 
+                ORDER BY total_amount DESC";
+        $result = $this->db->query($sql)->result_array();
+        return $result;
     }
 }

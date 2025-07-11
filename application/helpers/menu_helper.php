@@ -385,6 +385,7 @@ function app_init_admin_sidebar_menu_items()
     //     ]);
     // }
 
+    if (is_admin()) {
     if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
         $CI->app_menu->add_sidebar_menu_item('reports', [
             'name'     => _l('als_reports'),
@@ -394,6 +395,7 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
+	}
 
    /* if (staff_can('view-timesheets', 'reports')) {
         $CI->app_menu->add_sidebar_children_item('reports', [
@@ -571,6 +573,16 @@ function app_init_admin_sidebar_menu_items()
             'position' => 20,
             'badge'    => [],
         ]);
+		$CI->app_menu->add_setup_children_item('leads', [
+            'slug'     => 'deal-stages',
+            'name'     => _l('Deal Stages'),
+            'href'     => admin_url('leads/deal_stage'),
+            'position' => 21,
+            'badge'    => [],
+        ]);
+		
+		
+		
 		}
 		
         /*$CI->app_menu->add_setup_children_item('leads', [

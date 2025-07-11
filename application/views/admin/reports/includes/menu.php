@@ -1,9 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
-
-<div id="wrapper">
-  <div class="content">
-    <div class="sm:tw-flex tw-space-y-3 sm:tw-space-y-0 tw-gap-6">
+<div class="tw-my-3">
+ 
+<div class="sm:tw-flex tw-space-y-3 sm:tw-space-y-0 tw-gap-6">
 	
 	  <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-chart-area tw-mx-2"></i> Lead Reports</h4>
@@ -42,7 +40,7 @@
 		  </li>
 		  <li> <a href="<?php echo admin_url('reports/sales_by_payments');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Sales By Payments</a> 
 		  </li>
-		 <li> <a href="<?php echo admin_url('reports/invoice_by_staff');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Invoice By Staff</a> 
+		  <li> <a href="<?php echo admin_url('reports/invoice_by_staff');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Invoice By Staff</a> 
 		  </li>
 		  
 		  
@@ -60,7 +58,5 @@
       </div>
 	  
     </div>
-  </div>
 </div>
-<?php init_tail(); ?>
-</body></html>
+
