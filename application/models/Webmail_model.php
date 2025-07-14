@@ -582,9 +582,9 @@ $cnt=0;
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
-      $pg=floor($last_email_id / 50) +1;
+      $pg=floor($last_email_id / 10) +1;
 	  $messages = $mailbox->query()
-    ->all()->limit($limit = 50, $page = $pg)
+    ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
