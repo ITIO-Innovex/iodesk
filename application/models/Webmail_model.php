@@ -414,9 +414,10 @@ foreach ($folders as $folder) {
 	  
 	  
 try {
-     $pg=floor($last_email_id / 10) +1;	  
+
+     $pg=floor($last_email_id / 5) +1;	  
 	  $messages = $mailbox->query()
-    ->all()->limit($limit = 10, $page = $pg)
+    ->all()->limit($limit = 5, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
