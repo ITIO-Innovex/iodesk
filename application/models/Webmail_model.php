@@ -426,9 +426,9 @@ try {
 
 
 
-//print_r($messages);exit;
-$this->db->query("SET SESSION wait_timeout=600;");
-$this->db->reconnect();
+print_r($messages);exit;
+//$this->db->query("SET SESSION wait_timeout=600;");
+//$this->db->reconnect();
 foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
