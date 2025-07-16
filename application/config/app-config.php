@@ -14,10 +14,10 @@ if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
     define('Whatsapp_Socket_Url', 'wss://api.whatsapp.xeyso.com');
 } else {
     // Live environment
-    define('APP_BASE_URL', 'https://xeyso.com/iodesk');
+    define('APP_BASE_URL', 'https://my.itio.in');
     define('APP_DB_HOSTNAME', 'localhost');
-    define('APP_DB_USERNAME', 'xeyso_iodesk_crm');
-    define('APP_DB_PASSWORD', 'IBILk=zhrCT2');
+    define('APP_DB_USERNAME', 'itio_crm');
+    define('APP_DB_PASSWORD', 'Itio@crm123');
     define('APP_DB_NAME', 'xeyso_iodesk_crm');
     define('Whatsapp_Api_Url', 'https://api.whatsapp.xeyso.com');
     define('Whatsapp_Socket_Url', 'wss://api.whatsapp.xeyso.com');
