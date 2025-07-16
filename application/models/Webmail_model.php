@@ -427,6 +427,7 @@ try {
 
 
 //print_r($messages);exit;
+$this->db->query("SET SESSION wait_timeout=600;");
 foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
@@ -488,6 +489,7 @@ foreach ($messages as $message) {
 		$data['attachments'] = implode(',', $attachments_paths);//exit;
  }
  $cnt++;
+        $this->db->reconnect();
 		$this->db->insert(db_prefix() . 'emails', $data);
 		//echo $this->db->last_query();exit;
  

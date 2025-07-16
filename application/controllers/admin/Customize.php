@@ -132,4 +132,142 @@ class Customize extends AdminController
         // Not used for company master
         redirect(admin_url('customize'));
     }
+
+    // AJAX endpoint for deal stages in customize tab
+    public function get_deal_stages()
+    {
+        $this->load->model('leads_model');
+        $stages = $this->leads_model->get_deal_stage();
+        echo json_encode([
+            'success' => true,
+            'stages' => $stages
+        ]);
+        exit;
+    }
+
+    // AJAX endpoint for drag & drop customized deal stages
+    public function get_deal_stages_customized()
+    {
+        $this->load->model('leads_model');
+        $company_id = get_staff_company_id();
+        $this->load->database();
+        // Get all stages
+        $stages = $this->leads_model->get_deal_stage();
+        // Get custom order/checks for this company
+        $custom = $this->db->where('company_id', $company_id)->get('it_crm_deals_stage_custom')->result_array();
+        $checkedMap = [];
+        $orderMap = [];
+        foreach ($custom as $row) {
+            $checkedMap[$row['deal_stage_id']] = $row['checked'];
+            $orderMap[$row['deal_stage_id']] = $row['order'];
+        }
+        // If custom order exists, sort all stages accordingly
+        if (count($orderMap) > 0) {
+            usort($stages, function($a, $b) use ($orderMap) {
+                $oa = isset($orderMap[$a['id']]) ? $orderMap[$a['id']] : 9999;
+                $ob = isset($orderMap[$b['id']]) ? $orderMap[$b['id']] : 9999;
+                return $oa - $ob;
+            });
+        }
+        echo json_encode([
+            'success' => true,
+            'stages' => $stages,
+            'checkedMap' => $checkedMap
+        ]);
+        exit;
+    }
+
+    public function save_deal_stages_customized()
+    {
+        $company_id = get_staff_company_id();
+        $order = $this->input->post('order');
+        $checked = $this->input->post('checked');
+        $customized_default = $this->input->post('customized_default');
+        if (!is_array($order) || !is_array($checked)) {
+            echo json_encode(['success' => false]);
+            exit;
+        }
+        $this->load->database();
+        // Remove old records for this company
+        $this->db->where('company_id', $company_id)->delete('it_crm_deals_stage_custom');
+        // Insert new records
+        foreach ($order as $i => $deal_stage_id) {
+            $this->db->insert('it_crm_deals_stage_custom', [
+                'deal_stage_id' => $deal_stage_id,
+                'order' => $i,
+                'company_id' => $company_id,
+                'checked' => isset($checked[$deal_stage_id]) ? $checked[$deal_stage_id] : 0
+            ]);
+        }
+        // Update it_crm_company_master.deal_form_type
+        $this->db->where('company_id', $company_id)
+            ->update('it_crm_company_master', ['deal_form_type' => ($customized_default ? 1 : 0)]);
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    // AJAX: Get form layout for a deal stage and company
+    public function get_form_layout()
+    {
+        $deal_stage_id = $this->input->get('deal_stage_id');
+        $company_id = get_staff_company_id();
+        $row = $this->db->where(['deal_stage_id' => $deal_stage_id, 'company_id' => $company_id])
+            ->get('it_crm_deals_stage_custom')->row();
+        $layout = $row && $row->form_layout ? json_decode($row->form_layout, true) : [];
+        echo json_encode(['success' => true, 'layout' => $layout]);
+        exit;
+    }
+    // AJAX: Save form layout for a deal stage and company
+    public function save_form_layout()
+    {
+        $deal_stage_id = $this->input->post('deal_stage_id');
+        $company_id = get_staff_company_id();
+        $layout = $this->input->post('layout');
+        // If record exists, update; else insert
+        $exists = $this->db->where(['deal_stage_id' => $deal_stage_id, 'company_id' => $company_id])
+            ->get('it_crm_deals_stage_custom')->row();
+        if ($exists) {
+            $this->db->where(['deal_stage_id' => $deal_stage_id, 'company_id' => $company_id])
+                ->update('it_crm_deals_stage_custom', ['form_layout' => $layout]);
+        } else {
+            $this->db->insert('it_crm_deals_stage_custom', [
+                'deal_stage_id' => $deal_stage_id,
+                'company_id' => $company_id,
+                'form_layout' => $layout,
+                'order' => 9999,
+                'checked' => 1
+            ]);
+        }
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    // AJAX: Get form layout status for multiple stages
+    public function get_form_layout_status()
+    {
+        $ids = $this->input->post('ids');
+        $company_id = get_staff_company_id();
+        $statusMap = [];
+        if (is_array($ids)) {
+            $rows = $this->db->where('company_id', $company_id)
+                ->where_in('deal_stage_id', $ids)
+                ->get('it_crm_deals_stage_custom')->result();
+            foreach ($rows as $row) {
+                $statusMap[$row->deal_stage_id] = !empty($row->form_layout);
+            }
+        }
+        echo json_encode(['statusMap' => $statusMap]);
+        exit;
+    }
+
+    // AJAX: Get current company's deal_form_type
+    public function get_company_deal_form_type()
+    {
+        $company_id = get_staff_company_id();
+        $row = $this->db->where('company_id', $company_id)
+            ->get('it_crm_company_master')->row();
+        $deal_form_type = $row && isset($row->deal_form_type) ? (int)$row->deal_form_type : 0;
+        echo json_encode(['deal_form_type' => $deal_form_type]);
+        exit;
+    }
 } 

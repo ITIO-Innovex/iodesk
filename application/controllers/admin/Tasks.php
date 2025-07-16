@@ -215,7 +215,6 @@ class Tasks extends AdminController
                 $sqlTasksSelect .= $selectTotalComments . ' AND staffid=' . $staff_id . ') as total_comments_staff';
                 $sqlTasksSelect .= $selectTotalFiles . ' AND staffid=' . $staff_id . ') as total_files_staff';
             }
-			
 
             $sqlTasksSelect .= $selectTotalComments . ') as total_comments';
             $sqlTasksSelect .= $selectTotalFiles . ') as total_files';
@@ -321,6 +320,17 @@ $this->db->where('company_id',get_staff_company_id());
         if ($this->input->post()) {
             $data                = $this->input->post();
             $data['description'] = html_purify($this->input->post('description', false));
+
+            // Backend validation for Start Date <= Due Date
+            $startdate = isset($data['startdate']) ? to_sql_date($data['startdate']) : null;
+            $duedate = isset($data['duedate']) ? to_sql_date($data['duedate']) : null;
+            if ($startdate && $duedate && strtotime($startdate) > strtotime($duedate)) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Start Date must be less than or equal to Due Date.'
+                ]);
+                die;
+            }
             if ($id == '') {
                 if (staff_cant('create', 'tasks')) {
                     header('HTTP/1.0 400 Bad error');

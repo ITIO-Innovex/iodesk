@@ -90,11 +90,13 @@ array_push($where, 'AND ' . db_prefix() . 'tasks.company_id = ' . $this->ci->db-
         $output  = $result['output'];
         $rResult = $result['rResult'];
 
+        $serial = 1;
         foreach ($rResult as $aRow) {
             $row = [];
 
+            // Restore original first column (checkbox)
             $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
-
+ $row[] = $serial++;
             $row[] = '<a href="' . admin_url('tasks/view/' . $aRow['id']) . '" onclick="init_task_modal(' . $aRow['id'] . '); return false;">' . $aRow['id'] . '</a>';
 
             $outputName = '';
