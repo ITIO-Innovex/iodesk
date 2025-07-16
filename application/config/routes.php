@@ -211,3 +211,10 @@ $route['admin/reports/sales_by_payments'] = 'admin/reports/sales_by_payments';
 if (file_exists(APPPATH . 'config/my_routes.php')) {
     include_once(APPPATH . 'config/my_routes.php');
 }
+
+$route['admin/customize/get_deal_stages_customized'] = 'admin/customize/get_deal_stages_customized';
+$route['admin/customize/save_deal_stages_customized'] = 'admin/customize/save_deal_stages_customized';
+$route['admin/customize/get_form_layout'] = 'admin/customize/get_form_layout';
+$route['admin/customize/save_form_layout'] = 'admin/customize/save_form_layout';
+$route['admin/customize/get_form_layout_status'] = 'admin/customize/get_form_layout_status';
+$route['admin/customize/get_company_deal_form_type'] = 'admin/customize/get_company_deal_form_type';

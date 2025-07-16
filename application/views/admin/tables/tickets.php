@@ -168,6 +168,7 @@ array_push($where, 'AND ' . db_prefix() . 'tickets.company_id = ' . $this->ci->d
         $output  = $result['output'];
         $rResult = $result['rResult'];
 
+        // Remove serial number column
         foreach ($rResult as $aRow) {
             $row = [];
             for ($i = 0; $i < count($aColumns); $i++) {
@@ -237,6 +238,8 @@ array_push($where, 'AND ' . db_prefix() . 'tickets.company_id = ' . $this->ci->d
                     }
                 }
 
+                // Remove serial number before subject column
+                // (No serial number insertion)
                 $row[] = $_data;
 
                 if ($aRow['adminread'] == 0) {
