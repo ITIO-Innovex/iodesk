@@ -52,7 +52,7 @@
                                     <label><input type="radio" name="deal_stage_type" value="default" checked> Default</label>
                                     <label style="margin-left:20px;"><input type="radio" name="deal_stage_type" value="customized"> Customized</label>
                                 </div>
-                                <div id="deal-stage-default-list">
+                                <div id="deal-stage-default-list-deal">
                                     <ol>
                                         <li>Step : New</li>
                                         <li>Step : Document</li>
@@ -247,10 +247,10 @@ $(function() {
     });
     $('input[name="deal_stage_type"]').on('change', function() {
         if ($(this).val() === 'default') {
-            $('#deal-stage-default-list').show();
+            $('#deal-stage-default-list-deal').show();
             $('#deal-stage-customized-list').hide();
         } else {
-            $('#deal-stage-default-list').hide();
+            $('#deal-stage-default-list-deal').hide();
             $('#deal-stage-customized-list').show();
             $('#deal-stage-customized-loading').show();
             $('#customized-stage-list').hide();
