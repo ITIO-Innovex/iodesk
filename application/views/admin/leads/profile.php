@@ -288,6 +288,7 @@
                         <?php echo(isset($lead) && $lead->country != 0 ? e(get_country($lead->country)->short_name) : '-') ?>
                     </dd>
 					
+					<?php /*?>
 					<dt class="lead-field-heading tw-font-medium tw-text-neutral-500"><?php echo _l('Business Nature'); ?>
                     </dt>
                     <dd class="tw-text-neutral-900 tw-mt-1">
@@ -296,7 +297,7 @@
                     </dt>
                     <dd class="tw-text-neutral-900 tw-mt-1">
                         <?php echo(isset($lead) && $lead->IncorporationCountry != '' ? e(get_country($lead->IncorporationCountry)->short_name) : '-') ?>
-                    </dd>
+                    </dd><?php */?>
                     <?php /*?><dt class="lead-field-heading tw-font-medium tw-text-neutral-500"><?php echo _l('lead_zip'); ?></dt>
                     <dd class="tw-text-neutral-900 tw-mt-1">
                         <?php echo(isset($lead) && $lead->zip != '' ? e($lead->zip) : '-') ?></dd>
@@ -637,7 +638,7 @@ foreach ($custom_field_array as $key => $value) {
                 <?php $value = (isset($lead) ? $lead->title : ''); ?>
                 <?php //echo render_input('title', 'lead_title', $value); ?>
                 <?php $value = (isset($lead) ? $lead->email : ''); ?>
-                <?php echo render_input('email', 'lead_add_edit_email', $value); ?>
+                <?php echo render_input('email', 'lead_add_edit_email', $value,'email',['required' => 'true']); ?>
                 
 				<div class="col-md-4 tw-px-0">
 				<?php
@@ -651,19 +652,30 @@ foreach ($custom_field_array as $key => $value) {
                 <?php echo render_input('phonenumber', 'lead_add_edit_phonenumber', $value,'number',['required' => 'true','maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
 				</div>
 				
-                <?php $value = (isset($lead) ? $lead->company : ''); ?>
-                <?php echo render_input('company', 'Business Name', $value); //lead_company to Business Name ?>  
+				<?php
+               $countries                = get_all_countries();
+               $customer_default_country = get_option('customer_default_country');
+               $selected                 = (isset($lead) ? $lead->country : $customer_default_country);
+               echo render_select('country', $countries, [ 'country_id', [ 'short_name']], 'Resident`s Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]);
+               ?>
 				
+                
+				<?php /*?>
 				 <?php $value = (isset($lead) ? $lead->BusinessNature : ''); ?>
-                <?php echo render_input('BusinessNature', 'Business Nature', $value); //lead_company to Business Name ?>  
+                <?php echo render_input('BusinessNature', 'Business Nature', $value); //lead_company to Business Name ?>  <?php */?>
             </div>
             <div class="col-md-6">
+			
+			<?php $value = (isset($lead) ? $lead->company : ''); ?>
+                <?php echo render_input('company', 'Business Name', $value); //lead_company to Business Name ?>  
+				
+				
 			   <?php if ((isset($lead) && empty($lead->website)) || !isset($lead)) {
                    $value = (isset($lead) ? $lead->website : '');
-                   echo render_input('website', 'Business URL (add with https:// or http:// )', $value);//lead_website to Business URL 
+                   echo render_input('website', 'Business URL (add with https:// or http://)', $value);//lead_website to Business URL 
                } else { ?>
                 <div class="form-group">
-                    <label for="website"><?php echo _l('Business URL'); ?> (add with https:// or http:// )</label> 
+                    <label for="website"><?php echo _l('Business URL'); ?> (add with https:// or http://)</label> 
                     <div class="input-group">
 					<?php
 					
@@ -680,21 +692,17 @@ foreach ($custom_field_array as $key => $value) {
                     </div>
                 </div>
                 <?php }?>
-                <?php $value = (isset($lead) ? $lead->address : ''); ?>
-                <?php echo render_textarea('address', 'lead_address', $value, ['rows' => 1, 'style' => 'height:36px;font-size:100%;']); ?>
+               
 
-                <?php
-               $countries                = get_all_countries();
-               $customer_default_country = get_option('customer_default_country');
-               $selected                 = (isset($lead) ? $lead->country : $customer_default_country);
-               echo render_select('country', $countries, [ 'country_id', [ 'short_name']], 'Resident`s Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]);
-               ?>
+                
+			   <?php $value = (isset($lead) ? $lead->address : ''); ?>
+                <?php echo render_textarea('address', 'lead_address', $value, ['rows' => 1, 'style' => 'height:36px;font-size:100%;']); ?>
 			   
-			    <?php
+			    <?php /*?><?php
                $customer_default_country = get_option('customer_default_country');
                $selected                 = (isset($lead) ? $lead->IncorporationCountry : $customer_default_country);
                echo render_select('IncorporationCountry', $countries, [ 'country_id', [ 'short_name']], 'Incorporation Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]);
-               ?>
+               ?><?php */?>
 			   <?php $value = (isset($lead) ? $lead->subject : ''); ?>
                 <?php echo render_input('subject', 'Lead Subject', $value);  ?>
 				
@@ -725,8 +733,8 @@ foreach ($custom_field_array as $key => $value) {
             </div>
 			
             <div class="col-md-12">
-                <?php $value = (isset($lead) ? $lead->description : ''); ?>
-                <?php echo render_textarea('description', 'lead_description', $value); ?>
+               <?php /*?> <?php $value = (isset($lead) ? $lead->description : ''); ?>
+                <?php echo render_textarea('description', 'lead_description', $value); ?><?php */?>
 				
 				
 				
@@ -765,7 +773,7 @@ foreach ($custom_field_array as $key => $value) {
             </div>
 			<div class="clearfix"></div>
 			<div class="col-md-12">
-			<div class=""><h4>Custom Fields</h4></div>
+			<div class=""><label for="Custom" class="control-label">Custom Fields</label></div>
             
         
 			<div id="custom-fields">
@@ -785,7 +793,7 @@ foreach ($custom_field_array as $key => $value) {
 <input type="text" class="form-control" name="custom_field_value[]" placeholder="<?php echo $key;?>" value="<?php echo $value;?>" required>
 </div>
 <div class="col-sm-2">
-<a href="#" class="remove text-danger" title="Remove"><i class="fa fa fa-times"></i></a>
+<a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove"><i class="fa fa fa-times"></i></a>
 </div>
 </div>
 	  <?php
@@ -805,7 +813,7 @@ foreach ($custom_field_array as $key => $value) {
 		</div><?php */?>
      
     </div>
-    <button type="button" id="add-field">Add Field</button>
+    <button type="button" id="add-field" class="btn btn-primary btn-sm" title="Add Field"> + </button>
 	
     <br><br>
 			
@@ -1391,7 +1399,7 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
             <div class="modal-header" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">#<?php echo $lead->id;?> - <?php echo $dstatus; ?> [<?php echo $lead->deal_status;?>]</h4>
+                <h4 class="modal-title">#@@@@@<?php echo $lead->id;?> - <?php echo $dstatus; ?> [<?php echo $lead->deal_status;?>]</h4>
             </div>
             <div class="modal-body">
                 <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
@@ -1443,26 +1451,15 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
  <?php echo render_input('website', 'Business URL', $value,'url',['required' => 'true']); //,['required' => 'true'] ?>  
  </div>
 
- <div class="col-md-4">
- <?php $value = (isset($lead) ? $lead->BusinessNature : ''); ?>
- <?php echo render_input('BusinessNature', 'Business Nature', $value,'text',['required' => 'true']); //,['required' => 'true'] ?>  
- </div>
 <div class="col-md-4">
- <?php $value = (isset($lead) ? $lead->IncorporationCountry : ''); ?>
+ <?php $value = (isset($lead) ? $lead->country : ''); ?>
   
   <?php 
   
-  $selected = (isset($lead->IncorporationCountry) ? $lead->IncorporationCountry : '');
-  echo render_select('IncorporationCountry', $countries, [ 'country_id', [ 'short_name']], 'Incorporation Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]); ?>  
- </div>    
-<div class="col-md-4">
- <?php $value = (isset($lead) ? $lead->MonthlyVolume : ''); ?>
- <?php echo render_input('MonthlyVolume', 'Monthly Volume', $value,'text',['required' => 'true']); //lead_company to Business Name ?>  
- </div>
-<div class="col-md-4">
- <?php $value = (isset($lead) ? $lead->AverageProductPrice : ''); ?>
- <?php echo render_input('AverageProductPrice', 'Average Product Price', $value,'text',['required' => 'true']); //lead_company to Business Name ?>  
- </div>
+  $selected = (isset($lead->country) ? $lead->country : '');
+  echo render_select('country', $countries, [ 'country_id', [ 'short_name']], 'Resident`s Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]); ?>  
+ </div> 
+
  <div class="col-md-12">
  <?php $value = (isset($lead) ? $lead->address : ''); ?>
  <?php echo render_textarea('address', 'Address', $value,['required' => 'true']); ?>
@@ -1931,7 +1928,9 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
  <?php echo render_textarea('Reason', 'Reason', ''); ?>
  </div>
 </div>
-<?php }elseif(isset($lead->deal_status)&&$lead->deal_status==4){  echo "&nbsp;&nbsp;Invoice form" ?>
+<?php 
+}elseif(isset($lead->deal_status)&&$lead->deal_status==4){  
+echo "&nbsp;&nbsp;Invoice form"; ?>
 
 <?php } ?>
 </div>
@@ -1949,6 +1948,136 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
             </div>
             <div class="modal-footer" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button onclick="convert_to_dealxxx(); return false;" class="btn btn-primary"><?php echo $dstatus; ?></button>
+            </div>
+		<?php echo form_close(); ?>
+        </div>
+        <!-- /.modal-content -->
+        
+    </div>
+	
+	
+
+<div class="modal fade" id="CustomizedDealModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+<?php echo form_open((isset($lead) ? admin_url('leads/customizeddeal/' . $lead->id) : admin_url('leads/customizeddeal')), ['id' => 'customizeddeal_form', 'enctype' => 'multipart/form-data']); ?> 
+<?php
+
+$deal_list=$_SESSION['deal_form_order'];
+$deal_list_total=count($deal_list);
+$deal_stage=$deal_list[$lead->deal_stage];
+
+
+
+?>
+<div class="modal-content tw-bg-info-100">
+            <div class="modal-header" style="background-color: rgb(186 230 253 / 1) !important;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">#<?php echo $lead->id;?> [<?php echo get_deals_stage_title($deal_stage);?>]</h4>
+            </div>
+            <div class="modal-body">
+                <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+                
+                <input type="hidden" name="deal_id" id="deal_id" value="<?php echo $lead->id;?>"  />
+				<input type="hidden" name="deal_stage" id="deal_stage" value="<?php echo $deal_stage;?>"  />
+				
+<div>
+
+
+<div class="row">
+
+<div class="col-md-12">
+
+<?php
+
+$this->db->select('form_layout');
+$this->db->where('deal_stage_id', $deal_stage);
+$this->db->where('company_id', get_staff_company_id());
+$form_layout=$this->db->get('deals_stage_custom')->row();
+if (!empty($form_layout->form_layout)) {
+    $fields = json_decode($form_layout->form_layout);
+	//print_r($fields);
+	
+	$file_labels = [];
+
+
+	
+	
+	foreach ($fields as $field) {
+        $label = htmlspecialchars($field->label);
+        $name = strtolower(str_replace(' ', '_', $label)); // "Document Name" -> "document_name"
+        $required = !empty($field->required) ? 'required' : '';
+		echo "<div class='form-group'>";
+		echo "<label for='{$name}'>{$label}:</label>";
+
+        switch ($field->type) {
+            case 'text':
+                echo "<input type='text' name='{$name}' id='{$name}' class='form-control' {$required}>";
+                break;
+
+            case 'file':
+                echo "<input type='file' name='{$name}' id='{$name}' class='form-control' {$required}>";
+				$file_labels[]=$name;
+                break;
+
+            case 'textarea':
+                echo "<textarea name='{$name}' id='{$name}' class='form-control' {$required}></textarea>";
+				
+                break;
+			case 'cal':
+                echo "<input type='date' name='{$name}' id='{$name}' class='form-control' {$required}>";
+                break;
+			case 'listbox':	
+				echo '<select name="' . $name . '" id="' . $name . '" class="form-control" ' . $required . '>';
+				echo '<option value="">-- Select --</option>';
+				foreach ($field->options as $option) {
+					echo '<option value="' . htmlspecialchars($option) . '">' . htmlspecialchars($option) . '</option>';
+				}
+				echo '</select>';
+			break;
+
+            default:
+                echo "<!-- Unknown field type '{$field->type}' -->";
+        }
+		
+		
+		echo "</div>";
+		}
+		echo "<div class='form-group'>
+                    <label for='smtp_encryption'>Status</label>
+                    <select name='status' class='form-control'>
+                        <option value=''>Select Status</option>
+                        <option value='0' selected=''>Process</option>
+                        <option value='1'>Completed</option>
+                    </select>
+                </div>";
+	}
+?>
+
+
+</div>
+
+</div>
+
+
+
+
+
+</div>  
+
+
+
+</div>   
+               
+            </div>
+<?php if(!empty($file_labels)){ 
+$docString = implode(', ', $file_labels);
+?>
+<input type="hidden" name="file_labels" id="file_labels" value="<?php echo $docString;?>"  />			
+<?php } ?>
+			
+<div class="modal-footer" style="background-color: rgb(186 230 253 / 1) !important;">
+                <button class="btn btn-primary">Submit</button>
             </div>
 		<?php echo form_close(); ?>
         </div>

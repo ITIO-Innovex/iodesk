@@ -26,6 +26,8 @@ class Customize extends AdminController
         $company = $this->staff_model->getcompany($company_id);
         $this->load->model('settings_model');
         $staff_list = $this->settings_model->get_staff_list();
+		
+		  
 
         // Load SMTP settings from company->settings
         $smtp_settings = [];
@@ -117,7 +119,11 @@ class Customize extends AdminController
             'smtp_settings' => $smtp_settings,
             'staff_list' => $staff_list,
         ];
+// Get company deal form type
+$data['deal_form_type'] = $this->db->where('company_id', $company_id)->get('it_crm_company_master')->row()->deal_form_type;
+         
         $data['title'] = _l('customize_settings');
+		
         $this->load->view('admin/customize/all', $data);
     }
 

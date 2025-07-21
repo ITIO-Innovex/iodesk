@@ -65,7 +65,11 @@ font-weight: bolder !important;
 		}
 		echo '</div>';
 	}
-	?> <?php if(isset($lead->deal_status)&&$lead->deal_status){ ?>  
+	?> 
+	
+    <!--	For Customized $_SESSION['deal_form_type']=1 else 0 for default-->
+	<?php if(isset($lead->deal_status)&&$lead->deal_status&&$_SESSION['deal_form_type']==0){ ?> 
+	
 	
 	
 	<?php if(isset($lead->deal_status)&&$lead->deal_status==3&&$lead->uw_status==0&&get_staff_rolex()!=4){ ?>
@@ -84,7 +88,33 @@ font-weight: bolder !important;
 	<?php } ?>
 	
 	<?php } ?>
+	<?php }elseif(isset($lead->deal_status)&&$lead->deal_status&&$_SESSION['deal_form_type']==1){ // for Customized
+	$datastage=$_SESSION['deal_form_order'];
+	//print_r($datastage);
+	?>
+	<?php echo get_deals_stage_title($datastage[$lead->deal_stage]);?>
+	<?php 
+	
+	//print_r($flat);
+	echo '<div class="dt-buttons btn-group">';
+	$modalopen='';
+	foreach($datastage as $key=>$val){
+	if($key==$lead->deal_stage){ 
+	$btncss="btn-success"; $modalopen='data-toggle="modal" data-target="#CustomizedDealModal"';
+	}elseif($key < $lead->deal_stage){ $btncss="btn-info"; $modalopen="";
+	}else{$btncss="btn-warning"; $modalopen="";}
+	//echo $key." == ".$val."<br>";
+	echo '<button class="btn '.$btncss.' buttons-collection btn-sm btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" '.$modalopen.' aria-expanded="false"><span>'.get_deals_stage_title($val).'</span></button>';
+	}
+    echo '</div>';
+	?>
+   
+
+
+
 	<?php } ?>
+	
+	
 	</h4>
 </div>
 <div class="modal-body">

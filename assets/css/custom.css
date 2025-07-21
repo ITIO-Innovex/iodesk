@@ -864,7 +864,7 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
   color: wheat !important;
   padding: 10px !important;
 }
-#dealModal{
+#dealModal, #CustomizedDealModal{
   background-color: rgba(0, 0, 0, 0.5); /* fade to semi-black */
   box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;
   backdrop-filter: saturate(125%) blur(10px);

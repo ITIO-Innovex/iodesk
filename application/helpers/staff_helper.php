@@ -370,6 +370,36 @@ function get_company_status($company_id)
 		return 0;
 }
 
+function get_deal_form_type($company_id)
+{   
+        // Fetch company Name from company id
+		if(isset($company_id)&&$company_id){
+		$CI = & get_instance();
+		$CI->db->where('company_id', $company_id);
+		$com = $CI->db->select('deal_form_type')->from(db_prefix() . 'company_master')->get()->row();
+		if(isset($com)&&$com->deal_form_type){
+		return $com->deal_form_type;
+		}
+		}
+		
+		return 0;
+}
+
+function get_deals_stage_title($sid)
+{   
+        // Fetch company Name from company id
+		if(isset($sid)&&$sid){
+		$CI = & get_instance();
+		$CI->db->where('id', $sid);
+		$com = $CI->db->select('stage')->from(db_prefix() . 'deals_stage')->get()->row();
+		if(isset($com)&&$com->stage){
+		return $com->stage;
+		}
+		}
+		
+		return 0;
+}
+
 function get_staff_company_name($company_id = '')
 {   
 

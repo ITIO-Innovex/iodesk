@@ -1,23 +1,26 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); 
+
+echo $deal_form_type;
+?>
 <div id="wrapper">
     <div class="content">
         <div class="row">
             <div class="col-md-12">
-                <div class="panel_s">
+                <?php /*?><div class="panel_s">
                     <div class="panel-body">
                         <h4 class="no-margin">
                             <?php echo _l('customize_settings'); ?>
                         </h4>
                     </div>
-                </div>
+                </div><?php */?>
                 <div class="panel_s">
                     <div class="panel-body">
                         <!-- Tab Navigation -->
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="active"><a href="#company-tab" role="tab" data-toggle="tab">Company</a></li>
-                            <li><a href="#leads-tab" role="tab" data-toggle="tab">Leads</a></li>
-                            <li><a href="#deal-tab" role="tab" data-toggle="tab">Deal</a></li>
+                            <li><a href="#deal-tab" role="tab" data-toggle="tab" class="DealTab">Deal</a></li>
+							<li><a href="#leads-tab" role="tab" data-toggle="tab">Leads</a></li>
                         </ul>
                         <div class="tab-content" style="margin-top:20px;">
                             <div class="tab-pane active" id="company-tab">
@@ -36,29 +39,20 @@
                         </div>
                         <?php echo form_close(); ?>
                             </div>
-                            <div class="tab-pane" id="leads-tab">
-                            <div id="deal-stage-default-list">
-                                    <ol>
-                                        <li>Step 1 : Unassigned</li>
-                                        <li>Step 2 : Assigned</li>
-                                        <li>Step 3 : Hot</li>
-                                        <li>Step 4 : Junk Leads</li>
-                                    </ol> 
-
-                                </div>
-                            </div>
+                            
                             <div class="tab-pane" id="deal-tab">
                                 <div class="form-group">
-                                    <label><input type="radio" name="deal_stage_type" value="default" checked> Default</label>
-                                    <label style="margin-left:20px;"><input type="radio" name="deal_stage_type" value="customized"> Customized</label>
+<label><input type="radio" name="deal_stage_type" value="customized" id="dynamicCustomizedStage"> Customized</label>
+<label style="margin-left:20px;"><input type="radio" name="deal_stage_type"  value="default" checked> Default</label>
                                 </div>
                                 <div id="deal-stage-default-list-deal">
-                                    <ol>
-                                        <li>Step : New</li>
-                                        <li>Step : Document</li>
-                                        <li>Step : Under Writing with Approver</li>
-                                        <li>Step : Final Invoice</li>
-                                    </ol>
+   
+<div class="dt-buttons btn-group">
+<button class="btn btn-primary buttons-collection btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>New <i class="fa-solid fa-arrow-right"></i> </span></button>
+<button class="btn btn-warning buttons-collection  btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Document <i class="fa-solid fa-arrow-right"></i></span></button>
+<button class="btn btn-info buttons-collection btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Under Writing with Approver <i class="fa-solid fa-arrow-right"></i></span></button>
+<button class="btn btn-success buttons-collection btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Final Invoice</span></button>
+</div>
                                 </div>
                                 <div id="deal-stage-customized-list" style="display:none;">
                                     <div id="deal-stage-customized-content">
@@ -70,6 +64,17 @@
                                         <button id="save-customized-stages" class="btn btn-success" style="display:none; margin-top:10px;">Save</button>
                                         <div id="deal-stage-customized-save-msg" style="margin-top:10px;"></div>
                                     </div>
+                                </div>
+                            </div>
+							
+							<div class="tab-pane" id="leads-tab">
+                            <div id="deal-stage-default-list">
+									<div class="dt-buttons btn-group">
+<button class="btn btn-primary buttons-collection btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Unassigned <i class="fa-solid fa-arrow-right"></i> </span></button>
+<button class="btn btn-warning buttons-collection  btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Assigned <i class="fa-solid fa-arrow-right"></i></span></button>
+<button class="btn btn-success buttons-collection btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Hot <i class="fa-solid fa-arrow-right"></i></span></button>
+<button class="btn btn-danger buttons-collection btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" aria-expanded="false"><span>Junk Leads</span></button>
+</div>
                                 </div>
                             </div>
                         </div>
@@ -116,12 +121,29 @@
 </div>
 <?php init_tail(); ?>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-<script>
+<?php if (isset($deal_form_type) && $deal_form_type == 1) { ?>
+  <script>
+ 
+    const radio = document.getElementById('dynamicCustomizedStage');
+    if (radio) {
+      radio.checked = true;
+    }
+  </script>
+<?php } ?>
+ <script>
+
+
 $(function() {
     // Initialize form validation
     $('#customize-form').on('submit', function(e) {
         // Add any custom validation here if needed
         return true;
+    });
+	
+	// Open Default When Click On Deal Tab
+    $('.DealTab').on('click', function(e) {
+        // Add any custom validation here if needed
+         $('input[name="deal_stage_type"]:checked').trigger('change');
     });
     
     // Live preview functionality for company name
@@ -180,9 +202,15 @@ $(function() {
     function renderCustomizedStages(stages, checkedMap) {
         var html = '';
         stages.forEach(function(stage, idx) {
+            var isLast = idx === stages.length - 1;
             var checked = (checkedMap && checkedMap[stage.id] == 1) ? 'checked' : '';
+            var disabled = '';
+            if (isLast) {
+                checked = 'checked';
+                disabled = 'disabled';
+            }
             html += '<li class="list-group-item" data-id="' + stage.id + '">' +
-                '<input type="checkbox" class="customized-stage-check" data-id="' + stage.id + '" ' + checked + '> ' +
+                '<input type="checkbox" class="customized-stage-check" data-id="' + stage.id + '" ' + checked + ' ' + disabled + '> ' +
                 (stage.stage ? stage.stage : stage.name) +
                 '<span class="handle" style="cursor:move; float:right;"><i class="fa fa-arrows"></i></span>';
             if (checked) {
@@ -246,6 +274,7 @@ $(function() {
         }
     });
     $('input[name="deal_stage_type"]').on('change', function() {
+	//alert($(this).val());
         if ($(this).val() === 'default') {
             $('#deal-stage-default-list-deal').show();
             $('#deal-stage-customized-list').hide();
@@ -278,10 +307,16 @@ $(function() {
     $('#save-customized-stages').on('click', function() {
         var order = [];
         var checked = {};
-        $('#customized-stage-list li').each(function(i, el) {
+        var $items = $('#customized-stage-list li');
+        $items.each(function(i, el) {
             var id = $(el).data('id');
             order.push(id);
-            checked[id] = $(el).find('.customized-stage-check').is(':checked') ? 1 : 0;
+            // Always set last as checked
+            if (i === $items.length - 1) {
+                checked[id] = 1;
+            } else {
+                checked[id] = $(el).find('.customized-stage-check').is(':checked') ? 1 : 0;
+            }
         });
         var customizedDefault = $('#customized-default-checkbox').is(':checked') ? 1 : 0;
         $.ajax({
@@ -509,6 +544,7 @@ function renderViewForm(fields) {
     html += '</form>';
     return html;
 }
+
 </script>
 </body>
 </html> 

@@ -21,6 +21,18 @@ class Leads extends AdminController
 
         // Load the Webchat_model
         $this->load->model('Webchat_model');
+		if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']){
+		$deal_company_id=$_SESSION['staff_company_id'];
+		}else{
+		$deal_company_id=get_staff_company_id();
+		}
+		
+		
+		$_SESSION['deal_form_type']=get_deal_form_type($deal_company_id);
+		$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
+		
+		//print_r($_SESSION['deal_form_order']);
+		
     }
 
     /* List all leads */
@@ -1858,6 +1870,94 @@ class Leads extends AdminController
         }
 
     }
+	
+public function customizeddeal($id = '')
+{
+    if (!is_staff_member() || ($id != '' && !$this->leads_model->staff_can_access_lead($id))) {
+        ajax_access_denied();
+    }
+
+$deal_id    = $this->input->post('deal_id');
+$deal_stage = $this->input->post('deal_stage');
+$status = $this->input->post('status');
+$custom_data = $this->input->post();
+
+
+$process_field         = 'process' . $deal_stage;
+$process_status_field  = 'process' . $deal_stage . '_status';
+$process_addedon_field = 'process' . $deal_stage . '_addedon';
+
+// Check Upload docs
+
+            $upload_path = './uploads/leads/';
+            if (!is_dir($upload_path)) {
+                mkdir($upload_path, 0755, true);
+            }
+			
+			
+$status = $this->input->post('file_labels');			
+$file_labels=explode(",",$status);		
+if(!empty($file_labels)){	
+foreach($file_labels as $filename){
+$filename=trim($filename);
+                if (isset($_FILES[$filename]) && $_FILES[$filename]['error'] == 0) {
+                $config['upload_path']   = $upload_path;
+                $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|svg';
+                $config['max_size']      = 20480; // 2MB
+                $config['file_name']     = $filename.'-' . time();
+
+                $this->load->library('upload', $config);
+                if ($this->upload->do_upload($filename)) {
+                    $upload_data = $this->upload->data();
+                    $custom_data[$filename] = $upload_data['file_name'];
+                } else {
+				echo $this->upload->display_errors();exit;
+                    $custom_data[$filename] = "";
+                }
+
+
+}
+}
+}
+		
+
+           
+
+// Prepare data array
+$data = [
+    'deal_id'          => $deal_id,
+    'company_id'       => get_staff_company_id(),
+    $process_field     => json_encode($custom_data),
+    $process_status_field => $status,
+    $process_addedon_field => date('Y-m-d H:i:s')
+];
+
+if ($deal_stage == 1) {
+    // Insert if stage is 1
+    $this->db->insert('it_crm_deals_process_list', $data);
+} else {
+    // Update if record already exists for deal_id
+    $this->db->where('deal_id', $deal_id);
+    $this->db->update('it_crm_deals_process_list', $data);
+};
+
+$log_status="Working on ";
+if(isset($status)&&$status==1){
+
+$this->db->set('deal_stage', 'deal_stage + 1', FALSE);
+$this->db->set('last_status_change', '$process_addedon_field');
+$this->db->where('id', $deal_id);
+$this->db->update('it_crm_leads');
+$log_status="Completed ";
+
+}
+$log_title=$log_status." - ".get_deals_stage_title($deal_stage);
+$this->leads_model->log_lead_activity($deal_id, $log_title);
+
+//echo $this->db->last_query();exit;
+    set_alert('success', 'Deal updated successfully');
+    redirect(admin_url('leads/deals'));
+}
     public function get_lead_details($id){
         if($id){
            $leadData =  $this->leads_model->get_lead_by_id( $id);

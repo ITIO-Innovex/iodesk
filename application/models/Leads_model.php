@@ -2437,4 +2437,17 @@ $diffInHours = round($diffInSeconds / 3600);
     {
         return $this->db->select('*')->get('it_crm_deals_stage')->result_array();
     }
+	
+	public function get_deal_form_order()
+    {
+	    $this->db->where('company_id', get_staff_company_id());
+		$this->db->where('checked', 1);
+		$this->db->order_by('order', 'ASC');
+        $datastage = $this->db->select('deal_stage_id')->get(db_prefix() . 'deals_stage_custom')->result_array();
+		return $flat = array_column($datastage, 'deal_stage_id');
+		//echo $this->db->last_query();exit;//return
+    }
+	
+	
+	
 }
