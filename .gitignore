@@ -16,6 +16,7 @@ temp/
 # Ignore compiled files
 *.class
 *.pyc
+*.mno
 
 # Ignore OS or editor-specific files
 .DS_Store
