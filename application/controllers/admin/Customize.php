@@ -80,7 +80,7 @@ class Customize extends AdminController
             // Handle company logo upload
             if (isset($_FILES['customize_company_logo']) && $_FILES['customize_company_logo']['error'] == 0) {
                 $config['upload_path']   = $upload_path;
-                $config['allowed_types'] = 'gif|jpg|jpeg|png|svg';
+                $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|svg';
                 $config['max_size']      = 2048; // 2MB
                 $config['file_name']     = 'company_logo_' . time();
 
@@ -205,10 +205,11 @@ $data['deal_form_type'] = $this->db->where('company_id', $company_id)->get('it_c
                 'checked' => isset($checked[$deal_stage_id]) ? $checked[$deal_stage_id] : 0
             ]);
         }
+		$sss=$this->db->last_query();
         // Update it_crm_company_master.deal_form_type
-        $this->db->where('company_id', $company_id)
-            ->update('it_crm_company_master', ['deal_form_type' => ($customized_default ? 1 : 0)]);
-        echo json_encode(['success' => true]);
+        //$this->db->where('company_id', $company_id)
+           // ->update('it_crm_company_master', ['deal_form_type' => ($customized_default ? 1 : 0)]);
+        echo json_encode(['success' => $sss]);
         exit;
     }
 

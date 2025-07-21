@@ -3,6 +3,7 @@
 
 echo $deal_form_type;
 ?>
+<style> .field-label {margin-left: 0px !important; }</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -58,9 +59,9 @@ echo $deal_form_type;
                                     <div id="deal-stage-customized-content">
                                         <div id="deal-stage-customized-loading">Loading...</div>
                                         <ul id="customized-stage-list" class="list-group" style="margin-top:10px; display:none;"></ul>
-                                        <div id="customized-default-checkbox-wrapper" style="margin-top:10px;">
+                                        <?php /*?><div id="customized-default-checkbox-wrapper" style="margin-top:10px;">
                                           <label><input type="checkbox" id="customized-default-checkbox"> Set as Default</label>
-                                        </div>
+                                        </div><?php */?>
                                         <button id="save-customized-stages" class="btn btn-success" style="display:none; margin-top:10px;">Save</button>
                                         <div id="deal-stage-customized-save-msg" style="margin-top:10px;"></div>
                                     </div>
@@ -211,8 +212,10 @@ $(function() {
             }
             html += '<li class="list-group-item" data-id="' + stage.id + '">' +
                 '<input type="checkbox" class="customized-stage-check" data-id="' + stage.id + '" ' + checked + ' ' + disabled + '> ' +
-                (stage.stage ? stage.stage : stage.name) +
-                '<span class="handle" style="cursor:move; float:right;"><i class="fa fa-arrows"></i></span>';
+                (stage.stage ? stage.stage : stage.name);
+            if (!isLast) {
+                html += '<span class="handle" style="cursor:move; float:right;"><i class="fa fa-arrows"></i></span>';
+            }
             if (checked) {
                 html += '<button class="btn btn-primary btn-xs customized-form-btn" style="float:right; margin-right:10px;">Customized Form</button>';
                 var btnClass = 'btn-danger';
@@ -305,6 +308,16 @@ $(function() {
         }
     });
     $('#save-customized-stages').on('click', function() {
+	
+	 if (confirm('Are you sure you want to save the customized stages?')) {
+        // Proceed with the save logic
+        //alert('Saving...');
+    } else {
+        // Cancel the action
+        alert('Save cancelled.');
+        e.preventDefault(); // Optional: prevent default behavior
+    }
+	
         var order = [];
         var checked = {};
         var $items = $('#customized-stage-list li');
@@ -325,14 +338,15 @@ $(function() {
             data: { order: order, checked: checked, customized_default: customizedDefault },
             dataType: 'json',
             success: function(res) {
+			alert(JSON.stringify(res));
                 if (res.success) {
                     $('#deal-stage-customized-save-msg').html('<span class="text-success">Saved successfully!</span>');
                 } else {
-                    $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.</span>');
+                    $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed. </span>');
                 }
             },
             error: function() {
-                $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.</span>');
+                $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.66</span>');
             }
         });
     });

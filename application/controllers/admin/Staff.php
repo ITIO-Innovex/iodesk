@@ -141,6 +141,9 @@ class Staff extends AdminController
             $data = $this->input->post();
 			$data_staff = $data;
 			
+			// Add this line to ensure deal_form_type is set
+			$data['deal_form_type'] = $this->input->post('deal_form_type');
+			
 			if(isset($data['id'])&&$data['id']){
 			$id=$data['id'];
 			}

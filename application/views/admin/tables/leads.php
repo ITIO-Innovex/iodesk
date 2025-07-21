@@ -227,6 +227,8 @@ return App_table::find('leads')
             'assigned',
 			'absorber',
 			'deal_status',
+			'deal_stage',
+			'deal_stage_status',
             'lastname as assigned_lastname',
             db_prefix() . 'leads.addedfrom as addedfrom',
             '(SELECT count(leadid) FROM ' . db_prefix() . 'clients WHERE ' . db_prefix() . 'clients.leadid=' . db_prefix() . 'leads.id) as is_converted',
@@ -369,8 +371,29 @@ return App_table::find('leads')
 
             $row[] = $outputStatus;
 			if($pagexxx=='deals'){
-			 $row[] = $this->ci->leads_model->get_deal_status_title(e($aRow['deal_status']));
-			 }
+			
+			   if($_SESSION['deal_form_type']==1){
+			   $deal_list=$_SESSION['deal_form_order'];
+			   
+			   if(e($aRow['deal_stage_status'])==1){
+			   $dealstagetitle="Deal Success";
+			   }elseif(e($aRow['deal_stage_status'])==2){
+			   $dealstagetitle="Deal Failed";
+			   }else{
+			   $deal_stage=$deal_list[e($aRow['deal_stage'])];
+			   $deal_stage_title=$deal_list[e($aRow['deal_stage'])];
+			   $dealstagetitle=get_deals_stage_title($deal_stage);
+			   
+			   }
+			   
+			   
+			   
+				   $row[] = $dealstagetitle;
+				   }else{
+				   $row[] = $this->ci->leads_model->get_deal_status_title(e($aRow['deal_status']));
+				   }
+			   
+			   }
 			
 			//$row[] = e($aRow['absorber']);
 			/////////////////////////

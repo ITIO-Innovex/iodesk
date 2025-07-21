@@ -2043,6 +2043,17 @@ if (!empty($form_layout->form_layout)) {
 		
 		echo "</div>";
 		}
+		
+		if(isset($deal_stage)&&$deal_stage==10){
+		echo "<div class='form-group'>
+                    <label for='smtp_encryption'>Status</label>
+                    <select name='status' class='form-control'>
+                        <option value=''>Select Status</option>
+                        <option value='0' selected=''>Lost</option>
+                        <option value='1'>Won</option>
+                    </select>
+                </div>";
+		}else{
 		echo "<div class='form-group'>
                     <label for='smtp_encryption'>Status</label>
                     <select name='status' class='form-control'>
@@ -2051,6 +2062,8 @@ if (!empty($form_layout->form_layout)) {
                         <option value='1'>Completed</option>
                     </select>
                 </div>";
+				
+		  }
 	}
 ?>
 

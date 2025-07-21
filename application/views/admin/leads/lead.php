@@ -92,7 +92,14 @@ font-weight: bolder !important;
 	$datastage=$_SESSION['deal_form_order'];
 	//print_r($datastage);
 	?>
-	<?php echo get_deals_stage_title($datastage[$lead->deal_stage]);?>
+	<?php 
+	if(count($_SESSION['deal_form_order']) > $lead->deal_stage){
+	echo get_deals_stage_title($datastage[$lead->deal_stage]);
+	}else{
+	echo "check status";
+	}
+	
+	?>
 	<?php 
 	
 	//print_r($flat);
