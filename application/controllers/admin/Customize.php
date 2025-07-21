@@ -205,11 +205,11 @@ $data['deal_form_type'] = $this->db->where('company_id', $company_id)->get('it_c
                 'checked' => isset($checked[$deal_stage_id]) ? $checked[$deal_stage_id] : 0
             ]);
         }
-		$sss=$this->db->last_query();
+		//$sss=$this->db->last_query();
         // Update it_crm_company_master.deal_form_type
         //$this->db->where('company_id', $company_id)
            // ->update('it_crm_company_master', ['deal_form_type' => ($customized_default ? 1 : 0)]);
-        echo json_encode(['success' => $sss]);
+        echo json_encode(['success' => true]);
         exit;
     }
 
