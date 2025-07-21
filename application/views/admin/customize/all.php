@@ -338,7 +338,7 @@ $(function() {
             data: { order: order, checked: checked, customized_default: customizedDefault },
             dataType: 'json',
             success: function(res) {
-			alert(JSON.stringify(res));
+			//alert(JSON.stringify(res));
                 if (res.success) {
                     $('#deal-stage-customized-save-msg').html('<span class="text-success">Saved successfully!</span>');
                 } else {
@@ -346,7 +346,7 @@ $(function() {
                 }
             },
             error: function() {
-                $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.66</span>');
+                $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.</span>');
             }
         });
     });
