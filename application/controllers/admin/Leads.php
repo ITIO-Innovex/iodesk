@@ -1895,8 +1895,8 @@ $process_addedon_field = 'process' . $deal_stage . '_addedon';
             }
 			
 			
-$status = $this->input->post('file_labels');			
-$file_labels=explode(",",$status);		
+$statusfile = $this->input->post('file_labels');
+$file_labels = explode(",", $statusfile ?? "");
 if(!empty($file_labels)){	
 foreach($file_labels as $filename){
 $filename=trim($filename);
@@ -1932,14 +1932,30 @@ $data = [
     $process_addedon_field => date('Y-m-d H:i:s')
 ];
 
+//print_r($data);exit;
+
 if ($deal_stage == 1) {
     // Insert if stage is 1
     $this->db->insert('it_crm_deals_process_list', $data);
+	
+	
 } else {
     // Update if record already exists for deal_id
     $this->db->where('deal_id', $deal_id);
     $this->db->update('it_crm_deals_process_list', $data);
 };
+
+if ($deal_stage == 10) { // For set Final Status 1 for Success 9 for failed
+
+   if(isset($status)&&$status==1){
+   $this->db->set('deal_stage_status', 1);
+   }else{
+   $this->db->set('deal_stage_status', 2);
+   }
+   $this->db->where('id', $deal_id);
+   $this->db->update('it_crm_leads');
+   
+}
 
 $log_status="Working on ";
 if(isset($status)&&$status==1){

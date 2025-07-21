@@ -25,6 +25,7 @@
 								<th><?php echo _l('Phone Number'); ?></th>
 								<th><?php echo _l('Email'); ?></th>
 								<th><?php echo _l('Type'); ?></th>
+								<th><?php echo _l('Deal Form Type'); ?></th>
 								<th><?php echo _l('Status'); ?></th>
 								<th><?php echo _l('Total Staff'); ?></th>
 								<th><?php echo _l('Added On'); ?></th>
@@ -50,6 +51,15 @@
 									<td><?php echo e($list['phonenumber']); ?></td>
 									<td><?php echo e($list['email']); ?></td>
 									<td><?php echo $admintype; ?></td>
+									<td>
+  <?php
+    if (isset($list['deal_form_type'])) {
+      echo $list['deal_form_type'] == 1 ? 'Customized Form' : 'Default';
+    } else {
+      echo 'Customized Form'; // default if not set
+    }
+  ?>
+</td>
 									<td><?php //echo e($list['active']); ?>
 
 
@@ -63,7 +73,10 @@
                                     <td>
                                         <div class="tw-flex tw-items-center tw-space-x-3">
 <a href="#" onclick="edit_company(this,<?php echo e($list['company_id']); ?>);return false;"
-data-company="<?php echo e($list['companyname']); ?>" data-website="<?php echo e($list['website']); ?>" class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700"> <i class="fa-regular fa-pen-to-square fa-lg"></i></a>
+    data-company="<?php echo e($list['companyname']); ?>" 
+    data-website="<?php echo e($list['website']); ?>"
+    data-deal_form_type="<?php echo isset($list['deal_form_type']) ? e($list['deal_form_type']) : '1'; ?>"
+    class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700"> <i class="fa-regular fa-pen-to-square fa-lg"></i></a>
                                             
                                            
                                         </div>
@@ -102,6 +115,13 @@ data-company="<?php echo e($list['companyname']); ?>" data-website="<?php echo e
 
 <?php echo render_input('companyname', '<small class="req text-danger">* </small> Company Name', '', 'text', $required); ?>
 <?php echo render_input('website', '<small class="req text-danger">* </small> Website', '', 'url', $required); ?>
+<div class="form-group">
+  <label for="deal_form_type">Deal Form Type</label>
+  <select class="form-control" name="deal_form_type" id="deal_form_type">
+    <option value="0" <?php if(isset($member) && isset($member->deal_form_type) && $member->deal_form_type == 0) echo 'selected'; ?>>Default</option>
+    <option value="1" <?php if((isset($member) && isset($member->deal_form_type) && $member->deal_form_type == 1) || !isset($member)) echo 'selected'; ?>>Customized Form</option>
+  </select>
+</div>
 <div id="compStaff" >
 <hr class="hr-text gradient" data-content="For Company Admin Login Details">
 <?php echo render_input('firstname', '<small class="req text-danger">* </small> First Name', '', 'text'); ?>
@@ -181,16 +201,18 @@ function new_status() {
 function edit_company(invoker, id) {
     $('#additional').append(hidden_input('id', id));
     $('#status input[name="companyname"]').val($(invoker).data('company'));
-	$('#status input[name="website"]').val($(invoker).data('website'));
-	
+    $('#status input[name="website"]').val($(invoker).data('website'));
+    // Set deal_form_type if available
+    if ($(invoker).data('deal_form_type') !== undefined) {
+        $('#deal_form_type').val($(invoker).data('deal_form_type'));
+    }
     $('#status').modal('show');
     $('#compStaff').addClass('hide');
-	$('#firstname').removeAttr('required');
-	$('#lastname').removeAttr('required');
-	$('#email').removeAttr('required');
-	$('#phonenumber').removeAttr('required');
-	$('#status input[name="password"]').removeAttr('required');
-	
+    $('#firstname').removeAttr('required');
+    $('#lastname').removeAttr('required');
+    $('#email').removeAttr('required');
+    $('#phonenumber').removeAttr('required');
+    $('#status input[name="password"]').removeAttr('required');
 }
 
 
