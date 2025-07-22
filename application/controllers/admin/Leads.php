@@ -1966,14 +1966,14 @@ if ($deal_stage == 10) { // For set Final Status 1 for Success 9 for failed
    
 }
 
-$log_status="Process - ";
+$log_status="Process";
 if(isset($system_status)&&$system_status==1){
 
 $this->db->set('deal_stage', 'deal_stage + 1', FALSE);
 $this->db->set('last_status_change', date('Y-m-d H:i:s'));
 $this->db->where('id', $deal_id);
 $this->db->update('it_crm_leads');
-$log_status="Completed - ";
+$log_status="Completed";
 
 }
 $log_title=$log_status." - ".get_deals_stage_title($deal_stage);
