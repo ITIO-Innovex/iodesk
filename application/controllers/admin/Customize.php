@@ -195,15 +195,28 @@ $data['deal_form_type'] = $this->db->where('company_id', $company_id)->get('it_c
         }
         $this->load->database();
         // Remove old records for this company
-        $this->db->where('company_id', $company_id)->delete('it_crm_deals_stage_custom');
         // Insert new records
         foreach ($order as $i => $deal_stage_id) {
-            $this->db->insert('it_crm_deals_stage_custom', [
+            $exists = $this->db->where([
                 'deal_stage_id' => $deal_stage_id,
-                'order' => $i,
-                'company_id' => $company_id,
-                'checked' => isset($checked[$deal_stage_id]) ? $checked[$deal_stage_id] : 0
-            ]);
+                'company_id' => $company_id
+            ])->get('it_crm_deals_stage_custom')->row();
+            if ($exists) {
+                $this->db->where([
+                    'deal_stage_id' => $deal_stage_id,
+                    'company_id' => $company_id
+                ])->update('it_crm_deals_stage_custom', [
+                    'checked' => isset($checked[$deal_stage_id]) ? $checked[$deal_stage_id] : 0,
+                    'order' => $i
+                ]);
+            } else {
+                $this->db->insert('it_crm_deals_stage_custom', [
+                    'deal_stage_id' => $deal_stage_id,
+                    'order' => $i,
+                    'company_id' => $company_id,
+                    'checked' => isset($checked[$deal_stage_id]) ? $checked[$deal_stage_id] : 0
+                ]);
+            }
         }
 		//$sss=$this->db->last_query();
         // Update it_crm_company_master.deal_form_type

@@ -94,13 +94,22 @@ font-weight: bolder !important;
 	?>
 	<?php 
 	if(count($_SESSION['deal_form_order']) > $lead->deal_stage){
-	echo get_deals_stage_title($datastage[$lead->deal_stage]);
+	//echo get_deals_stage_title($datastage[$lead->deal_stage]);
 	}else{
-	echo "check status";
+	//echo "check status";
 	}
 	
 	?>
 	<?php 
+	
+	$deal_stage_status=$lead->deal_stage_status;
+	
+	if($deal_stage_status==1){
+	$inv_url=admin_url('invoices/invoice?iid=' . $lead->id);
+	?>
+	<a href="<?php echo $inv_url;?>" class="btn btn-sm btn-success tw-rounded-full "  target="_blank" title="Create Invoice" ><i class="fa-solid fa-handshake"></i> Invoice</a>
+	<?php
+	}else{
 	
 	//print_r($flat);
 	echo '<div class="dt-buttons btn-group">';
@@ -114,6 +123,7 @@ font-weight: bolder !important;
 	echo '<button class="btn '.$btncss.' buttons-collection btn-sm btn-default-dt-options" tabindex="0" aria-controls="leads" type="button" aria-haspopup="true" '.$modalopen.' aria-expanded="false"><span>'.get_deals_stage_title($val).'</span></button>';
 	}
     echo '</div>';
+	}
 	?>
    
 
@@ -433,9 +443,16 @@ $(document).ready(function () {
 
   checkWidth(); // Initial check
   $(window).resize(checkWidth); // Re-check on resize
+  // for complete deal status
+	 $('#systemStatus').on('change', function() {
+        var status = $(this).val();
+        if (status === '1') {
+            $('#noteArea').show();
+        } else {
+            $('#noteArea').hide();
+        }
+    });
 });
-
-
 </script>
 
 <?php 

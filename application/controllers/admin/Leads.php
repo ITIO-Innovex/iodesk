@@ -1879,8 +1879,18 @@ public function customizeddeal($id = '')
 
 $deal_id    = $this->input->post('deal_id');
 $deal_stage = $this->input->post('deal_stage');
-$status = $this->input->post('status');
+$system_status = $this->input->post('system_status');
 $custom_data = $this->input->post();
+
+$firstaction=1;
+$datajson = $this->input->post('datajson');
+if(isset($datajson)&&$datajson){
+unset($custom_data['datajson']);
+$originalData = json_decode($datajson, true);
+$mergedData = array_merge($originalData, $custom_data);
+$custom_data = $mergedData;
+$firstaction=2;
+}
 
 
 $process_field         = 'process' . $deal_stage;
@@ -1921,20 +1931,19 @@ $filename=trim($filename);
 }
 		
 
-           
-
+ 
 // Prepare data array
 $data = [
     'deal_id'          => $deal_id,
     'company_id'       => get_staff_company_id(),
     $process_field     => json_encode($custom_data),
-    $process_status_field => $status,
+    $process_status_field => $system_status,
     $process_addedon_field => date('Y-m-d H:i:s')
 ];
 
-//print_r($data);exit;
 
-if ($deal_stage == 1) {
+
+if ($deal_stage == 1 && $firstaction==1) {
     // Insert if stage is 1
     $this->db->insert('it_crm_deals_process_list', $data);
 	
@@ -1947,7 +1956,7 @@ if ($deal_stage == 1) {
 
 if ($deal_stage == 10) { // For set Final Status 1 for Success 9 for failed
 
-   if(isset($status)&&$status==1){
+   if(isset($system_status)&&$system_status==1){
    $this->db->set('deal_stage_status', 1);
    }else{
    $this->db->set('deal_stage_status', 2);
@@ -1957,14 +1966,14 @@ if ($deal_stage == 10) { // For set Final Status 1 for Success 9 for failed
    
 }
 
-$log_status="Working on ";
-if(isset($status)&&$status==1){
+$log_status="Process - ";
+if(isset($system_status)&&$system_status==1){
 
 $this->db->set('deal_stage', 'deal_stage + 1', FALSE);
-$this->db->set('last_status_change', '$process_addedon_field');
+$this->db->set('last_status_change', date('Y-m-d H:i:s'));
 $this->db->where('id', $deal_id);
 $this->db->update('it_crm_leads');
-$log_status="Completed ";
+$log_status="Completed - ";
 
 }
 $log_title=$log_status." - ".get_deals_stage_title($deal_stage);

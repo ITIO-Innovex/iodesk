@@ -257,11 +257,16 @@ return App_table::find('leads')
 		    /// For Reminder
 		    $reminderx="";
 		    if(isset($aRow['last_status_change'])&&$aRow['last_status_change']){
-			    if($aRow['deal_status'] != 4){
+			 
+				
+				if($aRow['deal_status'] != 4){
 				$reminderx=$this->ci->leads_model->lead_reminder($aRow['last_status_change']);
 				}else{
-				$reminderx="<i class='fa-solid fa-circle-check text-success' title='Final'></i>";
+				$reminderx="<i class='fa-solid fa-circle-check text-success' title='Final88'></i>";
 				}
+				
+				
+				
 		    }else{
 			$reminderx="<i class='fa-solid fa-circle-info text-danger fa-fade' title='New Leads'></i>";
 			}
@@ -371,14 +376,19 @@ return App_table::find('leads')
 
             $row[] = $outputStatus;
 			if($pagexxx=='deals'){
-			
+			  $hrefdeal='#';
+			  $hrefcss='btn-warning';
 			   if($_SESSION['deal_form_type']==1){
 			   $deal_list=$_SESSION['deal_form_order'];
 			   
 			   if(e($aRow['deal_stage_status'])==1){
-			   $dealstagetitle="Deal Success";
+			   $hrefdeal=admin_url('invoices/invoice?iid=' . $aRow['id']);
+			   $dealstagetitle="Invoice";
+			   $hrefcss='btn-success';
+			   
 			   }elseif(e($aRow['deal_stage_status'])==2){
 			   $dealstagetitle="Deal Failed";
+			   $hrefcss='btn-danger';
 			   }else{
 			   $deal_stage=$deal_list[e($aRow['deal_stage'])];
 			   $deal_stage_title=$deal_list[e($aRow['deal_stage'])];
@@ -386,6 +396,7 @@ return App_table::find('leads')
 			   
 			   }
 			   
+			   $dealstagetitle='<a href="'.$hrefdeal.'" class="btn btn-sm '.$hrefcss.' tw-rounded-full "  target="_blank" title="Create Invoice" >'.$dealstagetitle.'</a>';
 			   
 			   
 				   $row[] = $dealstagetitle;
