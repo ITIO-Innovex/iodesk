@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); 
 
-echo $deal_form_type;
+//echo $deal_form_type;
 ?>
 <style> .field-label {margin-left: 0px !important; }</style>
 <div id="wrapper">
@@ -99,7 +99,7 @@ echo $deal_form_type;
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="save-form-layout">Save</button>
+        <button type="button" class="btn btn-primary" data-val='' id="save-form-layout">Save</button>
       </div>
     </div>
   </div>
@@ -217,10 +217,10 @@ $(function() {
                 html += '<span class="handle" style="cursor:move; float:right;"><i class="fa fa-arrows"></i></span>';
             }
             if (checked) {
-                html += '<button class="btn btn-primary btn-xs customized-form-btn" style="float:right; margin-right:10px;">Customized Form</button>';
+                html += '<button class="btn btn-primary btn-xs customized-form-btn" data-idx="' + stage.id + '"  style="float:right; margin-right:10px;">Customized Form</button>';
                 var btnClass = 'btn-danger';
                 if (stageFormLayoutMap[stage.id]) btnClass = 'btn-success';
-                html += '<button class="btn ' + btnClass + ' btn-xs view-form-btn" style="float:right; margin-right:10px;" data-id="' + stage.id + '">View Form</button>';
+                html += '<button id="BtnID' + stage.id + '" class="btn ' + btnClass + ' btn-xs view-form-btn" style="float:right; margin-right:10px;" data-id="' + stage.id + '">View Form</button>';
             }
             html += '</li>';
         });
@@ -346,7 +346,7 @@ $(function() {
                 }
             },
             error: function() {
-                $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.</span>');
+                $('#deal-stage-customized-save-msg').html('<span class="text-danger">Save failed.66</span>');
             }
         });
     });
@@ -355,6 +355,9 @@ var currentDealStageId = null;
 // Open modal and load form layout
 $(document).on('click', '.customized-form-btn', function(e) {
     e.preventDefault();
+			var idx = $(this).attr('data-idx');
+			if(idx){ $('#save-form-layout').attr('data-val', idx); }
+			
     var li = $(this).closest('li');
     currentDealStageId = li.data('id');
     // Load existing layout if any
@@ -369,10 +372,12 @@ $(document).on('click', '.customized-form-btn', function(e) {
             } else {
                 renderFormBuilderFields([]);
             }
+			
             $('#customizedFormModal').modal('show');
         },
         error: function() {
             renderFormBuilderFields([]);
+			alert(22);
             $('#customizedFormModal').modal('show');
         }
     });
@@ -450,6 +455,9 @@ $(document).on('click', '.remove-field-btn', function() {
 });
 // Save form layout
 $('#save-form-layout').on('click', function() {
+var idx = $(this).attr('data-val');
+var btnId = 'BtnID' + idx; // Result: "BtnID5"
+
     var fields = [];
     $('#form-builder-fields .form-builder-field').each(function() {
         var label = $(this).find('.field-label').val();
@@ -469,6 +477,8 @@ $('#save-form-layout').on('click', function() {
         dataType: 'json',
         success: function(res) {
             if (res.success) {
+			    alert('Save Success');
+				$('#' + btnId).removeClass('btn-danger').addClass('btn-success');
                 $('#customizedFormModal').modal('hide');
             } else {
                 alert('Save failed');

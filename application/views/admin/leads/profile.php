@@ -406,9 +406,9 @@
 </div>
 </div>
 </div>
-
+<?php if($_SESSION['deal_form_type']==0){ ?>
 			
-			<div class="clearfix"></div>
+<div class="clearfix"></div>
 			<div class="col-md-12 col-xs-12">
                
 <div class="alert alert-warning" onclick="togglediv('#myDiv')"><?php echo _l('Deal Details'); ?> <span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span></div>
@@ -443,6 +443,8 @@
 </div>
 </div>
 </div>
+
+
 
 <?php
 
@@ -531,6 +533,73 @@ echo "<tbody></table>";
 <?php
 }
 ?>
+<?php }else{ 
+
+$this->db->select('*,');
+$this->db->limit(1);
+$this->db->where('deal_id', $lead->id);
+$this->db->where('company_id', get_staff_company_id());
+$process=$this->db->get('deals_process_list')->row();
+
+//print_r($process);
+$datastage=$_SESSION['deal_form_order'];
+
+foreach($datastage as $key=>$val){
+
+$field_process="process".$val;
+$field_process_addedon="process".$val."_addedon";
+
+if(isset($process)&&$process->$field_process){
+?>
+<div class="clearfix"></div>
+<div class="col-md-12 col-xs-12">
+               
+<div class="alert alert-warning" onclick="togglediv('#myxDiv<?php echo $val; ?>')"><?php echo get_deals_stage_title($val); ?> &nbsp;[
+<?php echo(isset($process) && $process->$field_process_addedon != '' ? '<span class="text-has-action text-success" data-toggle="tooltip" data-title="' . e(_dt($process->$field_process_addedon)) . '">' . e(time_ago($process->$field_process_addedon)) . '</span>' : '-') ?>]
+
+<span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span></div>
+<div id="myxDiv<?php echo $val; ?>" class="tw-border-neutral-200" style="display:none;">
+<div class="panel-body tw-mb-4">
+<div class="form-group">
+
+<?php
+$json = $process->$field_process;
+$data = json_decode($json, true);
+$allowed = ['gif', 'jpg', 'jpeg', 'png', 'pdf', 'svg'];
+unset($data['deal_stage'], $data['deal_id'], $data['file_labels']);
+echo "<table border='1' class='table dt-table dt-inline dataTable no-footer' >";
+foreach ($data as $key => $value) {
+
+if($key=='system_status' && $value==1){ $value="Completed";}elseif($key=='system_status' && $value==0){ $value="Processed";}
+// Get file extension
+$ext = strtolower(pathinfo($value, PATHINFO_EXTENSION));
+if (in_array($ext, $allowed)) {
+    $value='<a href="' . base_url('uploads/leads/'.$value) . '" target="_blank">View Document</a>';
+}else{
+ $value=htmlspecialchars($value);
+}
+
+    echo "<tr><td width='25%'><b>" . ucwords(str_replace('_', ' ', htmlspecialchars($key))) . "</b></td><td>:: " . $value . "</td></tr>";
+}
+echo "<tr><td width='25%'><b>Timestamp</b></td><td>:: " . $process->$field_process_addedon . "</td></tr>";
+echo "</table>";
+?>
+
+
+	
+</div>
+</div>
+</div>
+</div>
+<?php
+}
+}
+
+?>
+
+
+<?php } ?>
+
 <?php
 if ((isset($lead) && !empty($lead->custom_field))) {
 ?>
@@ -1399,7 +1468,7 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
             <div class="modal-header" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">#@@@@@<?php echo $lead->id;?> - <?php echo $dstatus; ?> [<?php echo $lead->deal_status;?>]</h4>
+                <h4 class="modal-title">#<?php echo $lead->id;?> - <?php echo $dstatus; ?> <?php /*?>[<?php echo $lead->deal_status;?>]<?php */?></h4>
             </div>
             <div class="modal-body">
                 <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
@@ -2000,8 +2069,44 @@ if (!empty($form_layout->form_layout)) {
 	
 	$file_labels = [];
 
+// Get Data if Inserted
+$getfield="process".$deal_stage;
+$this->db->select($getfield);
+$this->db->where('company_id', get_staff_company_id());
+$this->db->where('deal_id', $lead->id);
+$form_data=$this->db->get('deals_process_list')->row();
+//echo $this->db->last_query();
+if(isset($form_data)&&$form_data->$getfield){
+//print_r($form_data);
+$json=$form_data->$getfield;
+$data = json_decode($json, true);
 
-	
+// Remove the 'deal_stage' key
+
+unset($data['deal_stage'], $data['deal_id'], $data['file_labels'], $data['system_status'], $data['system_note']);
+$allowed = ['gif', 'jpg', 'jpeg', 'png', 'pdf', 'svg'];
+// Display as table
+foreach ($data as $key => $value) {
+
+if($key=='system_status' && $value==1){ $value="Completed";}elseif($key=='system_status' && $value==0){ $value="Processed";}
+// Get file extension
+$ext = strtolower(pathinfo($value, PATHINFO_EXTENSION));
+if (in_array($ext, $allowed)) {
+    $value='<a href="' . base_url('uploads/leads/'.$value) . '" target="_blank">View Document</a>';
+}else{
+ $value=htmlspecialchars($value);
+}
+
+
+echo "<div class='form-group'>";
+echo "<label>". ucwords(str_replace('_', ' ', $key)) ." :: </label>";
+echo "<span class='tw-mx-2'>" . $value . "</span>";
+echo "</div>";
+}
+
+echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  />";
+
+}else{
 	
 	foreach ($fields as $field) {
         $label = htmlspecialchars($field->label);
@@ -2044,10 +2149,19 @@ if (!empty($form_layout->form_layout)) {
 		echo "</div>";
 		}
 		
+if(!empty($file_labels)){ 
+$docString = implode(', ', $file_labels);
+?>
+<input type="hidden" name="file_labels" id="file_labels" value="<?php echo $docString;?>"  />			
+<?php }
+		
+		
+}		
+		}
 		if(isset($deal_stage)&&$deal_stage==10){
 		echo "<div class='form-group'>
                     <label for='smtp_encryption'>Status</label>
-                    <select name='status' class='form-control'>
+                    <select name='system_status' class='form-control' id='systemStatus'>
                         <option value=''>Select Status</option>
                         <option value='0' selected=''>Lost</option>
                         <option value='1'>Won</option>
@@ -2056,17 +2170,20 @@ if (!empty($form_layout->form_layout)) {
 		}else{
 		echo "<div class='form-group'>
                     <label for='smtp_encryption'>Status</label>
-                    <select name='status' class='form-control'>
+                    <select name='system_status' class='form-control' id='systemStatus'>
                         <option value=''>Select Status</option>
                         <option value='0' selected=''>Process</option>
                         <option value='1'>Completed</option>
                     </select>
                 </div>";
 				
-		  }
+		  
 	}
 ?>
-
+<div class='form-group' id="noteArea" style="display:none;">
+<label for='smtp_encryption'>Short Note</label>
+<textarea name="system_note"  class="form-control" placeholder="Enter about won / lost..."></textarea>
+</div>
 
 </div>
 
@@ -2083,11 +2200,7 @@ if (!empty($form_layout->form_layout)) {
 </div>   
                
             </div>
-<?php if(!empty($file_labels)){ 
-$docString = implode(', ', $file_labels);
-?>
-<input type="hidden" name="file_labels" id="file_labels" value="<?php echo $docString;?>"  />			
-<?php } ?>
+
 			
 <div class="modal-footer" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button class="btn btn-primary">Submit</button>
