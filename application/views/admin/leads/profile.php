@@ -772,7 +772,9 @@ foreach ($custom_field_array as $key => $value) {
                $selected                 = (isset($lead) ? $lead->IncorporationCountry : $customer_default_country);
                echo render_select('IncorporationCountry', $countries, [ 'country_id', [ 'short_name']], 'Incorporation Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]);
                ?><?php */?>
-			   <?php $value = (isset($lead) ? $lead->subject : ''); ?>
+			   <?php //$value = (isset($lead) ? $lead->subject : 'Web Service'); 
+			   $value = (isset($lead->subject) && !empty($lead->subject)) ? $lead->subject : 'Web Service';
+			   ?>
                 <?php echo render_input('subject', 'Lead Subject', $value);  ?>
 				
                 <?php //$value = (isset($lead) ? $lead->zip : ''); ?>
@@ -1513,7 +1515,7 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
  
 <div class="col-md-4">
  <?php $value = (isset($lead) ? $lead->company : ''); ?>
- <?php echo render_input('company', 'Business Name', $value,'text',['required' => 'true']); //,['required' => 'true'] ?>  
+ <?php echo render_input('company', 'Business Name', $value,'text'); //,['required' => 'true'] ?>  
  </div>    
 <div class="col-md-4">
  <?php $value = (isset($lead) ? $lead->website : ''); ?>
@@ -1535,7 +1537,7 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
  </div>
 <div class="col-md-12">
  <?php $value = (isset($lead) ? $lead->description : ''); ?>
- <?php echo render_textarea('description', 'Business Description', $value,['required' => 'true']); ?>
+ <?php echo render_textarea('description', 'Business Description', $value); ?> <!--//,['required' => 'true']-->
  </div>
 
  <div class="col-md-12 checkbox last:tw-mb-0">
