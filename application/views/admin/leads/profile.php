@@ -2132,7 +2132,7 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
 				
                 break;
 			case 'cal':
-                echo "<input type='date' name='{$name}' id='{$name}' class='form-control' {$required}>";
+                echo "<input type='datetime-local' name='{$name}' id='{$name}' class='form-control' {$required}>";
                 break;
 			case 'listbox':	
 				echo '<select name="' . $name . '" id="' . $name . '" class="form-control" ' . $required . '>';

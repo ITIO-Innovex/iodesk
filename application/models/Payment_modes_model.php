@@ -122,6 +122,7 @@ class Payment_modes_model extends App_Model
             'invoices_only'       => $data['invoices_only'],
             'show_on_pdf'         => $data['show_on_pdf'],
             'selected_by_default' => $data['selected_by_default'],
+			'company_id' => $data['company_id'],
         ]);
 
         $insert_id = $this->db->insert_id();

@@ -560,7 +560,7 @@ function renderViewForm(fields) {
                 html += '<input type="file" class="form-control" name="' + name + '" id="' + id + '" ' + required + ' disabled />';
                 break;
             case 'cal':
-                html += '<input type="date" class="form-control" name="' + name + '" id="' + id + '" ' + required + ' readonly />';
+                html += '<input type="datetime-local" class="form-control" name="' + name + '" id="' + id + '" ' + required + ' readonly />';
                 break;
         }
         html += '</div>';
