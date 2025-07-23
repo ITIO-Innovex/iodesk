@@ -76,7 +76,7 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="smtp_encryption"><?php echo _l('SMTP email encryption'); ?></label>
+                    <label for="smtp_encryption"><?php echo _l('SMTP Email Encryption'); ?></label>
                     <select name="settings[smtp_encryption]" class="form-control">
                         <option value="" <?php echo (empty($smtp_settings['smtp_encryption'] ?? '')) ? 'selected' : ''; ?>><?php echo _l('SMTP email encryption'); ?></option>
                         <option value="ssl" <?php echo (isset($smtp_settings['smtp_encryption']) && $smtp_settings['smtp_encryption'] == 'ssl') ? 'selected' : ''; ?>>SSL</option>
