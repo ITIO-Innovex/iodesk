@@ -17,7 +17,7 @@ class Import_leads extends App_import
 
     public function __construct()
     {
-        $this->notImportableFields = hooks()->apply_filters('not_importable_leads_fields', ['id', 'assigned', 'dateadded', 'last_status_change', 'addedfrom', 'leadorder', 'date_converted', 'lost', 'junk', 'is_imported_from_email_integration', 'email_integration_uid', 'is_public', 'dateassigned', 'client_id', 'lastcontact', 'last_lead_status', 'from_form_id', 'default_language', 'hash', 'company_id']);
+        $this->notImportableFields = hooks()->apply_filters('not_importable_leads_fields', ['id', 'assigned', 'dateadded', 'last_status_change', 'addedfrom', 'leadorder', 'date_converted', 'lost', 'junk', 'is_imported_from_email_integration', 'email_integration_uid', 'is_public', 'dateassigned', 'client_id', 'lastcontact', 'last_lead_status', 'from_form_id', 'default_language', 'hash', 'company_id','zip','city','state','telegram_bot_id', 'additional_data', 'merged_lead_ids', 'parent_id', 'is_child', 'is_merged', 'old_history', 'website_info', 'card_tdr', 'accept_cards', 'maximum_ticket_amount', 'minimum_ticket_amount', 'number_of_transactions', 'estimated_total_sales', 'target_countries', 'subject', 'processing_history', 'descriptor', 'products_services', 'customer_info', 'spoc_info','uw_status','custom_field','deal_stage_status','deal_stage','deal_status','is_deal','Source_Live','AverageProductPrice','IncorporationCountry','MonthlyVolume','AgentName','TelegramGroupId','WhatsAppGroupId','BusinessNature','SkypeInfo','Customerjourney','Responsible','Stage','LeadName','absorber','ip','lead_value','country_code','country','status','title','source']);
 
         $uniqueValidationFields = json_decode(get_option('lead_unique_validation'));
 
@@ -96,6 +96,15 @@ class Import_leads extends App_import
 					if (!isset($insert['company_id'])) {
                         $insert['company_id'] = get_staff_company_id();
                     }
+					
+					if (!isset($insert['source'])) {
+                        $insert['source'] = 7;
+                    }
+					
+					if (!isset($insert['status'])) {
+                        $insert['status'] = 3;
+                    }
+					
 
                     if ($this->ci->input->post('responsible')) {
                         $insert['assigned'] = $this->ci->input->post('responsible');

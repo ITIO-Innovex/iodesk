@@ -729,9 +729,9 @@ foreach ($custom_field_array as $key => $value) {
                ?>
 				
                 
-				<?php /*?>
-				 <?php $value = (isset($lead) ? $lead->BusinessNature : ''); ?>
-                <?php echo render_input('BusinessNature', 'Business Nature', $value); //lead_company to Business Name ?>  <?php */?>
+				
+				 <?php /*?><?php $value = (isset($lead) ? $lead->BusinessNature : ''); ?>
+                <?php echo render_input('BusinessNature', 'Business Nature', $value); //lead_company to Business Name ?><?php */?>  
             </div>
             <div class="col-md-6">
 			
@@ -767,7 +767,7 @@ foreach ($custom_field_array as $key => $value) {
 			   <?php $value = (isset($lead) ? $lead->address : ''); ?>
                 <?php echo render_textarea('address', 'lead_address', $value, ['rows' => 1, 'style' => 'height:36px;font-size:100%;']); ?>
 			   
-			    <?php /*?><?php
+			   <?php /*?><?php
                $customer_default_country = get_option('customer_default_country');
                $selected                 = (isset($lead) ? $lead->IncorporationCountry : $customer_default_country);
                echo render_select('IncorporationCountry', $countries, [ 'country_id', [ 'short_name']], 'Incorporation Country', $selected, ['data-none-selected-text' => _l('dropdown_non_selected_tex')]);
@@ -804,8 +804,8 @@ foreach ($custom_field_array as $key => $value) {
             </div>
 			
             <div class="col-md-12">
-               <?php /*?> <?php $value = (isset($lead) ? $lead->description : ''); ?>
-                <?php echo render_textarea('description', 'lead_description', $value); ?><?php */?>
+               <?php $value = (isset($lead) ? $lead->description : ''); ?>
+                <?php echo render_textarea('description', 'lead_description', $value); ?>
 				
 				
 				
