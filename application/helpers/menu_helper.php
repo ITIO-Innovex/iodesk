@@ -195,6 +195,7 @@ function app_init_admin_sidebar_menu_items()
 			'badge'    => [],
 		]);
     }
+	    if(isset($_SESSION['company_form_type'])&& $_SESSION['company_form_type']<>1){
 	
 		if (is_staff_member() && get_staff_rolex()<>3) {
 		$CI->app_menu->add_sidebar_menu_item('UW Status', [
@@ -204,6 +205,8 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 20,
 			'badge'    => [],
 		]);
+		}
+		
     }
 	
 	  /*  if (is_staff_member()) {

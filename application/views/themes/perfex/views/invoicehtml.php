@@ -5,6 +5,7 @@
         <div class="col-md-3">
             <div class="mbot30">
                 <div class="invoice-html-logo">
+				   
 					<?php echo get_company_logo(get_admin_uri() . '/', 'v-logo')?>
                 </div>
             </div>

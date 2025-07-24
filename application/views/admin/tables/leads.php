@@ -258,11 +258,12 @@ return App_table::find('leads')
 		    $reminderx="";
 		    if(isset($aRow['last_status_change'])&&$aRow['last_status_change']){
 			 
-				
-				if($aRow['deal_status'] != 4){
+				if($aRow['deal_stage_status'] == 1){
+				$reminderx="<i class='fa-solid fa-circle-check text-success' title='Final.'></i>";
+				}elseif($aRow['deal_status'] != 4){
 				$reminderx=$this->ci->leads_model->lead_reminder($aRow['last_status_change']);
 				}else{
-				$reminderx="<i class='fa-solid fa-circle-check text-success' title='Final88'></i>";
+				$reminderx="<i class='fa-solid fa-circle-check text-success' title='Final..'></i>";
 				}
 				
 				

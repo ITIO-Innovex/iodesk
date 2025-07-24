@@ -428,7 +428,11 @@ function get_staff_company_name($company_id = '')
 }
 
 function get_staff_company_logo($company_id = '')
-{   
+{  
+
+if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']<>1){
+$company_id=$_SESSION['staff_company_id'];
+}	
 
         // check company id is found or not
 		if($company_id==""){
@@ -437,12 +441,13 @@ function get_staff_company_logo($company_id = '')
 				$company_id=$GLOBALS['current_user']->company_id;
 				}
 		 }
-		 
+	
         // Fetch company Name from company id
 		if(isset($company_id)&&$company_id){
 		$CI = & get_instance();
 		$CI->db->where('company_id', $company_id);
 		$com = $CI->db->select('company_logo')->from(db_prefix() . 'company_master')->get()->row();
+		//echo $this->db->last_query();exit;
 		if(isset($com)&&$com->company_logo){
 		return $com->company_logo;
 		}else{
