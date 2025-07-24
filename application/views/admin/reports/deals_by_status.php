@@ -1,5 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<?php 
+
+if(!isset($_SESSION['deal_form_order'])||empty($_SESSION['deal_form_order'])){
+$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
+}
+?>
 
 <div id="wrapper">
   <div class="content">
@@ -106,7 +112,6 @@ foreach ($deals_by_status_data as $row) {
     $pieData[] = [$row['status_name'], (int)$row['total']];
     $barData[] = [$row['status_name'], (int)$row['total']];
 }
-$colors = array_map(function($row) { return $row['status_color']; }, $deals_by_status_data);
 ?>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
@@ -121,7 +126,6 @@ $colors = array_map(function($row) { return $row['status_color']; }, $deals_by_s
     var options = {
       title: 'Deals Distribution by Status',
       pieHole: 0.4,
-      colors: <?php echo json_encode($colors); ?>,
       legend: {position: 'bottom'},
       chartArea: {width: '80%', height: '70%'}
     };
@@ -135,7 +139,6 @@ $colors = array_map(function($row) { return $row['status_color']; }, $deals_by_s
         title: 'Deals by Status',
       },
       bars: 'horizontal',
-      colors: <?php echo json_encode($colors); ?>,
       legend: { position: 'none' },
       chartArea: {width: '80%', height: '70%'}
     };
