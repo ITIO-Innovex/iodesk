@@ -706,8 +706,12 @@ foreach ($custom_field_array as $key => $value) {
                 <?php echo render_input('name', 'lead_add_edit_name', $value); ?>
                 <?php $value = (isset($lead) ? $lead->title : ''); ?>
                 <?php //echo render_input('title', 'lead_title', $value); ?>
+				
                 <?php $value = (isset($lead) ? $lead->email : ''); ?>
-                <?php echo render_input('email', 'lead_add_edit_email', $value,'email',['required' => 'true']); ?>
+                <?php //echo render_input('email', 'lead_add_edit_email', $value,'email',['required' => 'true']); ?>
+				<div class="form-group" app-field-wrapper="email">
+				<label for="phonenumber" class="control-label"> <small class="req text-danger">* </small>Email</label>
+				<label for="email" class="control-label">Email Address</label><input type="email" id="email" name="email" class="form-control" required="true" value="<?php echo $value;?>"></div>
                 
 				<div class="col-md-4 tw-px-0">
 				<?php

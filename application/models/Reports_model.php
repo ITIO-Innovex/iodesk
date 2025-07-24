@@ -965,7 +965,7 @@ class Reports_model extends App_Model
     public function get_deals_by_status_data($period = 'this_month')
     {
         $this->load->model('leads_model');
-        $statuses = $this->leads_model->get_deal_status();
+        $statuses = $this->leads_model->get_deal_form_order();
         $data = [];
         // Set date conditions based on period
         $date_condition = '';
@@ -991,10 +991,12 @@ class Reports_model extends App_Model
                 break;
         }
         // Get data for each deal status
-        foreach ($statuses as $status) {
+		//print_r($statuses);exit;
+        foreach ($statuses as $key=>$status) {
+		//print_r($status);exit;
             $this->db->select('COUNT(*) as total');
             $this->db->from(db_prefix() . 'leads');
-            $this->db->where('deal_status', $status['id']);
+            $this->db->where('deal_stage', $key+1);
             $this->db->where('is_deal', 1);
             //$this->db->where('lost', 0); // Exclude lost deals
             //$this->db->where('junk', 0); // Exclude junk deals
@@ -1032,13 +1034,14 @@ class Reports_model extends App_Model
             }
             
             $result = $this->db->get()->row();
+			//echo $this->db->last_query();
             $data[] = [
-                'status_name' => $status['name'],
-                'status_color' => $status['color'],
+                'status_name' => get_deals_stage_title($status),
                 'total' => $result->total,
-                'status_id' => $status['id']
+                'status_id' => $status
             ];
         }
+		//exit;
         return $data;
     }
 
