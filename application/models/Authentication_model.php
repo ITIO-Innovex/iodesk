@@ -87,6 +87,7 @@ class Authentication_model extends App_Model
                         'staff_user_id'   => $user->$_id,
                         'staff_logged_in' => true,
 						'staff_company_id' => $user->company_id,
+						'company_form_type' => get_deal_form_type($user->company_id),
                     ];
                 } else {
                     $user_data                = [];

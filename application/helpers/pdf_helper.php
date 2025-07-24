@@ -54,11 +54,21 @@ function pdf_logo_url()
     if ($custom_pdf_logo_image_url != '') {
         $logoUrl = $custom_pdf_logo_image_url;
     } else {
+	
+	    if(!is_super() && is_staff_member()){
+		
+    	$logoUrl = get_staff_company_logo()?$companyUploadPath . get_staff_company_logo() : get_option('company_logo') ;
+	    }else{
+		
         if (get_option('company_logo_dark') != '' && file_exists($companyUploadPath . get_option('company_logo_dark'))) {
             $logoUrl = $companyUploadPath . get_option('company_logo_dark');
         } elseif (get_option('company_logo') != '' && file_exists($companyUploadPath . get_option('company_logo'))) {
             $logoUrl = $companyUploadPath . get_option('company_logo');
         }
+		
+		}
+		
+		
     }
 
     $logoImage = '';
