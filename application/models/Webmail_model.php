@@ -404,7 +404,7 @@ foreach ($folders as $folder) {
 
 
      
-	  $total_Email=$mailbox->query()->all()->count();
+	 // $total_Email=$mailbox->query()->all()->count();
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
@@ -415,9 +415,9 @@ foreach ($folders as $folder) {
 	  
 try {
 
-     $pg=floor($last_email_id / 5) +1;	  
+     $pg=floor($last_email_id / 10) +1;	  
 	  $messages = $mailbox->query()
-    ->all()->limit($limit = 5, $page = $pg)
+    ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
@@ -585,7 +585,7 @@ $cnt=0;
 
 
      
-	  $total_Email=$mailbox->query()->all()->count();
+	  //$total_Email=$mailbox->query()->all()->count();
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
