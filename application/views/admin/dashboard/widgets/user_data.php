@@ -142,7 +142,12 @@
 						}
 						?>
 					</div>
-					<?php $i++; } ?>
+					<?php $i++; } 
+					
+					if(count($notes)==0){
+					echo "<h5>You haven’t added any notes yet</h5>";
+					}
+					?>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="home_my_reminders">
                     <a href="<?php echo admin_url('misc/reminders'); ?>" class="mbot20 inline-block full-width">
@@ -159,6 +164,7 @@
                     <?php if (is_admin()) { ?>
                     <div class="activity-feed" style="max-height: 400px; overflow-y: auto;">
 					<?php
+					
 					$len	= count($deal_task);
 					$i		= 0;
 					foreach ($deal_task as $task) { ?>
@@ -212,7 +218,12 @@ if ($currentDateTime > $assignDateTime) {
 						}
 						?>
 					</div>
-					<?php $i++; } ?>
+					<?php $i++; } 
+					
+					if(count($deal_task)==0){
+					echo "<h5>You haven’t added any to-dos yet</h5>";
+					}
+					?>
 				</div>
                     <?php } ?>
                     

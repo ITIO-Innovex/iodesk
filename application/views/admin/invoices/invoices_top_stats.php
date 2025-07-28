@@ -21,7 +21,7 @@
 
       $total_invoices = total_rows(db_prefix() . 'invoices', $where_all);
       ?>
-    <div class="quick-top-stats">
+    <div class="quick-top-stats tw-border tw-border-solid tw-border-neutral-200 tw-rounded-md tw-bg-white tw-mt-2">
         <dl
             class="tw-mt-5 tw-grid tw-grid-cols-1 tw-divide-y tw-divide-solid tw-divide-neutral-200 tw-overflow-hidden md:tw-grid-cols-3 lg:tw-grid-cols-5 md:tw-divide-y-0 md:tw-divide-x tw-mb-0">
         <?php 

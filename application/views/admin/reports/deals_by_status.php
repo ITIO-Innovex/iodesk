@@ -62,6 +62,7 @@ $_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
               </thead>
               <tbody>
                 <?php 
+				
                 $total_deals = 0;
                 foreach ($deals_by_status_data as $row) {
                     $total_deals += $row['total'];
