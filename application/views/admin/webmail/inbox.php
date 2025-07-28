@@ -520,7 +520,16 @@ $('.isflag').click(function(){
          var mid=$(this).attr('data-mid');
 		 var fid=$(this).attr('data-fid');
 		 var resultid='.isflag'+mid;
-		 //alert(resultid);
+		 //alert(mid);
+		 //alert(fid);
+		 
+		 if(fid==0){
+		 $(this).attr('data-fid',1);
+		 $(this).removeClass('tw-text-info-800').addClass('tw-text-info-300');
+		 }else{
+		 $(this).attr('data-fid',0);
+		 $(this).removeClass('tw-text-info-300').addClass('tw-text-info-800');
+		 }
 		 
 		 $.post(admin_url + 'webmail/make_isflag', {
             mid: mid,
@@ -549,7 +558,7 @@ $('.isdelete').click(function(){
 		 var fid=$(this).attr('data-fid');
 		 var resultid='.isdelete'+mid;
 		 var tableid='.table'+mid;
-		 if(fid==0){ var msgx="Un Delete";}else if(fid==1){var msgx="Delete";}else if(fid==2){var msgx="Move to inbox";}else{var msgx="Permanent Delete";}
+		 if(fid==0){ var msgx="restore";}else if(fid==1){var msgx="Delete";}else if(fid==2){var msgx="Move to inbox";}else{var msgx="Permanent Delete";}
 		 if (!confirm('Are you sure you want to ' + msgx + ' this email?')) {
 		 return false;
 		 }

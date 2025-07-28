@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <div id="header">
-    <div class="hide-menu tw-ml-1"><i class="fa fa-align-left"></i></div>
+    <div class="hide-menu tw-ml-1"><i class="fa fa-align-left tw-text-white"></i></div>
 
     <nav>
         <div class="tw-flex tw-justify-between">
@@ -12,7 +12,7 @@
                         class="tw-px-4 tw-ml-1 tw-mt-2.5 focus:!tw-ring-0 tw-w-full !tw-placeholder-neutral-400 !tw-shadow-none tw-text-neutral-800 focus:!tw-placeholder-neutral-600 hover:!tw-placeholder-neutral-600 sm:tw-w-[400px] tw-h-[40px] tw-bg-neutral-300/30 hover:tw-bg-neutral-300/50 !tw-border-0"
                         placeholder="<?php echo _l('top_search_placeholder'); ?>" autocomplete="off">
                     <div id="top_search_button" class="tw-absolute rtl:tw-left-0 -tw-mt-2 tw-top-1.5 ltr:tw-right-1">
-                        <button class="tw-outline-none tw-border-0 tw-text-neutral-600">
+                        <button class="tw-outline-none tw-border-0 tw-text-white">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
@@ -146,7 +146,7 @@
 <span class="tw-text-neutral-300"><?php echo e(get_staff_company_name()); ?>
 <?php if(isset($_SESSION['super_view_company_name'])&&$_SESSION['super_view_company_name']){ ?> -> <span class='text-danger removebycompany' onclick="removebycompany(); return false;" title="Remove company"><?php echo $_SESSION['super_view_company_name'];?>&nbsp;<i class="fa-regular fa-circle-xmark"></i> <?php } ?></span></a></li>
                 <li>
-                <a onclick="window.history.back()"><i class="fa fa-arrow-circle-left tw-text-neutral-400" data-toggle="tooltip" title="Go Back" data-placement="bottom" aria-hidden="true"></i></a>
+                <a onclick="window.history.back()"><i class="fa fa-arrow-circle-left tw-text-neutral-400 tw-text-xl tw-text-white" data-toggle="tooltip" title="Go Back" data-placement="bottom" aria-hidden="true"></i></a>
                 </li>
                 <?php do_action_deprecated('after_render_top_search', [], '3.0.0', 'admin_navbar_start'); ?>
                 <?php hooks()->do_action('admin_navbar_start'); ?>
@@ -154,7 +154,7 @@
                 <li class="icon header-newsfeed">
                     <a href="#" class="open_newsfeed desktop" data-toggle="tooltip"
                         title="<?php echo _l('whats_on_your_mind'); ?>" data-placement="bottom">
-                        <i class="fa-solid fa-share-nodes tw-text-neutral-400"></i>
+                        <i class="fa-solid fa-share-nodes tw-text-neutral-400 tw-text-xl tw-text-white"></i>
                     </a>
                 </li>
                 <?php } ?>
@@ -162,7 +162,7 @@
                 <li class="icon header-todo">
                     <a href="<?php echo admin_url('todo'); ?>" data-toggle="tooltip"
                         title="<?php echo _l('nav_todo_items'); ?>" data-placement="bottom" class="">
-                        <i class="fa-solid fa-check-double tw-text-neutral-400"></i>
+                        <i class="fa-solid fa-check-double tw-text-neutral-400 tw-text-xl tw-text-white"></i>
 
                         <span
                             class="tw-leading-none tw-px-1 tw-py-0.5 tw-text-xs bg-warning tw-z-10 tw-absolute tw-rounded-full tw-right-1 tw-top-2.5 tw-min-w-[18px] tw-min-h-[18px] tw-inline-flex tw-items-center tw-justify-center nav-total-todos<?php echo $current_user->total_unfinished_todos == 0 ? ' hide' : ''; ?>">

@@ -42,7 +42,7 @@
                         <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Leads Status</span>
                     </div>
                     <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
-<?php echo $row->hot_lead;?> / <?php echo ($row->unassign_lead + $row->assign_lead + $row->junk_lead + $row->hot_lead);?>
+<span title="Completed Leads"><?php echo $row->hot_lead;?></span> / <span title="Total Leads"><?php echo ($row->unassign_lead + $row->assign_lead + $row->junk_lead + $row->hot_lead);?></span>
                     </span>
                 </div>
 				
@@ -111,23 +111,37 @@
 				  $this->db->where('company_id', get_staff_company_id());
 				  $this->db->where('assigned', get_staff_user_id());
 				  }
-                    
-                    $this->db->select("COUNT(CASE WHEN is_deal = 1 AND deal_status=1  THEN 1 END) AS new_lead, COUNT(CASE WHEN is_deal = 1 AND deal_status=2 THEN 1 END) AS doc_lead, COUNT(CASE WHEN is_deal = 1 AND deal_status=3 THEN 3 END) AS uw_lead, COUNT(CASE WHEN is_deal = 1 AND deal_status= 4  THEN 1 END) AS invoice_lead");
-                    
+                   
+				    $this->db->where('is_deal', 1);
+				    $this->db->group_by('deal_stage');
+                    $this->db->select(" deal_stage, COUNT(*) AS total,");
+                    $data = $this->db->get()->result_array();
 					
-                    $row = $this->db->get()->row();
-			
-					//echo $this->db->last_query();echo $row->new_lead;exit;
+$statuses = $this->leads_model->get_deal_form_order();
+	//print_r($statuses);	
+	$totalcnt=0;
+	$graphdata="";			
+foreach ($data as $item) {
+   if(isset($statuses[$item['deal_stage']])&&$statuses[$item['deal_stage']]){
+   $totalcnt=($totalcnt + $item['total']);
+   $graphdata.="['".get_deals_stage_title($statuses[$item['deal_stage']])."', ".$item['total']."],";	
+   }
+   
+}
+
+//echo $totalcnt;	
+//echo $graphdata;				
+
                   ?>
                
 				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2">
                         <i class="fa-solid fa-handshake menu-icon fa-2x"></i>
-                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Deal Status</span>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Deal Status - in Process</span>
                     </div>
-                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
-<?php echo $row->invoice_lead;?> / <?php echo ($row->new_lead + $row->doc_lead + $row->uw_lead + $row->invoice_lead);?>
-                    </span>
+                    <?php /*?><span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<span title="Completed Deals"><?php echo $row->invoice_lead;?></span> / <span title="Total Deals"><?php echo ($row->new_lead + $row->doc_lead + $row->uw_lead + $row->invoice_lead);?></span>
+                    </span><?php */?>
                 </div>
 				
 				 <script type="text/javascript">
@@ -148,11 +162,7 @@
         data.addColumn('string', 'Topping');
         data.addColumn('number', 'Slices');
         data.addRows([
-          ['New Deal', <?php echo $row->new_lead;?>],
-          ['Doc', <?php echo $row->doc_lead;?>],
-          ['UW', <?php echo $row->uw_lead;?>],
-          ['Invoice', <?php echo $row->invoice_lead;?>]
-          
+          <?php echo $graphdata;?>
         ]);
 
         // Set options for Sarah's pie chart.
@@ -210,7 +220,7 @@
                         <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Invoice Status</span>
                     </div>
                     <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
-<span title="Success"><?php echo $row->success_count;?></span> / <span title="Total"><?php echo ($row->success_count + $row->new_count + $row->process_count);?></span>
+<span title="Success Invoice"><?php echo $row->success_count;?></span> / <span title="Total Invoice"><?php echo ($row->success_count + $row->new_count + $row->process_count);?></span>
                     </span>
                 </div>
 				<script type="text/javascript">

@@ -23,13 +23,13 @@
     <thead>
       <tr role="row">
         <th class="toggleable">Name</th>
-        <th class="toggleable">Email</th>
+        <th class="toggleable"  style="text-align: left;">Email</th>
         <th class="toggleable">Username</th>
         <th class="toggleable">SMTP HOST</th>
         <th class="toggleable">IMAP HOST</th>
 		<th class="toggleable">Status</th>
 		<th class="">Created</th>
-		<th class="">Download Email</th>
+		<?php /*?><th class="">Download Email</th><?php */?>
       </tr>
     </thead>
     <tbody>
@@ -47,8 +47,11 @@
           <div class="row-options"><?php if ($entry['creator'] == get_staff_user_id() || is_admin()) { ?>
             <a href="#" onclick="edit_mailer_entry(<?php echo e($entry['id']); ?>); return false;" class="text-muted">Edit</a> | <a href="<?php echo admin_url('webmail_setup/delete/' . $entry['id']); ?>"
                 class="text-danger _delete">Delete </a><?php } ?></div></td>
-        <td><?php echo e($entry['mailer_email']); ?><br />
-Dep - <?php echo e($entry['departmentid']); ?> <!--- Staff -<?php echo e($entry['staffid']); ?>--></td>
+        <td style="text-align:left;"><?php echo e($entry['mailer_email']); ?><br />
+		<?php if(isset($entry['departmentid'])&& $entry['departmentid']<>0){ ?>
+Dep - <?php echo e($entry['departmentid']); ?>
+<?php } ?>
+</td>
         <td><?php echo e($entry['mailer_username']); ?><br />
 <?php echo substr_replace(e($entry['mailer_password']),'*****',2,7); ?></td>
         
@@ -67,7 +70,7 @@ Dep - <?php echo e($entry['departmentid']); ?> <!--- Staff -<?php echo e($entry[
 				 </td>
 		  <td><?php echo e($entry['creator_name']); ?> - <?php echo e(time_ago($entry['date_created'])); ?><br />
 <?php echo e(_dt($entry['date_created'])); ?></td>
-<td><a href="<?php echo base_url('cronjob/download_email_from_cron/' . $entry['id']);?>" target="_blank" title="Download / Update Email"><i class="fa-solid fa-cloud-arrow-down"></i></a></td>
+<?php /*?><td><a href="<?php echo base_url('cronjob/download_email_from_cron/' . $entry['id']);?>" target="_blank" title="Download / Update Email"><i class="fa-solid fa-cloud-arrow-down"></i></a></td><?php */?>
       </tr>
 	  <?php } ?>
     </tbody>

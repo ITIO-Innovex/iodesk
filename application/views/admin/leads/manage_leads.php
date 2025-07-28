@@ -39,7 +39,7 @@
                                 <?php } ?>
                             </a>
                             <?php }else{  ?>
-                            <a href="#" class="btn btn-warning pull-left display-block mright10"><i class="fa-solid fa-handshake"></i> Deal</a>
+                            <a href="#" onclick="return false;" class="btn btn-warning pull-left display-block mright10"><i class="fa-solid fa-handshake"></i> Deal</a>
                             <?php /*?><a href="<?php echo admin_url('leads/switch_kanban_deal/' . $switch_kanban_deal); ?>"
                                 class="btn btn-default mleft5 hidden-xs" data-toggle="tooltip" data-placement="top"
                                 data-title="<?php echo $switch_kanban_deal == 1 ? _l('leads_switch_to_kanban') : _l('switch_to_list_view'); ?>">
