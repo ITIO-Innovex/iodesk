@@ -541,11 +541,16 @@ $('.isflag').click(function(){
 			//alert(response.message);
 			
 			if(response.alert_type=="success"){
+			
+			if(fid==1){
+			 alert_float(response.alert_type, 'Un Flagged');
+			 }else{
 			 alert_float(response.alert_type, response.message);
-			 $(resultid).removeClass('tw-text-info-300').addClass('tw-text-info-800');
+			 }
+			 //$(resultid).removeClass('tw-text-info-300').addClass('tw-text-info-800');
 			}else{
 			 alert_float(response.alert_type, response.message);
-			 $(resultid).removeClass('tw-text-info-800').addClass('tw-text-info-300');
+			 //$(resultid).removeClass('tw-text-info-800').addClass('tw-text-info-300');
 			}
             
         });
