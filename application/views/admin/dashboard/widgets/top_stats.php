@@ -129,6 +129,37 @@ foreach ($data as $item) {
    
 }
 
+                  $this->db->from(db_prefix() . 'leads');
+                  if (is_super()) {
+				  if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+				  $this->db->where('company_id', $_SESSION['super_view_company_id']);
+				  }
+				  }elseif (is_admin()) {
+				  $this->db->where('company_id', get_staff_company_id());
+				  }else{
+				  $this->db->where('company_id', get_staff_company_id());
+				  $this->db->where('assigned', get_staff_user_id());
+				  }
+$this->db->where('is_deal', 1);
+$this->db->group_by('deal_stage_status');
+$this->db->select(" deal_stage_status, COUNT(*) AS ftotal,");
+$this->db->where('deal_stage_status', 1);
+$this->db->or_where('deal_stage_status', 2);
+//echo $this->db->get_compiled_select(); exit;
+$data = $this->db->get()->result_array();
+//echo $this->db->last_query();exit;
+foreach ($data as $item) {
+   if(isset($item['deal_stage_status'])&&$item['deal_stage_status']){
+   $totalcnt=($totalcnt + $item['ftotal']);
+	   if($item['deal_stage_status']==1){
+	   $graphdata.="['Completed', ".$item['ftotal']."],";
+	   }else{
+	   $graphdata.="['Lost', ".$item['ftotal']."],";
+	   }	
+   }
+   
+}
+
 //echo $totalcnt;	
 //echo $graphdata;				
 
