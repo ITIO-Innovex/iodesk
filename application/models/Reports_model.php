@@ -1044,7 +1044,27 @@ class Reports_model extends App_Model
 		//exit;
         return $data;
     }
-
+	
+	
+    public function get_deals_by_final_status_data($period = 'this_month')
+    {
+     
+		$this->db->from(db_prefix() . 'leads');
+		if (is_super()) {
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		$this->db->where('company_id', $_SESSION['super_view_company_id']);
+		}
+		}elseif (is_admin()) {
+		$this->db->where('company_id', get_staff_company_id());
+		}else{
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('assigned', get_staff_user_id());
+		}
+		$this->db->select("COUNT(CASE WHEN deal_stage_status = 1 AND is_deal = 1  THEN 1 END) AS Success, COUNT(CASE WHEN deal_stage_status = 2 AND is_deal = 1 THEN 1 END) AS Failed, COUNT(CASE WHEN deal_stage_status = 0 AND is_deal = 1 THEN 3 END) AS Process");
+		$data = $this->db->get()->result_array();
+       
+        return $data;
+    }
     /**
      * Get deals count by staff for the selected period
      */

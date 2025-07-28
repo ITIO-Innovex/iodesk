@@ -67,6 +67,7 @@ $_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
                 foreach ($deals_by_status_data as $row) {
                     $total_deals += $row['total'];
                 }
+				echo $total_deals;
                 ?>
                 <?php foreach ($deals_by_status_data as $row) { 
                     $percentage = ($total_deals > 0) ? round(($row['total'] / $total_deals) * 100, 2) : 0;
@@ -113,6 +114,13 @@ foreach ($deals_by_status_data as $row) {
     $pieData[] = [$row['status_name'], (int)$row['total']];
     $barData[] = [$row['status_name'], (int)$row['total']];
 }
+
+// for Deal status pie graph
+$result = "";
+foreach ($deals_by_final_status_data[0] as $key => $value) {
+$result .= '["'.$key.'",'.$value.'],';
+}
+
 ?>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
@@ -123,10 +131,12 @@ foreach ($deals_by_status_data as $row) {
     drawBarChart();
   }
   function drawPieChart() {
-    var data = google.visualization.arrayToDataTable(<?php echo json_encode($pieData); ?>);
+    var data = google.visualization.arrayToDataTable([["Status","Deals"],<?php echo substr($result,0,-1);?>]);
     var options = {
       title: 'Deals Distribution by Status',
       pieHole: 0.4,
+	   colors: [
+        '#38F527','#F54927','#C9C583',],
       legend: {position: 'bottom'},
       chartArea: {width: '80%', height: '70%'}
     };
