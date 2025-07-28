@@ -148,11 +148,13 @@ $this->db->or_where('deal_stage_status', 2);
 //echo $this->db->get_compiled_select(); exit;
 $data = $this->db->get()->result_array();
 //echo $this->db->last_query();exit;
+$completed=0;
 foreach ($data as $item) {
    if(isset($item['deal_stage_status'])&&$item['deal_stage_status']){
    $totalcnt=($totalcnt + $item['ftotal']);
 	   if($item['deal_stage_status']==1){
 	   $graphdata.="['Completed', ".$item['ftotal']."],";
+	   $completed=$item['ftotal'];
 	   }else{
 	   $graphdata.="['Lost', ".$item['ftotal']."],";
 	   }	
@@ -168,11 +170,11 @@ foreach ($data as $item) {
 				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2">
                         <i class="fa-solid fa-handshake menu-icon fa-2x"></i>
-                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Deal Status - in Process</span>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Deal Status</span>
                     </div>
-                    <?php /*?><span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
-<span title="Completed Deals"><?php echo $row->invoice_lead;?></span> / <span title="Total Deals"><?php echo ($row->new_lead + $row->doc_lead + $row->uw_lead + $row->invoice_lead);?></span>
-                    </span><?php */?>
+                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<span title="Completed Deals"><?php echo $completed;?></span> / <span title="Total Deals"><?php echo $totalcnt;?></span>
+                    </span>
                 </div>
 				
 				 <script type="text/javascript">
