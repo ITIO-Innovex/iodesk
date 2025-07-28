@@ -622,7 +622,7 @@ label {
   display: block;
   float: right;
   padding: 10px 14px 8px;
-  background-color: #FFD700;
+  background-color: #0b7992;
   border-radius:8px 8px 0 0;
   margin-right:10px;
   z-index:2;
@@ -636,7 +636,7 @@ label {
 }
 #global li:before, #global li:after {
   display:block; content:" "; position:absolute;  top:0; height:100%; width:18px;   
-  background-color: #FFD700;
+  background-color: #0b7992;
 }
 #global li:before {
   right:-8px;
