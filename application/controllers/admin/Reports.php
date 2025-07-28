@@ -1324,6 +1324,7 @@ class Reports extends AdminController
         $period = $this->input->get('period') ?: 'this_month';
         $data['selected_period'] = $period;
         $data['deals_by_status_data'] = $this->reports_model->get_deals_by_status_data($period);
+		$data['deals_by_final_status_data'] = $this->reports_model->get_deals_by_final_status_data($period);
         $this->load->view('admin/reports/deals_by_status', $data);
     }
 
