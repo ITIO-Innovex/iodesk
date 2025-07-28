@@ -145,7 +145,7 @@
 					<?php $i++; } 
 					
 					if(count($notes)==0){
-					echo "<h5>You haven’t added any notes yet</h5>";
+					echo "<h5>You haven`t added any notes yet</h5>";
 					}
 					?>
                 </div>
@@ -221,7 +221,7 @@ if ($currentDateTime > $assignDateTime) {
 					<?php $i++; } 
 					
 					if(count($deal_task)==0){
-					echo "<h5>You haven’t added any to-dos yet</h5>";
+					echo "<h5>You haven`t added any to-dos yet</h5>";
 					}
 					?>
 				</div>
