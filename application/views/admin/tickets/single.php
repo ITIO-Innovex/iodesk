@@ -19,10 +19,10 @@
                     </div>
                 </div>
                 <?php } ?>
-                <div class="tw-mb-4">
+                <div class="tw-mb-4  tw-text-white">
                     <div class="md:tw-flex md:tw-items-center">
                         <div class="tw-inline-flex tw-items-center tw-grow md:tw-mr-4">
-                            <h3 class="tw-font-semibold tw-text-xl tw-my-0">
+                            <h3 class="tw-font-semibold tw-text-xl tw-my-0 tw-text-0">
                                 <span id="ticket_subject">
                                     #<?php echo e($ticket->ticketid); ?> - <?php echo e($ticket->subject); ?>
                                 </span>
@@ -36,7 +36,7 @@
                     </div>
                     <?php
                                 if ($ticket->project_id) {
-                                    echo '<p class="tw-text-base tw-font-normal tw-mb-0">' . _l('ticket_linked_to_project', '<a href="' . admin_url('projects/view/' . $ticket->project_id) . '">' . get_project_name_by_id($ticket->project_id) . '</a>') . '</p>';
+                                    echo '<p class="tw-text-base tw-font-normal tw-mb-0">' . _l('ticket_linked_to_project', '<a href="' . admin_url('projects/view/' . $ticket->project_id) . '" class=" tw-text-white">' . get_project_name_by_id($ticket->project_id) . '</a>') . '</p>';
                                 }
                             ?>
                 </div>

@@ -127,13 +127,13 @@
 <?php echo render_input('firstname', '<small class="req text-danger">* </small> First Name', '', 'text'); ?>
 <?php echo render_input('lastname', '<small class="req text-danger">* </small> Last Name', ''); ?>
 <?php echo render_input('email', '<small class="req text-danger">* </small> Email (for admin User)', '', 'email', ['autocomplete' => 'off']); ?>
-<?php echo render_input('phonenumber', '<small class="req text-danger">* </small> Phone / Mobile', '', 'text', $required); ?>
+<?php echo render_input('phonenumber', '<small class="req text-danger">* </small> Phone / Mobile', '', 'text',['required' => 'true','maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
 <?php if (!isset($member) || is_admin() || !is_admin() && $member->admin == 0) { ?>
                                
 					   
                          <label for="password" class="control-label"><small class="req text-danger">* </small> <?php echo _l('staff_add_edit_password'); ?></label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control password" name="password" autocomplete="off">
+   <input type="password" class="form-control password" name="password" autocomplete="off" minlength="5" maxlength="15">
                                     <span class="input-group-addon tw-border-l-0">
                                         <a href="#password" class="show_password"
                                             onclick="showPassword('password'); return false;"><i class="fa fa-eye"></i></a>

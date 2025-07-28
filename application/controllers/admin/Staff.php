@@ -30,6 +30,10 @@ class Staff extends AdminController
         if (staff_cant('view', 'staff')) {
             access_denied('staff');
         }
+		
+		 if(!is_super()){
+		 access_denied('staff');
+		 }
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data('staff');
         }
