@@ -8,7 +8,8 @@
             <div class="col-md-12">
                 <div class="_buttons tw-mb-2 sm:tw-mb-4">
 				
-				<?php if(isset($_SESSION['leads_page_type'])&&$_SESSION['leads_page_type']=='leads'){ ?>
+				   <?php if (!is_super()) { ?>
+				   <?php if(isset($_SESSION['leads_page_type'])&&$_SESSION['leads_page_type']=='leads'){ ?>
                     <a href="#" onclick="init_lead(); return false;"
                         class="btn btn-primary mright5 pull-left display-block">
                         <i class="fa-regular fa-plus tw-mr-1"></i>
@@ -72,6 +73,8 @@
                             <?php echo form_hidden('sort', (get_option('default_leads_kanban_sort') != '' ? get_option('default_leads_kanban_sort_type') : '')); ?>
                         </div>
                     </div>
+					<?php } ?>
+					
                     <div class="clearfix"></div>
                     <div class="hide leads-overview tw-mt-2 sm:tw-mt-4 tw-mb-4 sm:tw-mb-0">
                         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg">

@@ -22,9 +22,10 @@ class Payments_model extends App_Model
         $this->db->order_by(db_prefix() . 'invoicepaymentrecords.id', 'asc');
         $this->db->where(db_prefix() . 'invoicepaymentrecords.id', $id);
 		if(!is_super()){
-		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('invoicepaymentrecords.company_id', get_staff_company_id());
 		}
         $payment = $this->db->get(db_prefix() . 'invoicepaymentrecords')->row();
+		
         if (!$payment) {
             return false;
         }
