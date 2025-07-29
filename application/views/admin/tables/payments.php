@@ -30,6 +30,8 @@ $where = [];
 if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
         array_push($where, 'AND ' . db_prefix() . 'invoicepaymentrecords.company_id=' . $this->ci->db->escape_str($_SESSION['super_view_company_id']));
 
+}else{
+ array_push($where, 'AND ' . db_prefix() . 'invoicepaymentrecords.company_id=' . $this->ci->db->escape_str(get_staff_company_id()));
 }
 
 	

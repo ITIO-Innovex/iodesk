@@ -208,7 +208,10 @@ return App_table::find('leads')
 	
 		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 		$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . $_SESSION['super_view_company_id'] . ')';
+		}else{
+		$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . get_staff_company_id() . ')';
 		}
+		
 
 	
 	}
