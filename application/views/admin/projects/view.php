@@ -1,5 +1,10 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+.bootstrap-select .dropdown-toggle .filter-option-inner-inner {color: aliceblue !important;}
+/*.caret{ border: solid #fff !important;}*/
+.caret { border: solid #FFFFFF !important;border-style: solid !important;border-width: 0 1px 1px 0 !important;}
+</style>
 <div id="wrapper">
     <?php echo form_hidden('project_id', $project->id) ?>
     <div class="content">
