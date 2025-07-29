@@ -64,7 +64,7 @@
 
 
 <div class="onoffswitch">
-<input type="checkbox" data-url="<?php echo admin_url('staff/deletecompany/' . e($list['company_id']).'/'. $surl); ?>"  class="onoffswitch-checkbox confirm-checkbox" id="v_<?php echo e($list['company_id']); ?>"  <?php if(isset($list['active'])&&$list['active']){ ?> checked="" <?php } ?> >
+<input type="checkbox" data-url="<?php echo admin_url('staff/deletecompany/' . e($list['company_id']).'/'. $surl); ?>"  class="onoffswitch-checkbox confirm-checkbox" onclick="return confirm('Are you sure you want to proceed?')" id="v_<?php echo e($list['company_id']); ?>"  <?php if(isset($list['active'])&&$list['active']){ ?> checked="" <?php } ?> >
 <label class="onoffswitch-label" for="v_<?php echo e($list['company_id']); ?>"></label>
 </div>
             </td>
@@ -166,6 +166,7 @@
 
 <?php init_tail(); ?>
 <script>
+
 <?php /*?>
  window.addEventListener('load', function () {
     appValidateForm($("body").find('#leads-status-form'), {
@@ -221,10 +222,13 @@ function edit_company(invoker, id) {
 </script>
 <script>
 $('.confirm-checkbox').on('change', function () {
-  const url = $(this).data('url');
 
-    const confirmed = confirm('Are you sure you want to proceed?');
+  const url = $(this).data('url');
+  //alert(url);
+
+    //const confirmed = confirm('Are you sure you want to proceed?');
     if (confirmed) {
+	//window.onbeforeunload = null;
       window.location.href = url;
     } else {
       $(this).prop('checked', false); // Uncheck if user cancels
