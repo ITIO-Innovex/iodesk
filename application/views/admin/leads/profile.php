@@ -2120,7 +2120,7 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
         $required = !empty($field->required) ? 'required' : '';
 		echo "<div class='form-group'>";
 		echo "<label for='{$name}'>{$label}:</label>";
-		if($field->type=='file'){ echo "(.gif .jpg .jpeg .png .pdf .svg only)"; }
+		if($field->type=='file'){ echo "(.gif .jpg .jpeg .png .pdf .svg .doc .docx .xls .xlsx .zip .txt only)"; }
 
         switch ($field->type) {
             case 'text':

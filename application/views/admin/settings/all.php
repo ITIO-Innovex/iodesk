@@ -50,7 +50,7 @@ foreach ($tabs as $group) { ?>
                 </ul>
 
                 <a href="<?php echo admin_url('settings?group=update'); ?>"
-                    class="tw-flex tw-items-center tw-mb-2 tw-ml-3 settings-group-system-update<?php echo $this->input->get('group') == 'update' ? 'bold': ''; ?>">
+                    class="tw-flex tw-items-center tw-mb-2 tw-text-white tw-ml-3 settings-group-system-update<?php echo $this->input->get('group') == 'update' ? 'bold': ''; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="tw-w-5 tw-h-5 tw-mr-2">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -63,7 +63,7 @@ foreach ($tabs as $group) { ?>
                 <?php if (is_admin()) {
         ?>
                 <a href="<?php echo admin_url('settings?group=info'); ?>"
-                    class="tw-flex tw-items-center tw-ml-3 settings-group-system-info<?php echo $this->input->get('group') == 'info' ? 'bold' : ''; ?>">
+                    class="tw-flex tw-items-center tw-text-white tw-ml-3 settings-group-system-info<?php echo $this->input->get('group') == 'info' ? 'bold' : ''; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="tw-w-5 tw-h-5 tw-mr-2">
                         <path stroke-linecap="round" stroke-linejoin="round"
