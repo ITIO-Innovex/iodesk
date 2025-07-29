@@ -1912,7 +1912,7 @@ foreach($file_labels as $filename){
 $filename=trim($filename);
                 if (isset($_FILES[$filename]) && $_FILES[$filename]['error'] == 0) {
                 $config['upload_path']   = $upload_path;
-                $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|svg';
+                $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|svg|doc|docx|xls|xlsx|zip|txt';
                 $config['max_size']      = 20480; // 2MB
                 $config['file_name']     = $filename.'-' . time();
 
