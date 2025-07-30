@@ -76,13 +76,48 @@
 </div>
 
 <?php
-// Prepare data for bar chart
-$barData = [["Staff", "Deals"]];
+$barData = [
+    ["Staff", "Assign Deals", ["role" => "style"]]
+];
+
 foreach ($deals_by_staff_data as $row) {
-    $barData[] = [$row['staff_name'], (int)$row['total']];
+    $color = sprintf("#%06X", mt_rand(0, 0xFFFFFF)); // random color
+    $barData[] = [$row['staff_name'], (int)$row['total'], $color];
 }
+echo json_encode($barData) . ");";
 ?>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+  <script type="text/javascript">
+  
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      var data = google.visualization.arrayToDataTable(<?php echo json_encode($barData); ?>);
+     
+
+      var view = new google.visualization.DataView(data);
+      view.setColumns([0, 1,
+                       { calc: "stringify",
+                         sourceColumn: 1,
+                         type: "string",
+                         role: "annotation" },
+                       2]);
+
+      var options = {
+        title: "Deals by Staff",
+		bars: 'horizontal',
+        <!--width: 600,-->
+        height: 400,
+        bar: {groupWidth: "95%"},
+        legend: { position: "none" },
+      };
+      var chart = new google.visualization.BarChart(document.getElementById("bar_chart_div"));
+      chart.draw(view, options);
+  }
+  </script>
+  <?php /*?>
 <script type="text/javascript">
   google.charts.load('current', {'packages':['bar']});
   google.charts.setOnLoadCallback(drawBarChart);
@@ -103,6 +138,6 @@ foreach ($deals_by_staff_data as $row) {
   function changePeriod(period) {
     window.location.href = '<?php echo admin_url('reports/deals_by_staff'); ?>?period=' + period;
   }
-</script>
+</script><?php */?>
 <?php init_tail(); ?>
 </body></html> 
