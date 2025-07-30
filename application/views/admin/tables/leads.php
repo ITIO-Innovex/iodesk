@@ -246,8 +246,8 @@ return App_table::find('leads')
 		}else{
 		array_push($where, ' AND is_deal=0');
 		}
-		
-		
+
+
         $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, $additionalColumns);
 
         $output  = $result['output'];
@@ -384,7 +384,7 @@ return App_table::find('leads')
 			  $hrefcss='btn-warning';
 			   if($_SESSION['deal_form_type']==1){
 			   $deal_list=$_SESSION['deal_form_order'];
-			   
+			   log_message('error', 'Deal Stage: ' . $aRow['deal_stage']);
 			   if(e($aRow['deal_stage_status'])==1){
 			   $hrefdeal=admin_url('invoices/invoice?iid=' . $aRow['id']);
 			   $dealstagetitle="Invoice";

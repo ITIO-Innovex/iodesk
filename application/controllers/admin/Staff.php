@@ -635,6 +635,8 @@ unset($data['id']);
 	if(isset($id)&&$id){
 	$_SESSION['super_view_company_id']=$id;
 	$_SESSION['super_view_company_name']=get_staff_company_name($id);
+	$_SESSION['deal_form_type']=get_deal_form_type($id);
+	$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order($id);
 	}
 	redirect(admin_url('dashboard'));
 	}
@@ -642,6 +644,8 @@ unset($data['id']);
 	public function removebycompany($id = ''){
 	unset($_SESSION['super_view_company_id']);
 	unset($_SESSION['super_view_company_name']);
+	unset($_SESSION['deal_form_order']);
+	unset($_SESSION['deal_form_type']);
 	redirect(admin_url('staff/companies'));
 	}
 	

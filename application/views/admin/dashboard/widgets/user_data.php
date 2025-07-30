@@ -11,7 +11,7 @@
 					<?php if (is_admin()) { ?>
                         <li role="presentation" class="active">
                             <a href="#home_tab_activity" aria-controls="home_tab_activity" role="tab" data-toggle="tab">
-                                <i class="fa fa-window-maximize menu-icon"></i>
+                                <i class="fa-solid fa-clock menu-icon" style="color: #edeff3;"></i>
                                 <?php echo _l('home_latest_activity'); ?>
                             </a>
                         </li>
@@ -19,6 +19,15 @@
                         <li role="presentation" >
                             <a href="#home_tab_tasks" aria-controls="home_tab_tasks" role="tab" data-toggle="tab">
                                 <i class="fa fa-tasks menu-icon"></i> <?php echo _l('home_my_tasks'); ?>
+						
+						<?php
+						$total_tasks = array_sum(array_column(tasks_summary_data(), 'total_tasks'));		
+						if ($total_tasks > 0) {
+                            echo '<span class="badge">' . $total_tasks . '</span>';
+                        }
+						?>
+								
+								
                             </a>
                         </li>
                         <li role="presentation">

@@ -83,7 +83,7 @@
                                  <td><?php echo $prd['id']; ?></td>   
 								 <td><img src="<?php echo !empty($prd['image']) ? base_url('uploads/product/images/' . $prd['image']) : base_url('uploads/product/images/dummy.jpg'); ?>" alt="Card Header Image" style="width: 150px; height:100px; border-top-left-radius: 5px; border-top-right-radius: 5px;"></td>
                                  <td><?php echo $prd['description']; ?><br />
-<a href="#" data-toggle="modal" data-target="#sales_item_modal" data-id="<?= $prd['id']; ?>">Edit </a>!! &nbsp;&nbsp;<a href="<?php echo admin_url('invoice_items/delete'); ?>/<?php echo $prd['id']; ?>"   title="Delete" class="text-danger" onclick="return confirm('Do you really want to Delete?');">Delete </a></td>
+<a href="#" data-toggle="modal" data-target="#sales_item_modal" data-id="<?= $prd['id']; ?>">Edit </a>&nbsp;&nbsp;<a href="<?php echo admin_url('invoice_items/delete'); ?>/<?php echo $prd['id']; ?>"   title="Delete" class="text-danger" onclick="return confirm('Do you really want to Delete?');">Delete </a></td>
 								 <td><?php echo $prd['long_description']; ?></td>
 								 <td><?php echo $prd['rate']; ?></td>
                                 </tr>

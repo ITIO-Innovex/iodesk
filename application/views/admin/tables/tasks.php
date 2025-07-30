@@ -15,6 +15,7 @@ return App_table::find('tasks')
             db_prefix() . 'tasks.id as id',
             db_prefix() . 'tasks.name as task_name',
             'status',
+			'company_id',
             'startdate',
             'duedate',
             get_sql_select_task_asignees_full_names() . ' as assignees',
@@ -26,15 +27,7 @@ return App_table::find('tasks')
         $sTable       = db_prefix() . 'tasks';
 
         $where = [];
-if(!is_super()){
-array_push($where, 'AND ' . db_prefix() . 'tasks.company_id = ' . $this->ci->db->escape_str(get_staff_company_id()));
-}else{
-  
-if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-array_push($where, 'AND ' . db_prefix() . 'tasks.company_id = ' . $this->ci->db->escape_str($_SESSION['super_view_company_id']));
-}
 
-}
         $join  = [];
 
         if ($filtersWhere = $this->getWhereFromRules()) {
@@ -44,6 +37,8 @@ array_push($where, 'AND ' . db_prefix() . 'tasks.company_id = ' . $this->ci->db-
         if (staff_cant('view', 'tasks')) {
             $where[] = get_tasks_where_string();
         }
+		
+		
 
         // Dashboard my tasks table
         if($this->ci->input->post('my_tasks')) {
@@ -51,6 +46,18 @@ array_push($where, 'AND ' . db_prefix() . 'tasks.company_id = ' . $this->ci->db-
         }
 
         array_push($where, 'AND CASE WHEN rel_type="project" AND rel_id IN (SELECT project_id FROM ' . db_prefix() . 'project_settings WHERE project_id=rel_id AND name="hide_tasks_on_main_tasks_table" AND value=1) THEN rel_type != "project" ELSE 1=1 END');
+		
+if (!is_super()) {
+    $company_id = get_staff_company_id();
+} else {
+    if (!empty($_SESSION['super_view_company_id'])) {
+        $company_id = $_SESSION['super_view_company_id'];
+    } else {
+        $company_id = 1;
+    }
+}
+
+array_push($where, 'AND ' . db_prefix() . 'tasks.company_id = ' . $this->ci->db->escape_str($company_id));
 
         $custom_fields = get_table_custom_fields('tasks');
 
