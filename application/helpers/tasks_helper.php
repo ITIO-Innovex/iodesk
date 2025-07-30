@@ -438,6 +438,17 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
     $statuses      = $CI->tasks_model->get_statuses();
     foreach ($statuses as $status) {
         $tasks_where = 'status = ' . $CI->db->escape_str($status['id']);
+		
+if(!is_super()){
+$tasks_where .=' AND company_id=' . get_staff_company_id();
+}elseif(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+$tasks_where .=' AND company_id=' . $_SESSION['super_view_company_id'];
+}else{
+$tasks_where .=' AND company_id=1';	
+}
+		
+		
+		
         if (staff_cant('view', 'tasks')) {
             $tasks_where .= ' ' . get_tasks_where_string();
         }
@@ -454,7 +465,7 @@ function tasks_summary_data($rel_id = null, $rel_type = null)
             $tasks_where .= $sqlProjectTasksWhere;
             $tasks_my_where .= $sqlProjectTasksWhere;
         }
-
+        //echo $tasks_where;
         $summary                   = [];
         $summary['total_tasks']    = total_rows(db_prefix() . 'tasks', $tasks_where);
         $summary['total_my_tasks'] = total_rows(db_prefix() . 'tasks', $tasks_my_where);

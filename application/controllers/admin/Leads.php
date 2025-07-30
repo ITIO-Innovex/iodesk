@@ -28,8 +28,21 @@ class Leads extends AdminController
 		}
 		
 		
-		$_SESSION['deal_form_type']=get_deal_form_type($deal_company_id);
-		$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
+		
+		
+if(!is_super()){
+$_SESSION['deal_form_type']=get_deal_form_type($deal_company_id);
+$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
+}else{
+	
+if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+$_SESSION['deal_form_type']=get_deal_form_type($_SESSION['super_view_company_id']);
+$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order($_SESSION['super_view_company_id']);
+}else{
+$_SESSION['deal_form_type']=get_deal_form_type($deal_company_id);
+$_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
+}
+}
 		
 		//print_r($_SESSION['deal_form_order']);
 		
