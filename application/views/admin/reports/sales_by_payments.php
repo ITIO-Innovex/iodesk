@@ -129,8 +129,12 @@ foreach ($sales_by_payments_data as $row) {
     var data = google.visualization.arrayToDataTable(<?php echo json_encode($barData); ?>);
     var options = {
       title: 'Sales by Payment Method',
+	   bars: 'horizontal',
       height: 300,
       legend: { position: 'top' },
+        //bar: { groupWidth: '75%' },
+        //isStacked: true
+	  
       chartArea: {width: '80%', height: '60%'},
       series: {
         0: {targetAxisIndex: 0},
