@@ -11,8 +11,6 @@
 //echo trim(get_option('smtp_password'));
 //echo get_company_website();
 
-print_r($_SESSION['deal_form_order']);
-echo $_SESSION['deal_form_type'];
 ?>
 
 <?php init_head(); ?>
