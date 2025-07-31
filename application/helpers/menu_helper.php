@@ -259,6 +259,58 @@ function app_init_admin_sidebar_menu_items()
 			'badge'    => [],
 		]);
     }
+	
+	//////////////////////////////////////////
+	
+	 $CI->app_menu->add_sidebar_menu_item('project', [
+        'collapse' => true,
+        'name'     => _l('project'),
+        'position' => 10,
+        'icon'     => 'fa-solid fa-chart-gantt',
+        'badge'    => [],
+    ]);
+
+     if (staff_can('project_dashboard',  'project')){
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Dashboard',
+            'name'     => _l('Dashboard'),
+            'href'     => admin_url('project'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+    }
+	 if (staff_can('project_project',  'project')){
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Project',
+            'name'     => _l('Project'),
+            'href'     => admin_url('project/list'),
+            'position' => 20,
+            'badge'    => [],
+        ]);
+    }
+    
+    if (staff_can('project_collaboration',  'project'))
+   {
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Collaboration',
+            'name'     => _l('Collaboration'),
+            'href'     => admin_url('project/collaboration'),
+            'position' => 25,
+            'badge'    => [],
+        ]);
+    }
+	if (staff_can('project_setting',  'project')) {
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Setting',
+            'name'     => _l('Setting'),
+            'href'     => admin_url('project/setting'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+    }
+	
+	
+	////////////////////////////////////////
 
     
 
