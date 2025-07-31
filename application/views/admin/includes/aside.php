@@ -63,11 +63,12 @@
         <?php hooks()->do_action('after_render_single_aside_menu', $item); ?>
         <?php
          } ?>
+		 
         <?php if ($this->app->show_setup_menu() == true && (is_staff_member() || is_admin())) { ?>
-        <li<?php if (get_option('show_setup_menu_item_only_on_hover') == 1) {
+        <li <?php if (get_option('show_setup_menu_item_only_on_hover') == 1) {
              echo ' style="display:none;"';
          } ?> id="setup-menu-item">
-            <a href="#" class="open-customizer"><i class="fa fa-cog menu-icon"></i>
+            <a href="#" class="open-customizer" style="margin-bottom:20px !important;"><i class="fa fa-cog menu-icon"></i>
                 <span class="menu-text">
                     <?php echo _l('setting_bar_heading'); ?>
                     <?php
@@ -79,7 +80,10 @@
             </a>
             <?php } ?>
             </li>
+
+        
             <?php hooks()->do_action('after_render_aside_menu'); ?>
             <?php $this->load->view('admin/projects/pinned'); ?>
     </ul>
+	
 </aside>

@@ -87,7 +87,7 @@ function get_available_staff_permissions($data = [])
                 'view_own' => _l('permission_payments_based_on_invoices'),
             ],
         ],
-        'projects' => [
+        /*'projects' => [
             'name'         => _l('projects'),
             'capabilities' => array_merge($withNotApplicableViewOwn, [ 'create_milestones' => _l('permission_create_timesheets'),
                 'edit_milestones'                                                          => _l('permission_edit_milestones'), 'delete_milestones' => _l('permission_delete_milestones'), ]),
@@ -95,7 +95,19 @@ function get_available_staff_permissions($data = [])
                 'view'     => _l('help_project_permissions'),
                 'view_own' => _l('permission_projects_based_on_assignee'),
             ],
+        ],*/
+		
+		'project' => [
+            'name'         => _l('project'),
+            'capabilities' => array_merge( [ 
+			    'view_own' => _l('permission_view_own'),
+			    'view'            => $viewGlobalName,
+			    'project_dashboard' => _l('Dashboard'),
+				'project_project' => _l('Project'),
+                'project_collaboration'=> _l('Collaboration'), 
+				'project_setting' => _l('Setting'), ]),
         ],
+		
         'proposals' => [
             'name'         => _l('proposals'),
             'capabilities' => array_merge($allPermissionsArray, [

@@ -4074,4 +4074,26 @@ $lang['no'] = 'No';
 $lang['no_leads_found_for_selected_period'] = 'No leads found for the selected period';
 $lang['percentage'] = 'Percentage';
 $lang['leads_source_table_name'] = 'Source Name';
+
+// other 
+$lang['Deals'] = 'Deals';
+$lang['Webmail'] = 'Webmail';
+$lang['Industries'] = 'Industries';
+$lang['Tags'] = 'Tags';
+$lang['Website'] = 'Website';
+$lang['Observer'] = 'Observer';
+$lang['Webmail Setup'] = 'Webmail Setup';
+$lang['AI Support'] = 'AI Support';
+$lang['Approver Status'] = 'Approver Status';
+$lang['Deal Status'] = 'Deal Status';
+$lang['Company Name'] = 'Company Name';
+$lang['Task Status'] = 'Task Status';
+$lang['Generate Content'] = 'Generate Content';
+$lang['New Webmail Setup'] = 'New Webmail Setup';
+$lang['New Mail'] = 'New Mail';
+$lang['TicketNo'] = 'TicketNo';
+$lang['Completed Projects'] = 'Completed Projects';
+$lang['In Progress Projects'] = 'In Progress Projects';
+$lang['TaskID'] = 'TaskID';
+$lang['total'] = 'total';
 ?>
