@@ -565,7 +565,7 @@ if(isset($process)&&$process->$field_process){
 <?php
 $json = $process->$field_process;
 $data = json_decode($json, true);
-$allowed = ['gif', 'jpg', 'jpeg', 'png', 'pdf', 'svg'];
+$allowed = ['gif', 'jpg', 'jpeg', 'png', 'pdf', 'svg', 'docx', 'xlsx'];
 unset($data['deal_stage'], $data['deal_id'], $data['file_labels']);
 echo "<table border='1' class='table dt-table dt-inline dataTable no-footer' >";
 foreach ($data as $key => $value) {
@@ -2124,7 +2124,7 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
 
         switch ($field->type) {
             case 'text':
-                echo "<input type='text' name='{$name}' id='{$name}' class='form-control' {$required}>";
+                echo "<input 111 type='text' name='{$name}' id='{$name}' class='form-control' {$required}>";
                 break;
 
             case 'file':
@@ -2138,6 +2138,11 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
                 break;
 			case 'cal':
                 echo "<input type='datetime-local' name='{$name}' id='{$name}' class='form-control' {$required}>";
+                break;
+			case 'radio':
+			    foreach ($field->options as $option) {
+                echo "<label><input type='radio' name='{$name}' id='{$name}' class='form-control' {$required}>". htmlspecialchars($option)."</label>";
+				}
                 break;
 			case 'listbox':	
 				echo '<select name="' . $name . '" id="' . $name . '" class="form-control" ' . $required . '>';

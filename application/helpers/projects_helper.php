@@ -480,3 +480,286 @@ function getAllProject(){
     $project = get_instance()->projects_model->getAllproject();
     return $project;
 }
+
+// New project helper functions for project management system
+/**
+ * Get project status name by ID
+ * @param  mixed $id project status id
+ * @return string
+ */
+function get_project_status_name($id)
+{
+    $CI = & get_instance();
+    $CI->db->where('projectstatusid', $id);
+    $status = $CI->db->get(db_prefix() . 'project_status')->row_array();
+    
+    if ($status) {
+        return $status['name'];
+    }
+    
+    return '';
+}
+
+/**
+ * Get project status color by ID
+ * @param  mixed $id project status id
+ * @return string
+ */
+function get_project_status_color($id)
+{
+    $CI = & get_instance();
+    $CI->db->where('projectstatusid', $id);
+    $status = $CI->db->get(db_prefix() . 'project_status')->row_array();
+    
+    if ($status) {
+        return $status['color'];
+    }
+    
+    return '#28B8DA';
+}
+
+/**
+ * Translate project status
+ * @param  mixed $id project status id
+ * @return string
+ */
+function project_status_translate($id)
+{
+    $status = get_project_status_name($id);
+    
+    if ($status == '') {
+        return _l('project_status_not_started');
+    }
+    
+    return _l('project_status_' . strtolower(str_replace(' ', '_', $status)));
+}
+
+/**
+ * Get project priority name by ID
+ * @param  mixed $id project priority id
+ * @return string
+ */
+function get_project_priority_name($id)
+{
+    $CI = & get_instance();
+    $CI->db->where('priorityid', $id);
+    $priority = $CI->db->get(db_prefix() . 'project_priorities')->row_array();
+    
+    if ($priority) {
+        return $priority['name'];
+    }
+    
+    return '';
+}
+
+/**
+ * Get project priority color by ID
+ * @param  mixed $id project priority id
+ * @return string
+ */
+function get_project_priority_color($id)
+{
+    $CI = & get_instance();
+    $CI->db->where('priorityid', $id);
+    $priority = $CI->db->get(db_prefix() . 'project_priorities')->row_array();
+    
+    if ($priority) {
+        return $priority['color'];
+    }
+    
+    return '#28B8DA';
+}
+
+/**
+ * Translate project priority
+ * @param  mixed $id project priority id
+ * @return string
+ */
+function project_priority_translate($id)
+{
+    $priority = get_project_priority_name($id);
+    
+    if ($priority == '') {
+        return _l('project_priority_low');
+    }
+    
+    return _l('project_priority_' . strtolower($priority));
+}
+
+/**
+ * Get project group name by ID
+ * @param  mixed $id project group id
+ * @return string
+ */
+function get_project_group_name($id)
+{
+    $CI = & get_instance();
+    $CI->db->where('groupid', $id);
+    $group = $CI->db->get(db_prefix() . 'project_groups')->row_array();
+    
+    if ($group) {
+        return $group['name'];
+    }
+    
+    return '';
+}
+
+/**
+ * Get project service name by ID
+ * @param  mixed $id project service id
+ * @return string
+ */
+function get_project_service_name($id)
+{
+    $CI = & get_instance();
+    $CI->db->where('serviceid', $id);
+    $service = $CI->db->get(db_prefix() . 'project_services')->row_array();
+    
+    if ($service) {
+        return $service['name'];
+    }
+    
+    return '';
+}
+
+/**
+ * Check if user has permission for projects
+ * @param  string $permission permission name
+ * @param  mixed $id project id
+ * @return boolean
+ */
+function has_project_permission($permission, $id = '')
+{
+    $CI = & get_instance();
+    
+    if (!is_staff_logged_in()) {
+        return false;
+    }
+    
+    if (is_admin()) {
+        return true;
+    }
+    
+    $permissions = get_staff_permissions();
+    
+    if (isset($permissions['projects'])) {
+        if (in_array($permission, $permissions['projects'])) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Get all projects from project_master table
+ * @param  array $where where conditions
+ * @return array
+ */
+function get_projects_master($where = [])
+{
+    $CI = & get_instance();
+    $CI->load->model('project_model');
+    
+    if (!empty($where)) {
+        $CI->db->where($where);
+    }
+    
+    return $CI->db->get(db_prefix() . 'project_master')->result_array();
+}
+
+/**
+ * Get projects by status from project_master table
+ * @param  mixed $status project status id
+ * @return array
+ */
+function get_projects_by_status_master($status)
+{
+    return get_projects_master(['project_status' => $status]);
+}
+
+/**
+ * Get projects by assignee from project_master table
+ * @param  mixed $assignee staff id
+ * @return array
+ */
+function get_projects_by_assignee_master($assignee)
+{
+    return get_projects_master(['assign' => $assignee]);
+}
+
+/**
+ * Get projects by owner from project_master table
+ * @param  mixed $owner staff id
+ * @return array
+ */
+function get_projects_by_owner_master($owner)
+{
+    return get_projects_master(['owner' => $owner]);
+}
+
+/**
+ * Get projects by group from project_master table
+ * @param  mixed $group project group id
+ * @return array
+ */
+function get_projects_by_group_master($group)
+{
+    return get_projects_master(['project_group' => $group]);
+}
+
+/**
+ * Get projects count from project_master table
+ * @param  array $where where conditions
+ * @return integer
+ */
+function get_projects_count_master($where = [])
+{
+    $CI = & get_instance();
+    
+    if (!empty($where)) {
+        $CI->db->where($where);
+    }
+    
+    return $CI->db->count_all_results(db_prefix() . 'project_master');
+}
+
+/**
+ * Get projects count by status from project_master table
+ * @param  mixed $status project status id
+ * @return integer
+ */
+function get_projects_count_by_status_master($status)
+{
+    return get_projects_count_master(['project_status' => $status]);
+}
+
+/**
+ * Get projects count by assignee from project_master table
+ * @param  mixed $assignee staff id
+ * @return integer
+ */
+function get_projects_count_by_assignee_master($assignee)
+{
+    return get_projects_count_master(['assign' => $assignee]);
+}
+
+/**
+ * Get projects count by owner from project_master table
+ * @param  mixed $owner staff id
+ * @return integer
+ */
+function get_projects_count_by_owner_master($owner)
+{
+    return get_projects_count_master(['owner' => $owner]);
+}
+
+/**
+ * Get projects count by group from project_master table
+ * @param  mixed $group project group id
+ * @return integer
+ */
+function get_projects_count_by_group_master($group)
+{
+    return get_projects_count_master(['project_group' => $group]);
+}

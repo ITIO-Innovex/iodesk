@@ -270,24 +270,37 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 
-     if (staff_can('project_dashboard',  'project')){
+      if (staff_can('project_dashboard',  'project')){
         $CI->app_menu->add_sidebar_children_item('project', [
             'slug'     => 'Dashboard',
             'name'     => _l('Dashboard'),
+            'href'     => admin_url('project/dashboard'),
+            'position' => 10,
+            'badge'    => [],
+        ]);
+    }
+   
+	 if (staff_can('project_project',  'project')){
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Project',
+            'name'     => _l('Project'),
             'href'     => admin_url('project'),
             'position' => 15,
             'badge'    => [],
         ]);
     }
-	 if (staff_can('project_project',  'project')){
+	
+	if (staff_can('project_project',  'project')){
         $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'Project',
-            'name'     => _l('Project'),
-            'href'     => admin_url('project/list'),
-            'position' => 20,
+            'slug'     => 'Tasks',
+            'name'     => _l('Tasks'),
+            'href'     => admin_url('project/tasks'),
+            'position' => 15,
             'badge'    => [],
         ]);
     }
+	
+	 
     
     if (staff_can('project_collaboration',  'project'))
    {
@@ -299,14 +312,35 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
-	if (staff_can('project_setting',  'project')) {
+	
+	
+	if (staff_can('project_group',  'project')) {
         $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'Setting',
-            'name'     => _l('Setting'),
-            'href'     => admin_url('project/setting'),
+            'slug'     => 'project_group',
+            'name'     => _l('project_group'),
+            'href'     => admin_url('project/project_group'),
             'position' => 30,
             'badge'    => [],
         ]);
+    }
+	if (is_super()) {
+	
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'project_status',
+            'name'     => _l('project_status_table_name'),
+            'href'     => admin_url('project/project_status'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'project_priority',
+            'name'     => _l('project_priority'),
+            'href'     => admin_url('project/project_priority'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+		
     }
 	
 	
@@ -347,14 +381,14 @@ function app_init_admin_sidebar_menu_items()
 			'icon'     => 'fa-brands fa-whatsapp',
 			'badge'    => [],
 		]);
-		$CI->app_menu->add_sidebar_children_item('conversion', [
+		/*$CI->app_menu->add_sidebar_children_item('conversion', [
 			'slug'     => 'als_webchat',
 			'name'     => _l('als_webchat'),
 			'href'     => admin_url('leads/webchat'),
 			'position' => 2,
 			'icon'     => 'far fa-comment-dots',
 			'badge'    => [],
-		]);
+		]);*/
     }
 
 

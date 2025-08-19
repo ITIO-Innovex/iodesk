@@ -36,6 +36,10 @@ hooks()->add_action('admin_init', function () {
     App_table::register(
         App_table::new('projects')->customfieldable('projects')
     );
+	
+	 App_table::register(
+        App_table::new('project')->customfieldable('project')
+    );
 
     App_table::register(
         App_table::new('leads')->customfieldable('leads')
