@@ -916,3 +916,111 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
     }
   }
   /*//  for Deals Tab*/
+.project-dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 20px;
+  min-width: 150px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  padding: 0;
+}
+.project-dropdown-menu .dropdown-item {
+  display: block;
+  padding: 10px 16px;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+}
+.project-dropdown-menu .dropdown-item:last-child {
+  border-bottom: none;
+}
+.project-dropdown-menu .dropdown-item:hover {
+  background: #f5f5f5;
+  color: #222;
+}
+#boredr-none select.form-control {
+    box-shadow: unset !important;
+}
+#flash-message {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    min-width: 200px;
+    max-width: 300px;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 9999;
+    animation: slideIn 0.4s ease-out;
+}
+
+.flash-success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: #fff;
+}
+
+.flash-error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #fff;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.action-task {
+    display: none;
+	}
+  .action-task-btn {
+	right: 10px;
+    position: absolute;
+	border-radius: 30px;
+    background: linear-gradient(15deg, #880088, #aa2068, #cc3f47, #de6f3d, #f09f33, #de6f3d, #cc3f47, #aa2068, #880088) no-repeat;
+    background-size: 300%;
+  	color: #fff;
+  	border: none;
+  	background-position: left center;
+  	box-shadow: 0 30px 10px -20px rgba(0,0,0,.2);
+  	transition: background .3s ease;
+	padding: 5px 10px;
+
+  }
+  
+.action-task-btn:hover {
+  background-size: 320%;
+  background-position: right center;
+  color: #fff;
+}
+
+.action-task-btn:hover svg {
+  fill: #fff;
+}
+
+.action-task-btn svg {
+  width: 23px;
+  fill: #f09f33;
+  transition: .3s ease;
+}
+/* Loader background */
+#loader-project {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display:none;
+  z-index: 9999;
+}

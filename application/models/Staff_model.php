@@ -343,30 +343,57 @@ class Staff_model extends App_Model
 	
         $select_str = '*,CONCAT(firstname,\' \',lastname) as full_name';
 		
-	if(isset($_GET['cid'])&&$_GET['cid']){	
-	$companyid=$_GET['cid'];
-    }elseif(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-    $companyid=$_SESSION['super_view_company_id'];
-	}else{
-	$companyid=get_staff_companyid();
+	if(isset($_GET['cid']) && $_GET['cid']){	
+	    $companyid = (int)$_GET['cid'];
+    } elseif(isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']){
+        $companyid = (int)$_SESSION['super_view_company_id'];
+	} else {
+	    $companyid = (int)get_staff_companyid();
+	}
+	
+	// Ensure companyid is valid
+	if (!$companyid || $companyid <= 0) {
+	    $companyid = 1; // Default to company ID 1 if invalid
 	}
 
         // Used to prevent multiple queries on logged in staff to check the total unread notifications in core/AdminController.php
   
-  // New condation for superadmin admin and staff
-		if (!is_admin()){ 
-		$fetch_via_staff_id=" AND staffid='" . get_staff_user_id()."'";
-		}else{ 
-		$fetch_via_staff_id="";
-		}
+        // New condition for superadmin admin and staff
+        if (!is_admin()){ 
+            $fetch_via_staff_id = " AND staffid='" . get_staff_user_id() . "'";
+        } else { 
+            $fetch_via_staff_id = "";
+        }
         //echo $fetch_via_staff_id;exit;
 
         if (is_staff_logged_in() && $id != '' && $id == get_staff_user_id()) {
-            $select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE isread=0'.$fetch_via_staff_id.' AND company_id='.$companyid.' ) as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE finished=0'.$fetch_via_staff_id. ') as total_unfinished_todos';
+            // Build the notifications subquery safely
+            $notifications_where = "isread=0 AND company_id=" . $companyid;
+            if (!empty($fetch_via_staff_id)) {
+                $notifications_where .= $fetch_via_staff_id;
+            }
+            
+            // Build the todos subquery safely
+            $todos_where = "finished=0";
+            if (!empty($fetch_via_staff_id)) {
+                $todos_where .= $fetch_via_staff_id;
+            }
+            
+            // Add safety check for company_id
+            if ($companyid > 0) {
+                $select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE ' . $notifications_where . ') as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE ' . $todos_where . ') as total_unfinished_todos';
+            } else {
+                // Fallback if company_id is invalid
+                $select_str .= ',0 as total_unread_notifications, 0 as total_unfinished_todos';
+            }
         }
 
         $this->db->select($select_str);
-        $this->db->where($where);
+        
+        // Safely apply where conditions
+        if (!empty($where) && is_array($where)) {
+            $this->db->where($where);
+        }
 		
 		
 

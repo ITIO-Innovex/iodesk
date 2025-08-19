@@ -145,6 +145,7 @@ $autoload['helper'] = [
         'credit_notes',
         'proposals',
         'projects',
+		'project',
         'tasks',
         'fields',
         'leads',

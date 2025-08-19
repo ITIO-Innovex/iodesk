@@ -23,7 +23,7 @@
                     <h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
                         <?php echo e($member->firstname . ' ' . $member->lastname); ?>
                         <?php if ($member->last_activity && $member->staffid != get_staff_user_id()) { ?>
-                        <small> - <?php echo _l('last_active'); ?>:
+                        <small class="tw-text-white"> - <?php echo _l('last_active'); ?>:
                             <span class="text-has-action" data-toggle="tooltip"
                                 data-title="<?php echo e(_dt($member->last_activity)); ?>">
                                 <?php echo e(time_ago($member->last_activity)); ?>

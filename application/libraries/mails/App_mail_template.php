@@ -278,6 +278,8 @@ class App_mail_template
 		
 		if(isset($_SESSION['templatesub'])&&$_SESSION['templatesub']&&strstr($this->template->subject,"{uw_company}")){
 		return str_replace("{uw_company}",$_SESSION['templatesub'],$this->template->subject);exit;
+		}elseif(isset($_SESSION['templatesub'])&&$_SESSION['templatesub']&&strstr($this->template->subject,"{project_sublect}")){
+		return str_replace("{project_sublect}",$_SESSION['templatesub'],$this->template->subject);exit;
 		}else{
         return $this->template->subject;
 		}

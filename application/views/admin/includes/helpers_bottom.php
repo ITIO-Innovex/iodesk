@@ -32,7 +32,7 @@
     <?php echo _l('confirm_logout'); ?>
   </a>
 </div>
-
+<div id="flash-message" style="display:none;"></div>
 <!--Lead convert to customer modal-->
 <div id="lead_convert_to_customer"></div>
 

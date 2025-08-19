@@ -2122,6 +2122,12 @@ $lang['project_status_1']                                    = 'Not Started';
 $lang['project_status_2']                                    = 'In Progress';
 $lang['project_status_3']                                    = 'On Hold';
 $lang['project_status_4']                                    = 'Finished';
+$lang['project_status_table_name']                           = 'Project Status';
+$lang['no_project_statuses_found']                          = 'No project statuses found';
+$lang['project_status_add_edit_order']                      = 'Order';
+$lang['project_group_table_name']                           = 'Project Group';
+$lang['no_project_groups_found']                           = 'No project groups found';
+$lang['project_group_add_edit_order']                      = 'Order';
 $lang['project_file_dateadded']                              = 'Date uploaded';
 $lang['project_file_filename']                               = 'Filename';
 $lang['project_file__filetype']                              = 'File type';
@@ -2255,6 +2261,44 @@ $lang['project_note']                                        = 'Note';
 $lang['project_note_private']                                = 'Personal notes';
 $lang['project_save_note']                                   = 'Save note';
 $lang['project_user']										 = 'Users';
+
+# Project Table Language Lines
+$lang['project_id']                                             = 'Project ID';
+$lang['project_title']                                          = 'Project Title';
+$lang['project_tags']                                           = 'Tags';
+$lang['project_owner']                                          = 'Owner';
+$lang['project_assign']                                         = 'Assigned To';
+$lang['project_group']                                          = 'Project Group';
+$lang['project_progress']                                       = 'Progress';
+$lang['project_created']                                        = 'Created Date';
+$lang['project_status_not_started']                             = 'Not Started';
+$lang['project_status_in_progress']                             = 'In Progress';
+$lang['project_status_on_hold']                                 = 'On Hold';
+$lang['project_status_completed']                               = 'Completed';
+$lang['project_status_cancelled']                               = 'Cancelled';
+$lang['project_priority_low']                                   = 'Low';
+$lang['project_priority_medium']                                = 'Medium';
+$lang['project_priority_high']                                  = 'High';
+$lang['project_priority_urgent']                                = 'Urgent';
+$lang['my_projects_assigned']                                   = 'My Projects';
+$lang['new_project_added_successfully']                         = 'New project added successfully';
+$lang['project_message_updated_successfully']                   = 'Project message updated successfully';
+$lang['project_reply']                                          = 'Project Reply';
+$lang['project_reply_lowercase']                                = 'project reply';
+$lang['project_attachment']                                     = 'Project Attachment';
+$lang['project_priorities']                                     = 'Project Priorities';
+$lang['project_priority']                                       = 'Project Priority';
+$lang['project_priority_lowercase']                             = 'project priority';
+$lang['project_predefined_replies']                             = 'Project Predefined Replies';
+$lang['project_predefined_reply']                               = 'Project Predefined Reply';
+$lang['project_predefined_reply_lowercase']                     = 'project predefined reply';
+$lang['project_statuses']                                       = 'Project Statuses';
+$lang['project_status_lowercase']                               = 'project status';
+$lang['project_services']                                       = 'Project Services';
+$lang['project_service']                                        = 'Project Service';
+$lang['project_service_lowercase']                              = 'project service';
+$lang['total_projects_deleted']                                 = 'Total projects deleted: %s';
+$lang['project_not_found']                                      = 'Project not found';
 
 
 # Project Activity
@@ -4096,4 +4140,6 @@ $lang['Completed Projects'] = 'Completed Projects';
 $lang['In Progress Projects'] = 'In Progress Projects';
 $lang['TaskID'] = 'TaskID';
 $lang['total'] = 'total';
+$lang['no_projects_found'] = 'No project found';
+$lang['edit_group'] = 'Edit Project Group';
 ?>

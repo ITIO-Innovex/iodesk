@@ -105,7 +105,8 @@ function get_available_staff_permissions($data = [])
 			    'project_dashboard' => _l('Dashboard'),
 				'project_project' => _l('Project'),
                 'project_collaboration'=> _l('Collaboration'), 
-				'project_setting' => _l('Setting'), ]),
+				'project_status' => _l('Status'),
+				'project_group' => _l('Group'), ]),
         ],
 		
         'proposals' => [
@@ -408,6 +409,26 @@ function get_deals_stage_title($sid)
 		return $com->stage;
 		}
 		}
+		
+		return 0;
+}
+
+function get_staff_email($sid='')
+{   
+        // Fetch company Name from company id
+		if(isset($sid)&&$sid){
+		$staff_id=$sid;
+		}else{
+		$staff_id=get_staff_user_id();
+		}
+		
+		$CI = & get_instance();
+		$CI->db->where('staffid', $staff_id);
+		$com = $CI->db->select('email')->from(db_prefix() . 'staff')->get()->row();
+		if(isset($com)&&$com->email){
+		return $com->email;
+		}
+		
 		
 		return 0;
 }
