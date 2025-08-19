@@ -28,7 +28,7 @@
     </script>
     <?php app_admin_head(); ?>
 </head>
-
-<body <?php echo admin_body_class(isset($bodyclass) ? $bodyclass : ''); ?> style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1504.jpg');?>)  !important; ">
+<?php $bguser="iodesk-bg1504.jpg"; if (is_super()) {$bguser="iodesk-bg1505.jpg";}elseif(is_admin()){$bguser="iodesk-bg1506.jpg";}else{$bguser="iodesk-bg1504.jpg";} ?>
+<body  <?php echo admin_body_class(isset($bodyclass) ? $bodyclass : ''); ?> style="background-image: url(<?php echo base_url('uploads/bg/'.$bguser);?>)  !important; ">
 <div class="containervg">
     <?php hooks()->do_action('after_body_start'); ?>

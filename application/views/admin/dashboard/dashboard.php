@@ -32,7 +32,7 @@
 	</div>
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
 	<i class="fa-regular fa-circle-check menu-icon fa-2x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Role : <?php echo get_staff_rolex(); ?> [<?=get_user_type();?>]
+	<span class="tw-truncate tw-text-xl">Role : <?php //echo get_staff_rolex(); ?> [<?=get_user_type();?>]
 	</span>                     
 	</div> 
 	
@@ -55,7 +55,7 @@
 	
 	</div>
     <div class="screen-options-btn box-shadow-bg">
-        <i class="fa-solid fa-user  menu-icon tw-mx-2 fa-2x" title="View Profile"></i>
+        <i class="fa-solid fa-user  menu-icon tw-mx-2 fa-2x" title="View Profile - <?=get_user_type();?>"></i>
     </div>
     <div class="content">
         <div class="row">

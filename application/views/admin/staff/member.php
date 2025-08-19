@@ -82,7 +82,7 @@
                               ?>
                                         <input type="checkbox" value="1" name="is_not_staff" id="is_not_staff"
                                             <?php echo e($checked); ?>>
-                                        <label for="is_not_staff"><?php echo _l('is_not_staff_member'); ?></label>
+                                        <label for="is_not_staff"><?php echo _l('is_not_staff_member'); ?> <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Only staff members are authorized to access this portal. You must be a staff member to log in." ></i></label>
                                     </div>
                                     <hr />
                                 </div>
@@ -467,7 +467,7 @@
                                         <a href="#" <?php
                                           // Do not show the note popover when there is no associated task
                                           // The user will be able to add note and select task in the popup window that will open
-                                          if ($t['task_id'] != 0) { ?> data-toggle="popover" data-placement="bottom"
+                                          if($t['task_id'] != 0) { ?> data-toggle="popover" data-placement="bottom"
                                             data-html="true" data-trigger="manual"
                                             data-title="<?php echo _l('note'); ?>"
                                             data-content='<?php echo render_textarea('timesheet_note'); ?><button type="button"
