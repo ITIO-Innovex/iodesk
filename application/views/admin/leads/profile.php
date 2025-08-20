@@ -128,9 +128,13 @@
 	<div class="mleft5 pull-right">
         <a href="#" class="btn btn-success pull-right lead-top-btn" data-toggle="modal" data-target="#dealModal" ><i class="fa-solid fa-handshake"></i> Convert to Deal <?php //echo $lead->is_deal?></a>
     </div>
+	<?php }elseif(isset($lead->is_deal)&&$lead->is_deal==0&&$lead->status!=1){ ?>
+	<div class="mleft5 pull-right">
+        <a href="#" class="btn btn-secondary pull-right lead-top-btn" data-toggle="tooltip" data-title="A lead can be converted to a deal only if its status is set to Hot and it is assigned to a staff member." ><i class="fa-solid fa-handshake"></i> Convert to Deal <?php //echo $lead->is_deal?></a>
+    </div>
 	<?php }else{ ?>
 	<?php /*?><div class="mleft5 pull-right">
-<a href="#" class="btn btn-warning pull-right lead-top-btn" onclick="alert('Already converted to deal')" ><i class="fa-solid fa-handshake"></i> Deal</a><?php */?><?php } ?></div>
+<a href="#" class="btn btn-warning pull-right lead-top-btn" onclick="alert('Already converted to deal')" ><i class="fa-solid fa-handshake"></i> Deal</a></div><?php */?><?php } ?>
     <?php
            $client                                 = false;
            $convert_to_client_tooltip_email_exists = '';
@@ -1501,29 +1505,29 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
 <input type="hidden" name="country" value="<?php echo isset($lead) ? $lead->country  : '';?> " />
 <div class="col-md-4">
  <?php $value = (isset($lead) ? $lead->name  : ''); ?>
- <?php echo render_input('name', 'Full Name', $value,'text',['required' => 'true']); ?>  
+ <?php echo render_input('name', 'Full Name <small class="text-danger">* </small>', $value,'text',['required' => 'true']); ?>  
  </div>    
 <div class="col-md-4">
  <?php $value = (isset($lead) ? $lead->email : ''); ?>
- <?php echo render_input('email', 'Email ID', $value,'email',['required' => 'true']);  ?>  
+ <?php echo render_input('email', 'Email ID <small class="text-danger">* </small>', $value,'email',['required' => 'true']);  ?>  
  </div>
 <div class="col-md-4">
 <div class="col-md-4 tw-px-0">
  <?php $value = (isset($lead) ? $lead->country_code : ''); ?>
- <?php echo render_input('country_code', 'Country Code', $value,'text',['required' => 'true']); ?>  
+ <?php echo render_input('country_code', 'Country Code <small class="text-danger">* </small>', $value,'text',['required' => 'true']); ?>  
  </div><div class="col-md-8 tw-px-0">
  <?php $value = (isset($lead) ? $lead->phonenumber : ''); ?>
- <?php echo render_input('phonenumber', 'Phone Number', $value,'number',['required' => 'true']); ?> 
+ <?php echo render_input('phonenumber', 'Phone Number <small class="text-danger">* </small>', $value,'number',['required' => 'true']); ?> 
   </div>
  </div>
  
 <div class="col-md-4">
  <?php $value = (isset($lead) ? $lead->company : ''); ?>
- <?php echo render_input('company', 'Business Name', $value,'text'); //,['required' => 'true'] ?>  
+ <?php echo render_input('company', 'Business Name <small class="text-danger">* </small>', $value,'text'); //,['required' => 'true'] ?>  
  </div>    
 <div class="col-md-4">
  <?php $value = (isset($lead) ? $lead->website : ''); ?>
- <?php echo render_input('website', 'Business URL', $value,'url',['required' => 'true']); //,['required' => 'true'] ?>  
+ <?php echo render_input('website', 'Business URL <small class="text-danger">* </small>', $value,'url',['required' => 'true']); //,['required' => 'true'] ?>  
  </div>
 
 <div class="col-md-4">
@@ -1537,7 +1541,7 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
 
  <div class="col-md-12">
  <?php $value = (isset($lead) ? $lead->address : ''); ?>
- <?php echo render_textarea('address', 'Address', $value,['required' => 'true']); ?>
+ <?php echo render_textarea('address', 'Address  <small class="text-danger">* </small>', $value,['required' => 'true']); ?>
  </div>
 <div class="col-md-12">
  <?php $value = (isset($lead) ? $lead->description : ''); ?>
@@ -2141,7 +2145,7 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
                 break;
 			case 'radio':
 			    foreach ($field->options as $option) {
-                echo "<label><input type='radio' name='{$name}' id='{$name}' class='form-control' {$required}>". htmlspecialchars($option)."</label>";
+                echo "<label class='tw-mt-2'><input type='radio' name='{$name}' id='{$name}' class='tw-mt-2' {$required}>". htmlspecialchars($option)."</label>";
 				}
                 break;
 			case 'listbox':	

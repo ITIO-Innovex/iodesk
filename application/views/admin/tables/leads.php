@@ -328,12 +328,12 @@ return App_table::find('leads')
            /* $row[] = ($aRow['phonenumber'] != '' ? '<a href="tel:' . e($aRow['phonenumber']) . '">' . e($aRow['phonenumber']) . '</a>' : '');*/
 			$row[] = ($aRow['website'] != '' ? '<a  href="' . maybe_add_http(e($aRow['website'])) . '" target="_blank" title="' . e($aRow['website']) . '"><i class="fa-solid fa-globe"></i></a>' : '');
 			e($aRow['website']);
-			$row[] = e($aRow['BusinessNature']);
+			/*$row[] = e($aRow['BusinessNature']);*/
 
-            $base_currency = get_base_currency();
+            /*$base_currency = get_base_currency();*/
 //            $row[]         = e(($aRow['lead_value'] != 0 ? app_format_money($aRow['lead_value'], $base_currency->id) : ''));
 
-            $row[] .= render_tags($aRow['tags']);
+           /* $row[] .= render_tags($aRow['tags']);*/
 
             $assignedOutput = '';
             if ($aRow['assigned'] != 0) {
@@ -412,7 +412,7 @@ return App_table::find('leads')
 			
 			//$row[] = e($aRow['absorber']);
 			/////////////////////////
-			$absorberOutput = '';
+			/*$absorberOutput = '';
             if ($aRow['absorber'] != 0) {
                 $full_name = get_staff_full_name($aRow['absorber']);
 
@@ -431,9 +431,9 @@ return App_table::find('leads')
                  if(is_admin($currentLoggedInUser)|| staff_can('view', 'leads')){
                     $absorberOutput = '<span class="text-success " style=""><a onclick="leadAssign('.$aRow['id'].')" data-toggle="modal" data-target="#leadAbsorberModel"><i class="fa fa-plus" aria-hidden="true"style="font-size: 20px;position:relative;left:25px;top:10px"></i></a></span>';
                  }
-            }
+            }*/
 
-            $row[] = $absorberOutput;
+            /*$row[] = $absorberOutput;*/
 			/////////////////////////////
 
             $row[] = e($aRow['source_name']);

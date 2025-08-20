@@ -565,17 +565,36 @@ $client->disconnect();
         'username'      => $mailer_username,
         'password'      => $mailer_password,
         'protocol'      => 'imap', 
+		'timeout'       => 60
 		//'authentication' => "oauth"            // Protocol (imap/pop3)
     ]);
 	
-	
-	if ($client->connect()) {
-	
-	
-	
+// convert warnings to exceptions
+set_error_handler(function($severity, $message, $file, $line) {
+    if (!(error_reporting() & $severity)) return;
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
 
-$cnt=0;
+$cnt=0;	
+$connection=false;
+             // Check IMAP connection
+			try {
+			if ($client->connect()) {
+			$connection=true;
+			} else {
+			$data['msg']="IMAP Error :-".$e->getMessage();
+			$data['cnt']=0;
+			return $data;
+			
+			}
+			} catch (\Exception $e) {
+			$data['msg']="IMAP Error :-".$e->getMessage();
+			$data['cnt']=0;
+			return $data;
+			}
 
+	
+	if ($connection) {
  
 	$mailbox = $client->getFolder($folder);
 	 if ($mailbox === null) {

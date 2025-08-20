@@ -63,12 +63,13 @@
 									<td><?php //echo e($list['active']); ?>
 
 
-<div class="onoffswitch">
+<div class="onoffswitch" data-toggle="tooltip" data-title="When a company (<?php echo e($list['companyname']); ?>) is deactivated, all associated staff and administrators will be restricted from logging in.">
 <input type="checkbox" data-url="<?php echo admin_url('staff/deletecompany/' . e($list['company_id']).'/'. $surl); ?>"  class="onoffswitch-checkbox confirm-checkbox" onclick="return confirm('Are you sure you want to proceed?')" id="v_<?php echo e($list['company_id']); ?>"  <?php if(isset($list['active'])&&$list['active']){ ?> checked="" <?php } ?> >
 <label class="onoffswitch-label" for="v_<?php echo e($list['company_id']); ?>"></label>
 </div>
             </td>
-<td><a class="tw-rounded-full tw-bg-danger-600 tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-6 tw-w-6 -tw-mt-1 group-hover:!tw-bg-primary-700" href="<?php echo admin_url('staff?cid='. e($list['company_id'])); ?>" title="view staff list" target="_blank"><?php echo e($list['staff_count']); ?></td>
+<td><a class="tw-rounded-full tw-bg-danger-600 tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-6 tw-w-6 -tw-mt-1 group-hover:!tw-bg-primary-700" data-toggle="tooltip" data-title="Total added staff" ><?php echo e($list['staff_count']); ?></td>
+<?php /*?>href="<?php echo admin_url('staff?cid='. e($list['company_id'])); ?>"<?php */?>
 									<td><?php echo e($list['addedon']); ?></td>
                                     <td>
                                         <div class="tw-flex tw-items-center tw-space-x-3">
@@ -116,7 +117,7 @@
 <?php echo render_input('companyname', '<small class="req text-danger">* </small> Company Name', '', 'text', $required); ?>
 <?php echo render_input('website', '<small class="req text-danger">* </small> Website', '', 'url', $required); ?>
 <div class="form-group">
-  <label for="deal_form_type">Deal Form Type</label>
+  <label for="deal_form_type">Deal Form Type <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="By default, the system uses the standard (old) form for the deal section. For customized forms, a dynamic self-created form will be used instead." ></i></label>
   <select class="form-control" name="deal_form_type" id="deal_form_type">
     <option value="0" <?php if(isset($member) && isset($member->deal_form_type) && $member->deal_form_type == 0) echo 'selected'; ?>>Default</option>
     <option value="1" <?php if((isset($member) && isset($member->deal_form_type) && $member->deal_form_type == 1) || !isset($member)) echo 'selected'; ?>>Customized Form</option>
@@ -124,16 +125,26 @@
 </div>
 <div id="compStaff" >
 <hr class="hr-text gradient" data-content="For Company Admin Login Details">
-<?php echo render_input('firstname', '<small class="req text-danger">* </small> First Name', '', 'text'); ?>
-<?php echo render_input('lastname', '<small class="req text-danger">* </small> Last Name', ''); ?>
-<?php echo render_input('email', '<small class="req text-danger">* </small> Email (for admin User)', '', 'email', ['autocomplete' => 'off']); ?>
-<?php echo render_input('phonenumber', '<small class="req text-danger">* </small> Phone / Mobile', '', 'text',['required' => 'true','maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
+<div class="row">
+<div class="col-sm-4">
+<?php echo render_input('firstname', '<small class="req text-danger">* </small> First Name', '', 'text', ['autocomplete' => 'off','placeholder' => 'Enter first name']); ?>
+</div>
+<div class="col-sm-4">
+<?php echo render_input('lastname', '<small class="req text-danger">* </small> Last Name', '','text', ['autocomplete' => 'off','placeholder' => 'Enter last name']); ?>
+</div>
+<div class="col-sm-4">
+<?php echo render_input('phonenumber', '<small class="req text-danger">* </small> Phone / Mobile', '', 'text',['required' => 'true','maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57','placeholder' => 'Enter phone / mobile number']); ?>
+</div>
+
+</div>
+<?php echo render_input('email', '<small class="req text-danger">* </small> Email <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Please enter the email address. This email will be used for the admin login with full access permissions" ></i>', '', 'email', ['autocomplete' => 'off','placeholder' => 'This email will be used for the admin login with full access permissions']); ?>
+
 <?php if (!isset($member) || is_admin() || !is_admin() && $member->admin == 0) { ?>
                                
 					   
                          <label for="password" class="control-label"><small class="req text-danger">* </small> <?php echo _l('staff_add_edit_password'); ?></label>
                                 <div class="input-group">
-   <input type="password" class="form-control password" name="password" autocomplete="off" minlength="5" maxlength="15">
+   <input type="password" class="form-control password" name="password" autocomplete="off" minlength="5" maxlength="15" placeholder="Please enter your password to access the admin login.">
                                     <span class="input-group-addon tw-border-l-0">
                                         <a href="#password" class="show_password"
                                             onclick="showPassword('password'); return false;"><i class="fa fa-eye"></i></a>
@@ -146,9 +157,9 @@
 <?php } ?>
 
 <div>
-								<div class="tw-mt-2">
+								<?php /*?><div class="tw-mt-2">
                 <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
-            </div>
+            </div><?php */?>
                             </div>
 			</div>
         </div>
