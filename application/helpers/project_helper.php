@@ -68,6 +68,21 @@ function proj_status_translate($id = null)
 
 }
 
+function get_project_status_title($id)
+{   
+        // Fetch company Name from company id
+		if(isset($id)&&$id){
+		$CI = & get_instance();
+		$CI->db->where('id', $id);
+		$com = $CI->db->select('name')->from(db_prefix() . 'project_status')->get()->row();
+		if(isset($com)&&$com->name){
+		return $com->name;
+		}
+		}
+		
+		return null;
+}
+
 function get_project_group($sid)
 {   
         // Fetch company Name from company id

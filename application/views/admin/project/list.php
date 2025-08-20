@@ -95,12 +95,14 @@
 	</div></td>
 					<td><?php echo $completion; ?>%</td>
                     <td>
+					<span style="display:none"><?php echo get_staff_full_name($staff['staffid']);?></span>
   <select class="form-control project-owner-select" data-project-id="<?php echo $status['id']; ?>" style="min-width:120px;">
     <?php foreach($staff_members as $staff): ?>
       <option value="<?php echo $staff['staffid']; ?>" <?php if($staff['staffid'] == $status['owner']) echo 'selected'; ?>><?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?></option>
     <?php endforeach; ?>
   </select></td>
                     <td id="boredr-none" style="background:<?php echo $prod_status->color; ?>; color:#FFFFFF;" class="tw-text-white" align="center">
+					<span style="display:none"><?php echo get_project_status_title($status['project_status']);?></span>
   <select class="form-control project-status-select" data-project-id="<?php echo $status['id']; ?>" style="background:<?php echo $prod_status->color; ?>; color:#fff; border:none; min-width:120px;">
     <?php foreach($project_statuses as $ps): ?>
       <option value="<?php echo $ps['id']; ?>" <?php if($ps['id'] == $status['project_status']) echo 'selected'; ?>><?php echo $ps['name']; ?></option>
