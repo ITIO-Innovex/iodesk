@@ -90,7 +90,7 @@
     <a class="dropdown-item" href="<?php echo admin_url('project/tasks/'.$status['id']); ?>">Access Project</a>
     <a class="dropdown-item" href="<?php echo admin_url('project/view/'.$status['id']); ?>">View Details</a>
     <a class="dropdown-item" href="<?php echo admin_url('project/edit/'.$status['id']); ?>">Edit Project</a>
-	<a class="dropdown-item _delete" href="<?php echo admin_url('project/delete_project/'.$status['id']); ?>">Move to Archive</a>  
+	<a class="dropdown-item _delete" href="<?php echo admin_url('project/delete_project/'.$status['id']); ?>">Delete Project</a>  
 	
 	</div></td>
 					<td><?php echo $completion; ?>%</td>
@@ -213,7 +213,7 @@
 			<div class="row">
               <div class="col-md-6">
               <div class="form-group">
-                <label for="tags" class="control-label"><?php echo _l('Tags'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Add text and press enter for add tag"></i></label>
+                <label for="tags" class="control-label"><?php echo _l('Tags'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Add tags to better manage and search records. Add text and press enter for add tag"></i></label>
                 <input type="text" class="form-control tagify-input" id="tags" name="tags" placeholder="<?php echo _l('Enter a tag name'); ?>">
                 
               </div>
