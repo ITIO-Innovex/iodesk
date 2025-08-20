@@ -69,14 +69,21 @@
                   <tr>
 					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo $status['id']; ?></td>
                     <td  class="sticky-col second-col" style="width: 300px;
-    max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 30) . '...' : '-'; ?>
+    max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 50) . '...' : '-'; ?>
+	<?php //echo get_project_title($project_id);?>
+	<?php if(!isset($project_id)||empty($project_id)){ ?><br />
+<span class="text-warning text-bold" title="Project Title">
+	<?php echo isset($status['project_id']) ? get_project_title($status['project_id'], 0, 50) . '' : '-'; ?>
+	</span>
+	<?php }?>
 	
 	<a href="<?php echo admin_url('project/tasks_details/'.$status["id"]); ?>" class="action-task action-task-btn tw-m-1 tw-p-1" style=""> <i class="fa-solid fa-file-contract"></i> View</a>
 
                     <td style="position:relative;">
   <i class="fa-solid fa-ellipsis-vertical project-dropdown-toggle" data-project-id="<?php echo $status['id']; ?>" style="float:inline-end; cursor:pointer;"></i>
   <div class="project-dropdown-menu" style="display:none; position:absolute; right:0; top:20px; min-width:150px; background:#fff; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:1000;">
-	<a class="dropdown-item _delete" href="<?php echo admin_url('project/delete_task/'.$status['id']); ?>">Move to Archive</a>  
+  <a class="dropdown-item" href="<?php echo admin_url('project/tasks_details/'.$status['id']); ?>">Task Details</a>
+  <a class="dropdown-item _delete" href="<?php echo admin_url('project/delete_task/'.$status['id']); ?>">Delete Task</a>  
 	
 	</div></td>
                     <td>
@@ -213,13 +220,13 @@
              
                            <!-- Tags -->
               <div class="form-group">
-                <label for="tags" class="control-label"><?php echo _l('Tags'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Add Tags"></i></label>
+                <label for="tags" class="control-label"><?php echo _l('Tags'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Add tags to better manage and search records. Add text and press enter for add tag"></i></label>
                 <input type="text" class="form-control" id="tagsInput" name="tags" placeholder="<?php echo _l('Enter a tag name'); ?>">
               </div>
               
               <!-- File Attachments -->
               <div class="form-group">
-                <label for="task_attachments" class="control-label"><?php echo _l('Attachments'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Upload multiple files"></i></label>
+                <label for="task_attachments" class="control-label"><?php echo _l('Attachments'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Choose multiple files to upload together."></i></label>
                 <div class="input-group">
                   <input type="file" class="form-control" id="task_attachments" name="task_attachments[]" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx,.zip,.rar">
                   <span class="input-group-btn">
