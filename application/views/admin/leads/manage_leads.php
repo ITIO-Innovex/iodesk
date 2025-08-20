@@ -76,7 +76,7 @@
 					<?php } ?>
 					
                     <div class="clearfix"></div>
-                    <div class="hide leads-overview tw-mt-2 sm:tw-mt-4 tw-mb-4 sm:tw-mb-0">
+                    <div class="hide leads-overview tw-mt-2 sm:tw-mt-4 tw-mb-4 sm:tw-mb-0  mail-bg tw-p-2 tw-rounded">
                         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg">
                             <?php echo _l('leads_summary'); ?>
                         </h4>
@@ -266,19 +266,19 @@
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-website'],
                               ];
 							  
-							  $_table_data[] = [
+							  /*$_table_data[] = [
                                'name'     => _l('Industries'),
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-BusinessNature'],
-                              ];
+                              ];*/
                               /*$_table_data[] = [
                                  'name'     => _l('leads_dt_lead_value'),
                                  'th_attrs' => ['class' => 'toggleable', 'id' => 'th-lead-value'],
                                 ];
 								*/
-                              $_table_data[] = [
+                              /*$_table_data[] = [
                                'name'     => _l('tags'),
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-tags'],
-                              ];
+                              ];*/
                               $_table_data[] = [
                                'name'     => _l('leads_dt_assigned'),
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-assigned'],
@@ -297,10 +297,10 @@
                               ];
 							  }
 							  
-							  $_table_data[] = [
+							  /*$_table_data[] = [
                                'name'     => _l('Observer'),
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-assigned'],
-                              ];
+                              ];*/
 							  
                               $_table_data[] = [
                                'name'     => _l('leads_source'),

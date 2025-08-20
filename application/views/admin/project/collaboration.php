@@ -107,7 +107,8 @@
                                                         
                                                         <div class="activity-content tw-ml-11 tw-ml-4">
                                                             <div class="activity-description tw-mb-2">
-                                                                <strong><?php echo htmlspecialchars($log['description']); ?></strong>
+                                                                <strong>!!<?php 
+																echo str_replace(",", "<br>", $log['description']);?>!!</strong>
                                                             </div>
                                                             
                                                             <?php if (!empty($log['project_title'])): ?>

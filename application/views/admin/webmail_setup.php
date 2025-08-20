@@ -98,7 +98,7 @@ Dep - <?php echo e($entry['departmentid']); ?>
                 <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1" />
                  
 <div class="table-responsive">
-<span>All fields is required</span>
+<span class="text-danger">All fields is required</span>
   <table class="table table-bordered roles no-margin">
     <tbody>
 	
@@ -258,7 +258,13 @@ function retrieve_imap_department_folders() {
     })
 }
 
+$(document).ready(function(){
+    $("#mailer_email").on("keyup", function(){
+        $("#mailer_username").val($(this).val());
+    });
+});
 </script>
+
 </body>
 
 </html>

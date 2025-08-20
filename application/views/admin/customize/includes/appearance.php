@@ -71,7 +71,9 @@
 
 <!-- SMTP Settings Section -->
 <div class="row">
-    <div class="col-md-12">SMTP Settings</h4>
+    <div class="col-md-12">
+	<h4 class="bold mt-4">SMTP Settings</h4>
+
         <hr class="hr-panel-separator" />
         <div class="row">
             <div class="col-md-6">

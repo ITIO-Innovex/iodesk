@@ -21,7 +21,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="active"><a href="#company-tab" role="tab" data-toggle="tab">Company</a></li>
                             <li><a href="#deal-tab" role="tab" data-toggle="tab" class="DealTab">Deal</a></li>
-							<li><a href="#leads-tab" role="tab" data-toggle="tab">Leads</a></li>
+							<?php /*?><li><a href="#leads-tab" role="tab" data-toggle="tab">Leads</a></li><?php */?>
                         </ul>
                         <div class="tab-content" style="margin-top:20px;">
                             <div class="tab-pane active" id="company-tab">
@@ -407,7 +407,7 @@ function formFieldHtml(field, idx) {
         '<option value="textarea"' + (field.type === 'textarea' ? ' selected' : '') + '>Textarea</option>' +
         '<option value="listbox"' + (field.type === 'listbox' ? ' selected' : '') + '>Listbox</option>' +
         '<option value="radio"' + (field.type === 'radio' ? ' selected' : '') + '>Radio</option>' +
-        '<option value="checkbox"' + (field.type === 'checkbox' ? ' selected' : '') + '>Checkbox</option>' +
+        /*'<option value="checkbox"' + (field.type === 'checkbox' ? ' selected' : '') + '>Checkbox</option>' +*/
         '<option value="file"' + (field.type === 'file' ? ' selected' : '') + '>File</option>' +
         '<option value="cal"' + (field.type === 'cal' ? ' selected' : '') + '>Calendar/Date</option>' +
         '</select></div>';
