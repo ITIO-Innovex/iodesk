@@ -27,7 +27,7 @@ function app_init_admin_sidebar_menu_items()
         'collapse' => true,
         'name'     => _l('als_sales'),
         'position' => 10,
-        'icon'     => 'fa-solid fa-receipt',
+        'icon'     => 'fa-regular fa-user',
         'badge'    => [],
     ]);
 
