@@ -61,7 +61,7 @@
             <div id="additional"></div>
             <?php echo render_input('name', 'Group Title'); ?> 
             <?php echo render_color_picker('color', _l('Group Color')); ?> 
-            <?php echo render_input('statusorder', 'project_group_add_edit_order', total_rows(db_prefix() . 'project_group') + 1, 'number'); ?></div>
+            <?php /*?><?php echo render_input('statusorder', 'project_group_add_edit_order', total_rows(db_prefix() . 'project_group') + 1, 'number'); ?><?php */?></div>
         </div>
       </div>
       <div class="modal-footer">

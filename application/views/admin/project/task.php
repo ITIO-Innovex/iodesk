@@ -106,6 +106,7 @@
                     </td>
                     
                     <td id="boredr-none" style="background:<?php echo $prod_status->color; ?>; color:#FFFFFF;" class="tw-text-white" align="center">
+<span style="display:none"><?php echo get_project_status_title($status['task_status']);?></span>
   <select class="form-control task-status-select" data-task-id="<?php echo $status['id']; ?>" style="background:<?php echo $prod_status->color; ?>; color:#fff; border:none; min-width:120px;">
     <?php foreach($project_statuses as $ps): ?>
       <option value="<?php echo $ps['id']; ?>" <?php if($ps['id'] == $status['task_status']) echo 'selected'; ?>><?php echo $ps['name']; ?></option>
@@ -201,13 +202,13 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="task_start_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('Start Date'); ?></label>
-                  <input type="date" class="form-control" id="task_start_date" name="task_start_date" title="Start date" required>
+                  <input type="datetime-local" class="form-control" id="task_start_date" name="task_start_date" title="Start date" required>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="task_end_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('End Date'); ?></label>
-                  <input type="date" class="form-control" id="task_end_date" name="task_end_date" title="End date" required>
+                  <input type="datetime-local" class="form-control" id="task_end_date" name="task_end_date" title="End date" required>
                 </div>
               </div>
             </div>
