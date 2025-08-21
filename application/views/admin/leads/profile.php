@@ -540,26 +540,24 @@ echo "<tbody></table>";
 <?php }else{ 
 
 $this->db->select('*,');
-$this->db->limit(1);
+//$this->db->limit(1);
 $this->db->where('deal_id', $lead->id);
 $this->db->where('company_id', get_staff_company_id());
 $process=$this->db->get('deals_process_list')->row();
-
+//echo $this->db->last_query();
 //print_r($process);
 $datastage=$_SESSION['deal_form_order'];
 
 foreach($datastage as $key=>$val){
 
-$field_process="process".$val;
-$field_process_addedon="process".$val."_addedon";
-
-if(isset($process)&&$process->$field_process){
+//if(isset($process)&&$process->$field_process){
+if (isset($process) && isset($process->process)) {
 ?>
 <div class="clearfix"></div>
 <div class="col-md-12 col-xs-12">
                
 <div class="alert alert-warning" onclick="togglediv('#myxDiv<?php echo $val; ?>')"><?php echo get_deals_stage_title($val); ?> &nbsp;[
-<?php echo(isset($process) && $process->$field_process_addedon != '' ? '<span class="text-has-action text-success" data-toggle="tooltip" data-title="' . e(_dt($process->$field_process_addedon)) . '">' . e(time_ago($process->$field_process_addedon)) . '</span>' : '-') ?>]
+<?php echo(isset($process) && $process->process_addedon != '' ? '<span class="text-has-action text-success" data-toggle="tooltip" data-title="' . e(_dt($process->process_addedon)) . '">' . e(time_ago($process->process_addedon)) . '</span>' : '-') ?>]
 
 <span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span></div>
 <div id="myxDiv<?php echo $val; ?>" class="tw-border-neutral-200" style="display:none;">
@@ -567,7 +565,7 @@ if(isset($process)&&$process->$field_process){
 <div class="form-group">
 
 <?php
-$json = $process->$field_process;
+$json = $process->process;
 $data = json_decode($json, true);
 $allowed = ['gif', 'jpg', 'jpeg', 'png', 'pdf', 'svg', 'docx', 'xlsx'];
 unset($data['deal_stage'], $data['deal_id'], $data['file_labels']);
@@ -585,7 +583,7 @@ if (in_array($ext, $allowed)) {
 
     echo "<tr><td width='25%'><b>" . ucwords(str_replace('_', ' ', htmlspecialchars($key))) . "</b></td><td>:: " . $value . "</td></tr>";
 }
-echo "<tr><td width='25%'><b>Timestamp</b></td><td>:: " . $process->$field_process_addedon . "</td></tr>";
+echo "<tr><td width='25%'><b>Timestamp</b></td><td>:: " . $process->process_addedon . "</td></tr>";
 echo "</table>";
 ?>
 
@@ -2042,12 +2040,16 @@ echo "&nbsp;&nbsp;Invoice form"; ?>
 <?php
 
 $deal_list=$_SESSION['deal_form_order'];
+//print_r($deal_list);
+$lastdealid = $_SESSION['lastdealid']= end($deal_list);
 $deal_list_total=count($deal_list);
 $deal_stage=$deal_list[$lead->deal_stage];
+$deal_stage;
 
 
 
 ?>
+<!--===============================================================-->
 <div class="modal-content tw-bg-info-100">
             <div class="modal-header" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -2064,11 +2066,8 @@ $deal_stage=$deal_list[$lead->deal_stage];
 
 
 <div class="row">
-
 <div class="col-md-12">
-
 <?php
-
 $this->db->select('form_layout');
 $this->db->where('deal_stage_id', $deal_stage);
 $this->db->where('company_id', get_staff_company_id());
@@ -2076,18 +2075,22 @@ $form_layout=$this->db->get('deals_stage_custom')->row();
 if (!empty($form_layout->form_layout)) {
     $fields = json_decode($form_layout->form_layout);
 	//print_r($fields);
-	
-	$file_labels = [];
+		$file_labels = [];
 
 // Get Data if Inserted
-$getfield="process".$deal_stage;
+$getfield="process";
 $this->db->select($getfield);
 $this->db->where('company_id', get_staff_company_id());
 $this->db->where('deal_id', $lead->id);
+$this->db->where('deal_stage', $deal_stage);
 $form_data=$this->db->get('deals_process_list')->row();
 //echo $this->db->last_query();
-if(isset($form_data)&&$form_data->$getfield){
+
+
+
+if(isset($form_data)&&$form_data->process){
 //print_r($form_data);
+
 $json=$form_data->$getfield;
 $data = json_decode($json, true);
 
@@ -2128,7 +2131,7 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
 
         switch ($field->type) {
             case 'text':
-                echo "<input 111 type='text' name='{$name}' id='{$name}' class='form-control' {$required}>";
+                echo "<input type='text' name='{$name}' id='{$name}' class='form-control' {$required}>";
                 break;
 
             case 'file':
@@ -2145,7 +2148,7 @@ echo "<input type='hidden' name='datajson' id='file_labels' value='".$json."'  /
                 break;
 			case 'radio':
 			    foreach ($field->options as $option) {
-                echo "<label class='tw-mt-2'><input type='radio' name='{$name}' id='{$name}' class='tw-mt-2' {$required}>". htmlspecialchars($option)."</label>";
+                echo "<label class='tw-mx-2'><input type='radio' name='{$name}' id='{$name}' class='tw-mt-2' {$required}><span class='tw-mx-2'>". htmlspecialchars($option)."</span></label>";
 				}
                 break;
 			case 'listbox':	
@@ -2172,11 +2175,41 @@ $docString = implode(', ', $file_labels);
 <?php }
 		
 		
-}		
-		}
-		if(isset($deal_stage)&&$deal_stage==10){
+}
+
+if(isset($deal_stage)&&$deal_stage==$lastdealid){
+		echo "<div class='form-group'>
+                    <label for='smtp_encryption'>Status Final</label>
+                    <select name='system_status' class='form-control' id='systemStatus'>
+                        <option value=''>Select Status</option>
+                        <option value='0' selected=''>Lost</option>
+                        <option value='1'>Won</option>
+                    </select>
+                </div>";
+		}else{
 		echo "<div class='form-group'>
                     <label for='smtp_encryption'>Status</label>
+                    <select name='system_status' class='form-control' id='systemStatus'>
+                        <option value=''>Select Status</option>
+                        <option value='0' selected=''>Process</option>
+                        <option value='1'>Completed</option>
+                    </select>
+                </div>";
+				
+		  
+	}
+	}
+?>
+<?php /*?>
+
+<?php
+
+
+		
+		}
+		if(isset($deal_stage)&&$deal_stage==$lastdealid){
+		echo "<div class='form-group'>
+                    <label for='smtp_encryption'>Status Final</label>
                     <select name='system_status' class='form-control' id='systemStatus'>
                         <option value=''>Select Status</option>
                         <option value='0' selected=''>Lost</option>
@@ -2196,13 +2229,13 @@ $docString = implode(', ', $file_labels);
 		  
 	}
 ?>
+<?php */?>
 <div class='form-group' id="noteArea" style="display:none;">
 <label for='smtp_encryption'>Short Note</label>
 <textarea name="system_note"  class="form-control" placeholder="Enter about won / lost..."></textarea>
 </div>
 
 </div>
-
 </div>
 
 
@@ -2216,6 +2249,8 @@ $docString = implode(', ', $file_labels);
 </div>   
                
             </div>
+			
+			<!--===================================================================-->
 
 			
 <div class="modal-footer" style="background-color: rgb(186 230 253 / 1) !important;">

@@ -176,9 +176,9 @@
       </div></div>
 	  <?php 
 	  $project_description=$project['project_description'];
-	  echo render_textarea('project_description', '', $project_description, ['required' => 'true'], [], '', 'tinymce'); ?>
+	  echo render_textarea('project_description', '', $project_description, ['required' => 'true'], [], '', 'editor'); ?>
       <div class="form-group">
-        <label>Tags</label>
+        <label>Tags <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Add tags to better manage and search records. Add text and press enter for add tag" data-original-title="" title=""></i></label>
         <input type="text" class="form-control" name="edit_tags" id="tagsInput" value="<?php echo isset($project['tags']) ? htmlspecialchars($project['tags']) : ''; ?>">
       </div>
       <div class="row">
@@ -275,6 +275,13 @@ $('.toggle-btn').on('click', function() {
 });
 </script>
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+
+<script>
+	$('.editor').jqte();
+</script>
 <!-- Tagify CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.min.js"></script>

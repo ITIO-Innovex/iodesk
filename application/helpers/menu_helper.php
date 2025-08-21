@@ -662,13 +662,7 @@ function app_init_admin_sidebar_menu_items()
             'position' => 20,
             'badge'    => [],
         ]);
-		$CI->app_menu->add_setup_children_item('leads', [
-            'slug'     => 'deal-stages',
-            'name'     => _l('Deal Stages'),
-            'href'     => admin_url('leads/deal_stage'),
-            'position' => 21,
-            'badge'    => [],
-        ]);
+		
 		
 		
 		
@@ -690,7 +684,13 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 		
-		
+		$CI->app_menu->add_setup_children_item('leads', [
+            'slug'     => 'deal-stages',
+            'name'     => _l('Deal Stages'),
+            'href'     => admin_url('leads/deal_stage'),
+            'position' => 21,
+            'badge'    => [],
+        ]);
 		
 		$CI->app_menu->add_setup_children_item('leads', [
             'slug'     => 'task-status',

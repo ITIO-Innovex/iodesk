@@ -148,11 +148,12 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
         $('#edit_start_date').val(p.start_date);
         $('#edit_deadline').val(p.deadline);
 		$('#edit_tags').val(p.tags);
-        if(window.tinymce && tinymce.get('edit_project_description')) {
-          tinymce.get('edit_project_description').setContent(p.project_description || '');
-        } else {
-          $('#edit_project_description').val(p.project_description);
-        }
+		$('#edit_project_description').jqteVal(p.project_description);
+        //if(window.tinymce && tinymce.get('edit_project_description')) {
+          //tinymce.get('edit_project_description').setContent(p.project_description || '');
+        //} else {
+          //$('#edit_project_description').val(p.project_description);
+        //}
         // Set strict project checkbox
         $('#edit_make_this_a_strict_project').prop('checked', p.make_this_a_strict_project == 1);
         // Set project access radio buttons

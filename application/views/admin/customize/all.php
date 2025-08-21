@@ -44,7 +44,7 @@
                             <div class="tab-pane" id="deal-tab">
                                 <div class="form-group">
 <label><input type="radio" name="deal_stage_type" value="customized" id="dynamicCustomizedStage"> Customized</label>
-<label style="margin-left:20px;"><input type="radio" name="deal_stage_type"  value="default" checked> Default</label>
+<?php /*?><label style="margin-left:20px;"><input type="radio" name="deal_stage_type"  value="default" checked> Default</label><?php */?>
                                 </div>
                                 <div id="deal-stage-default-list-deal">
    
@@ -95,7 +95,7 @@
       </div>
       <div class="modal-body">
         <div id="form-builder-fields"></div>
-        <button id="add-field-btn" class="btn btn-default btn-xs" style="margin-bottom:10px;">Add Field</button>
+        <button id="add-field-btn" class="btn btn-success btn-xs" style="margin-bottom:10px;">Add Field</button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -207,15 +207,15 @@ $(function() {
             var checked = (checkedMap && checkedMap[stage.id] == 1) ? 'checked' : '';
             var disabled = '';
             if (isLast) {
-                checked = 'checked';
-                disabled = 'disabled';
+                //checked = 'checked';
+                //disabled = 'disabled';
             }
             html += '<li class="list-group-item" data-id="' + stage.id + '">' +
                 '<input type="checkbox" class="customized-stage-check" data-id="' + stage.id + '" ' + checked + ' ' + disabled + '> ' +
                 (stage.stage ? stage.stage : stage.name);
-            if (!isLast) {
+            //if (!isLast) {
                 html += '<span class="handle" style="cursor:move; float:right;"><i class="fa fa-arrows"></i></span>';
-            }
+            //}
             if (checked) {
                 html += '<button class="btn btn-primary btn-xs customized-form-btn" data-idx="' + stage.id + '"  style="float:right; margin-right:10px;">Customized Form</button>';
                 var btnClass = 'btn-danger';
@@ -401,8 +401,8 @@ $('#add-field-btn').on('click', function() {
 function formFieldHtml(field, idx) {
     var html = '<div class="form-builder-field panel panel-default" data-idx="' + idx + '">' +
         '<div class="panel-body">' +
-        '<div class="form-group"><label>Label</label><input type="text" class="form-control field-label" value="' + (field.label || '') + '"></div>' +
-        '<div class="form-group"><label>Type</label><select class="form-control field-type">' +
+        '<div class="row"><div class="col-sm-5"><div class="form-group"><label>Label</label><input type="text" class="form-control field-label" value="' + (field.label || '') + '"></div></div>' +
+        '<div class="col-sm-5"><div class="form-group"><label>Type</label><select class="form-control field-type">' +
         '<option value="text"' + (field.type === 'text' ? ' selected' : '') + '>Text</option>' +
         '<option value="textarea"' + (field.type === 'textarea' ? ' selected' : '') + '>Textarea</option>' +
         '<option value="listbox"' + (field.type === 'listbox' ? ' selected' : '') + '>Listbox</option>' +
@@ -410,8 +410,8 @@ function formFieldHtml(field, idx) {
         /*'<option value="checkbox"' + (field.type === 'checkbox' ? ' selected' : '') + '>Checkbox</option>' +*/
         '<option value="file"' + (field.type === 'file' ? ' selected' : '') + '>File</option>' +
         '<option value="cal"' + (field.type === 'cal' ? ' selected' : '') + '>Calendar/Date</option>' +
-        '</select></div>';
-    html += '<div class="form-group"><label><input type="checkbox" class="field-required" ' + (field.required ? 'checked' : '') + '> Required</label></div>';
+        '</select></div></div>';
+    html += '<div class="col-sm-2"><div class="form-group"><label><input type="checkbox" class="field-required" ' + (field.required ? 'checked' : '') + '> Required</label></div></div></div>';
     if (["listbox","radio","checkbox"].includes(field.type)) {
         html += '<div class="form-group"><label>Options (comma separated)</label><input type="text" class="form-control field-options" value="' + (field.options ? field.options.join(',') : '') + '"></div>';
     } else {

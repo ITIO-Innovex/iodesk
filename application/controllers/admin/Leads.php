@@ -1883,7 +1883,8 @@ $_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
         }
 
     }
-	
+
+/////////////////Deal Customized Form////////////	
 public function customizeddeal($id = '')
 {
     if (!is_staff_member() || ($id != '' && !$this->leads_model->staff_can_access_lead($id))) {
@@ -1895,20 +1896,16 @@ $deal_stage = $this->input->post('deal_stage');
 $system_status = $this->input->post('system_status');
 $custom_data = $this->input->post();
 
-$firstaction=1;
+
 $datajson = $this->input->post('datajson');
 if(isset($datajson)&&$datajson){
 unset($custom_data['datajson']);
 $originalData = json_decode($datajson, true);
 $mergedData = array_merge($originalData, $custom_data);
 $custom_data = $mergedData;
-$firstaction=2;
+
 }
 
-
-$process_field         = 'process' . $deal_stage;
-$process_status_field  = 'process' . $deal_stage . '_status';
-$process_addedon_field = 'process' . $deal_stage . '_addedon';
 
 // Check Upload docs
 
@@ -1949,25 +1946,25 @@ $filename=trim($filename);
 $data = [
     'deal_id'          => $deal_id,
     'company_id'       => get_staff_company_id(),
-    $process_field     => json_encode($custom_data),
-    $process_status_field => $system_status,
-    $process_addedon_field => date('Y-m-d H:i:s')
+	'deal_stage'       => $deal_stage,
+    'process'     	   => json_encode($custom_data),
+    'process_status'   => $system_status,
+    'process_addedon'  => date('Y-m-d H:i:s')
 ];
 
-
-
-if ($deal_stage == 1 && $firstaction==1) {
-    // Insert if stage is 1
-    $this->db->insert('it_crm_deals_process_list', $data);
-	
-	
-} else {
-    // Update if record already exists for deal_id
+if(exist_deal_process($deal_id,$deal_stage,get_staff_company_id())){
+// Update if record already exists for deal_id
     $this->db->where('deal_id', $deal_id);
     $this->db->update('it_crm_deals_process_list', $data);
-};
+}else{
+// Insert if stage is 1
+    $this->db->insert('it_crm_deals_process_list', $data);
+}
 
-if ($deal_stage == 10) { // For set Final Status 1 for Success 9 for failed
+
+
+
+if ($deal_stage == $_SESSION['lastdealid']) { // For set Final Status 1 for Success 9 for failed
 
    if(isset($system_status)&&$system_status==1){
    $this->db->set('deal_stage_status', 1);
@@ -1996,7 +1993,12 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
     set_alert('success', 'Deal updated successfully');
     redirect(admin_url('leads/deals'));
 }
-    public function get_lead_details($id){
+    
+////////////////////////////////////////////	
+	
+	
+	
+	public function get_lead_details($id){
         if($id){
            $leadData =  $this->leads_model->get_lead_by_id( $id);
            $staff_role = get_staff_rolex();
@@ -2192,6 +2194,19 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
         if (!is_admin()) {
             access_denied('Deal Stage');
         }
+		
+		if(!is_super()){
+	    $this->db->where('company_id', get_staff_company_id());
+	    }else{
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		$this->db->where('company_id', $_SESSION['super_view_company_id']);
+		}else{
+		$this->db->where('company_id', get_staff_company_id());
+		}
+		
+
+	
+	}
         $data['stages'] = $this->leads_model->get_deal_stage();
         $data['title']    = 'Deal Stage';
         $this->load->view('admin/leads/deal_stage', $data);
@@ -2203,12 +2218,15 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
         if (!is_admin()) {
             access_denied('Deal Stage');
         }
+		
+		
         $id = $this->input->post('id');
         $data = [
             'stage' => $this->input->post('name'),
             'color' => $this->input->post('color'),
             'statusorder' => $this->input->post('statusorder'),
             'status' => $this->input->post('status') == '1' ? 1 : 0,
+			'company_id' => get_staff_company_id(),
         ];
         if ($id) {
             $this->db->where('id', $id);

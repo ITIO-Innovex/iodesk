@@ -76,7 +76,7 @@ foreach ($rResult as $aRow) {
                 $checked = 'checked';
             }
 
-            $_data = '<div class="onoffswitch">
+            $_data = '<div class="onoffswitch" data-toggle="tooltip" data-title="When a staff member is deactivated, their account will be restricted from logging in.">
                 <input type="checkbox" ' . (($aRow['staffid'] == get_staff_user_id() || (is_admin($aRow['staffid']) || staff_cant('edit', 'staff')) && !is_admin()) ? 'disabled' : '') . ' data-switch-url="' . admin_url() . 'staff/change_staff_status" name="onoffswitch" class="onoffswitch-checkbox" id="c_' . $aRow['staffid'] . '" data-id="' . $aRow['staffid'] . '" ' . $checked . '>
                 <label class="onoffswitch-label" for="c_' . $aRow['staffid'] . '"></label>
             </div>';
