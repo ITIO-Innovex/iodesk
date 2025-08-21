@@ -106,8 +106,9 @@ class App
     public function get_current_db_version()
     {
         $this->ci->db->limit(1);
-
-        return $this->ci->db->get(db_prefix() . 'migrations')->row()->version;
+        $result = $this->ci->db->get(db_prefix() . 'migrations')->row();
+        
+        return $result ? $result->version : '0';
     }
 
     /**

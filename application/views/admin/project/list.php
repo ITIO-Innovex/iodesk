@@ -208,7 +208,7 @@
             
                          <!-- Description -->
              
-			 <?php echo render_textarea('project_description', '', '', ['required' => 'true'], [], '', 'tinymce'); ?>
+			 <?php echo render_textarea('project_description', '', '', ['required' => 'true'], [], '', 'editor'); ?>
              
 			 
                            <!-- Tags -->
@@ -305,7 +305,7 @@ Portal users can only view, follow, and comment whereas, project users will have
                 </div>
               </div>
             </div>
-			<?php echo render_textarea('edit_project_description', '', '', [], [], '', 'tinymce'); ?>
+			<?php echo render_textarea('edit_project_description', '', '', [], [], '', 'editor'); ?>
            <div class="form-group">
               <label for="edit_tags" class="control-label">Tags</label>
               <input type="text" class="form-control tagify-input" id="edit_tags" name="edit_tags" placeholder="Enter a tag name">
@@ -535,6 +535,13 @@ $('#start_date').on('change', function() {
 
 
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+
+<script>
+	$('.editor').jqte();
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.min.js"></script>
 <script>

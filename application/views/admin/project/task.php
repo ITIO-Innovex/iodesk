@@ -217,7 +217,7 @@
              
             
                          <!-- Description -->
-             <?php echo render_textarea('task_description', '', '', ['required' => 'true'], [], '', 'tinymce'); ?>
+             <?php echo render_textarea('task_description', '', '', ['required' => 'true'], [], '', 'editor'); ?>
              
                            <!-- Tags -->
               <div class="form-group">
@@ -469,6 +469,13 @@ $('body').on('click', '.remove_attachment', function() {
 </style>
 
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+
+<script>
+	$('.editor').jqte();
+</script>
 <!-- Tagify CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.min.js"></script>

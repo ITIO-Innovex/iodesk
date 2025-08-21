@@ -180,7 +180,8 @@ border-radius: 20px;
 					<?php echo form_open(admin_url('project/addcomments'), ['id' => 'add-comment-form', 'onsubmit' => 'return submitCommentForm(this);']); ?>
 					<input type="hidden" name="project_id" value="<?php echo (int)$task['project_id']; ?>">
 					<input type="hidden" name="task_id" value="<?php echo (int)$task['id']; ?>">
-					<?php echo render_textarea('comments', '', '', [], [], '', 'tinymce'); ?>
+					<?php //echo render_textarea('comments', '', '', [], [], '', 'tinymce'); ?>
+<textarea name="comments" id="comments" class="form-control editor"  placeholder="Comments..." required></textarea>
 					<button type="submit" class="btn btn-primary submit-loader">Submit</button>
 					<span id="submit-loader-message" class="text-info tw-px-2"></span>
 					<?php echo form_close(); ?>
@@ -306,18 +307,19 @@ function submitCommentForm(form){
   
   var $form = $(form);
   // Pull TinyMCE content if active
-  if (typeof tinymce !== 'undefined' && tinymce.get('comments')) {
-    $form.find('textarea[name="comments"]').val(tinymce.get('comments').getContent());
-  }
+  //if (typeof tinymce !== 'undefined' && tinymce.get('comments')) {
+    //$form.find('textarea[name="comments"]').val(tinymce.get('comments').getContent());
+  //}
   var formData = $form.serialize();
   $.post($form.attr('action'), formData).done(function(resp){
     var data;
     try { data = JSON.parse(resp); } catch(e){ data = {success:false}; }
     if (data && data.success) {
       // Clear editor/textarea
-      if (typeof tinymce !== 'undefined' && tinymce.get('comments')) {
-        tinymce.get('comments').setContent('');
-      }
+      //if (typeof tinymce !== 'undefined' && tinymce.get('comments')) {
+        //tinymce.get('comments').setContent('');
+      //}
+	  $('#comments').jqteVal('');
 	  showFlashMessage('Comment added', 'success');
       $form.find('textarea[name="comments"]').val('');
 	  $("#submit-loader-message").text("");
@@ -544,9 +546,16 @@ function togglediv(divdata){
 
 </script>
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+
+<script>
+	$('.editor').jqte();
+</script>
 <script>
 $('.submit-loader').click(function(e){
-      var content = tinymce.get("comments").getContent();
+      var content = $('#comments').val();//tinymce.get("comments").getContent();
 	  //alert(content);
 	  $("#submit-loader-message").text("");
         if(content === ""){

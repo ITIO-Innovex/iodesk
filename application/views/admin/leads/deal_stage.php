@@ -15,6 +15,7 @@
             <table class="table dt-table" data-order-col="1" data-order-type="asc">
                             <thead>
                                 <th>Stage Name</th>
+								<?php /*?><th><?php echo _l('company'); ?></th><?php */?>
                                 <th><?php echo _l('status'); ?></th>
                                 <th><?php echo _l('options'); ?></th>
                             </thead>
@@ -30,6 +31,7 @@
                                             data-status="<?php echo e($stage['status']); ?>"
                                         ><?php echo e($stage['stage']); ?></a><br />
                                     </td>
+									 <?php /*?><td><?php echo e($stage['company_id']); ?></td><?php */?>
                                     <td>
                                         <a href="javascript:void(0);" onclick="toggleStageStatus(<?php echo $stage['id']; ?>, <?php echo $stage['status']; ?>)" id="status-label-<?php echo $stage['id']; ?>">
                                         <?php if ($stage['status']) { ?>
@@ -82,7 +84,7 @@
             <div id="additional"></div>
             <?php echo render_input('name', 'Stage Title'); ?> 
 			<?php echo render_color_picker('color', _l('Stage Color')); ?> 
-			<?php echo render_input('statusorder', 'leads_stage_add_edit_order', count($stages) + 1, 'number'); ?>
+			<?php //echo render_input('statusorder', 'leads_stage_add_edit_order', count($stages) + 1, 'number'); ?>
             <div class="form-group">
                 <label for="status">Status</label>
                 <select name="status" id="status" class="form-control">

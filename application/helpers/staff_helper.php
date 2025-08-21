@@ -413,6 +413,23 @@ function get_deals_stage_title($sid)
 		return 0;
 }
 
+function exist_deal_process($deal_id,$deal_stage,$company_id)
+{   
+       
+		$CI = & get_instance();
+		$CI->db->where('deal_id', $deal_id);
+		$CI->db->where('deal_stage', $deal_stage);
+		$CI->db->where('company_id', $company_id);
+		$com = $CI->db->select('count(id) as cnt')->from(db_prefix() . 'deals_process_list')->get()->row();
+		if(isset($com)&&$com->cnt==1){
+		return true;
+		}else{
+		return false;
+		}
+	
+		return false;
+}
+
 function get_staff_email($sid='')
 {   
         // Fetch company Name from company id
