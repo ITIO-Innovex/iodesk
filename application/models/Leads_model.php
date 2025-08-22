@@ -2435,6 +2435,7 @@ $diffInHours = round($diffInSeconds / 3600);
 
     public function get_deal_stage()
     {
+	    $this->db->where('company_id', get_staff_company_id());
         return $this->db->select('*')->get('it_crm_deals_stage')->result_array();
     }
 	
