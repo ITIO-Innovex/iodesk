@@ -23,13 +23,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
-    $CI->app_menu->add_sidebar_menu_item('sales', [
-        'collapse' => true,
-        'name'     => _l('als_sales'),
-        'position' => 10,
-        'icon'     => 'fa-solid fa-receipt',
-        'badge'    => [],
-    ]);
+   
 
     // if ((staff_can('view',  'proposals') || staff_can('view_own',  'proposals'))
     //     || (staff_has_assigned_proposals() && get_option('allow_staff_view_proposals_assigned') == 1)
@@ -55,6 +49,13 @@ function app_init_admin_sidebar_menu_items()
     //     ]);
     // }
 
+     $CI->app_menu->add_sidebar_menu_item('salesD', [
+        'collapse' => true,
+        'name'     => _l('als_sales dd'),
+        'position' => 10,
+        'icon'     => 'fa-solid fa-receipt',
+        'badge'    => [],
+    ]);
     if ((staff_can('view',  'invoices') || staff_can('view_own',  'invoices'))
         || (staff_has_assigned_invoices() && get_option('allow_staff_view_invoices_assigned') == 1)
     ) {
@@ -270,6 +271,15 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 
+      if (staff_can('project_dashboard',  'project')){
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Dashboard',
+            'name'     => _l('Dashboard'),
+            'href'     => admin_url('project/dashboard'),
+            'position' => 10,
+            'badge'    => [],
+        ]);
+    }
    
 	 if (staff_can('project_project',  'project')){
         $CI->app_menu->add_sidebar_children_item('project', [
@@ -281,15 +291,17 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 	
-	  if (staff_can('project_dashboard',  'project')){
+	if (staff_can('project_project',  'project')){
         $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'Dashboard',
-            'name'     => _l('Dashboard'),
-            'href'     => admin_url('project/dashboard'),
-            'position' => 20,
+            'slug'     => 'Tasks',
+            'name'     => _l('Tasks'),
+            'href'     => admin_url('project/tasks'),
+            'position' => 15,
             'badge'    => [],
         ]);
     }
+	
+	 
     
     if (staff_can('project_collaboration',  'project'))
    {
@@ -301,15 +313,17 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
-	if (staff_can('project_status',  'project')) {
+	if (staff_can('project_collaboration',  'project'))
+   {
         $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'project_status',
-            'name'     => _l('project_status'),
-            'href'     => admin_url('project/project_status'),
-            'position' => 30,
+            'slug'     => 'Chat',
+            'name'     => _l('Chat'),
+            'href'     => admin_url('project_chat'),
+            'position' => 25,
             'badge'    => [],
         ]);
     }
+	
 	
 	if (staff_can('project_group',  'project')) {
         $CI->app_menu->add_sidebar_children_item('project', [
@@ -319,6 +333,26 @@ function app_init_admin_sidebar_menu_items()
             'position' => 30,
             'badge'    => [],
         ]);
+    }
+	
+	if (is_super()) {
+	
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'project_status',
+            'name'     => _l('project_status_table_name'),
+            'href'     => admin_url('project/project_status'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'project_priority',
+            'name'     => _l('project_priority'),
+            'href'     => admin_url('project/project_priority'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+		
     }
 	
 	
@@ -359,14 +393,14 @@ function app_init_admin_sidebar_menu_items()
 			'icon'     => 'fa-brands fa-whatsapp',
 			'badge'    => [],
 		]);
-		$CI->app_menu->add_sidebar_children_item('conversion', [
+		/*$CI->app_menu->add_sidebar_children_item('conversion', [
 			'slug'     => 'als_webchat',
 			'name'     => _l('als_webchat'),
 			'href'     => admin_url('leads/webchat'),
 			'position' => 2,
 			'icon'     => 'far fa-comment-dots',
 			'badge'    => [],
-		]);
+		]);*/
     }
 
 
@@ -640,13 +674,7 @@ function app_init_admin_sidebar_menu_items()
             'position' => 20,
             'badge'    => [],
         ]);
-		$CI->app_menu->add_setup_children_item('leads', [
-            'slug'     => 'deal-stages',
-            'name'     => _l('Deal Stages'),
-            'href'     => admin_url('leads/deal_stage'),
-            'position' => 21,
-            'badge'    => [],
-        ]);
+		
 		
 		
 		
@@ -668,7 +696,13 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 		
-		
+		$CI->app_menu->add_setup_children_item('leads', [
+            'slug'     => 'deal-stages',
+            'name'     => _l('Deal Stages'),
+            'href'     => admin_url('leads/deal_stage'),
+            'position' => 21,
+            'badge'    => [],
+        ]);
 		
 		$CI->app_menu->add_setup_children_item('leads', [
             'slug'     => 'task-status',
