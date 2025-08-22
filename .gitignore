@@ -1,5 +1,9 @@
 application/logs
 attachments/
+uploads/leads/
+uploads/ticket_attachments/
+uploads/project_task/
+uploads/tasks/
 
 # Ignore all .log files
 *.log

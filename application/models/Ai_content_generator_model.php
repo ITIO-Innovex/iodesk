@@ -147,7 +147,48 @@ return false;
         return false;
     }
 
-	
+    // AI Provider Management Methods
+    public function get_ai_providers($list='')
+    {
+	    if(isset($list)&&$list==1){
+		$this->db->select('provider_name,provider_url,');
+		}else{
+        $this->db->select('*');
+		}
+        $this->db->from(db_prefix() . 'ai_providers');
+        $this->db->order_by('id', 'DESC');
+		$this->db->where('company_id', get_staff_company_id());
+        return $this->db->get()->result_array();
+    }
+
+    public function get_ai_provider($id)
+    {
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'ai_providers');
+        $this->db->where('id', $id);
+		$this->db->where('company_id', get_staff_company_id());
+        return $this->db->get()->row_array();
+    }
+
+    public function add_ai_provider($data)
+    {
+        $this->db->insert(db_prefix() . 'ai_providers', $data);
+        return $this->db->affected_rows() > 0;
+    }
+
+    public function update_ai_provider($id, $data)
+    {
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'ai_providers', $data);
+        return $this->db->affected_rows() > 0;
+    }
+
+    public function delete_ai_provider($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->delete(db_prefix() . 'ai_providers');
+        return $this->db->affected_rows() > 0;
+    }
     
     
 }
