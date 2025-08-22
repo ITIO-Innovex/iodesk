@@ -2247,6 +2247,8 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
         }
         $this->db->where('id', $id);
         $this->db->delete('it_crm_deals_stage');
+		$this->db->where('deal_stage_id', $id);
+        $this->db->delete('it_crm_deals_stage_custom');
         set_alert('success', 'Deal stage deleted successfully');
         redirect(admin_url('leads/deal_stage'));
     }

@@ -23,13 +23,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
-    $CI->app_menu->add_sidebar_menu_item('sales', [
-        'collapse' => true,
-        'name'     => _l('als_sales'),
-        'position' => 10,
-        'icon'     => 'fa-solid fa-receipt',
-        'badge'    => [],
-    ]);
+   
 
     // if ((staff_can('view',  'proposals') || staff_can('view_own',  'proposals'))
     //     || (staff_has_assigned_proposals() && get_option('allow_staff_view_proposals_assigned') == 1)
@@ -55,6 +49,13 @@ function app_init_admin_sidebar_menu_items()
     //     ]);
     // }
 
+     $CI->app_menu->add_sidebar_menu_item('sales', [
+        'collapse' => true,
+        'name'     => _l('als_sales'),
+        'position' => 10,
+        'icon'     => 'fa-solid fa-receipt',
+        'badge'    => [],
+    ]);
     if ((staff_can('view',  'invoices') || staff_can('view_own',  'invoices'))
         || (staff_has_assigned_invoices() && get_option('allow_staff_view_invoices_assigned') == 1)
     ) {
@@ -308,6 +309,16 @@ function app_init_admin_sidebar_menu_items()
             'slug'     => 'Collaboration',
             'name'     => _l('Collaboration'),
             'href'     => admin_url('project/collaboration'),
+            'position' => 25,
+            'badge'    => [],
+        ]);
+    }
+	if (staff_can('project_collaboration',  'project'))
+   {
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'Chat',
+            'name'     => _l('Chat'),
+            'href'     => admin_url('project_chat'),
             'position' => 25,
             'badge'    => [],
         ]);
