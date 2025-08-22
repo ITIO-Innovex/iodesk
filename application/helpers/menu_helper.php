@@ -51,7 +51,7 @@ function app_init_admin_sidebar_menu_items()
 
      $CI->app_menu->add_sidebar_menu_item('salesD', [
         'collapse' => true,
-        'name'     => _l('als_sales dd'),
+        'name'     => _l('als_sales'),
         'position' => 10,
         'icon'     => 'fa-solid fa-receipt',
         'badge'    => [],
@@ -68,7 +68,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
     if (staff_can('view',  'items')) {
-        $CI->app_menu->add_sidebar_children_item('sales', [
+        $CI->app_menu->add_sidebar_children_item('salesD', [
             'slug'     => 'items',
             'name'     => _l('items'),
             'href'     => admin_url('invoice_items'),
@@ -80,7 +80,7 @@ function app_init_admin_sidebar_menu_items()
         staff_can('view',  'payments') || staff_can('view_own',  'invoices')
         || (get_option('allow_staff_view_invoices_assigned') == 1 && staff_has_assigned_invoices())
     ) {
-        $CI->app_menu->add_sidebar_children_item('sales', [
+        $CI->app_menu->add_sidebar_children_item('salesD', [
             'slug'     => 'payments',
             'name'     => _l('payments'),
             'href'     => admin_url('payments'),
