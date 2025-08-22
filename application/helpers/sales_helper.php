@@ -121,7 +121,7 @@ function app_format_money($amount, $currency, $excludeSymbol = false)
      * Determine the symbol
      * @var string
      */
-    $symbol = !$excludeSymbol ? $currency->symbol : '';
+    $symbol = !$excludeSymbol && $currency && isset($currency->symbol) ? $currency->symbol : '';
 
     /**
      * Check decimal places
@@ -134,13 +134,17 @@ function app_format_money($amount, $currency, $excludeSymbol = false)
      * @var string
      */
 
-    $amountFormatted = number_format($amount, $d, $currency->decimal_separator, $currency->thousand_separator);
+    $decimal_separator = ($currency && isset($currency->decimal_separator)) ? $currency->decimal_separator : get_option('decimal_separator');
+    $thousand_separator = ($currency && isset($currency->thousand_separator)) ? $currency->thousand_separator : get_option('thousand_separator');
+    
+    $amountFormatted = number_format($amount, $d, $decimal_separator, $thousand_separator);
 
     /**
      * Maybe add the currency symbol
      * @var string
      */
-    $formattedWithCurrency = $currency->placement === 'after' ? $amountFormatted . '' . $symbol : $symbol . '' . $amountFormatted;
+    $placement = ($currency && isset($currency->placement)) ? $currency->placement : 'before';
+    $formattedWithCurrency = $placement === 'after' ? $amountFormatted . '' . $symbol : $symbol . '' . $amountFormatted;
 
     return hooks()->apply_filters('app_format_money', $formattedWithCurrency, [
         'amount'         => $amount,
