@@ -1,5 +1,4 @@
 <?php
-///////////////
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -271,15 +270,6 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 
-      if (staff_can('project_dashboard',  'project')){
-        $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'Dashboard',
-            'name'     => _l('Dashboard'),
-            'href'     => admin_url('project/dashboard'),
-            'position' => 10,
-            'badge'    => [],
-        ]);
-    }
    
 	 if (staff_can('project_project',  'project')){
         $CI->app_menu->add_sidebar_children_item('project', [
@@ -291,17 +281,15 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 	
-	if (staff_can('project_project',  'project')){
+	  if (staff_can('project_dashboard',  'project')){
         $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'Tasks',
-            'name'     => _l('Tasks'),
-            'href'     => admin_url('project/tasks'),
-            'position' => 15,
+            'slug'     => 'Dashboard',
+            'name'     => _l('Dashboard'),
+            'href'     => admin_url('project/dashboard'),
+            'position' => 20,
             'badge'    => [],
         ]);
     }
-	
-	 
     
     if (staff_can('project_collaboration',  'project'))
    {
@@ -313,7 +301,15 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
-	
+	if (staff_can('project_status',  'project')) {
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'project_status',
+            'name'     => _l('project_status'),
+            'href'     => admin_url('project/project_status'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+    }
 	
 	if (staff_can('project_group',  'project')) {
         $CI->app_menu->add_sidebar_children_item('project', [
@@ -323,25 +319,6 @@ function app_init_admin_sidebar_menu_items()
             'position' => 30,
             'badge'    => [],
         ]);
-    }
-	if (is_super()) {
-	
-        $CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'project_status',
-            'name'     => _l('project_status_table_name'),
-            'href'     => admin_url('project/project_status'),
-            'position' => 30,
-            'badge'    => [],
-        ]);
-		
-		$CI->app_menu->add_sidebar_children_item('project', [
-            'slug'     => 'project_priority',
-            'name'     => _l('project_priority'),
-            'href'     => admin_url('project/project_priority'),
-            'position' => 30,
-            'badge'    => [],
-        ]);
-		
     }
 	
 	
