@@ -539,16 +539,22 @@ echo "<tbody></table>";
 ?>
 <?php }else{ 
 
-$this->db->select('*,');
-//$this->db->limit(1);
-$this->db->where('deal_id', $lead->id);
-$this->db->where('company_id', get_staff_company_id());
-$process=$this->db->get('deals_process_list')->row();
-//echo $this->db->last_query();
-//print_r($process);
+
 $datastage=$_SESSION['deal_form_order'];
 
 foreach($datastage as $key=>$val){
+
+$this->db->select('*,');
+
+$this->db->where('deal_id', $lead->id);
+$this->db->where('deal_stage', $val);
+$this->db->where('company_id', get_staff_company_id());
+$this->db->limit(1);
+//log_message('error', 'Query: ' . $this->db->get_compiled_select());
+$process=$this->db->get('deals_process_list')->row();
+//echo $this->db->last_query();
+//log_message('error', 'Error: ' . $eeerrr);
+//print_r($process);
 
 //if(isset($process)&&$process->$field_process){
 if (isset($process) && isset($process->process)) {
