@@ -162,9 +162,6 @@ class Project_chat extends AdminController
         if ($this->input->post()) {
             $post_data = $this->input->post();
             
-            // Debug: Log all POST data
-            log_message('debug', 'Edit Conversation - All POST data: ' . print_r($post_data, true));
-            
             // Skip manual CSRF validation - CodeIgniter handles this automatically
             // if CSRF protection is enabled in config
 
@@ -181,10 +178,6 @@ class Project_chat extends AdminController
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
 
-                // Debug logging
-                log_message('debug', 'Edit Conversation - POST data: ' . print_r($this->input->post(), true));
-                log_message('debug', 'Edit Conversation - Conversation ID: ' . $conversation_id);
-                log_message('debug', 'Edit Conversation - Update data: ' . print_r($conversation_data, true));
 
                 $update_result = $this->project_chat_model->update_conversation($conversation_id, $conversation_data);
 
@@ -197,8 +190,7 @@ class Project_chat extends AdminController
                     set_alert('success', 'Conversation updated successfully');
                     redirect(admin_url('project_chat'));
                 } else {
-                    log_message('error', 'Failed to update conversation ID: ' . $conversation_id);
-                    set_alert('danger', 'Failed to update conversation. Please check the logs for details.');
+                    set_alert('danger', 'Failed to update conversation.');
                 }
             } else {
                 set_alert('danger', validation_errors());

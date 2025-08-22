@@ -127,28 +127,8 @@ class Project_chat_model extends App_Model
     // Update conversation
     public function update_conversation($conversation_id, $data)
     {
-        // Debug logging
-        log_message('debug', 'Update Conversation ID: ' . $conversation_id);
-        log_message('debug', 'Update Data: ' . print_r($data, true));
-        
-        // Check if conversation exists first
-        $this->db->where('id', $conversation_id);
-        $existing = $this->db->get(db_prefix() . 'project_conversations')->row_array();
-        log_message('debug', 'Existing conversation: ' . print_r($existing, true));
-        
-        if (!$existing) {
-            log_message('error', 'Conversation ID ' . $conversation_id . ' not found');
-            return false;
-        }
-        
         $this->db->where('id', $conversation_id);
         $this->db->update(db_prefix() . 'project_conversations', $data);
-        
-        // Debug query and result
-        log_message('debug', 'Update Query: ' . $this->db->last_query());
-        log_message('debug', 'Affected Rows: ' . $this->db->affected_rows());
-        log_message('debug', 'DB Error: ' . print_r($this->db->error(), true));
-        
         return $this->db->affected_rows() > 0;
     }
 
