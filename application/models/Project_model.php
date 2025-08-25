@@ -200,7 +200,7 @@ class Project_model extends App_Model
 		}elseif(is_admin()){
 		$this->db->where('company_id', get_staff_company_id());
 		}else{
-		$this->db->where('owner', get_staff_user_id());
+		$this->db->where('company_id', get_staff_company_id());
 		}
         $this->db->order_by('statusorder', 'asc');
         return $this->db->get(db_prefix() . 'project_group')->result_array();

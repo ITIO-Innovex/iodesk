@@ -130,13 +130,13 @@ border-radius: 20px;
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="task_start_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('Start Date'); ?></label>
-                  <input type="date" class="form-control" id="task_start_date" name="task_start_date" value="<?php echo isset($task['task_start_date']) ? $task['task_start_date'] : ''; ?>" title="Select start date" required>
+                  <input type="datetime-local" class="form-control" id="task_start_date" name="task_start_date" value="<?php echo isset($task['task_start_date']) ? $task['task_start_date'] : ''; ?>" title="Select start date" required>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="task_end_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('End Date'); ?></label>
-                  <input type="date" class="form-control" id="task_end_date" name="task_end_date" value="<?php echo isset($task['task_end_date']) ? $task['task_end_date'] : ''; ?>" title="Select end date" required>
+                  <input type="datetime-local" class="form-control" id="task_end_date" name="task_end_date" value="<?php echo isset($task['task_end_date']) ? $task['task_end_date'] : ''; ?>" title="Select end date" required>
                 </div>
               </div>
             </div>	

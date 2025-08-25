@@ -30,12 +30,19 @@ function get_available_staff_permissions($data = [])
     $withNotApplicableViewOwn = array_merge(['view_own' => ['not_applicable' => true, 'name' => _l('permission_view_own')]], $withoutViewOwnPermissionsArray);
 
     $corePermissions = [
+		'ai_support' => [
+            'name'         => _l('AI Support'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
+            ],
+        ],
         'bulk_pdf_exporter' => [
             'name'         => _l('bulk_pdf_exporter'),
             'capabilities' => [
                 'view' => $viewGlobalName,
             ],
         ],
+		
         'contracts' => [
             'name'         => _l('contracts'),
             'capabilities' => array_merge($allPermissionsArray, [
@@ -46,11 +53,23 @@ function get_available_staff_permissions($data = [])
             'name'         => _l('credit_notes'),
             'capabilities' => $allPermissionsArray,
         ],
+		'conversation' => [
+            'name'         => _l('Conversation'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
+            ],
+        ],
         'customers' => [
             'name'         => _l('clients'),
             'capabilities' => $withNotApplicableViewOwn,
             'help'         => [
                 'view_own' => _l('permission_customers_based_on_admins'),
+            ],
+        ],
+		'direct_email' => [
+            'name'         => _l('Direct Email'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
             ],
         ],
         'email_templates' => [
@@ -137,10 +156,11 @@ function get_available_staff_permissions($data = [])
             'name'         => _l('staff'),
             'capabilities' => $withoutViewOwnPermissionsArray,
         ],
-        'subscriptions' => [
+        /*'subscriptions' => [
             'name'         => _l('subscriptions'),
             'capabilities' => $allPermissionsArray,
         ],
+		*/
         'tasks' => [
             'name'         => _l('tasks'),
             'capabilities' => array_merge($withNotApplicableViewOwn, [
@@ -152,6 +172,25 @@ function get_available_staff_permissions($data = [])
              'help' => [
                 'view'     => _l('help_tasks_permissions'),
                 'view_own' => _l('permission_tasks_based_on_assignee'),
+            ],
+        ],
+		'tickets' => [
+            'name'         => _l('tickets'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
+            ],
+        ],
+		'webmail' => [
+            'name'         => _l('Webmail'),
+            'capabilities' => [
+				'webmail' => _l('Webmail'),
+				'webmail_setup' => _l('Webmail Setup'),
+            ],
+        ],
+		'user_utility' => [
+            'name'         => _l('User Utility'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
             ],
         ],
         'checklist_templates' => [

@@ -146,7 +146,7 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);*/
 
-    if ((!is_staff_member() && get_option('access_tickets_to_none_staff_members') == 1) || is_staff_member()) {
+    if ((!is_staff_member() && get_option('access_tickets_to_none_staff_members') == 1) || (is_staff_member() && staff_can('view',  'tickets'))) {
         $enable_badge = get_option('enable_support_menu_badges');
         $CI->app_menu->add_sidebar_menu_item('support', [
             'collapse' => $enable_badge ? true : null,
@@ -177,7 +177,7 @@ function app_init_admin_sidebar_menu_items()
     }
 
 
-    if (is_staff_member()) {
+    if (is_staff_member()&& staff_can('view',  'leads')) {
 		$CI->app_menu->add_sidebar_menu_item('leads', [
 			'name'     => _l('als_leads'),
 			'href'     => admin_url('leads'),
@@ -187,7 +187,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }
 	
-	    if (is_staff_member()) {
+	    if (is_staff_member()&& staff_can('view',  'leads')) {
 		$CI->app_menu->add_sidebar_menu_item('deals', [
 			'name'     => _l('Deals'),
 			'href'     => admin_url('leads/deals'),
@@ -220,7 +220,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }*/
     // Direct Email
-    if (is_staff_member()) {
+    if (is_staff_member() && staff_can('direct_email_view',  'direct_email')) {
 		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
 			'name'     => 'Direct-Email',
 			'href'     => admin_url('direct_email'),
@@ -231,7 +231,7 @@ function app_init_admin_sidebar_menu_items()
     }
     // End Direct Email
 
-    if (is_staff_member()) {
+    if (is_staff_member() && staff_can('webmail',  'webmail')) {
 		$CI->app_menu->add_sidebar_menu_item('webmail', [
 			'name'     => _l('Webmail'),
 			'href'     => admin_url('webmail'),
@@ -241,7 +241,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }
 
-    if (is_staff_member()) {
+    if (is_staff_member() && staff_can('webmail_setup',  'webmail')) {
 		$CI->app_menu->add_sidebar_menu_item('webmail-setup', [
 			'name'     => _l('Webmail Setup'),
 			'href'     => admin_url('webmail_setup'),
@@ -251,7 +251,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }
 
-    if (is_staff_member()) {
+    if (is_staff_member() && staff_can('view',  'ai_support')) {
 		$CI->app_menu->add_sidebar_menu_item('ai-content-generator', [
 			'name'     => _l('AI Support'),
 			'href'     => admin_url('ai_content_generator'),
@@ -361,7 +361,7 @@ function app_init_admin_sidebar_menu_items()
     
 
 
-    if (is_staff_member()) {
+    if (is_staff_member() && staff_can('view',  'conversation')) {
 		$CI->app_menu->add_sidebar_menu_item('conversion', [
 			'collapse' => true,
 			'name'     => _l('lead_conversion'),
@@ -485,6 +485,16 @@ function app_init_admin_sidebar_menu_items()
     //         'badge'    => [],
     //     ]);
     // }
+
+    if (is_admin() || staff_can('view', 'user_utility')) {
+        $CI->app_menu->add_sidebar_menu_item('user-utility', [
+            'name'     => 'User Utility',
+            'href'     => admin_url('user_utility'),
+            'icon'     => 'fa-solid fa-wrench',
+            'position' => 58,
+            'badge'    => [],
+        ]);
+    }
 
     if (is_admin()) {
     if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
