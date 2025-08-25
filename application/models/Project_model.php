@@ -256,7 +256,8 @@ class Project_model extends App_Model
             $result1=send_mail_template('project_mail', $staffemail, $data['owner'], $insert_id, $project_details, $mail_subject);
 			
 			log_message('error', 'Result: ' . ($result1 ? 'Success' : 'Failed'));
-			log_message('error', 'Debugger: ' . $this->email->print_debugger());
+			$CI =& get_instance();
+			log_message('error', 'Debugger: ' . $CI->email->print_debugger());
 			
 			
 			//echo "Result: " . ($result1 ? 'Success' : 'Failed') . "<br>\n";
