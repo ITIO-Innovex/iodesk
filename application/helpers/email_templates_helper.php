@@ -108,7 +108,25 @@ function send_mail_template()
 {
     $params = func_get_args();
 
-    return mail_template(...$params)->send();
+    try {
+        $mail_instance = mail_template(...$params);
+        if (!$mail_instance) {
+            log_activity('Failed to create mail template instance');
+            return false;
+        }
+        
+        $result = $mail_instance->send();
+        
+        if (!$result) {
+            // Additional logging for send_mail_template function level
+            log_activity('send_mail_template() function: Email sending failed');
+        }
+        
+        return $result;
+    } catch (Exception $e) {
+        log_activity('send_mail_template() function: Exception occurred - ' . $e->getMessage());
+        return false;
+    }
 }
 
 /**

@@ -124,10 +124,20 @@ class App_mail_template
          * Log activity
          */
         if (!$this->validate()) {
+            $validation_error = '';
+            if ($this->template->active == 0) {
+                $validation_error = 'Template is disabled';
+            } elseif (!valid_email($this->send_to)) {
+                $validation_error = 'Invalid email address: ' . $this->send_to;
+            }
+            
+            log_activity('Failed to send email template [' . $validation_error . ', Template: ' . $this->template->name . ']');
+            
             hooks()->do_action('failed_to_send_email_template', [
                  'template'     => $this->template,
                  'send_to'      => $this->send_to,
                  'merge_fields' => $this->merge_fields,
+                 'error'        => $validation_error,
                ]);
 
             $this->clear();
@@ -221,9 +231,24 @@ class App_mail_template
             return true;
         }
 
-        if (ENVIRONMENT !== 'production') {
-            log_activity('Failed to send email template - ' . $this->ci->email->print_debugger());
+        // Log email failure with detailed error information
+        $error_message = 'Failed to send email template [Email: ' . $this->send_to . ', Template: ' . $this->template->name . ']';
+        
+        // Add debug information if available
+        $debug_info = $this->ci->email->print_debugger();
+        if (!empty($debug_info)) {
+            $error_message .= ' - Debug Info: ' . $debug_info;
         }
+        
+        log_activity($error_message);
+
+        // Also trigger hook for failed email sending
+        hooks()->do_action('failed_to_send_email_template', [
+            'template'     => $this->template,
+            'send_to'      => $this->send_to,
+            'merge_fields' => $this->merge_fields,
+            'error'        => $debug_info,
+        ]);
 
         $this->clear();
 

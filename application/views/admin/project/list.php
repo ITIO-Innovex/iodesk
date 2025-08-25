@@ -95,7 +95,7 @@
 	</div></td>
 					<td><?php echo $completion; ?>%</td>
                     <td>
-					<span style="display:none"><?php echo get_staff_full_name($staff['staffid']);?></span>
+					<span style="display:none"><?php echo get_staff_full_name($status['owner']);?></span>
   <select class="form-control project-owner-select" data-project-id="<?php echo $status['id']; ?>" style="min-width:120px;">
     <?php foreach($staff_members as $staff): ?>
       <option value="<?php echo $staff['staffid']; ?>" <?php if($staff['staffid'] == $status['owner']) echo 'selected'; ?>><?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?></option>

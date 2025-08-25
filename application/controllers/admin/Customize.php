@@ -110,7 +110,7 @@ class Customize extends AdminController
             }
             //print_r($data);exit;
             $this->staff_model->updatecompany($data, $company_id);
-            set_alert('success', _l('settings_updated77'));
+            set_alert('success', _l('settings_updated'));
             redirect(admin_url('customize'));
         }
 
