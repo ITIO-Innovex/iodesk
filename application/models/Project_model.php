@@ -253,7 +253,15 @@ class Project_model extends App_Model
 			$staffemail=get_staff_email($data['owner']);
 			$mail_subject="Assign New Project # :".$insert_id." - ".$data['project_title'];
 			$project_details=$mail_subject."<br><br>".$data['project_description'];
-            send_mail_template('project_mail', $staffemail, $data['owner'], $insert_id, $project_details, $mail_subject);
+            $result1=send_mail_template('project_mail', $staffemail, $data['owner'], $insert_id, $project_details, $mail_subject);
+			
+			log_message('error', 'Result: ' . ($result1 ? 'Success' : 'Failed'));
+			
+			
+			//echo "Result: " . ($result1 ? 'Success' : 'Failed') . "<br>\n";
+//echo "Log: " . $this->email->print_debugger() . "<br>\n";exit;
+			//echo "Result: " . ($result1 ? 'Success' : 'Failed') . "<br>\n";
+//echo "Log: " . $CI->email->print_debugger() . "<br>\n";
 			$project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
 			$this->log_project_activity($insert_id, $project_type, 'Added New Project');
             log_activity('New Project Added [ID: ' . $insert_id . ']');

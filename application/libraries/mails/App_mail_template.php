@@ -332,11 +332,11 @@ class App_mail_template
 
 
             if ($fromemail == '') {
-                $fromemail = $_SESSION['staff_fromemai']?$_SESSION['staff_fromemai'] : get_option('smtp_email');
+                $fromemail = isset($_SESSION['staff_fromemai']) ? $_SESSION['staff_fromemai'] : get_option('smtp_email');
             }
 
             if ($fromname == '') {
-                $fromname = $_SESSION['staff_company'] ? $_SESSION['staff_company'] : get_option('companyname');
+                $fromname = isset($_SESSION['staff_company']) ? $_SESSION['staff_company'] : get_option('companyname');
             }
 
             return [
@@ -346,8 +346,8 @@ class App_mail_template
         }
 
         return hooks()->apply_filters('email_template_from_headers', [
-                'fromemail' => $_SESSION['staff_fromemai']?$_SESSION['staff_fromemai'] : get_option('smtp_email'),//get_option('smtp_email')
-                'fromname'  => $_SESSION['staff_company'] ? $_SESSION['staff_company'] : get_option('companyname'),
+                'fromemail' => isset($_SESSION['staff_fromemai']) ? $_SESSION['staff_fromemai'] : get_option('smtp_email'),//get_option('smtp_email')
+                'fromname'  => isset($_SESSION['staff_company']) ? $_SESSION['staff_company'] : get_option('companyname'),
             ], $this->template);
     }
 
