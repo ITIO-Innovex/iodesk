@@ -21,6 +21,7 @@ temp/
 *.class
 *.pyc
 *.mno
+*.sql
 
 # Ignore OS or editor-specific files
 .DS_Store

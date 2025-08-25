@@ -111,21 +111,96 @@ function send_mail_template()
     try {
         $mail_instance = mail_template(...$params);
         if (!$mail_instance) {
-            log_activity('Failed to create mail template instance');
+            $error_msg = 'Failed to create mail template instance';
+            log_activity($error_msg);
+            log_email_error($error_msg, $params);
             return false;
         }
         
         $result = $mail_instance->send();
         
         if (!$result) {
-            // Additional logging for send_mail_template function level
-            log_activity('send_mail_template() function: Email sending failed');
+            $error_msg = 'send_mail_template() function: Email sending failed';
+            $template_class = isset($params[0]) ? $params[0] : 'Unknown';
+            $recipient = isset($params[1]) ? $params[1] : 'Unknown';
+            
+            $detailed_error = "Email sending failed - Template: {$template_class}, Recipient: {$recipient}";
+            
+            log_activity($error_msg);
+            log_email_error($detailed_error, $params);
         }
         
         return $result;
     } catch (Exception $e) {
-        log_activity('send_mail_template() function: Exception occurred - ' . $e->getMessage());
+        $error_msg = 'send_mail_template() function: Exception occurred - ' . $e->getMessage();
+        log_activity($error_msg);
+        log_email_error($error_msg, $params, $e);
         return false;
+    }
+}
+
+/**
+ * Log email errors to dedicated log file with detailed information
+ * @param string $error_message The error message
+ * @param array $params The parameters passed to send_mail_template
+ * @param Exception $exception Optional exception object
+ */
+function log_email_error($error_message, $params = [], $exception = null)
+{
+    $CI = &get_instance();
+    
+    // Create logs directory if it doesn't exist
+    $log_dir = APPPATH . '../logs/';
+    if (!is_dir($log_dir)) {
+        mkdir($log_dir, 0755, true);
+    }
+    
+    $log_file = $log_dir . 'email_errors_' . date('Y-m-d') . '.log';
+    
+    $log_entry = [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'error' => $error_message,
+        'template_class' => isset($params[0]) ? $params[0] : 'N/A',
+        'recipient' => isset($params[1]) ? $params[1] : 'N/A',
+        'parameters' => $params,
+        'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'N/A',
+        'ip_address' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'N/A',
+        'request_uri' => isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : 'N/A'
+    ];
+    
+    if ($exception) {
+        $log_entry['exception'] = [
+            'message' => $exception->getMessage(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $exception->getTraceAsString()
+        ];
+    }
+    
+    // Format log entry
+    $formatted_log = "[" . $log_entry['timestamp'] . "] EMAIL ERROR\n";
+    $formatted_log .= "Error: " . $log_entry['error'] . "\n";
+    $formatted_log .= "Template: " . $log_entry['template_class'] . "\n";
+    $formatted_log .= "Recipient: " . $log_entry['recipient'] . "\n";
+    $formatted_log .= "Parameters: " . json_encode($log_entry['parameters']) . "\n";
+    $formatted_log .= "IP: " . $log_entry['ip_address'] . "\n";
+    $formatted_log .= "URI: " . $log_entry['request_uri'] . "\n";
+    
+    if (isset($log_entry['exception'])) {
+        $formatted_log .= "Exception File: " . $log_entry['exception']['file'] . "\n";
+        $formatted_log .= "Exception Line: " . $log_entry['exception']['line'] . "\n";
+        $formatted_log .= "Exception Message: " . $log_entry['exception']['message'] . "\n";
+        $formatted_log .= "Stack Trace:\n" . $log_entry['exception']['trace'] . "\n";
+    }
+    
+    $formatted_log .= str_repeat("-", 80) . "\n\n";
+    
+    // Write to log file
+    file_put_contents($log_file, $formatted_log, FILE_APPEND | LOCK_EX);
+    
+    // Also log to CodeIgniter's log if available
+    if (class_exists('CI_Log')) {
+        log_message('error', 'Email Error: ' . $error_message);
     }
 }
 
