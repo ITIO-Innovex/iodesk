@@ -11,7 +11,7 @@ class Project extends AdminController
     {
         parent::__construct();
         if (get_option('access_projects_to_none_staff_members') == 0 && !is_staff_member()) {
-            redirect(admin_url());
+            //redirect(admin_url());
         }
 		$this->load->model('project_model');
     }
@@ -19,7 +19,7 @@ class Project extends AdminController
     public function index($status = '', $userid = '')
     {
          if (!is_admin()) {
-            access_denied('Project Statuses');
+            //access_denied('Project Statuses');
         }
         
         // Load required models
@@ -38,7 +38,7 @@ class Project extends AdminController
 	    public function tasks($id = '' , $sid = '')
         {
 			 if (!is_admin()) {
-				access_denied('Project Statuses');
+				//access_denied('Project Statuses');
 			}
 		
         
@@ -68,7 +68,7 @@ class Project extends AdminController
     public function project_status()
     {
         if (!is_admin()) {
-            access_denied('Project Statuses');
+            //access_denied('Project Statuses');
         }
         $data['statuses'] = $this->project_model->get_project_statuses();
         $data['title']    = 'Project Statuses';
@@ -79,7 +79,7 @@ class Project extends AdminController
     public function projectstatus()
     {
         if (!is_admin()) {
-            access_denied('Project Statuses');
+            //access_denied('Project Statuses');
         }
         if ($this->input->post()) {
             $data = $this->input->post();
@@ -117,7 +117,7 @@ class Project extends AdminController
     public function delete_project_status($id)
     {
         if (!is_admin()) {
-            access_denied('Project Statuses');
+            //access_denied('Project Statuses');
         }
         if (!$id) {
             redirect(admin_url('project/project_status'));
@@ -138,7 +138,7 @@ class Project extends AdminController
 	public function project_priority()
 	{
 		if (!is_admin()) {
-			access_denied('Project Priorities');
+			//access_denied('Project Priorities');
 		}
 		$data['priorities'] = $this->project_model->get_project_priorities();
 		$data['title']    = 'Project Priorities';
@@ -149,7 +149,7 @@ class Project extends AdminController
 	public function projectpriority()
 	{
 		if (!is_admin()) {
-			access_denied('Project Priorities');
+			//access_denied('Project Priorities');
 		}
 		if ($this->input->post()) {
 			$data = $this->input->post();
@@ -186,7 +186,7 @@ class Project extends AdminController
 	public function delete_project_priority($id)
 	{
 		if (!is_admin()) {
-			access_denied('Project Priorities');
+			//access_denied('Project Priorities');
 		}
 		if (!$id) {
 			redirect(admin_url('project/project_priority'));
@@ -205,7 +205,7 @@ class Project extends AdminController
     public function project_group()
     {
         if (!is_admin()) {
-            access_denied('Project Groups');
+            //access_denied('Project Groups');
         }
         $data['groups'] = $this->project_model->get_project_groups();
         $data['title']  = 'Project Groups';
@@ -216,7 +216,7 @@ class Project extends AdminController
     public function projectgroup()
     {
         if (!is_admin()) {
-            access_denied('Project Groups');
+            //access_denied('Project Groups');
         }
         if ($this->input->post()) {
             $data = $this->input->post();
@@ -254,7 +254,7 @@ class Project extends AdminController
     public function delete_project_group($id)
     {
         if (!is_admin()) {
-            access_denied('Project Groups');
+            //access_denied('Project Groups');
         }
         if (!$id) {
             redirect(admin_url('project/project_group'));
@@ -274,9 +274,10 @@ class Project extends AdminController
     /* Get project Dashboard Data */
     public function dashboard()
     {
-        if (!is_admin()) {
-            access_denied('Project Dashboard');
-        }
+        if(is_admin() || (is_staff_member() && staff_can('project_dashboard',  'project'))) { 
+        }else{
+		access_denied('Project Dashboard');
+		}
         
         $this->load->model('project_model');
         $this->load->model('staff_model');
@@ -305,7 +306,7 @@ class Project extends AdminController
     public function collaboration()
     {
         if (!is_admin()) {
-            access_denied('Project Collaboration');
+            //access_denied('Project Collaboration');
         }
         
         $this->load->model('project_model');
@@ -331,7 +332,7 @@ class Project extends AdminController
     public function test_activity_logs()
     {
         if (!is_admin()) {
-            access_denied('Project Collaboration');
+            //access_denied('Project Collaboration');
         }
         
         $this->load->model('project_model');
@@ -356,7 +357,7 @@ class Project extends AdminController
     public function addproject()
     {
         if (!is_admin()) {
-            access_denied('Projects');
+            //access_denied('Projects');
         }
         
         if ($this->input->post()) {
@@ -464,7 +465,7 @@ class Project extends AdminController
     public function addtask($pid='')
     {
         if (!is_admin()) {
-            access_denied('Projects');
+            //access_denied('Projects');
         }
         
         if ($this->input->post()) {
@@ -652,7 +653,7 @@ class Project extends AdminController
     }
 	
 	public function view($id = '') {
-        if (!is_admin() || !$id) {
+        if (!$id) {
             access_denied('Project View');
         }
         $this->load->model('project_model');
@@ -783,7 +784,7 @@ class Project extends AdminController
 	
 	public function tasks_details($task_id = '')
     {
-        if (!is_admin() || !$task_id) {
+        if (!$task_id) {
             access_denied('Task View');
         }
         $this->load->model('project_model');
@@ -813,7 +814,7 @@ class Project extends AdminController
     public function addcomments()
     {
         if (!is_admin()) {
-            access_denied('Add Comment');
+            //access_denied('Add Comment');
         }
         if (!$this->input->post()) {
             show_404();
@@ -844,7 +845,7 @@ class Project extends AdminController
     public function getcomments()
     {
         if (!is_admin()) {
-            access_denied('Get Comments');
+            //access_denied('Get Comments');
         }
         $taskId    = (int) $this->input->get('task_id');
         $projectId = (int) $this->input->get('project_id');

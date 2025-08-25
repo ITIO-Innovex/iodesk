@@ -217,3 +217,10 @@ $route['admin/customize/get_form_layout'] = 'admin/customize/get_form_layout';
 $route['admin/customize/save_form_layout'] = 'admin/customize/save_form_layout';
 $route['admin/customize/get_form_layout_status'] = 'admin/customize/get_form_layout_status';
 $route['admin/customize/get_company_deal_form_type'] = 'admin/customize/get_company_deal_form_type';
+
+// User Utility routes
+$route['admin/user_utility'] = 'admin/user_utility/index';
+$route['admin/user_utility/create'] = 'admin/user_utility/create';
+$route['admin/user_utility/edit/(:num)'] = 'admin/user_utility/edit/$1';
+$route['admin/user_utility/view/(:num)'] = 'admin/user_utility/view/$1';
+$route['admin/user_utility/delete/(:num)'] = 'admin/user_utility/delete/$1';
