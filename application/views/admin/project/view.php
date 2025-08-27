@@ -165,13 +165,13 @@
       <div class="col-md-6">
       <div class="form-group">
         <label><small class="req text-danger">* </small>Start Date</label>
-        <input type="date" class="form-control" name="start_date" value="<?php echo $project['start_date']; ?>" title="Select start date" required>
+        <input type="date" class="form-control" name="start_date" id="start_date" value="<?php echo $project['start_date']; ?>" title="Select start date" required>
       </div>
 	  </div>
 	  <div class="col-md-6">
       <div class="form-group">
         <label><small class="req text-danger">* </small>End Date</label>
-        <input type="date" class="form-control" name="deadline" value="<?php echo $project['deadline']; ?>" title="Select end date" required>
+        <input type="date" class="form-control" name="deadline" id="end_date" value="<?php echo $project['deadline']; ?>" title="Select end date" required>
       </div>
       </div></div>
 	  <?php 
@@ -273,6 +273,11 @@ $('.toggle-btn').on('click', function() {
   var target = $(this).data('target');
   $(target).slideToggle(); // or use .toggle() / .fadeToggle()
 });
+
+
+
+
+
 </script>
 <?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
@@ -281,6 +286,17 @@ $('.toggle-btn').on('click', function() {
 
 <script>
 	$('.editor').jqte();
+	
+	 $("#edit-project-form-details").on("submit", function(e){
+    let startDate = new Date($("#start_date").val());
+    let endDate   = new Date($("#end_date").val());
+
+    if(startDate > endDate){
+      e.preventDefault(); // stop form submit
+      alert("Start Date cannot be later than End Date.");
+      return false;
+    }
+  });
 </script>
 <!-- Tagify CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
