@@ -8,7 +8,7 @@ class Backup extends AdminController
     {
         parent::__construct();
 
-        if (!is_admin()) {
+        if (!is_super()) {
             access_denied('Backup');
         }
     }
