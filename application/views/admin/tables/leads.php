@@ -286,7 +286,7 @@ return App_table::find('leads')
             $nameRow = '<a ' . $hrefAttr . '>' . e($aRow['name']) . '</a>';
 
             $nameRow .= '<div class="row-options">';
-            $nameRow .= '<a ' . $hrefAttr . '><i class="fa-solid fa-eye" title="Make to Junk"></i></a>';
+            $nameRow .= '<a ' . $hrefAttr . '><i class="fa-solid fa-eye" title="View"></i></a>';
 
             $locked = false;
 

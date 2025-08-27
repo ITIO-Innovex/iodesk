@@ -112,15 +112,15 @@ if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 <td style="width:35px;"><div class="tw-rounded-full <?php echo $randomWord;?> tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-8 tw-w-8 -tw-mt-1 group-hover:!tw-bg-primary-700"><?=strtoupper(substr($message['from_email'],0,2));?></div></td>
 <td style="width:50px;"><div>
 <?php if(isset($message['isfalg'])&&$message['isfalg']==1){ ?>
-<i class="fa-solid fa-fire-flame-simple tw-text-info-800 isflag" data-mid="<?=$message['id'];?>" data-fid="0" title="Click for normal"></i>
+<i class="fa-solid fa-fire-flame-simple tw-text-info-800 tw-cursor-pointer isflag" data-mid="<?=$message['id'];?>" data-fid="0" title="Click for normal"></i>
 <?php }else{ ?>
-<i class="fa-solid fa-fire-flame-simple tw-text-info-300 isflag isflag<?=$message['id'];?>" data-mid="<?=$message['id'];?>" data-fid="1" title="Click for important"></i>
+<i class="fa-solid fa-fire-flame-simple tw-text-info-300 tw-cursor-pointer isflag isflag<?=$message['id'];?>" data-mid="<?=$message['id'];?>" data-fid="1" title="Click for important"></i>
 <?php } ?>
 <?php if(isset($message['is_deleted'])&&$message['is_deleted']==0){ ?>
-<i class="fa-solid fa-trash text-danger isdelete" data-mid="<?=$message['id'];?>" data-fid="1" title="Delete"></i>
+<i class="fa-solid fa-trash text-danger tw-cursor-pointer isdelete" data-mid="<?=$message['id'];?>" data-fid="1" title="Delete"></i>
 <?php }else{ ?>
-<i class="fa-solid fa-envelope-circle-check text-warning isdelete" data-mid="<?=$message['id'];?>" data-fid="0" title="Move to inbox"></i>
-<i class="fa-solid fa-square-xmark text-danger isdelete" data-mid="<?=$message['id'];?>" data-fid="3" title="Delete Permanent"></i>
+<i class="fa-solid fa-envelope-circle-check text-warning tw-cursor-pointer isdelete " data-mid="<?=$message['id'];?>" data-fid="0" title="Move to inbox"></i>
+<i class="fa-solid fa-square-xmark text-danger tw-cursor-pointer isdelete" data-mid="<?=$message['id'];?>" data-fid="3" title="Delete Permanent"></i>
 <?php } ?>
 <?php if(isset($message['isattachments'])&&$message['isattachments']==1&&$message['folder']!='Spam'){ ?>
 &nbsp;<i class="fa-solid fa-paperclip" style="color: #000000;"></i>

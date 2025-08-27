@@ -110,7 +110,7 @@
                         <?php hooks()->do_action('after_customer_profile_company_phone', $client ?? null); ?>
                         <?php if ((isset($client) && empty($client->website)) || !isset($client)) {
                       $value = (isset($client) ? $client->website : '');
-                      echo render_input('website', 'website (add with https:// or http:// )', $value,'url');
+                      echo render_input('website', 'Website (add with https:// or http:// )', $value,'url');
                   } else { ?>
                         <div class="form-group">
                             <label for="website"><?php echo _l('client_website'); ?></label>

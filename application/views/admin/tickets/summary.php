@@ -51,7 +51,6 @@
       }
   }
 foreach ($statuses as $status) {
-    $_where = '';
     if ($where == '') {
         $_where = 'status=' . $status['ticketstatusid'];
     } else {
@@ -60,7 +59,8 @@ foreach ($statuses as $status) {
     if (isset($project_id)) {
         $_where = $_where . ' AND project_id=' . $project_id;
     }
-    $_where = $_where . ' AND merged_ticket_id IS NULL'; ?>
+    $_where = $_where . ' AND merged_ticket_id IS NULL AND company_id='.get_staff_company_id(); 
+	?>
     <div class="col-md-2 col-xs-6 md:tw-border-r md:tw-border-solid md:tw-border-neutral-300 last:tw-border-r-0">
         <a href="#" data-cview="ticket_status_<?php echo e($status['ticketstatusid']); ?>"
             class="tw-text-neutral-600 hover:tw-opacity-70 tw-inline-flex tw-items-center"
