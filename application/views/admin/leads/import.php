@@ -39,8 +39,8 @@
                                     <div class="form-group">
                                         <button type="button"
                                             class="btn btn-primary import btn-import-submit"><?php echo _l('import'); ?></button>
-                                        <button type="button"
-                                            class="btn btn-primary simulate btn-import-submit"><?php echo _l('simulate_import'); ?></button>
+                                        <?php /*?><button type="button"
+                                            class="btn btn-primary simulate btn-import-submit"><?php echo _l('simulate_import'); ?></button><?php */?>
                                     </div>
                                     <?php echo form_close(); ?>
                                 </div>
