@@ -122,7 +122,27 @@ function send_mail_template()
         if (!$result) {
             $error_msg = 'send_mail_template() function: Email sending failed';
             $template_class = isset($params[0]) ? $params[0] : 'Unknown';
-            $recipient = isset($params[1]) ? $params[1] : 'Unknown';
+            
+            // Handle recipient parameter - could be string, object, or other types
+            $recipient = 'Unknown';
+            if (isset($params[1])) {
+                if (is_string($params[1])) {
+                    $recipient = $params[1];
+                } elseif (is_object($params[1])) {
+                    // Try to get email from common object properties
+                    if (isset($params[1]->email)) {
+                        $recipient = $params[1]->email;
+                    } elseif (isset($params[1]->name)) {
+                        $recipient = $params[1]->name;
+                    } elseif (isset($params[1]->id)) {
+                        $recipient = 'ID: ' . $params[1]->id;
+                    } else {
+                        $recipient = get_class($params[1]) . ' object';
+                    }
+                } else {
+                    $recipient = gettype($params[1]);
+                }
+            }
             
             $detailed_error = "Email sending failed - Template: {$template_class}, Recipient: {$recipient}";
             
@@ -157,11 +177,32 @@ function log_email_error($error_message, $params = [], $exception = null)
     
     $log_file = $log_dir . 'email_errors_' . date('Y-m-d') . '.log';
     
+    // Handle recipient parameter safely for logging
+    $recipient_info = 'N/A';
+    if (isset($params[1])) {
+        if (is_string($params[1])) {
+            $recipient_info = $params[1];
+        } elseif (is_object($params[1])) {
+            // Try to get meaningful info from object
+            if (isset($params[1]->email)) {
+                $recipient_info = $params[1]->email;
+            } elseif (isset($params[1]->name)) {
+                $recipient_info = $params[1]->name;
+            } elseif (isset($params[1]->id)) {
+                $recipient_info = 'ID: ' . $params[1]->id;
+            } else {
+                $recipient_info = get_class($params[1]) . ' object';
+            }
+        } else {
+            $recipient_info = gettype($params[1]);
+        }
+    }
+
     $log_entry = [
         'timestamp' => date('Y-m-d H:i:s'),
         'error' => $error_message,
         'template_class' => isset($params[0]) ? $params[0] : 'N/A',
-        'recipient' => isset($params[1]) ? $params[1] : 'N/A',
+        'recipient' => $recipient_info,
         'parameters' => $params,
         'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'N/A',
         'ip_address' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'N/A',
