@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head();
 if (!is_super()) { 
-//access_denied('Database Backups'); 
+access_denied('Database Backups'); 
 }
  ?>
 <div id="wrapper">
