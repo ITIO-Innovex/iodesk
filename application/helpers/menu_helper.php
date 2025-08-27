@@ -919,4 +919,15 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
+
+    // Database Backup menu item (Super only)
+    if (is_super()) {
+        $CI->app_menu->add_setup_menu_item('database_backups', [
+            'href'     => admin_url('database_backups'),
+            'name'     => 'DB Backup',
+            'position' => 60,
+            'icon'     => 'fa fa-database',
+            'badge'    => [],
+        ]);
+    }
 }
