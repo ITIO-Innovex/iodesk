@@ -27,14 +27,23 @@ class Database_backups extends AdminController
     {
         try {
             // Create backups directory if it doesn't exist
-            $backup_dir = FCPATH . 'backups/';
+            $backup_dir = FCPATH . 'backups' . DIRECTORY_SEPARATOR;
             if (!is_dir($backup_dir)) {
-                if (!mkdir($backup_dir, 0755, true)) {
+                if (!mkdir($backup_dir, 0777, true)) {
                     throw new Exception('Failed to create backup directory');
                 }
                 // Create .htaccess to protect directory
-                file_put_contents($backup_dir . '.htaccess', "Order Deny,Allow\nDeny from all");
+                if (!file_exists($backup_dir . '.htaccess')) {
+                    file_put_contents($backup_dir . '.htaccess', "Order Deny,Allow\nDeny from all");
+                }
             }
+            
+            // Test write permissions by creating a temporary file
+            $test_file = $backup_dir . 'test_write_' . time() . '.tmp';
+            if (!@file_put_contents($test_file, 'test')) {
+                throw new Exception('Backup directory is not writable. Please check folder permissions for: ' . $backup_dir);
+            }
+            @unlink($test_file);
 
             // Get database configuration
             $db_config = $this->db->database;
