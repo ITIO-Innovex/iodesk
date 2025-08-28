@@ -900,7 +900,7 @@ function app_init_admin_sidebar_menu_items()
         $CI->app_menu->add_setup_children_item('finance', [
             'slug'     => 'currencies',
             'name'     => _l('acs_sales_currencies_submenu'),
-            'href'     => admin_url('currencies '),
+            'href'     => admin_url('currencies'),
             'position' => 10,
             'badge'    => [],
         ]);
