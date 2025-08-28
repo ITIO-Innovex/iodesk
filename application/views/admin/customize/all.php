@@ -325,11 +325,11 @@ $(function() {
             var id = $(el).data('id');
             order.push(id);
             // Always set last as checked
-            if (i === $items.length - 1) {
-                checked[id] = 1;
-            } else {
+            //if (i === $items.length - 1) {
+               // checked[id] = 1;
+            //} else {
                 checked[id] = $(el).find('.customized-stage-check').is(':checked') ? 1 : 0;
-            }
+            //}
         });
         var customizedDefault = $('#customized-default-checkbox').is(':checked') ? 1 : 0;
         $.ajax({
