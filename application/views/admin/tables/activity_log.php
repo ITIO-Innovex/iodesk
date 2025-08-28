@@ -7,11 +7,25 @@ $aColumns = [
     'date',
     db_prefix().'activity_log.staffid',
     ];
+	 
+   $sWhere = [];
+    $sid=get_staff_full_name();
+	
+	if(is_admin()){
+	if(isset($_GET['sid'])&&$_GET['sid']){
+	$sid=base64_decode($_GET['sid']);
+	}
+	}
+	if(!is_super()){
+	array_push($sWhere, ' AND company_id = "'.get_staff_company_id().'"');
+	}
+	
+    array_push($sWhere, ' AND staffid = "'.$sid.'"');
 
-$sWhere = [];
 if ($this->ci->input->post('activity_log_date')) {
     array_push($sWhere, 'AND date LIKE "' . $this->ci->db->escape_like_str(to_sql_date($this->ci->input->post('activity_log_date'))) . '%" ESCAPE \'!\'');
 }
+
 $sIndexColumn = 'id';
 $sTable       = db_prefix().'activity_log';
 $result       = data_tables_init($aColumns, $sIndexColumn, $sTable, [], $sWhere);
