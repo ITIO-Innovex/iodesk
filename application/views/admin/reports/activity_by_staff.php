@@ -56,7 +56,7 @@
                     
                     <tr>
                       <td><?php echo $row['staffid'];  ?></td>
-                      <td><?php echo (int)$row['activity_count']; ?></td>
+                      <td><a href="<?php echo admin_url('utilities/activity_log'); ?>?sid=<?php echo base64_encode($row['staffid']);?>" title="View Activities" target="_blank"><?php echo (int)$row['activity_count']; ?></a></td>
                       <td><?php echo $row['last_activity']; ?></td>
                     </tr>
                   <?php endforeach; ?>
