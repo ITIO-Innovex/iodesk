@@ -430,7 +430,7 @@ $('#add-field-btn').on('click', function() {
 function formFieldHtml(field, idx) {
     var html = '<div class="form-builder-field panel panel-default" data-idx="' + idx + '">' +
         '<div class="panel-body">' +
-        '<div class="row"><div class="col-sm-5"><div class="form-group"><label>Label</label><input type="text" class="form-control field-label" value="' + (field.label || '') + '"></div></div>' +
+        '<div class="row"><div class="col-sm-5"><div class="form-group"><label>Label</label><input type="text" class="form-control field-label" required value="' + (field.label || '') + '"></div></div>' +
         '<div class="col-sm-5"><div class="form-group"><label>Type</label><select class="form-control field-type">' +
         '<option value="text"' + (field.type === 'text' ? ' selected' : '') + '>Text</option>' +
         '<option value="textarea"' + (field.type === 'textarea' ? ' selected' : '') + '>Textarea</option>' +
@@ -631,6 +631,18 @@ $(function() {
   $("#form-builder-fields").disableSelection();
 
 
+
+  // Remove field handler (works for dynamically added panels too)
+  $(document).on('click', '.remove-field-btn', function(){
+    $(this).closest('.form-builder-field').remove();
+    // reindex after removal
+    $('#form-builder-fields .form-builder-field').each(function(index) {
+      $(this).attr('data-idx', index);
+    });
+    $("#form-builder-fields").sortable('refresh');
+    $('#save-form-layout').attr('data-val', $('#form-builder-fields .form-builder-field').length);
+  });
+});
 </script>
 </body>
 </html> 
