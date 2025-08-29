@@ -152,7 +152,49 @@ border-radius: 20px;
 	  <input type="number" min="0" max="100" step="1" oninput="validity.valid||(value='<?php echo $task['task_progress']; ?>');" name="task_progress" id="task_progress" class="form-control" value="<?php echo $task['task_progress']; ?>" required>
 	  </div>
 </div>
-	  
+
+<!-- Reminder Field -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="task_reminder" class="control-label">Reminder</label>
+      <select name="task_reminder" id="task_reminder" class="form-control">
+        <option value="none" <?php echo (isset($task['task_reminder']) && $task['task_reminder'] == 'none') ? 'selected' : ''; ?>>None</option>
+        <option value="daily" <?php echo (isset($task['task_reminder']) && $task['task_reminder'] == 'daily') ? 'selected' : ''; ?>>Daily</option>
+        <option value="on" <?php echo (isset($task['task_reminder']) && $task['task_reminder'] == 'on') ? 'selected' : ''; ?>>On</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <!-- Daily Time Picker -->
+    <div class="form-group" id="daily-time-group" style="display: none;">
+      <label for="reminder_daily_time" class="control-label">Reminder Time</label>
+      <input type="time" name="reminder_daily_time" id="reminder_daily_time" class="form-control" 
+             value="<?php echo isset($task['reminder_daily_time']) ? $task['reminder_daily_time'] : '09:00'; ?>">
+    </div>
+    
+    <!-- On Date Dropdown -->
+    <div class="form-group" id="on-date-group" style="display: none;">
+      <label for="reminder_on_date" class="control-label">Reminder Date</label>
+      <select name="reminder_on_date" id="reminder_on_date" class="form-control">
+        <option value="created_date" <?php echo (isset($task['reminder_on_date']) && $task['reminder_on_date'] == 'created_date') ? 'selected' : ''; ?>>Created Date</option>
+        <option value="start_date" <?php echo (isset($task['reminder_on_date']) && $task['reminder_on_date'] == 'start_date') ? 'selected' : ''; ?>>Start Date</option>
+        <option value="due_date" <?php echo (isset($task['reminder_on_date']) && $task['reminder_on_date'] == 'due_date') ? 'selected' : ''; ?>>Due Date</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- On Time Picker (full width when On is selected) -->
+<div class="row" id="on-time-row" style="display: none;">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="reminder_on_time" class="control-label">Reminder Time</label>
+      <input type="time" name="reminder_on_time" id="reminder_on_time" class="form-control" 
+             value="<?php echo isset($task['reminder_on_time']) ? $task['reminder_on_time'] : '09:00'; ?>">
+    </div>
+  </div>
+</div>
 	  
 <div class="form-group">
   <button type="button" class="btn btn-primary" id="save-task-btn">
@@ -364,6 +406,32 @@ waitForJQuery(function() {
       init_selectpicker();
     }
 
+    // Handle reminder field visibility
+    function toggleReminderFields() {
+      var reminderType = $('#task_reminder').val();
+      
+      // Hide all conditional fields first
+      $('#daily-time-group').hide();
+      $('#on-date-group').hide();
+      $('#on-time-row').hide();
+      
+      // Show relevant fields based on selection
+      if (reminderType === 'daily') {
+        $('#daily-time-group').show();
+      } else if (reminderType === 'on') {
+        $('#on-date-group').show();
+        $('#on-time-row').show();
+      }
+    }
+    
+    // Initialize reminder fields on page load
+    toggleReminderFields();
+    
+    // Handle reminder dropdown change
+    $('#task_reminder').on('change', function() {
+      toggleReminderFields();
+    });
+
     // Debug: Check if form elements exist
     //console.log('Form elements check:');
     //console.log('- Task update form:', $('#task-update-form').length);
@@ -439,6 +507,12 @@ waitForJQuery(function() {
 	  var taskTags = $form.find('input[name="task_tags"]').val();
 	  var taskProgress = $form.find('input[name="task_progress"]').val();
       
+      // Get reminder values
+      var taskReminder = $form.find('select[name="task_reminder"]').val();
+      var reminderDailyTime = $form.find('input[name="reminder_daily_time"]').val();
+      var reminderOnDate = $form.find('select[name="reminder_on_date"]').val();
+      var reminderOnTime = $form.find('input[name="reminder_on_time"]').val();
+      
       console.log('Form values:', {
         taskId: taskId,
         selectedOwners: selectedOwners,
@@ -446,7 +520,11 @@ waitForJQuery(function() {
         endDate: endDate,
         taskStatus: taskStatus,
         taskPriority: taskPriority,
-		taskTags: taskTags
+		taskTags: taskTags,
+        taskReminder: taskReminder,
+        reminderDailyTime: reminderDailyTime,
+        reminderOnDate: reminderOnDate,
+        reminderOnTime: reminderOnTime
       });
 
       // Prepare form data
@@ -458,7 +536,11 @@ waitForJQuery(function() {
         task_status: taskStatus,
         task_priority: taskPriority,
 		task_progress: taskProgress,
-		task_tags: taskTags
+		task_tags: taskTags,
+        task_reminder: taskReminder,
+        reminder_daily_time: reminderDailyTime,
+        reminder_on_date: reminderOnDate,
+        reminder_on_time: reminderOnTime
       };
       
       console.log('Form data to send:', formData);

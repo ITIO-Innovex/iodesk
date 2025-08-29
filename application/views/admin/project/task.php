@@ -239,6 +239,49 @@
                 </div>
                 <small class="text-muted">Allowed file types: PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX, ZIP, RAR</small>
               </div>
+			  
+			  <!-- Reminder Field -->
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="task_reminder" class="control-label">Reminder</label>
+      <select name="task_reminder" id="task_reminder" class="form-control">
+        <option value="none" <?php echo (isset($task['task_reminder']) && $task['task_reminder'] == 'none') ? 'selected' : ''; ?>>None</option>
+        <option value="daily" <?php echo (isset($task['task_reminder']) && $task['task_reminder'] == 'daily') ? 'selected' : ''; ?>>Daily</option>
+        <option value="on" <?php echo (isset($task['task_reminder']) && $task['task_reminder'] == 'on') ? 'selected' : ''; ?>>On</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <!-- Daily Time Picker -->
+    <div class="form-group" id="daily-time-group" style="display: none;">
+      <label for="reminder_daily_time" class="control-label">Reminder Time</label>
+      <input type="time" name="reminder_daily_time" id="reminder_daily_time" class="form-control" 
+             value="<?php echo isset($task['reminder_daily_time']) ? $task['reminder_daily_time'] : '09:00'; ?>">
+    </div>
+    
+    <!-- On Date Dropdown -->
+    <div class="form-group" id="on-date-group" style="display: none;">
+      <label for="reminder_on_date" class="control-label">Reminder Date</label>
+      <select name="reminder_on_date" id="reminder_on_date" class="form-control">
+        <option value="created_date" <?php echo (isset($task['reminder_on_date']) && $task['reminder_on_date'] == 'created_date') ? 'selected' : ''; ?>>Created Date</option>
+        <option value="start_date" <?php echo (isset($task['reminder_on_date']) && $task['reminder_on_date'] == 'start_date') ? 'selected' : ''; ?>>Start Date</option>
+        <option value="due_date" <?php echo (isset($task['reminder_on_date']) && $task['reminder_on_date'] == 'due_date') ? 'selected' : ''; ?>>Due Date</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- On Time Picker (full width when On is selected) -->
+<div class="row" id="on-time-row" style="display: none;">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="reminder_on_time" class="control-label">Reminder Time</label>
+      <input type="time" name="reminder_on_time" id="reminder_on_time" class="form-control" 
+             value="<?php echo isset($task['reminder_on_time']) ? $task['reminder_on_time'] : '09:00'; ?>">
+    </div>
+  </div>
+</div>
             
           </div>
         </div>
@@ -255,6 +298,8 @@
 </div>
 <!-- /.modal -->
 <script>
+
+
 // Wait for jQuery to be fully loaded
 function initializeTasktModal() {
     if (typeof jQuery !== 'undefined' && typeof jQuery.fn !== 'undefined') {
@@ -290,7 +335,13 @@ function initializeTasktModal() {
             $('#addTaskModal select[name="task_priority"]').val('');
 			$('#addTaskModal select[name="task_priority"]').val('');
 			$('#addTaskModal input[name="project_id"]').val('');
+			
+			$('#addTaskModal select[name="task_reminder"]').val('');
+			$('#addTaskModal select[name="reminder_on_date"]').val('');
+			$('#addTaskModal input[name="reminder_daily_time"]').val('');
+			$('#addTaskModal input[name="reminder_on_time"]').val('');
 			//$('#addProjectModal textarea[name="task_description"]').val('');
+			
             
             
             
@@ -469,6 +520,34 @@ $('body').on('click', '.remove_attachment', function() {
 </style>
 
 <?php init_tail(); ?>
+<script>
+
+    // Handle reminder field visibility
+    function toggleReminderFields() {
+      var reminderType = $('#task_reminder').val();
+      
+      // Hide all conditional fields first
+      $('#daily-time-group').hide();
+      $('#on-date-group').hide();
+      $('#on-time-row').hide();
+      
+      // Show relevant fields based on selection
+      if (reminderType === 'daily') {
+        $('#daily-time-group').show();
+      } else if (reminderType === 'on') {
+        $('#on-date-group').show();
+        $('#on-time-row').show();
+      }
+    }
+    
+    // Initialize reminder fields on page load
+    toggleReminderFields();
+    
+    // Handle reminder dropdown change
+    $('#task_reminder').on('change', function() {
+      toggleReminderFields();
+    });
+</script>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>

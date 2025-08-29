@@ -1961,6 +1961,21 @@ if(exist_deal_process($deal_id,$deal_stage,get_staff_company_id())){
     $this->db->insert('it_crm_deals_process_list', $data);
 }
 
+// Build HTML table from array
+$table = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;">';
+foreach ($custom_data as $key => $value) {
+    $table .= '<tr>
+        <td style="font-weight:bold;background:#f6f6f6;">'.ucwords(str_replace('_',' ',htmlspecialchars($key))).'</td>
+        <td>'.(!empty($value) ? htmlspecialchars($value) : '<em>(empty)</em>').'</td>
+    </tr>';
+}
+$table .= '</table>';
+
+$staffemail=get_staff_email(get_staff_user_id());
+$mail_subject="Update Deal Stage  - ".$deal_id." - ".get_deals_stage_title($deal_stage);
+$deal_details=$mail_subject."<br><br>".$table;
+$result1=send_mail_template('deal_status_updates', $staffemail, get_staff_user_id(), $deal_id, $deal_details, $mail_subject);
+
 
 
 

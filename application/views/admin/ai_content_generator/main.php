@@ -44,12 +44,18 @@ return $txt;
 <div style="float:right">
 <?php
 foreach ($providers as $provider) {
+
+if(isset($provider['viewon'])&&$provider['viewon']==2) {
 ?>
-<a type="submit" name="submit" class="btn btn-primary mtop20 provider_modal" data-title="<?php echo $provider['provider_name'];?>" data-url="<?php echo $provider['provider_url'];?>"><?php echo $provider['provider_name'];?></a>
+<a href="<?php echo $provider['provider_url'];?>"  name="submit" class="btn btn-success mtop20" target="_blank" title="Redirect to <?php echo $provider['provider_url'];?>" ><?php echo $provider['provider_name'];?> <i class="fa-solid fa-up-right-from-square"></i></a>
+<?php
+}else{
+?>
+<a type="submit" name="submit" class="btn btn-primary mtop20 provider_modal" data-title="<?php echo $provider['provider_name'];?>" data-url="<?php echo $provider['provider_url'];?>"><?php echo $provider['provider_name'];?> <i class="fa-solid fa-expand"></i></a>
 <?php
     //echo "Name: " . $provider['provider_name'] . " | URL: " . $provider['provider_url'] . "<br>";
 }
-
+}
 
 ?>
 </div>
@@ -156,7 +162,7 @@ foreach ($providers as $provider) {
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="height:80vh;">
-	  <div><a id="providerHref" href="#" class="btn btn-primary tw-my-2"  target="_blank" title="Move to web" style="float:right">Move to website</a></div>
+	  <div><a id="providerHref" href="#" class="btn btn-success tw-my-2"  target="_blank" title="Move to web" style="float:right">Move to website</a></div>
         <iframe id="providerIframe" src="" style="width:100%; height:100%; border:0;"></iframe>
       </div>
 	  <div class="modal-footer">
