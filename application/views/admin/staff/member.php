@@ -128,7 +128,8 @@
                                     </div>
                                 </div>
                                 <?php $value = (isset($member) ? $member->phonenumber : ''); ?>
-                                <?php echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value); ?>
+                                <?php //echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value); ?>
+								 <?php echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value,'number',['maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
                                 <div class="form-group">
                                     <label for="facebook" class="control-label"><i class="fa-brands fa-facebook-f"></i>
                                         <?php echo _l('staff_add_edit_facebook'); ?></label>
@@ -178,7 +179,11 @@
                                 <?php $value = (isset($member) ? $member->email_signature : ''); ?>
                                 <?php echo render_textarea('email_signature', 'settings_email_signature', $value, ['data-entities-encode' => 'true']); ?>
                                 <div class="form-group select-placeholder">
-                                    <label for="direction"><?php echo _l('document_direction'); ?></label>
+                                    <label for="direction"><i class="fa-regular fa-circle-question pull-left tw-mt-0.5 tw-mr-1"
+                                    data-toggle="tooltip"
+                                    data-title="LTR (Left to Right) - Displays text from left to right. Common for English.
+
+RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew."></i><?php echo _l('document_direction'); ?></label>
                                     <select class="selectpicker"
                                         data-none-selected-text="<?php echo _l('system_default_string'); ?>"
                                         data-width="100%" name="direction" id="direction">

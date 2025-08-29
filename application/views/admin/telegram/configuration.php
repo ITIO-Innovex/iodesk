@@ -84,19 +84,19 @@
                 <input type="hidden" name="id" id="config_id" value="">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>Telegram Name</label>
+                        <label>Telegram Name <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Your display name for identification in Telegram." ></i></label>
                         <input name="telegram_name" id="name" type="text" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Telegram Username</label>
+                        <label>Telegram Username <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Your unique Telegram handle starting with @." ></i></label>
                         <input name="telegram_username" id="username" type="text" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Telegram Token</label>
+                        <label>Telegram Token <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="API token from BotFather to connect your bot." ></i></label>
                         <input name="telegram_token" id="token" type="text" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label>Type</label>
+                        <label>Department <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Select department for assign" ></i></label>
                         <select name="type" id="type" class="form-control" onchange="typeRender(this)">
                             <option value="0">Select any one option...</option>
                             <option value="1">Department</option>
