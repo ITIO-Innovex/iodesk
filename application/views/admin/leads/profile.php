@@ -854,6 +854,7 @@ foreach ($custom_field_array as $key => $value) {
                     </div>
                 </div>
             </div>
+			<?php if(isset($lead)&& $lead->id){ ?>
 			<div class="clearfix"></div>
 			<div class="col-md-12">
 			<div class=""><label for="Custom" class="control-label">Custom Fields</label></div>
@@ -883,17 +884,7 @@ foreach ($custom_field_array as $key => $value) {
 	  }
 	  }
 	  ?>
-	  <?php /*?><div class="field-group form-group row">
-	  <div class="col-sm-3">
-        <input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" required>
-		</div>
-	  <div class="col-sm-7">
-        <input type="text" class="form-control" name="custom_field_value[]" placeholder="Field Value" required>
-		</div>
-	  <div class="col-sm-2">
-		<a href="#" class="remove text-danger" title="Remove"><i class="fa fa fa-times"></i></a>
-		</div>
-		</div><?php */?>
+	 
      
     </div>
     <button type="button" id="add-field" class="btn btn-primary btn-sm" title="Add Field"> + </button>
@@ -902,6 +893,8 @@ foreach ($custom_field_array as $key => $value) {
 			
 			
 			</div>
+			<?php } ?>
+			
             <div class="col-md-12 mtop15">
                 <?php $rel_id = (isset($lead) ? $lead->id : false); ?>
                 <?php echo render_custom_fields('leads', $rel_id); ?>

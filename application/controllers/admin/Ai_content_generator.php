@@ -179,9 +179,10 @@ class Ai_content_generator extends AdminController
                 $insert_data = [
                     'provider_name' => $this->input->post('provider_name'),
                     'provider_url' => $this->input->post('provider_url'),
-                    'api_key' => $this->input->post('api_key'),
+                    /*'api_key' => $this->input->post('api_key'),*/
                     'status' => $this->input->post('status'),
 					'company_id' => get_staff_company_id(),
+					'viewon' => $this->input->post('viewon'),
                     'created_at' => date('Y-m-d H:i:s'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
@@ -234,8 +235,9 @@ class Ai_content_generator extends AdminController
                 $update_data = [
                     'provider_name' => $this->input->post('provider_name'),
                     'provider_url' => $this->input->post('provider_url'),
-                    'api_key' => $this->input->post('api_key'),
+                    /*'api_key' => $this->input->post('api_key'),*/
                     'status' => $this->input->post('status'),
+					'viewon' => $this->input->post('viewon'),
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
 

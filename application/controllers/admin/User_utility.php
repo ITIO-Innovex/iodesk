@@ -36,6 +36,16 @@ class User_utility extends AdminController
         if ($this->input->post()) {
             $form_name = $this->input->post('form_name');
             $form_fields = $this->input->post('form_fields');
+			
+			foreach ($form_fields as &$field) {
+            // Convert name - variable friendly format
+           $var_name = strtolower(str_replace(" ", "_", $field['name']));
+           $field['name'] = $var_name;
+           }
+
+
+			
+			
 
             if (empty($form_name) || empty($form_fields)) {
                 set_alert('danger', 'Form name and fields are required');
@@ -48,6 +58,8 @@ class User_utility extends AdminController
                 'created_by' => get_staff_user_id(),
                 'company_id' => get_staff_company_id()
             ];
+			
+			//print_r($data);exit;
 
             $insert_id = $this->user_utility_model->add($data);
 

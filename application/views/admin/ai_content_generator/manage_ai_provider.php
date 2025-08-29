@@ -14,6 +14,7 @@
                                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#addProviderModal">
                                     <i class="fa fa-plus"></i> Add New Provider
                                 </button>
+								<a href="<?php echo admin_url('ai_content_generator'); ?>" class="btn btn-info" title="Back to AI Support"><i class="fa fa-arrow-left"></i> Back</a>
                             </div>
                         </div>
                         <hr class="hr-panel-heading" />
@@ -28,6 +29,7 @@
                                         <th>URL</th>
                                         <th>API Key</th>
                                         <th>Status</th>
+										<th>View</th>
                                         <th>Created</th>
                                         <th>Actions</th>
                                     </tr>
@@ -52,6 +54,13 @@
                                                         <span class="label label-success">Active</span>
                                                     <?php else: ?>
                                                         <span class="label label-danger">Inactive</span>
+                                                    <?php endif; ?>
+                                                </td>
+												 <td>
+                                                    <?php if ($provider['viewon'] == 1): ?>
+                                                        <span class="label label-success">Iframe</span>
+                                                    <?php else: ?>
+                                                        <span class="label label-danger">Redirect</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td><?php echo date('Y-m-d H:i', strtotime($provider['created_at'])); ?></td>
@@ -107,10 +116,18 @@
                         <input type="url" class="form-control" id="provider_url" name="provider_url" required>
                         <small class="text-muted">Full API endpoint URL</small>
                     </div>
-                    <div class="form-group">
+                    <?php /*?><div class="form-group">
                         <label for="api_key">API Key</label>
                         <textarea class="form-control" id="api_key" name="api_key" rows="3"></textarea>
                         <small class="text-muted">Your API key for this provider</small>
+                    </div><?php */?>
+					<div class="form-group">
+                        <label for="edit_status">View on <span class="text-danger">*</span></label>
+                        <select class="form-control" id="viewon" name="viewon" required>
+                            <option value="">Select</option>
+							<option value="1">Iframe</option>
+                            <option value="2">Redirect</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="status">Status <span class="text-danger">*</span></label>
@@ -151,10 +168,17 @@
                         <input type="url" class="form-control" id="edit_provider_url" name="provider_url" required>
                         <small class="text-muted">Full API endpoint URL</small>
                     </div>
-                    <div class="form-group">
+                    <?php /*?><div class="form-group">
                         <label for="edit_api_key">API Key</label>
                         <textarea class="form-control" id="edit_api_key" name="api_key" rows="3" ></textarea>
                         <small class="text-muted">Your API key for this provider</small>
+                    </div><?php */?>
+					<div class="form-group">
+                        <label for="edit_status">View on <span class="text-danger">*</span></label>
+                        <select class="form-control" id="edit_viewon" name="viewon" required>
+                            <option value="1">Iframe</option>
+                            <option value="2">Redirect</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="edit_status">Status <span class="text-danger">*</span></label>
@@ -194,6 +218,7 @@ $(document).ready(function() {
             $('#edit_provider_url').val(data.provider_url);
             $('#edit_api_key').val(data.api_key);
             $('#edit_status').val(data.status);
+			$('#edit_viewon').val(data.viewon);
             
             // Set form action
             $('#editProviderForm').attr('action', '<?php echo admin_url("ai_content_generator/edit_ai_provider/"); ?>' + providerId);

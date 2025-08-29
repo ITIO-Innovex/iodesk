@@ -151,7 +151,7 @@ return false;
     public function get_ai_providers($list='')
     {
 	    if(isset($list)&&$list==1){
-		$this->db->select('provider_name,provider_url,');
+		$this->db->select('provider_name,provider_url,viewon,');
 		}else{
         $this->db->select('*');
 		}

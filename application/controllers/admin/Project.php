@@ -495,6 +495,11 @@ class Project extends AdminController
             //if (!empty($data['tags'])) $insert_data['task_tags'] = $data['tags'];
 			if (!empty($data['project_id'])) $insert_data['project_id'] = $data['project_id'];
 			
+			if (!empty($data['task_reminder'])) $insert_data['task_reminder'] = $data['task_reminder'];
+			if (!empty($data['reminder_daily_time'])) $insert_data['reminder_daily_time'] = $data['reminder_daily_time'];
+			if (!empty($data['reminder_on_date'])) $insert_data['reminder_on_date'] = $data['reminder_on_date'];
+			if (!empty($data['reminder_on_time'])) $insert_data['reminder_on_time'] = $data['reminder_on_time'];
+			
 		if(isset($data['tags'])&&$data['tags']){
 		//$tagsJson = $_POST['tags']; 
         // Convert JSON to PHP array
@@ -718,6 +723,17 @@ class Project extends AdminController
 	}else{
 	$tagsString="";
 	}	
+	
+	$task_reminder=$this->input->post('task_reminder');
+	$reminder_daily_time=$this->input->post('reminder_daily_time');
+	$reminder_on_date=$this->input->post('reminder_on_date');
+	$reminder_on_time=$this->input->post('reminder_on_time');
+	
+	if(isset($task_reminder)&&$task_reminder=='none'){
+	$reminder_daily_time='';
+	$reminder_on_date='';
+	$reminder_on_time='';
+	}
 		
         $data = [
             'task_owner' => $this->input->post('task_owner'),
@@ -726,7 +742,11 @@ class Project extends AdminController
             'task_status' => $this->input->post('task_status'),
             'task_priority' => $this->input->post('task_priority'),
 			'task_progress' => $this->input->post('task_progress'),
-			'task_tags' => $tagsString
+			'task_tags' => $tagsString,
+            'task_reminder' => $task_reminder,
+            'reminder_daily_time' => $reminder_daily_time,
+            'reminder_on_date' => $reminder_on_date,
+            'reminder_on_time' => $reminder_on_time
         ];
 		
 		
