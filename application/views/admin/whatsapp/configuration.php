@@ -71,24 +71,24 @@
                 </div> -->
                 <input type="hidden" name="userId" id="userId" value="<?= get_staff_user_id() ?>">
                 <div class="form-group">
-                    <label>Access Token</label>
+                    <label>Access Token <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Your secret key from WhatsApp Cloud API for authentication." ></i></label>
                     <input name="accessToken" id="accessToken" type="text" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Phone number Id</label>
+                    <label>Phone number Id <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Unique ID of your WhatsApp Business phone number." ></i></label>
                     <input name="phoneNumberId" id="phoneNumberId" type="text" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Phone Number</label>
+                    <label>Phone Number <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="The actual WhatsApp Business phone number (with country code)." ></i></label>
                     <input name="phoneNumber" id="phoneNumber" type="text" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Webhook Verification Token</label>
+                    <label>Webhook Verification Token <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Custom token you set to verify incoming webhooks."></i></label>
                     <input name="webhookVerificationToken" id="webhookVerificationToken" type="text" class="form-control" required>
                 </div> 
                 <?php if(!is_super()) { ?> 
                     <div class="form-group">
-                        <label>Department</label>
+                        <label>Department <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Select department for assign"></i></label>
                         <select name="department" id="department" class="form-control">
                             <option value="0">Select a department</option>
                             <?php foreach($departmentData as $DD){ ?>
@@ -99,7 +99,7 @@
                 <?php } ?>
                 <?php if(is_super()) { ?>
                     <div class="form-group">
-                        <label>Company</label>
+                        <label>Company <i class="fa-solid fa-circle-info text-info" data-toggle="tooltip" data-title="Select company for assign"></i></label>
                         <select name="company" id="company" class="form-control">
                             <option value="0">Select a company</option>
                             <?php foreach($company_list as $cc){ ?>

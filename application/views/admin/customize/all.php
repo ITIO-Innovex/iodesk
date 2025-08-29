@@ -4,6 +4,35 @@
 //echo $deal_form_type;
 ?>
 <style> .field-label {margin-left: 0px !important; }</style>
+<style>
+  /* handle style */
+  .drag-handle {
+    cursor: move;
+    font-size: 16px;
+    display: inline-block;
+    color: #666;
+  }
+  /* placeholder looks like panel */
+  .panel-placeholder {
+    border: 2px dashed #bbb;
+    background: #fafafa;
+    min-height: 60px;
+    margin-bottom: 15px;
+  }
+  /* small tweak so the panel moves nicely */
+  #form-builder-fields .panel {
+    margin-bottom: 15px;
+  }
+  .form-builder-field .panel-body {
+   padding: 8px !important;
+   }
+   .tooltip {
+  z-index: 9999 !important;  /* higher than modal */
+}
+.popover {
+  z-index: 9999 !important;
+}
+</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -417,7 +446,7 @@ function formFieldHtml(field, idx) {
     } else {
         html += '<div class="form-group"><label>Options (N/A for this type)</label><input type="text" class="form-control field-options" value="" disabled></div>';
     }
-    html += '<button class="btn btn-danger btn-xs remove-field-btn">Remove</button>';
+    html += '<button class="btn btn-danger btn-xs remove-field-btn">Remove</button> <span class="drag-handle"  style="float: right;"  data-toggle="tooltip" title=" ----- Drag to reorder"><i class="fa fa-arrows"></i></span>';
     html += '</div></div>';
     return html;
 }
@@ -568,6 +597,39 @@ function renderViewForm(fields) {
     html += '</form>';
     return html;
 }
+
+</script>
+<script>
+$(function() {
+  // Make the panels sortable
+  $("#form-builder-fields").sortable({
+    axis: "y",
+    handle: ".drag-handle",
+    placeholder: "panel-placeholder",
+    forcePlaceholderSize: true,
+    tolerance: "pointer",
+    scroll: true,
+    // on sort update, re-index the panels
+    update: function(event, ui) {
+      $('#form-builder-fields .form-builder-field').each(function(index) {
+        $(this).attr('data-idx', index);
+      });
+
+      // Optional: update save button counter (if you use data-val for count)
+      var count = $('#form-builder-fields .form-builder-field').length;
+      $('#save-form-layout').attr('data-val', count);
+
+      // Optional: you can collect the new order into an array for AJAX saving
+      var order = $('#form-builder-fields .form-builder-field').map(function() {
+        return $(this).attr('data-idx');
+      }).get();
+      console.log('new order:', order);
+    }
+  });
+
+  // prevent accidental text selection while dragging
+  $("#form-builder-fields").disableSelection();
+
 
 </script>
 </body>

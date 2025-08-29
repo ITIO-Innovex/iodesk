@@ -729,6 +729,7 @@ class Expenses_model extends App_Model
     public function add_category($data)
     {
         $data['description'] = nl2br($data['description']);
+		$data['company_id']  = get_staff_company_id();
         $this->db->insert(db_prefix() . 'expenses_categories', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {

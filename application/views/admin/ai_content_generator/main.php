@@ -156,6 +156,7 @@ foreach ($providers as $provider) {
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="height:80vh;">
+	  <div><a id="providerHref" href="#" class="btn btn-primary tw-my-2"  target="_blank" title="Move to web" style="float:right">Move to website</a></div>
         <iframe id="providerIframe" src="" style="width:100%; height:100%; border:0;"></iframe>
       </div>
 	  <div class="modal-footer">
@@ -226,7 +227,9 @@ $(document).on("click", ".provider_modal", function () {
     var title = $(this).data("title");
     var url = $(this).data("url");
     $("#providerModalLabel").text(title);
+	$("#providerHref").text(title);
     $("#providerIframe").attr("src", url);
+	$("#providerHref").attr("href", url);
     $('#providerModal').modal('show');
    
 });
