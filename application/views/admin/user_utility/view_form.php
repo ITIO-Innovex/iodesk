@@ -1,5 +1,9 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+.radio input[type=radio] {opacity: 1;}
+.checkbox input[type=checkbox]{opacity: 1;}
+</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
