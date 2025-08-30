@@ -61,12 +61,14 @@
                                                 <a href="<?php echo admin_url('user_utility/edit/' . $form->id); ?>" class="text-info">
                                                     <i class="fa fa-pencil-square-o"></i>
                                                 </a>
+												<?php if (is_admin()) { ?>
                                                 <a href="<?php echo admin_url('user_utility/delete/' . $form->id); ?>" 
                                                    class="text-danger _delete" 
                                                    data-toggle="tooltip" 
                                                    data-title="<?php echo _l('delete'); ?>">
                                                     <i class="fa fa-remove"></i>
                                                 </a>
+												<?php } ?>
                                             </div>
                                         </td>
                                     </tr>

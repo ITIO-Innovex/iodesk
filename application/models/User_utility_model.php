@@ -15,7 +15,11 @@ class User_utility_model extends App_Model
     public function get_all_forms($where = [])
     {
         $this->db->select('*');
-		$this->db->where('created_by', get_staff_user_id());
+		$this->db->group_start();
+		$this->db->where("FIND_IN_SET(".get_staff_user_id().", share_with) >", 0, FALSE); // FALSE = don't escape
+		$this->db->or_where('created_by', get_staff_user_id());
+		$this->db->group_end();
+		$this->db->where('is_deleted', 0);
         $this->db->from(db_prefix() . 'user_utility_forms');
         
         if (!empty($where)) {
@@ -23,13 +27,15 @@ class User_utility_model extends App_Model
         }
         
         // Filter by company if not admin
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         
         $this->db->order_by('date_created', 'DESC');
-        
-        return $this->db->get()->result();
+        //echo $this->db->get_compiled_select(); exit;
+        return $this->db->get()->result(); //return 
+		echo $this->db->last_query();exit;
+		
     }
 
     /**
@@ -37,14 +43,23 @@ class User_utility_model extends App_Model
      */
     public function get($id)
     {
-        $this->db->where('id', $id);
-        $this->db->where('created_by', get_staff_user_id());
+	
+	
+	     $this->db->group_start();
+	    $this->db->where("FIND_IN_SET(".get_staff_user_id().", share_with) >", 0, FALSE); // FALSE = don't escape
+		$this->db->or_where('created_by', get_staff_user_id());
+		$this->db->group_end();
+		$this->db->where('id', $id);
+		$this->db->where('is_deleted', 0);
+       
+        //$this->db->where('created_by', get_staff_user_id());
         // Filter by company if not admin
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         
         return $this->db->get(db_prefix() . 'user_utility_forms')->row();
+		//echo $this->db->last_query();exit;//return
     }
 
     /**
@@ -62,6 +77,20 @@ class User_utility_model extends App_Model
         }
 
         return $insert_id;
+    } 
+	
+	public function addcomment($data)
+    {
+        $data['date_created'] = date('Y-m-d H:i:s');
+        
+        $this->db->insert(db_prefix() . 'user_utility_comments', $data);
+        $insert_id = $this->db->insert_id();
+
+        if ($insert_id) {
+            log_activity('User Utility Comment Created [ID: ' . $insert_id . ']');
+        }
+
+        return $insert_id;
     }
 
     /**
@@ -74,7 +103,7 @@ class User_utility_model extends App_Model
         $this->db->where('id', $id);
         
         // Filter by company if not admin
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         
@@ -100,17 +129,23 @@ class User_utility_model extends App_Model
             return false;
         }
 
+		
+		$data['date_updated'] = date('Y-m-d H:i:s');
+		$data['is_deleted'] = 1;
+        
         $this->db->where('id', $id);
-        $this->db->where('created_by', get_staff_user_id());
+        
         // Filter by company if not admin
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         
-        $this->db->delete(db_prefix() . 'user_utility_forms');
+        $this->db->update(db_prefix() . 'user_utility_forms', $data);
+		//echo $this->db->last_query();exit;
+		
         
         if ($this->db->affected_rows() > 0) {
-            log_activity('User Utility Form Deleted [ID: ' . $id . ', Name: ' . $form->form_name . ']');
+            log_activity('User Utility Form Deleted [ID: ' . $id . ', Name: ' . $form->form_name . ' By '.get_staff_user_id().']');
             
             // Clean up uploaded files if any
             $this->cleanup_form_files($form);
@@ -179,7 +214,7 @@ class User_utility_model extends App_Model
         // Total forms
         $this->db->select('COUNT(*) as total');
         $this->db->from(db_prefix() . 'user_utility_forms');
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         $result = $this->db->get()->row();
@@ -189,7 +224,7 @@ class User_utility_model extends App_Model
         $this->db->select('COUNT(*) as total');
         $this->db->from(db_prefix() . 'user_utility_forms');
         $this->db->where('form_data IS NOT NULL');
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         $result = $this->db->get()->row();
@@ -199,12 +234,19 @@ class User_utility_model extends App_Model
         $this->db->select('COUNT(*) as total');
         $this->db->from(db_prefix() . 'user_utility_forms');
         $this->db->where('date_created >=', date('Y-m-d', strtotime('-30 days')));
-        if (!is_admin()) {
+        if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         }
         $result = $this->db->get()->row();
         $stats['recent_forms'] = $result->total;
         
         return $stats;
+    }
+	
+	public function commentlist($id)
+    {
+		$this->db->where('utility_id', $id);
+		$this->db->order_by('date_created', 'DESC');
+        return $this->db->get(db_prefix() . 'user_utility_comments')->result();
     }
 }
