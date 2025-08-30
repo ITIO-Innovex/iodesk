@@ -173,9 +173,11 @@ class User_utility extends AdminController
         }
 
         $form = $this->user_utility_model->get($id);
+		
         if (!$form) {
             show_404();
         }
+		$formdata=$form->form_data;
 
         if ($this->input->post()) {
             $form_data = [];
@@ -187,7 +189,7 @@ class User_utility extends AdminController
 
                 if ($field_type === 'file') {
                     // Handle file upload
-                    if (isset($_FILES[$field_name]) && $_FILES[$field_name]['error'] === 0) {
+                    if (isset($_FILES[$field_name]) && $_FILES[$field_name]['error'] === 0 &&!empty($_FILES[$field_name]['name'])) {
                         $upload_path = './uploads/user_utility/';
                         if (!is_dir($upload_path)) {
                             mkdir($upload_path, 0755, true);
@@ -197,13 +199,24 @@ class User_utility extends AdminController
                         if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $upload_path . $file_name)) {
                             $form_data[$field_name] = $file_name;
                         }
-                    }
+                    }else{
+					$data = json_decode($formdata, true); // true = associative array
+					// Access document
+					if (isset($data['document']) && !empty($data['document'])) {
+						$form_data[$field_name] = $data['document'];
+					} else {
+						$form_data[$field_name] = 'dasdsad';
+					}
+					
+					}
                 } elseif ($field_type === 'checkbox') {
                     $form_data[$field_name] = $this->input->post($field_name) ? $this->input->post($field_name) : [];
                 } else {
                     $form_data[$field_name] = $this->input->post($field_name);
                 }
             }
+			
+			//echo json_encode($form_data);exit;
 
             $update_data = [
                 'form_data' => json_encode($form_data)
