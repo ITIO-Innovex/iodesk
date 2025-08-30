@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); //print_r($form); ?>
 <style>
 .checkbox input[type=checkbox], .checkbox input[type=radio] {
     opacity: 1 !important;
@@ -25,8 +25,30 @@
                         </div>
                         
                         <div class="row">
-                            <div class="col-md-6">
-                                <?php echo render_input('form_name', 'Form Name', isset($form) ? $form->form_name : '', 'text', array('required' => true)); ?>
+                            <div class="col-md-12">
+<?php echo render_input('form_name', 'Form Name', isset($form) ? $form->form_name : '', 'text', array('required' => true)); ?>
+
+<div class="form-group">
+                <label for="task_owner" class="control-label"><?php echo _l('Assign To'); ?></label>
+                <select class="form-control selectpicker" id="share_with" name="share_with[]" multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" title="Assign To">
+                  <?php if (isset($staff_members) && is_array($staff_members)) { ?>
+                    <?php foreach ($staff_members as $staff) { ?>
+                      <?php 
+                      $selected = '';
+                      if (isset($form)&&$form->share_with) {
+                          $ownerIds = explode(',', $form->share_with);
+                          if (in_array($staff['staffid'], $ownerIds)) {
+                              $selected = 'selected';
+                          }
+                      }
+                      ?>
+                      <option data-content='<span class="tw-inline-flex tw-items-center"><?php echo str_replace("'", "&apos;", staff_profile_image($staff['staffid'], ["tw-h-6 tw-w-6 tw-rounded-full tw-inline-block tw-mr-2 tw-ring-2 tw-ring-white"], "small")); ?><span><?php echo e($staff['firstname'] . ' ' . $staff['lastname']); ?></span></span>' value="<?php echo $staff['staffid']; ?>" <?php echo $selected; ?>>
+                        <?php echo e($staff['firstname'] . ' ' . $staff['lastname']); ?>
+                      </option>
+                    <?php } ?>
+                  <?php } ?>
+                </select>
+              </div>
                             </div>
                         </div>
                         
@@ -48,16 +70,16 @@
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label>Field Type</label>
-                                                        <select name="form_fields[<?php echo $index; ?>][type]" 
-                                                                class="form-control field-type" required>
-                                                            <option value="text" <?php echo $field['type'] == 'text' ? 'selected' : ''; ?>>Text</option>
-                                                            <option value="textarea" <?php echo $field['type'] == 'textarea' ? 'selected' : ''; ?>>Textarea</option>
-                                                            <option value="listbox" <?php echo $field['type'] == 'listbox' ? 'selected' : ''; ?>>Listbox</option>
-                                                            <option value="radio" <?php echo $field['type'] == 'radio' ? 'selected' : ''; ?>>Radio</option>
-                                                            <option value="checkbox" <?php echo $field['type'] == 'checkbox' ? 'selected' : ''; ?>>Checkbox</option>
-                                                            <option value="datetime" <?php echo $field['type'] == 'datetime' ? 'selected' : ''; ?>>Date/Time</option>
-                                                            <option value="file" <?php echo $field['type'] == 'file' ? 'selected' : ''; ?>>File</option>
-                                                        </select>
+<select name="form_fields[<?php echo $index; ?>][type]" class="form-control field-type" required>
+<option value="text" <?php echo $field['type'] == 'text' ? 'selected' : ''; ?>>Text</option>
+<option value="textarea" <?php echo $field['type'] == 'textarea' ? 'selected' : ''; ?>>Textarea</option>
+<option value="editor" <?php echo $field['type'] == 'editor' ? 'selected' : ''; ?>>Editor</option>
+<option value="listbox" <?php echo $field['type'] == 'listbox' ? 'selected' : ''; ?>>Listbox</option>
+<option value="radio" <?php echo $field['type'] == 'radio' ? 'selected' : ''; ?>>Radio</option>
+<option value="checkbox" <?php echo $field['type'] == 'checkbox' ? 'selected' : ''; ?>>Checkbox</option>
+<option value="datetime" <?php echo $field['type'] == 'datetime' ? 'selected' : ''; ?>>Date/Time</option>
+<option value="file" <?php echo $field['type'] == 'file' ? 'selected' : ''; ?>>File</option>
+</select>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label>Options (for listbox/radio/checkbox)</label>
@@ -135,6 +157,7 @@ $(document).ready(function() {
                                     class="form-control field-type" required>
                                 <option value="text">Text</option>
                                 <option value="textarea">Textarea</option>
+								<option value="editor">Editor</option>
                                 <option value="listbox">Listbox</option>
                                 <option value="radio">Radio</option>
                                 <option value="checkbox">Checkbox</option>

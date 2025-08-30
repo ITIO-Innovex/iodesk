@@ -6,13 +6,13 @@
             <div class="col-md-12">
                 <div class="panel_s">
                     <div class="panel-body">
-                        <?php echo form_open_multipart(current_url(), array('id' => 'dynamic-form')); ?>
+                        
                         <div class="row">
                             <div class="col-md-12">
                                 <h4 class="no-margin">
                                     <?php echo $title; ?>
                                     <a href="<?php echo admin_url('user_utility'); ?>" class="btn btn-default pull-right">
-                                        <i class="fa fa-arrow-left"></i> <?php echo _l('back'); ?>
+                                        <i class="fa fa-arrow-left"></i> <?php echo _l('Back'); ?>
                                     </a>
                                     <a href="<?php echo admin_url('user_utility/edit/' . $form->id); ?>" class="btn btn-info pull-right" style="margin-right: 10px;">
                                         <i class="fa fa-edit"></i> Edit Form
@@ -30,6 +30,7 @@
                         
                         <div class="row">
                             <div class="col-md-8">
+							 
                                 <?php foreach ($form->form_fields as $field) { 
                                     $field_name = $field['name'];
                                     $field_type = $field['type'];
@@ -37,7 +38,7 @@
                                     $field_value = isset($form->form_data[$field_name]) ? $form->form_data[$field_name] : '';
                                     $field_options = isset($field['options']) ? explode(',', $field['options']) : [];
                                 ?>
-                                
+<?php echo form_open_multipart(current_url(), array('id' => 'dynamic-form')); ?>
                                 <div class="form-group">
                                     <label for="<?php echo $field_name; ?>">
                                         <?php echo ucfirst(str_replace('_', ' ', $field_name)); ?>
@@ -58,6 +59,13 @@
                                         <textarea name="<?php echo $field_name; ?>" 
                                                   id="<?php echo $field_name; ?>"
                                                   class="form-control" 
+                                                  rows="4"
+                                                  <?php echo $field_required ? 'required' : ''; ?>><?php echo htmlspecialchars($field_value); ?></textarea>
+												  
+												  <?php } elseif ($field_type === 'editor') { ?>
+                                        <textarea name="<?php echo $field_name; ?>" 
+                                                  id="<?php echo $field_name; ?>"
+                                                  class="form-control editor" 
                                                   rows="4"
                                                   <?php echo $field_required ? 'required' : ''; ?>><?php echo htmlspecialchars($field_value); ?></textarea>
                                                   
@@ -123,7 +131,8 @@
                                                name="<?php echo $field_name; ?>" 
                                                id="<?php echo $field_name; ?>"
                                                class="form-control" 
-                                               <?php echo $field_required ? 'required' : ''; ?>>
+                                               >
+											   <?php //echo $field_required ? 'required' : ''; ?>
                                         <?php if ($field_value) { ?>
                                             <small class="text-muted">
                                                 Current file: <a href="<?php echo base_url('uploads/user_utility/' . $field_value); ?>" target="_blank"><?php echo $field_value; ?></a>
@@ -133,12 +142,60 @@
                                 </div>
                                 
                                 <?php } ?>
-                                
+                               <?php if (is_admin()) { ?>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-success">
                                         <i class="fa fa-save"></i> Save Form Data
                                     </button>
                                 </div>
+								<?php } ?>
+<?php echo form_close(); ?>
+
+<div class="tw-p-2 mail-bg tw-rounded">
+<div class="form-group tw-p-2">							
+<a class="btn btn-danger tw-p-2 pull-right" id="toggleCommentBtn">Add Comment</a>
+</div>
+<div class="clearfix"></div>
+<!-- Comment Form (hidden by default) -->
+<div id="commentForm" class=" margin-top-50" style="display: none; margin-top: 10px;">
+
+  <?php echo form_open(admin_url('user_utility/addcomment'), ['id' => 'addcomment-form']); ?>
+  <input type="hidden" name="tid" value="<?php echo $form->id; ?>" />
+   <div class="form-group">
+    <textarea name="comment" placeholder="Write your comment..." class="form-control editor" required></textarea>
+	</div>
+	 <div class="form-group">
+    <button class="btn btn-success" type="submit"><i class='fa-solid fa-comment'></i> Submit</button>
+	</div>
+  <?php echo form_close(); ?>
+</div>
+</div>
+
+
+<div class="tw-p-2 mail-bg tw-rounded">
+<div class="form-group">							
+<h4 >Comments (<?php echo count($commentlist);?>)</h4>
+</div>
+<div class="clearfix"></div>
+<!-- Comment Form (hidden by default) -->
+<?php if (!empty($commentlist)) { ?>
+    <div class="">
+        <?php foreach ($commentlist as $c) { ?>
+		<div class="tw-p-2 tw-my-2 modal-content">
+		<h4 class="panel-title">Added on <?php echo $c->date_created ?> By : <?php echo get_staff_full_name($c->created_by); ?></h4>
+            <div class="tw-my-2">
+                <strong>Comment:</strong><?php echo  $c->comment ?><br>
+            </div>
+			</div>
+        <?php } ?>
+    </div>
+<?php } else { ?>
+    <p>No comments found.</p>
+<?php } ?>
+
+</div>
+
+
                             </div>
                             
                             <div class="col-md-4">
@@ -157,11 +214,33 @@
                                             } elseif (strpos($value, '.') !== false && file_exists('./uploads/user_utility/' . $value)) {
                                                 echo '<a href="' . base_url('uploads/user_utility/' . $value) . '" target="_blank">' . $value . '</a>';
                                             } else {
-                                                echo htmlspecialchars($value);
+                                                echo $value;
                                             }
                                             ?>
                                         </div>
                                         <?php } ?>
+                                    </div>
+                                </div>
+                                <?php } ?>
+								
+								<?php if (!empty($form->share_with) && $form->share_with !== null) { ?>
+                                <div class="panel panel-success">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">Share With</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        
+										<?php
+										if (isset($form)&&$form->share_with) {
+                                        $numbers = explode(',', $form->share_with);
+										foreach ($numbers as $num) {
+                                        //echo $num . "<br>";
+										echo "<p><strong><i class='fa-solid fa-comment'></i> ".get_staff_full_name($num) . "</strong><br>"; 
+                                        }
+                                        
+                                        }
+										?>
+
                                     </div>
                                 </div>
                                 <?php } ?>
@@ -179,9 +258,11 @@
                                         <p><strong>Fields Count:</strong> <?php echo count($form->form_fields); ?></p>
                                     </div>
                                 </div>
+								
+								
                             </div>
                         </div>
-                        <?php echo form_close(); ?>
+                        
                     </div>
                 </div>
             </div>
@@ -192,6 +273,11 @@
 
 
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+<script> $('.editor').jqte(); </script>
+
 <script>
 $(document).ready(function() {
     // Form validation
@@ -232,4 +318,12 @@ $(document).ready(function() {
         $(this).closest('.form-group').removeClass('has-error');
     });
 });
+</script>
+<!-- Script -->
+<script>
+  $(document).ready(function(){
+    $("#toggleCommentBtn").click(function(){
+      $("#commentForm").toggle(); // Show/Hide on each click
+    });
+  });
 </script>

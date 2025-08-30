@@ -35,7 +35,15 @@ class User_utility extends AdminController
 
         if ($this->input->post()) {
             $form_name = $this->input->post('form_name');
+			$share_with = $this->input->post('share_with');
             $form_fields = $this->input->post('form_fields');
+			
+			if (!empty($share_with)) {
+                // Accept multiple owners from multiselect; store as comma-separated string
+                if (is_array($share_with)) {
+                    $share_with = implode(',', array_filter($share_with));
+                }
+            }
 			
 			foreach ($form_fields as &$field) {
             // Convert name - variable friendly format
@@ -54,6 +62,7 @@ class User_utility extends AdminController
 
             $data = [
                 'form_name' => $form_name,
+				'share_with' => $share_with,
                 'form_fields' => json_encode($form_fields),
                 'created_by' => get_staff_user_id(),
                 'company_id' => get_staff_company_id()
@@ -70,7 +79,7 @@ class User_utility extends AdminController
                 set_alert('danger', 'Failed to create form');
             }
         }
-
+        $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
         $data['title'] = 'Create New Form';
         $this->load->view('admin/user_utility/form', $data);
     }
@@ -92,6 +101,14 @@ class User_utility extends AdminController
         if ($this->input->post()) {
             $form_name = $this->input->post('form_name');
             $form_fields = $this->input->post('form_fields');
+			$share_with = $this->input->post('share_with');
+			
+			if (!empty($share_with)) {
+                // Accept multiple owners from multiselect; store as comma-separated string
+                if (is_array($share_with)) {
+                    $share_with = implode(',', array_filter($share_with));
+                }
+            }
 
             if (empty($form_name) || empty($form_fields)) {
                 set_alert('danger', 'Form name and fields are required');
@@ -100,6 +117,7 @@ class User_utility extends AdminController
 
             $data = [
                 'form_name' => $form_name,
+				'share_with' => $share_with,
                 'form_fields' => json_encode($form_fields)
             ];
 
@@ -116,6 +134,7 @@ class User_utility extends AdminController
         $data['form'] = $form;
         $data['form']->form_fields = json_decode($form->form_fields, true);
         $data['title'] = 'Edit Form: ' . $form->form_name;
+		$data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
         $this->load->view('admin/user_utility/form', $data);
     }
 
@@ -204,7 +223,11 @@ class User_utility extends AdminController
         $data['form']->form_fields = json_decode($form->form_fields, true);
         $data['form']->form_data = $form->form_data ? json_decode($form->form_data, true) : [];
         $data['title'] = 'Form: ' . $form->form_name;
+		$data['commentlist'] = $this->user_utility_model->commentlist($id);
+		//echo $id;
+		//print_r($data['commentlist']);exit;
         $this->load->view('admin/user_utility/view_form', $data);
+		
     }
 
     /**
@@ -224,4 +247,30 @@ class User_utility extends AdminController
 
         echo json_encode($field_types);
     }
+	
+	
+	public function addcomment()
+    {
+       
+            if ($this->input->post()) {
+            $data['comment'] = $this->input->post('comment');
+			$data['utility_id'] = $this->input->post('tid');
+			$data['created_by'] = get_staff_user_id();
+			
+			
+			$insert_id = $this->user_utility_model->addcomment($data);
+
+            if ($insert_id) {
+                set_alert('success', 'Comment added successfully');
+                redirect(admin_url('user_utility/view/'.$data['utility_id']));
+            } else {
+                set_alert('danger', 'Failed to add Comment');
+            }
+
+        
+
+        redirect(admin_url('user_utility/view/18'));
+		}
+    }
+
 }

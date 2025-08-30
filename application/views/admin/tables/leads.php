@@ -358,7 +358,8 @@ return App_table::find('leads')
 
             $row[] = $assignedOutput;
 			
-			
+			// Initialize outputStatus variable
+			$outputStatus = '';
 
             if ($aRow['status_name'] == null) {
                 if ($aRow['lost'] == 1) {
