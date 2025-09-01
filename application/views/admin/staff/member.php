@@ -3,7 +3,7 @@
 <div id="wrapper">
     <div class="content">
         <?php if (isset($member)) { ?>
-        <?php $this->load->view('admin/staff/stats'); ?>
+        <?php //$this->load->view('admin/staff/stats'); ?>
         <div class="member">
             <?php echo form_hidden('isedit'); ?>
             <?php echo form_hidden('memberid', $member->staffid); ?>
@@ -395,12 +395,12 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                         </div>
                     </div>
                 </div>
-                <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
+                <?php /*?><h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
                     <?php echo _l('task_timesheets'); ?> & <?php echo _l('als_reports'); ?>
                 </h4>
                 <div class="panel_s">
                     <div class="panel-body">
-                        <?php echo form_open($this->uri->uri_string(), ['method' => 'GET']); ?>
+                        <?php /*?><?php echo form_open($this->uri->uri_string(), ['method' => 'GET']); ?>
                         <?php echo form_hidden('filter', 'true'); ?>
                         <div class="row">
                             <div class="col-md-6">
@@ -441,8 +441,8 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                                     class="btn btn-success apply-timesheets-filters"><?php echo _l('apply'); ?></button>
                             </div>
                         </div>
-                        <?php echo form_close(); ?>
-                        <hr class="hr-panel-separator" />
+                        <?php echo form_close(); ?><?php */?>
+                        <?php /*?><hr class="hr-panel-separator" />
                         <table class="table dt-table">
                             <thead>
                                 <th><?php echo _l('task'); ?></th>
@@ -550,8 +550,8 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                             </tfoot>
                         </table>
                     </div>
-                </div>
-                <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
+                </div><?php */?>
+                <?php /*?><h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
                     <?php echo _l('projects'); ?>
                 </h4>
                 <div class="panel_s">
@@ -566,7 +566,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                             _l('project_status'),
                         ], 'staff-projects'); ?>
                     </div>
-                </div>
+                </div><?php */?>
             </div>
             <?php } ?>
         </div>

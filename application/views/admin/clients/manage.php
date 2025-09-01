@@ -39,9 +39,25 @@
 
                         <?php if (staff_can('view',  'customers') || have_assigned_customers()) {
                       $where_summary = '';
-                      if (staff_cant('view', 'customers')) {
-                          $where_summary = ' AND userid IN (SELECT customer_id FROM ' . db_prefix() . 'customer_admins WHERE staff_id=' . get_staff_user_id() . ')';
-                      } ?>
+                      //if (staff_cant('view', 'customers')) {
+                          //$where_summary = ' AND userid IN (SELECT customer_id FROM ' . db_prefix() . 'customer_admins WHERE staff_id=' . get_staff_user_id() . ')';
+                      //} 
+					  
+					  // Filter by company if not admin
+        if (is_super()) {
+		
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		$where_summary=' AND company_id ='.$_SESSION['super_view_company_id'];
+		}else{
+		$where_summary=' AND company_id ='.get_staff_company_id();
+		}
+		
+        }elseif (is_admin()) {
+		$where_summary=' AND company_id ='.get_staff_company_id();
+		}else{
+		$where_summary=' AND company_id ='.get_staff_company_id().' AND addedfrom='.get_staff_user_id();
+		}
+		?>
                         <div class="mbot15">
                             <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-flex tw-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
