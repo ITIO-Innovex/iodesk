@@ -111,6 +111,9 @@ class Cron_model extends App_Model
 
             app_maybe_delete_old_temporary_files();
 
+            // Check and send task reminders
+            $this->check_task_reminders();
+
             hooks()->do_action('after_cron_run', $manually);
 
             // For all cases try to release the lock after everything is finished
@@ -1944,6 +1947,159 @@ class Cron_model extends App_Model
         }
 
         return true;
+    }
+
+    /**
+     * Check and send task reminders based on reminder settings
+     */
+    public function check_task_reminders()
+    {
+        $this->load->model('tasks_model');
+        $this->load->model('staff_model');
+        
+        // Check if reminder columns exist first
+        if (!$this->db->field_exists('task_reminder', db_prefix() . 'tasks')) {
+            log_message('error', 'Task reminder columns do not exist. Please run migration 317_version_317.php');
+            return;
+        }
+        
+        $current_time = date('H:i');
+        $current_date = date('Y-m-d');
+        
+        // Get tasks with reminders
+        $this->db->select('t.*, p.name as project_name');
+        $this->db->from(db_prefix() . 'tasks t');
+        $this->db->join(db_prefix() . 'projects p', 'p.id = t.project_id', 'left');
+        $this->db->where('t.task_reminder !=', 'none');
+        $this->db->where('t.task_reminder IS NOT NULL');
+        $this->db->where('t.status !=', 5); // Not completed
+        $tasks = $this->db->get()->result_array();
+        
+        foreach ($tasks as $task) {
+            $should_send_reminder = false;
+            $reminder_type = $task['task_reminder'];
+            
+            if ($reminder_type == 'daily' && !empty($task['reminder_daily_time'])) {
+                // Check if it's time for daily reminder
+                if ($current_time == substr($task['reminder_daily_time'], 0, 5)) {
+                    $should_send_reminder = true;
+                }
+            } elseif ($reminder_type == 'on' && !empty($task['reminder_on_date']) && !empty($task['reminder_on_time'])) {
+                // Check if it's time for date-based reminder
+                $reminder_date = '';
+                
+                switch ($task['reminder_on_date']) {
+                    case 'created_date':
+                        $reminder_date = date('Y-m-d', strtotime($task['dateadded']));
+                        break;
+                    case 'start_date':
+                        $reminder_date = $task['task_start_date'];
+                        break;
+                    case 'due_date':
+                        $reminder_date = $task['task_end_date'];
+                        break;
+                }
+                
+                if ($reminder_date == $current_date && $current_time == substr($task['reminder_on_time'], 0, 5)) {
+                    $should_send_reminder = true;
+                }
+            }
+            
+            if ($should_send_reminder) {
+                $this->send_task_reminder($task);
+            }
+        }
+    }
+    
+    /**
+     * Send task reminder notification
+     */
+    private function send_task_reminder($task)
+    {
+        // Get task assignees
+        $this->db->select('staffid');
+        $this->db->from(db_prefix() . 'task_assigned');
+        $this->db->where('taskid', $task['id']);
+        $assignees = $this->db->get()->result_array();
+        
+        foreach ($assignees as $assignee) {
+            $staff = $this->staff_model->get($assignee['staffid']);
+            
+            if ($staff && !empty($staff->email)) {
+                $this->send_reminder_email($staff, $task);
+            }
+        }
+        
+        // Log the reminder
+        log_message('info', 'Task reminder sent for task ID: ' . $task['id'] . ' - ' . $task['name']);
+    }
+    
+    /**
+     * Send reminder email to staff member
+     */
+    private function send_reminder_email($staff, $task)
+    {
+        $subject = 'Task Reminder: ' . $task['name'];
+        
+        $message = '<h3>Task Reminder</h3>';
+        $message .= '<p><strong>Task:</strong> ' . $task['name'] . '</p>';
+        $message .= '<p><strong>Project:</strong> ' . ($task['project_name'] ?: 'No Project') . '</p>';
+        $message .= '<p><strong>Priority:</strong> ' . $this->get_task_priority_name($task['task_priority']) . '</p>';
+        $message .= '<p><strong>Status:</strong> ' . $this->get_task_status_name($task['task_status']) . '</p>';
+        
+        if (!empty($task['task_start_date'])) {
+            $message .= '<p><strong>Start Date:</strong> ' . date('Y-m-d', strtotime($task['task_start_date'])) . '</p>';
+        }
+        
+        if (!empty($task['task_end_date'])) {
+            $message .= '<p><strong>Due Date:</strong> ' . date('Y-m-d', strtotime($task['task_end_date'])) . '</p>';
+        }
+        
+        $message .= '<p><strong>Progress:</strong> ' . $task['task_progress'] . '%</p>';
+        
+        if (!empty($task['description'])) {
+            $message .= '<p><strong>Description:</strong><br>' . nl2br($task['description']) . '</p>';
+        }
+        
+        $task_url = admin_url('project/tasks_details/' . $task['id']);
+        $message .= '<p><a href="' . $task_url . '" class="btn btn-primary">View Task</a></p>';
+        
+        // Send email
+        $this->email->initialize();
+        $this->email->from(get_option('smtp_email'), get_option('companyname'));
+        //$this->email->to($staff->email);
+		$this->email->to('vikashg@itio.in');
+        $this->email->subject($subject);
+        $this->email->message($message);
+        $this->email->send();
+    }
+    
+    /**
+     * Get task priority name
+     */
+    private function get_task_priority_name($priority_id)
+    {
+        $priorities = [
+            1 => 'Low',
+            2 => 'Medium', 
+            3 => 'High',
+            4 => 'Urgent'
+        ];
+        
+        return isset($priorities[$priority_id]) ? $priorities[$priority_id] : 'Unknown';
+    }
+    
+    /**
+     * Get task status name
+     */
+    private function get_task_status_name($status_id)
+    {
+        $this->db->select('name');
+        $this->db->from(db_prefix() . 'tasks_status');
+        $this->db->where('id', $status_id);
+        $status = $this->db->get()->row();
+        
+        return $status ? $status->name : 'Unknown';
     }
 
     private function hasTimeoutOccurred()

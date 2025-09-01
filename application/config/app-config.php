@@ -30,6 +30,7 @@ if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
 * --------------------------------------------------------------------------
 */
 define('APP_ENC_KEY', '7455bbb8733011a3d46f93921250e991');
+define('APP_CRON_KEY', '7455bbb8733011a3d46f93921250e991');
 
 /**
  * Database charset and collation
