@@ -15,8 +15,8 @@ class User_utility extends AdminController
      */
     public function index()
     {
-        if (!is_admin() && !has_permission('user_utility', '', 'view')) {
-            //access_denied('User Utility');
+        if (!is_admin() && !staff_can('view', 'user_utility')) {
+            access_denied('User Utility');
         }
 
         $data['forms'] = $this->user_utility_model->get_all_forms();
@@ -29,8 +29,8 @@ class User_utility extends AdminController
      */
     public function create()
     {
-        if (!is_admin() && !has_permission('user_utility', '', 'create')) {
-           // access_denied('User Utility');
+        if (!is_admin() && !staff_can('view', 'user_utility')) {
+            access_denied('User Utility');
         }
 
         if ($this->input->post()) {
@@ -89,8 +89,8 @@ class User_utility extends AdminController
      */
     public function edit($id)
     {
-        if (!is_admin() && !has_permission('user_utility', '', 'edit')) {
-            //access_denied('User Utility');
+        if (!is_admin() && !staff_can('view', 'user_utility')) {
+            access_denied('User Utility');
         }
 
         $form = $this->user_utility_model->get($id);
@@ -143,8 +143,8 @@ class User_utility extends AdminController
      */
     public function delete($id)
     {
-        if (!is_admin() && !has_permission('user_utility', '', 'delete')) {
-            //access_denied('User Utility');
+        if (!is_admin() && !staff_can('view', 'user_utility')) {
+            access_denied('User Utility');
         }
 
         $form = $this->user_utility_model->get($id);
@@ -168,8 +168,8 @@ class User_utility extends AdminController
      */
     public function view($id)
     {
-        if (!is_admin() && !has_permission('user_utility', '', 'view')) {
-           // access_denied('User Utility');
+       if (!is_admin() && !staff_can('view', 'user_utility')) {
+            access_denied('User Utility');
         }
 
         $form = $this->user_utility_model->get($id);

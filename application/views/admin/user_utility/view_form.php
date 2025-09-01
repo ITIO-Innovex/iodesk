@@ -146,7 +146,7 @@
                                 </div>
                                 
                                 <?php } ?>
-                               <?php if (is_admin()) { ?>
+                               <?php if (is_admin() || $form->created_by==get_staff_user_id()) { ?>
                                 <div class="form-group">
                                     <button type="submit" class="btn btn-success">
                                         <i class="fa fa-save"></i> Save Form Data

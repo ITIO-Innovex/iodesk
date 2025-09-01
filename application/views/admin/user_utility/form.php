@@ -17,7 +17,7 @@
                                 <h4 class="no-margin">
                                     <?php echo $title; ?>
                                     <a href="<?php echo admin_url('user_utility'); ?>" class="btn btn-default pull-right">
-                                        <i class="fa fa-arrow-left"></i> <?php echo _l('back'); ?>
+                                        <i class="fa fa-arrow-left"></i> <?php echo _l('Back'); ?>
                                     </a>
                                 </h4>
                                 <hr class="hr-panel-heading" />
@@ -120,7 +120,7 @@
                             <div class="col-md-12">
                                 <hr>
                                 <button type="submit" class="btn btn-info">
-                                    <?php echo isset($form) ? _l('update') : _l('save'); ?>
+                                    <?php echo isset($form) ? _l('Update') : _l('Save'); ?>
                                 </button>
                             </div>
                         </div>
