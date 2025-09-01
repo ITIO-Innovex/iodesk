@@ -15,26 +15,39 @@ class User_utility_model extends App_Model
     public function get_all_forms($where = [])
     {
         $this->db->select('*');
-		$this->db->group_start();
-		$this->db->where("FIND_IN_SET(".get_staff_user_id().", share_with) >", 0, FALSE); // FALSE = don't escape
-		$this->db->or_where('created_by', get_staff_user_id());
-		$this->db->group_end();
-		$this->db->where('is_deleted', 0);
-        $this->db->from(db_prefix() . 'user_utility_forms');
+		
         
         if (!empty($where)) {
             $this->db->where($where);
         }
         
         // Filter by company if not admin
-        if (!is_super()) {
-            $this->db->where('company_id', get_staff_company_id());
-        }
+        if (is_super()) {
+		
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		$this->db->where('company_id', $_SESSION['super_view_company_id']);
+		}else{
+		$this->db->where('company_id', get_staff_company_id());
+		}
+		
+            
+        }elseif (is_admin()) {
+		$this->db->where('company_id', get_staff_company_id());
+		}else{
+		$this->db->group_start();
+		$this->db->where("FIND_IN_SET(".get_staff_user_id().", share_with) >", 0, FALSE); // FALSE = don't escape
+		$this->db->or_where('created_by', get_staff_user_id());
+		$this->db->group_end();
+		}
+		
+		
+		$this->db->where('is_deleted', 0);
+        $this->db->from(db_prefix() . 'user_utility_forms');
         
         $this->db->order_by('date_created', 'DESC');
         //echo $this->db->get_compiled_select(); exit;
         return $this->db->get()->result(); //return 
-		echo $this->db->last_query();exit;
+		//echo $this->db->last_query();exit;
 		
     }
 
@@ -45,19 +58,28 @@ class User_utility_model extends App_Model
     {
 	
 	
-	     $this->db->group_start();
+	     
+		
+       
+           if (is_super()) {
+		
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		$this->db->where('company_id', $_SESSION['super_view_company_id']);
+		}else{
+		$this->db->where('company_id', get_staff_company_id());
+		}
+		
+            
+        }elseif (is_admin()) {
+		$this->db->where('company_id', get_staff_company_id());
+		}else{
+		$this->db->group_start();
 	    $this->db->where("FIND_IN_SET(".get_staff_user_id().", share_with) >", 0, FALSE); // FALSE = don't escape
 		$this->db->or_where('created_by', get_staff_user_id());
 		$this->db->group_end();
-		$this->db->where('id', $id);
+		}
+        $this->db->where('id', $id);
 		$this->db->where('is_deleted', 0);
-       
-        //$this->db->where('created_by', get_staff_user_id());
-        // Filter by company if not admin
-        if (!is_super()) {
-            $this->db->where('company_id', get_staff_company_id());
-        }
-        
         return $this->db->get(db_prefix() . 'user_utility_forms')->row();
 		//echo $this->db->last_query();exit;//return
     }
