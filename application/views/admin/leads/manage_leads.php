@@ -27,7 +27,7 @@
                         <div class="col-sm-5 ">
 						<?php if(isset($_SESSION['leads_page_type'])&&$_SESSION['leads_page_type']=='leads'){ ?>
                             <a href="#" class="btn btn-default btn-with-tooltip" data-toggle="tooltip"
-                                data-title="<?php echo _l(''); ?>" data-placement="top"
+                                data-title="<?php echo 'View your leads summary here.'; ?>" data-placement="top"
                                 onclick="slideToggle('.leads-overview'); return false;"><i
                                     class="fa fa-bar-chart"></i></a>
                             <?php /*?><a href="<?php echo admin_url('leads/switch_kanban/' . $switch_kanban); ?>"
@@ -40,7 +40,9 @@
                                 <?php } ?>
                             </a><?php */?>
                             <?php }else{  ?>
-                            <a href="#" onclick="return false;" class="btn btn-warning pull-left display-block mright10"><i class="fa-solid fa-handshake"></i> Deal</a>
+                            <?php /*?><a href="#" onclick="return false;" class="btn btn-warning pull-left display-block mright10"><i class="fa-solid fa-handshake"></i> Deal</a><?php */?>
+							
+<h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-flex tw-items-center tw-text-white mright10 display-block"><i class="fa-solid fa-handshake"></i><span> Deal</span></h4>
                             <?php /*?><a href="<?php echo admin_url('leads/switch_kanban_deal/' . $switch_kanban_deal); ?>"
                                 class="btn btn-default mleft5 hidden-xs" data-toggle="tooltip" data-placement="top"
                                 data-title="<?php echo $switch_kanban_deal == 1 ? _l('leads_switch_to_kanban') : _l('switch_to_list_view'); ?>">
