@@ -541,6 +541,18 @@ $('#start_date').on('change', function() {
 
 <script>
 	$('.editor').jqte();
+	
+	 $("#edit-project-form").on("submit", function(e){
+    let startDate = new Date($("#edit_start_date").val());
+    let endDate   = new Date($("#edit_deadline").val());
+
+    if(startDate > endDate){
+      e.preventDefault(); // stop form submit
+      alert("Start Date cannot be later than End Date.");
+      return false;
+    }
+  });
+  
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.min.js"></script>
