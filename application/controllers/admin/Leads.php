@@ -1952,6 +1952,9 @@ $data = [
     'process_addedon'  => date('Y-m-d H:i:s')
 ];
 
+
+
+
 if(exist_deal_process($deal_id,$deal_stage,get_staff_company_id())){
 // Update if record already exists for deal_id
     $this->db->where('deal_id', $deal_id);
@@ -1961,13 +1964,25 @@ if(exist_deal_process($deal_id,$deal_stage,get_staff_company_id())){
     $this->db->insert('it_crm_deals_process_list', $data);
 }
 
+
 // Build HTML table from array
 $table = '<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;">';
 foreach ($custom_data as $key => $value) {
-    $table .= '<tr>
-        <td style="font-weight:bold;background:#f6f6f6;">'.ucwords(str_replace('_',' ',htmlspecialchars($key))).'</td>
-        <td>'.(!empty($value) ? htmlspecialchars($value) : '<em>(empty)</em>').'</td>
-    </tr>';
+
+if($key=="deal_stage"){ $value=get_deals_stage_title($value);
+}elseif($key=="system_status"){ 
+ if($value==1){
+$value="Completed";
+}else{
+$value="Process";
+}
+
+}
+
+$table .= '<tr>
+<td style="font-weight:bold;background:#f6f6f6;">'.ucwords(str_replace('_',' ',htmlspecialchars($key))).'</td>
+<td>'.(!empty($value) ? htmlspecialchars($value) : '<em>(empty)</em>').'</td>
+</tr>';
 }
 $table .= '</table>';
 

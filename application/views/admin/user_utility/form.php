@@ -64,9 +64,10 @@
                                                 <div class="row">
                                                     <div class="col-md-4">
                                                         <label>Field Name</label>
-                                                        <input type="text" name="form_fields[<?php echo $index; ?>][name]" 
-                                                               class="form-control field-name" 
-                                                               value="<?php echo $field['name']; ?>" required>
+<input type="text" name="form_fields[<?php echo $index; ?>][name]" class="form-control field-name" value="<?php echo $field['name']; ?>"  onkeypress="return (event.charCode >= 65 && event.charCode <= 90)   ||  
+                           (event.charCode >= 97 && event.charCode <= 122) || 
+                           (event.charCode >= 48 && event.charCode <= 57)  ||  
+                           event.charCode == 32" required>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label>Field Type</label>
@@ -149,7 +150,7 @@ $(document).ready(function() {
                         <div class="col-md-4">
                             <label>Field Name</label>
                             <input type="text" name="form_fields[${fieldIndex}][name]" 
-                                   class="form-control field-name" required>
+class="form-control field-name"  onkeypress="return (event.charCode >= 65 && event.charCode <= 90)   || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode >= 48 && event.charCode <= 57)  ||  event.charCode == 32" required>
                         </div>
                         <div class="col-md-3">
                             <label>Field Type</label>
