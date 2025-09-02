@@ -216,7 +216,7 @@
                                             <?php 
                                             if (is_array($value)) {
                                                 echo implode(', ', $value);
-                                            } elseif (strpos($value, '.') !== false && file_exists('./uploads/user_utility/' . $value)) {
+                                            } elseif (!empty($value) && strpos((string)$value, '.') !== false && file_exists('./uploads/user_utility/' . $value)) {
                                                 echo '<a href="' . base_url('uploads/user_utility/' . $value) . '" target="_blank">' . $value . '</a>';
                                             } else {
                                                 echo $value;
