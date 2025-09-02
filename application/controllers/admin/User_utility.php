@@ -109,6 +109,12 @@ class User_utility extends AdminController
                     $share_with = implode(',', array_filter($share_with));
                 }
             }
+			
+			foreach ($form_fields as &$field) {
+            // Convert name - variable friendly format
+           $var_name = strtolower(str_replace(" ", "_", $field['name']));
+           $field['name'] = $var_name;
+           }
 
             if (empty($form_name) || empty($form_fields)) {
                 set_alert('danger', 'Form name and fields are required');
