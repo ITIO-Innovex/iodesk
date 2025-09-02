@@ -34,7 +34,8 @@
                         
                         <div class="row">
                             <div class="col-md-8">
-							 
+							 <?php echo form_open_multipart(current_url(), array('id' => 'dynamic-form')); ?>
+<input type="hidden" name="falsedata" value="1" />
                                 <?php foreach ($form->form_fields as $field) { 
                                     $field_name = $field['name'];
                                     $field_type = $field['type'];
@@ -42,8 +43,7 @@
                                     $field_value = isset($form->form_data[$field_name]) ? $form->form_data[$field_name] : '';
                                     $field_options = isset($field['options']) ? explode(',', $field['options']) : [];
                                 ?>
-<?php echo form_open_multipart(current_url(), array('id' => 'dynamic-form')); ?>
-<input type="hidden" name="falsedata" value="1" />
+
                                 <div class="form-group">
                                     <label for="<?php echo $field_name; ?>">
                                         <?php echo ucfirst(str_replace('_', ' ', $field_name)); ?>
