@@ -18,8 +18,8 @@ class Project extends AdminController
 
     public function index($status = '', $userid = '')
     {
-         if (!is_admin()) {
-            //access_denied('Project Statuses');
+        if (!is_admin() && !staff_can('project_project', 'project')) {
+            access_denied('Project');
         }
         
         // Load required models
@@ -37,9 +37,9 @@ class Project extends AdminController
 	
 	    public function tasks($id = '' , $sid = '')
         {
-			 if (!is_admin()) {
-				//access_denied('Project Statuses');
-			}
+			 if (!is_admin() && !staff_can('project_project', 'project')) {
+             access_denied('Project');
+             }
 		
         
         // Load required models
@@ -305,8 +305,9 @@ class Project extends AdminController
     /* Get project Collaboration Data */
     public function collaboration()
     {
-        if (!is_admin()) {
-            //access_denied('Project Collaboration');
+       
+		if (!is_admin() && !staff_can('project_collaboration', 'project')) {
+            access_denied('Project Collaboration');
         }
         
         $this->load->model('project_model');
