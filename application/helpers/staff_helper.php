@@ -124,6 +124,7 @@ function get_available_staff_permissions($data = [])
 			    'project_dashboard' => _l('Dashboard'),
 				'project_project' => _l('Project'),
                 'project_collaboration'=> _l('Collaboration'), 
+				'project_chat'=> _l('Chat'),
 				'project_status' => _l('Status'),
 				'project_group' => _l('Group'), ]),
         ],

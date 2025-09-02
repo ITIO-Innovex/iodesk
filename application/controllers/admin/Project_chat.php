@@ -9,8 +9,8 @@ class Project_chat extends AdminController
         parent::__construct();
         $this->load->model('project_chat_model');
         $this->load->library('form_validation');
-        if (!is_admin()) {
-            access_denied('project_chat');
+        if (!is_admin() && !staff_can('project_chat', 'project')) {
+            access_denied('Project Chat');
         }
     }
 

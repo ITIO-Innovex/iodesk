@@ -1114,7 +1114,7 @@ class Project_model extends App_Model
 		}elseif(is_admin()){
 		$this->db->where('pal.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pal.owner', get_staff_user_id());
+		$this->db->where('pal.staffid', get_staff_user_id());
 		}
 		
         $this->db->order_by('pal.date', 'DESC');
@@ -1135,7 +1135,7 @@ class Project_model extends App_Model
 		}elseif(is_admin()){
 		$this->db->where('pal.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pal.owner', get_staff_user_id());
+		$this->db->where('pal.staffid', get_staff_user_id());
 		}
         $this->db->order_by('pal.date', 'ASC');
         $logs = $this->db->get()->result_array();

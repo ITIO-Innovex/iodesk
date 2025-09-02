@@ -313,7 +313,7 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
-	if (staff_can('project_collaboration',  'project'))
+	if (staff_can('project_chat',  'project'))
    {
         $CI->app_menu->add_sidebar_children_item('project', [
             'slug'     => 'Chat',

@@ -74,6 +74,7 @@
                                                     <a href="<?php echo admin_url('project_chat/chatbox/' . $conversation['id']); ?>" class="btn btn-info btn-sm">
                                                         <i class="fa fa-comments" title="Chat"></i> 
                                                     </a>
+													<?php if (is_admin()) { ?>
                                                     <a href="<?php echo admin_url('project_chat/edit_conversation/' . $conversation['id']); ?>" class="btn btn-warning btn-sm">
                                                         <i class="fa fa-edit" title="Edit"></i> 
                                                     </a>
@@ -82,6 +83,7 @@
                                                        onclick="return confirm('Are you sure you want to delete this conversation? This action cannot be undone.')">
                                                         <i class="fa fa-trash" title="Delete"></i> 
                                                     </a>
+													<?php } ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
