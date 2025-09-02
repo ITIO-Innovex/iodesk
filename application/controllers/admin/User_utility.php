@@ -201,13 +201,9 @@ class User_utility extends AdminController
                             $form_data[$field_name] = $file_name;
                         }
                     }else{
-					$data = json_decode($formdata, true); // true = associative array
-					// Access document
-					if (isset($data['document']) && !empty($data['document'])) {
-						$form_data[$field_name] = $data['document'];
-					} else {
-						$form_data[$field_name] = 'dasdsad';
-					}
+					$files = json_decode($formdata, true); // true = associative array
+					//print_r($field_name);
+					$form_data[$field_name] = $files[$field_name];
 					
 					}
                 } elseif ($field_type === 'checkbox') {
@@ -216,7 +212,7 @@ class User_utility extends AdminController
                     $form_data[$field_name] = $this->input->post($field_name);
                 }
             }
-			
+			//exit;
 			//echo json_encode($form_data);exit;
 
             $update_data = [
