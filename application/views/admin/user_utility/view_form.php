@@ -43,6 +43,7 @@
                                     $field_options = isset($field['options']) ? explode(',', $field['options']) : [];
                                 ?>
 <?php echo form_open_multipart(current_url(), array('id' => 'dynamic-form')); ?>
+<input type="hidden" name="falsedata" value="1" />
                                 <div class="form-group">
                                     <label for="<?php echo $field_name; ?>">
                                         <?php echo ucfirst(str_replace('_', ' ', $field_name)); ?>
