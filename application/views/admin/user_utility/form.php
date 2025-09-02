@@ -54,7 +54,7 @@
                         
                         <div class="row">
                             <div class="col-md-12">
-                                <h5>Form Fields</h5>
+                                <h5>Form Fields (Each form field must have a unique name.)</h5>
                                 <div id="form-fields-container">
                                     <?php if (isset($form) && !empty($form->form_fields)) { 
                                         foreach ($form->form_fields as $index => $field) { ?>
