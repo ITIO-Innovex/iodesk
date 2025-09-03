@@ -463,7 +463,8 @@ unset($data['id']);
 			
             $this->db->order_by('date', 'desc');
             $notifications = $this->db->get(db_prefix() . 'notifications')->result_array();
-			//echo $this->db->last_query();exit;
+			//$lastqry=$this->db->last_query();
+			//log_message('error', 'MSG-' . $lastqry);
             $i             = 0;
             foreach ($notifications as $notification) {
                 if (($notification['fromcompany'] == null && $notification['fromuserid'] != 0) || ($notification['fromcompany'] == null && $notification['fromclientid'] != 0)) {
@@ -505,6 +506,7 @@ unset($data['id']);
                 $notifications[$i]['full_date']   = _dt($notification['date']);
                 $i++;
             } //$notifications as $notification
+			//log_message('error', 'where: ' . json_encode($notifications));
             echo json_encode($notifications);
             die;
         }

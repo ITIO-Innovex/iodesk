@@ -134,7 +134,7 @@
           } ?>">
                 <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
                     <?php echo _l('staff_profile_notifications'); ?>
-                    <a href="#" class="tw-font-normal tw-text-sm"
+                    <a href="#" class="tw-font-normal tw-text-sm tw-text-white"
                         onclick="mark_all_notifications_as_read_inline(); return false;"><?php echo _l('mark_all_as_read'); ?></a>
                 </h4>
                 <div id="notifications"
@@ -208,7 +208,7 @@ $(function() {
                 });
 
                 if (page >= total_pages - 1) {
-                    $(".loader").addClass("disabled");
+                    $(".loader").addClass("disabled33");
                 }
             }
         });

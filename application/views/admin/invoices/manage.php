@@ -22,7 +22,7 @@ $(function(){
 <script>
 setTimeout(function() {
     $(".sidebar").removeAttr("style");
-}, 50); // 5000 ms = 5 seconds
+}, 100); // 5000 ms = 5 seconds
 
 </script>
 </body>
