@@ -20,7 +20,7 @@ if ($status != Invoices_model::STATUS_PAID && $status != Invoices_model::STATUS_
 }
 
 // Add logo
-$info_left_column .= pdf_logo_url();
+$info_left_column .= pdf_logo_url($invoice->company_id);
 
 // Write top left logo and right column info/text
 pdf_multi_row($info_left_column, $info_right_column, $pdf, ($dimensions['wk'] / 2) - $dimensions['lm']);
