@@ -8,7 +8,7 @@ a:focus, a:hover {color: #CCCCCC !important;}
     <div class="content">
         <?php if (($staff_p->staffid == get_staff_user_id() || is_admin()) && !$this->input->get('notifications')) { ?>
         <div class="mbot30">
-            <?php $this->load->view('admin/staff/stats'); ?>
+            <?php //$this->load->view('admin/staff/stats'); ?>
         </div>
         <?php } ?>
         <div class="row">
