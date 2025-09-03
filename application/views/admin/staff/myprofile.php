@@ -2,6 +2,7 @@
 <?php init_head(); ?>
 <style>
 .btn.disabled {opacity: 1 !important;}
+a:focus, a:hover {color: #CCCCCC !important;}
 </style>
 <div id="wrapper">
     <div class="content">
