@@ -537,11 +537,13 @@ class Misc_model extends App_Model
 
     public function set_notification_read_inline($id)
     {
-        $this->db->where('touserid', get_staff_user_id());
+        //$this->db->where('touserid', get_staff_user_id());
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'notifications', [
-            'isread_inline' => 1,
+            'isread_inline' => 1,'isread' => 1,
         ]);
+		$lastqry=$this->db->last_query();
+			log_message('error', 'MSG-' . $lastqry);
     }
 
     public function set_desktop_notification_read($id)
