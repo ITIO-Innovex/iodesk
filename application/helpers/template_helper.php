@@ -302,10 +302,13 @@ window.addEventListener('load', function() {
  * @param  string $type       dark logo or light logo
  * @return mixed             string
  */
-function get_company_logo($uri = '', $href_class = '', $type = '')
+function get_company_logo($uri = '', $href_class = '', $type = '', $company_id = '')
 {
-   
-   if(!is_super() && is_staff_member()){
+//echo $company_id."XXXXXXX";exit;
+    if(isset($company_id) && !empty($company_id)){
+	$company_logo = get_staff_company_logo(8)?get_staff_company_logo(8) : get_option('company_logo') ;
+    $company_name = get_staff_company_name(8)?get_staff_company_name(8) : get_option('companyname') ;
+    }elseif(!is_super() && is_staff_member()){
     $company_logo = get_staff_company_logo()?get_staff_company_logo() : get_option('company_logo') ;
     $company_name = get_staff_company_name()?get_staff_company_name() : get_option('companyname') ;
 	}else{

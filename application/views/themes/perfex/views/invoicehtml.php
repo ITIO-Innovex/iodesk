@@ -1,12 +1,14 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-
+<?php defined('BASEPATH') or exit('No direct script access allowed'); //print_r($invoice); ?>
+<style>
+.tw-max-w-md { max-width:80% !important;}
+</style>
 <div class="mtop15 preview-top-wrapper">
     <div class="row">
         <div class="col-md-3">
             <div class="mbot30">
                 <div class="invoice-html-logo">
 				   
-					<?php echo get_company_logo(get_admin_uri() . '/', 'v-logo')?>
+					<?php echo get_company_logo(get_admin_uri() . '/', 'v-logo','',$invoice->company_id)?>
                 </div>
             </div>
         </div>
@@ -91,14 +93,14 @@
                         <?php echo format_customer_info($invoice, 'invoice', 'shipping'); ?>
                     </address>
                     <?php } ?>
-                    <p class="invoice-html-date tw-mb-0 tw-text-normal">
+                    <p class="invoice-html-date tw-mb-0 tw-text-normal tw-text-neutral-700">
                         <span class="tw-font-medium tw-text-neutral-700">
                             <?php echo _l('invoice_data_date'); ?>
                         </span>
                         <?php echo e(_d($invoice->date)); ?>
                     </p>
                     <?php if (!empty($invoice->duedate)) { ?>
-                    <p class="invoice-html-duedate tw-mb-0 tw-text-normal">
+                    <p class="invoice-html-duedate tw-mb-0 tw-text-normal tw-text-neutral-900">
                         <span class="tw-font-medium tw-text-neutral-700">
                             <?php echo _l('invoice_data_duedate'); ?>
                         </span>
@@ -106,7 +108,7 @@
                     </p>
                     <?php } ?>
                     <?php if ($invoice->sale_agent && get_option('show_sale_agent_on_invoices') == 1) { ?>
-                    <p class="invoice-html-sale-agent tw-mb-0 tw-text-normal">
+                    <p class="invoice-html-sale-agent tw-mb-0 tw-text-normal tw-text-neutral-700">
                         <span class="tw-font-medium tw-text-neutral-700"><?php echo _l('sale_agent_string'); ?>:</span>
                         <?php echo e(get_staff_full_name($invoice->sale_agent)); ?>
                     </p>
@@ -443,4 +445,7 @@ $(function() {
         online_payments.find('input').prop('checked', true);
     }
 });
+
+$("#vsidebar").hide();
+$("#varea").removeClass("col-sm-12 col-md-9 col-lg-10").addClass("tw-max-w-md tw-mx-auto tw-pt-24 authentication-form-wrapper tw-relative tw-z-20 out-form");
 </script>

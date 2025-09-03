@@ -40,7 +40,7 @@ function load_pdf_language($clientLanguage)
  * Additional statements applied because this function wont work on all servers. All depends how the server is configured.
  * @return string
  */
-function pdf_logo_url()
+function pdf_logo_url($company_id = '')
 {
     $custom_pdf_logo_image_url = get_option('custom_pdf_logo_image_url');
     $width                     = get_option('pdf_logo_width');
@@ -55,8 +55,9 @@ function pdf_logo_url()
         $logoUrl = $custom_pdf_logo_image_url;
     } else {
 	
-	    if(!is_super() && is_staff_member()){
-		
+	    if(isset($company_id) && !empty($company_id)){
+		$logoUrl = get_staff_company_logo($company_id)?$companyUploadPath . get_staff_company_logo($company_id) : get_option('company_logo') ;
+	    }elseif(!is_super() && is_staff_member()){
     	$logoUrl = get_staff_company_logo()?$companyUploadPath . get_staff_company_logo() : get_option('company_logo') ;
 	    }else{
 		
