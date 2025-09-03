@@ -4144,4 +4144,11 @@ $lang['no_projects_found'] = 'No project found';
 $lang['edit_group'] = 'Edit Project Group';
 $lang['no_records_found'] = 'No records found';
 $lang['new'] = 'New';
+$lang['Dashboard'] = 'Dashboard';
+$lang['Project'] = 'Project';
+$lang['Tasks'] = 'Tasks';
+$lang['Collaboration'] = 'Collaboration';
+$lang['Chat'] = 'Chat';
+$lang['Deal Stages'] = 'Deal Stages';
+$lang['Project Title'] = 'Project Title';
 ?>

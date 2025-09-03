@@ -46,8 +46,10 @@
 
                 $i = 0;
                 foreach ($additional_data as $data) {
-                    if (strpos($data, '<lang>') !== false) {
-                        $lang = get_string_between($data, '<lang>', '</lang>');
+                    if (strpos((string)$data, '<lang>') !== false) {
+					
+                        //$lang = get_string_between($data, '<lang>', '</lang>');
+						$lang = get_string_between((string)$data, '<lang>', '</lang>');
                         $temp = _l($lang);
                         if (strpos($temp, 'project_status_') !== false) {
                             $status = get_project_status_by_id(strafter($temp, 'project_status_'));

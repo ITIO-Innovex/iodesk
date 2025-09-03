@@ -55,7 +55,7 @@ $rules[] = App_table_filter::new('assigned', 'SelectRule')->label(_l('ticket_ass
         })->all();
     });
 //echo "============>>>".rand();exit;
-log_message('error', 'STAGE 1');
+//log_message('error', 'STAGE 1');
 return App_table::find('project')
     ->outputUsing(function ($params) use ($statuses) {
         extract($params);
