@@ -923,7 +923,7 @@ function app_init_admin_sidebar_menu_items()
     }
 
     // Database Backup menu item (Super only)
-    if (is_super()) {
+    if (is_admin()) {
         $CI->app_menu->add_setup_menu_item('database_backups', [
             'href'     => admin_url('database_backups'),
             'name'     => 'DB Backup',

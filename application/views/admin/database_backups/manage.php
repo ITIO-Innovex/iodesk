@@ -25,7 +25,14 @@
                 <div class="panel_s">
                     <div class="panel-body">
                         <div class="tw-mb-4">
-                            <?php echo form_open(admin_url('database_backups/export_backup'), ['id' => 'backup-form']); ?>
+                            <?php 
+							if(is_super()){
+							echo form_open(admin_url('database_backups/export_backup'), ['id' => 'backup-form']); 
+							}else if(is_admin()){
+							echo form_open(admin_url('database_backups/export_db_data'), ['id' => 'backup-form']); 
+							}
+							
+							?>
                             <button type="submit" class="btn btn-primary" id="export-backup-btn">
                                 <i class="fa fa-download tw-mr-1"></i>
                                 Export Backup
@@ -40,7 +47,7 @@
                         </div>
                     </div>
                 </div>
-
+ <?php  if(is_super()){ ?>
                 <div class="panel_s">
                     <div class="panel-body">
                         <h5 class="tw-font-semibold tw-mb-3">Previous Backups</h5>
@@ -90,6 +97,7 @@
                         <?php } ?>
                     </div>
                 </div>
+ <?php  } ?>
             </div>
         </div>
     </div>

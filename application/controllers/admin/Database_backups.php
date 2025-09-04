@@ -11,7 +11,7 @@ class Database_backups extends AdminController
         $this->load->library('zip');
         
         // Only allow admin access
-        if (!is_super()) {
+        if (!is_admin()) {
             access_denied('Database Backups');
         }
     }
@@ -22,7 +22,96 @@ class Database_backups extends AdminController
         $data['backups'] = $this->get_backup_files();
         $this->load->view('admin/database_backups/manage', $data);
     }
+    public function export_db_data()
+    {
+	
+	     // Load DB config from CI
+        $host = $this->db->hostname;
+        $user = $this->db->username;
+        $pass = $this->db->password;
+        $db   = $this->db->database;
 
+        // Get company ID from helper
+        $companyId = get_staff_company_id();
+
+        // Connect with mysqli (for INFORMATION_SCHEMA queries)
+        $conn = new mysqli($host, $user, $pass, $db);
+        if ($conn->connect_error) {
+            show_error("Database connection failed: " . $conn->connect_error);
+        }
+
+        // Get tables with company_id column
+        $sql = "SELECT TABLE_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = '$db' 
+                  AND COLUMN_NAME = 'company_id'";
+        $result = $conn->query($sql);
+
+        if (!$result || $result->num_rows === 0) {
+            show_error("No tables found with company_id column.");
+        }
+
+        // File paths
+        $sqlFile = "company{$companyId}_backup_" . date("Ymd_His") . ".sql";
+        $fp = fopen($sqlFile, "w");
+
+        // Loop tables
+        while ($row = $result->fetch_assoc()) {
+            $table = $row['TABLE_NAME'];
+            fwrite($fp, "\n-- Dumping data from $table (company_id=$companyId)\n");
+
+            // CREATE TABLE
+            $createTableRes = $conn->query("SHOW CREATE TABLE `$table`");
+            $createRow = $createTableRes->fetch_assoc();
+            fwrite($fp, "DROP TABLE IF EXISTS `$table`;\n");
+            fwrite($fp, $createRow['Create Table'] . ";\n\n");
+
+            // Table data
+            $dataRes = $conn->query("SELECT * FROM `$table` WHERE company_id=$companyId");
+            if ($dataRes && $dataRes->num_rows > 0) {
+                while ($dataRow = $dataRes->fetch_assoc()) {
+                    $cols = array_map(function ($v) use ($conn) {
+                        return "`" . $conn->real_escape_string($v) . "`";
+                    }, array_keys($dataRow));
+
+                    $vals = array_map(function ($v) use ($conn) {
+                        if ($v === null) return "NULL";
+                        return "'" . $conn->real_escape_string($v) . "'";
+                    }, array_values($dataRow));
+
+                    $insertSQL = "INSERT INTO `$table` (" . implode(", ", $cols) . ") VALUES (" . implode(", ", $vals) . ");\n";
+                    fwrite($fp, $insertSQL);
+                }
+            }
+            fwrite($fp, "\n");
+        }
+
+        fclose($fp);
+        $conn->close();
+
+        // Create ZIP
+        $zipFile = str_replace(".sql", ".zip", $sqlFile);
+        $zip = new ZipArchive();
+        if ($zip->open($zipFile, ZipArchive::CREATE) === TRUE) {
+            $zip->addFile($sqlFile, basename($sqlFile));
+            $zip->close();
+            unlink($sqlFile); // remove raw SQL
+        } else {
+            show_error("Could not create ZIP file.");
+        }
+
+        // Force download
+        $this->load->helper('download');
+        header('Content-Type: application/zip');
+        header('Content-Disposition: attachment; filename="' . basename($zipFile) . '"');
+        header('Content-Length: ' . filesize($zipFile));
+        readfile($zipFile);
+
+        // Cleanup
+        unlink($zipFile);
+        exit;
+	
+	}
     public function export_backup()
     {
         try {
