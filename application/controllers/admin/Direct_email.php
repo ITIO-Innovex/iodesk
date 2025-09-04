@@ -1,6 +1,11 @@
 <?php
-//use app\services\imap\Imap;
 defined('BASEPATH') or exit('No direct script access allowed');
+use Webklex\PHPIMAP\ClientManager;
+use Webklex\PHPIMAP\Client;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once APPPATH.'/vendor/vendor/autoload.php';
 
 class Direct_email extends AdminController
 {
@@ -24,7 +29,9 @@ class Direct_email extends AdminController
 		$bulkEmails = array_map(function($email) {
 			return ['Email' => $email];
 		}, $emailArray);
-		$response=$this->send_attchment_message1($bulkEmails,$email_subject,$email_message); 
+		//$response=$this->send_attchment_message1($bulkEmails,$email_subject,$email_message); 
+		//log_message('error', 'sendMail' . $email_subject);
+		$response=$this->send_attchment_message_by_smpt($bulkEmails,$email_subject,$email_message); 
 	   $pst['msg'] = "Your message has been successfully sent to " . $email_to;
 	   $pst['response'] = $response;
 	   echo json_encode($pst);
@@ -33,7 +40,8 @@ class Direct_email extends AdminController
         $email_from='PAYCLY <info@paycly.com>';
         $email_reply='PAYCLY <info@paycly.com>';
         // TechWizard Logic
-        $apiKey = '66D2CD590806CC7B4D826B621729CCDE154FB77DB40D9C50B3ABD1A00E56B1DE5FCB29FD311552A0FCE88D9D1378764F';
+        //$apiKey = '66D2CD590806CC7B4D826B621729CCDE154FB77DB40D9C50B3ABD1A00E56B1DE5FCB29FD311552A0FCE88D9D1378764F';
+		$apiKey = '2BEC2EC03749B5A74BBDC1C95365EB21BFFEAFF64ED98FE02BD67740D05A1686D5BAD64D530E82374E324CE437C8FF68'; //vikash
         $url = 'https://api.elasticemail.com/v4/emails';
         $postData = [
             'Recipients' => $bulkEmails,
@@ -76,4 +84,48 @@ class Direct_email extends AdminController
         return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
         // TechWizard logic End
     }
+	
+	function send_attchment_message_by_smpt($bulkEmails, $email_subject, $email_message) {
+    $subject = $email_subject;
+    $body = $email_message;
+
+    $mailer_smtp_host = "smtppro.zoho.in";//smtp-relay.brevo.com
+    $mailer_smtp_port = 465; // use 465 if you want SSL 587
+    $mailer_username  = "mailers@itio.in";//7a1e20002@smtp-brevo.com
+    $mailer_password  = "India@992@@";//Y2FnXGDyZvRBbzAr
+    $senderEmail 	  = "mailers@itio.in";
+    $senderName       = "CRM";
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->isSMTP();
+        $mail->Host       = $mailer_smtp_host;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $mailer_username;
+        $mail->Password   = $mailer_password;
+        //Match security with port
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = $mailer_smtp_port;
+        $mail->isHTML(true);
+        $mail->CharSet = 'UTF-8';
+        $mail->setFrom($senderEmail, $senderName);
+        $mail->addAddress('vikashg@bigit.io');
+        //foreach ($bulkEmails as $email) {
+            //$mail->addAddress($email);
+        //}
+		//log_message('error', '!!!'.$email_subject);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+		//log_message('error', 'subject'.$subject);
+		//log_message('error', 'Body'.$body);
+        $mail->SMTPDebug = 2; 
+        $mail->Debugoutput = 'error_log';
+        $mail->send();
+        log_message('error', 'Email Sent');
+        return true;
+    } catch (Exception $e) {
+        log_message('error', 'Email could not be sent. Error: ' . $mail->ErrorInfo);
+        return false;
+    }
+}
 }

@@ -241,15 +241,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }
 
-    if (is_staff_member() && staff_can('webmail_setup',  'webmail')) {
-		$CI->app_menu->add_sidebar_menu_item('webmail-setup', [
-			'name'     => _l('Webmail Setup'),
-			'href'     => admin_url('webmail_setup'),
-			'icon'     => 'fa-solid fa-at',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
+    
 
     if (is_staff_member() && staff_can('view',  'ai_support')) {
 		$CI->app_menu->add_sidebar_menu_item('ai-content-generator', [
@@ -365,7 +357,7 @@ function app_init_admin_sidebar_menu_items()
 		$CI->app_menu->add_sidebar_menu_item('conversion', [
 			'collapse' => true,
 			'name'     => _l('lead_conversion'),
-			'position' => 20,
+			'position' => 45,
 			'icon'     => 'fas fa-comments',
 			'badge'    => [],
 		]);
@@ -490,8 +482,8 @@ function app_init_admin_sidebar_menu_items()
         $CI->app_menu->add_sidebar_menu_item('user-utility', [
             'name'     => 'User Utility',
             'href'     => admin_url('user_utility'),
-            'icon'     => 'fa-solid fa-wrench',
-            'position' => 58,
+            'icon'     => 'fa-solid fa-file-zipper',
+            'position' => 40,
             'badge'    => [],
         ]);
     }
@@ -918,6 +910,16 @@ function app_init_admin_sidebar_menu_items()
             'position' => 20,
             'badge'    => [],
         ]);
+    }
+	
+	if (is_staff_member() && staff_can('webmail_setup',  'webmail')) {
+		$CI->app_menu->add_setup_menu_item('webmail-setup', [
+			'name'     => _l('Webmail Setup'),
+			'href'     => admin_url('webmail_setup'),
+			'icon'     => 'fa-solid fa-at',
+			'position' => 60,
+			'badge'    => [],
+		]);
     }
 
     // Database Backup menu item (Super only)
