@@ -6,7 +6,7 @@
             <div class="col-md-12">
                 <div class="tw-mb-2 sm:tw-mb-4">
                     <h4 class="tw-font-semibold tw-mt-0 tw-text-neutral-800">
-                        <?php echo $title; ?> <?php echo $backup_dir = FCPATH . 'backups' . DIRECTORY_SEPARATOR; ?>
+                        <?php echo $title; ?> <?php //echo $backup_dir = FCPATH . 'backups' . DIRECTORY_SEPARATOR; ?>
                     </h4>
                 </div>
 
