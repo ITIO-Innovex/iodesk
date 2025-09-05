@@ -8,6 +8,120 @@
          $initial_column = 'col-lg-4';
          
          ?>
+		 
+		 <?php if($departmentsID==8){ ?>
+<?php if (is_staff_member()) { ?>
+<?php
+                  $this->db->from(db_prefix() . 'user_utility_forms');
+                    if (is_super()) {
+					if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+				  $this->db->where('company_id', $_SESSION['super_view_company_id']);
+				  }
+				  }elseif (is_admin()) {
+				  $this->db->where('company_id', get_staff_company_id());
+				  }else{
+				  $this->db->where('company_id', get_staff_company_id());
+				  $this->db->where('created_by', get_staff_user_id());
+				  }
+                    
+$this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, COUNT(CASE WHEN status = 2  THEN 1 END) AS process_count");
+                    
+					
+                    $row = $this->db->get()->row();
+			
+				//echo $this->db->last_query();exit;
+				//echo $row->new_count;
+                   
+                  ?>
+        <div class="quick-stats-leads col-xs-12 col-md-6 col-sm-6 col-lg-6 tw-mb-2 sm:tw-mb-0">
+            <div class="top_stats_wrapper">
+                
+                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
+                        <i class="fa-solid fa-circle-info menu-icon fa-2x text-info"></i>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Total Task</span>
+                    </div>
+                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<span title="Success Invoice"><?php echo ($row->success_count  + $row->process_count);?></span>
+                    </span>
+                </div>
+				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
+                        <i class="fa-solid fa-record-vinyl menu-icon fa-2x text-warning"></i>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Process Task</span>
+                    </div>
+                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<span title="Success Invoice"><?php echo ($row->process_count);?></span>
+                    </span>
+                </div>
+				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
+                        <i class="fa-solid fa-circle-check menu-icon fa-2x text-success"></i>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Success Task</span>
+                    </div>
+                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<span title="Success Invoice"><?php echo ($row->success_count);?></span>
+                    </span>
+                </div>
+				
+            </div>
+        </div>
+		<div class="quick-stats-leads col-xs-12 col-md-6 col-sm-6 col-lg-6 tw-mb-2 sm:tw-mb-0">
+            <div class="top_stats_wrapper">
+                
+                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
+                        <i class="fa-solid fa-receipt menu-icon fa-2x"></i>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Task Status</span>
+                    </div>
+                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<span title="Success Task"><?php echo $row->success_count;?></span> / <span title="Process Task"><?php echo ($row->success_count  + $row->process_count);?></span>
+                    </span>
+                </div>
+				<script type="text/javascript">
+
+      // Load Charts and the corechart package.
+      google.charts.load('current', {'packages':['corechart']});
+
+      // Draw the pie chart for Sarah's pizza when Charts is loaded.
+      google.charts.setOnLoadCallback(drawLeadsChart);
+
+     
+
+      // Callback that draws the pie chart for Sarah's pizza.
+      function drawLeadsChart() {
+
+        // Create the data table for Sarah's pizza.
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Topping');
+        data.addColumn('number', 'Slices');
+        data.addRows([
+          ['Process', <?php echo $row->process_count;?>],
+          ['Completed', <?php echo $row->success_count;?>]
+          
+        ]);
+
+        // Set options for Sarah's pie chart.
+        var options = {title:'Task by Status',
+		               width:400,
+					   height:400,
+					   legend:'bottom',
+					   colors: ['#008000', '#FEBE10']
+					   };
+                       
+                       
+
+        // Instantiate and draw the chart for Sarah's pizza.
+        var chart = new google.visualization.PieChart(document.getElementById('Task_chart_div'));
+        chart.draw(data, options);
+      }
+    </script> 
+	<div id="Task_chart_div" style="border: 1px solid #ccc"></div>
+            </div>
+        </div>
+        <?php } ?>
+<?php }else{ ?>
+
         <?php if (is_staff_member()) { ?>
 		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 <?php echo e($initial_column); ?> tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
@@ -415,7 +529,7 @@ $iwhere="";
         <?php } ?>
 		
 		
-        
+<?php } ?>        
         
     </div>
 </div>
