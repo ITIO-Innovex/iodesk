@@ -17,6 +17,13 @@ class Dashboard extends AdminController
         $this->load->model('departments_model');
         $this->load->model('todo_model');
         $data['departments'] = $this->departments_model->get();
+		$data['departmentsID'] = $this->departments_model->get_staff_departments(get_staff_user_id(), true);
+
+if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
+    $data['departmentsID'] = $data['departmentsID'][0];
+} else {
+    $data['departmentsID'] = null; // or set a default department ID
+}
 
         $data['todos'] = $this->todo_model->get_todo_items(0);
         // Only show last 5 finished todo items
