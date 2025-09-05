@@ -8,6 +8,7 @@
     <div class="content">
         <div class="row">
             <div class="col-md-12">
+			<div id="loader-project"><i class="fa-solid fa-spinner fa-spin fa-5x text-warning"></i></div>
                 <div class="panel_s">
                     <div class="panel-body">
                         
@@ -21,6 +22,10 @@
                                     <a href="<?php echo admin_url('user_utility/edit/' . $form->id); ?>" class="btn btn-info pull-right" style="margin-right: 10px;">
                                         <i class="fa fa-edit"></i> Edit Form
                                     </a>
+<select class="form-control pull-right document-status-select" data-doc-id="<?php echo $form->id;?>" name="doc_status" style="width:100px;margin-right: 10px;color:#FFFFFF; <?php if($form->status == 2){ ?> background:#FF0000;  <?php  }else{?> background:#00CC33; <?php } ?>"  title="Document Status">
+<option value="2" <?php if($form->status == 2){ ?>  selected="selected" <?php  } ?>>Process</option>
+<option value="1" <?php if($form->status == 1){ ?>  selected="selected" <?php  } ?>>Completed</option>
+</select>
                                 </h4>
                                 <hr class="hr-panel-heading" />
                             </div>
@@ -158,7 +163,7 @@
 
 <div class="tw-p-2 mail-bg tw-rounded">
 <div class="form-group tw-p-2">							
-<a class="btn btn-danger tw-p-2 pull-right" id="toggleCommentBtn">Add Comment</a>
+<a class="btn btn-danger tw-p-2 pull-right" id="toggleCommentBtn">Add Comment / Reply</a>
 </div>
 <div class="clearfix"></div>
 <!-- Comment Form (hidden by default) -->

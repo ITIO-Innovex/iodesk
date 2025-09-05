@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-use Webklex\PHPIMAP\ClientManager;
-use Webklex\PHPIMAP\Client;
+//use Webklex\PHPIMAP\ClientManager;
+//use Webklex\PHPIMAP\Client;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -25,18 +25,18 @@ class Direct_email extends AdminController
         $email_to=$_POST['email'];
 		$email_subject=$_POST['subject'];
 		$email_message="<html>".$_POST['message']."</html>";
-		$emailArray = explode(";",$email_to);
-		$bulkEmails = array_map(function($email) {
-			return ['Email' => $email];
-		}, $emailArray);
+		//$emailArray = explode(";",$email_to);
+		//$bulkEmails = array_map(function($email) {
+			//return ['Email' => $email];
+		//}, $emailArray);
 		//$response=$this->send_attchment_message1($bulkEmails,$email_subject,$email_message); 
 		//log_message('error', 'sendMail' . $email_subject);
-		$response=$this->send_attchment_message_by_smpt($bulkEmails,$email_subject,$email_message); 
+		$response=$this->send_attchment_message_by_smtp($email_to,$email_subject,$email_message); 
 	   $pst['msg'] = "Your message has been successfully sent to " . $email_to;
 	   $pst['response'] = $response;
 	   echo json_encode($pst);
     }
-    function send_attchment_message1($bulkEmails,$email_subject,$email_message){
+    /*function send_attchment_message1($bulkEmails,$email_subject,$email_message){
         $email_from='PAYCLY <info@paycly.com>';
         $email_reply='PAYCLY <info@paycly.com>';
         // TechWizard Logic
@@ -83,9 +83,9 @@ class Direct_email extends AdminController
         }
         return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
         // TechWizard logic End
-    }
+    }*/
 	
-	function send_attchment_message_by_smpt($bulkEmails, $email_subject, $email_message) {
+	function send_attchment_message_by_smtp($bulkEmails, $email_subject, $email_message) {
     $subject = $email_subject;
     $body = $email_message;
 
@@ -94,7 +94,7 @@ class Direct_email extends AdminController
     $mailer_username  = "mailers@itio.in";//7a1e20002@smtp-brevo.com
     $mailer_password  = "India@992@@";//Y2FnXGDyZvRBbzAr
     $senderEmail 	  = "mailers@itio.in";
-    $senderName       = "CRM";
+    $senderName       = get_staff_company_name() ? get_staff_company_name() : 'Mailert CRM';
     $mail = new PHPMailer(true);
 
     try {
@@ -103,29 +103,45 @@ class Direct_email extends AdminController
         $mail->SMTPAuth   = true;
         $mail->Username   = $mailer_username;
         $mail->Password   = $mailer_password;
-        //Match security with port
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = $mailer_smtp_port;
+		$port_config = [
+    					587 => PHPMailer::ENCRYPTION_STARTTLS,
+    					465 => PHPMailer::ENCRYPTION_SMTPS,
+    					25  => false
+		];
+
+		$mail->SMTPSecure = $port_config[$mailer_smtp_port] ?? false;
+		$mail->Port       = $mailer_smtp_port;
+
+
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->setFrom($senderEmail, $senderName);
-        $mail->addAddress('vikashg@bigit.io');
-        //foreach ($bulkEmails as $email) {
-            //$mail->addAddress($email);
-        //}
+        //$mail->addAddress('vikashg@bigit.io,vikashg@itio.in');
+		$bulkEmails=str_replace(";",",",$bulkEmails);
+		$recipients = explode(",", $bulkEmails);
+        // Add each email to PHPMailer
+		foreach ($recipients as $email) {
+			$email = trim($email); // remove spaces
+			if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+				$mail->addAddress($email);
+			}
+		}
 		//log_message('error', '!!!'.$email_subject);
         $mail->Subject = $subject;
         $mail->Body    = $body;
-		//log_message('error', 'subject'.$subject);
-		//log_message('error', 'Body'.$body);
-        $mail->SMTPDebug = 2; 
-        $mail->Debugoutput = 'error_log';
+        //$mail->SMTPDebug = 2; 
+        //$mail->Debugoutput = 'error_log';
         $mail->send();
-        log_message('error', 'Email Sent');
-        return true;
+        //log_message('error', 'Email Sent');
+        //return true;
+		$http_code=200;
+		$response='Success';
+		return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
     } catch (Exception $e) {
-        log_message('error', 'Email could not be sent. Error: ' . $mail->ErrorInfo);
-        return false;
+        log_message('error', 'Email could not be sent. Error: ' . $mail->ErrorInfo .''.$mail->SMTPDebug);
+        $http_code=400;
+		$response='Failed';
+		return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
     }
 }
 }

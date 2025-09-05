@@ -271,4 +271,15 @@ class User_utility_model extends App_Model
 		$this->db->order_by('date_created', 'DESC');
         return $this->db->get(db_prefix() . 'user_utility_comments')->result();
     }
+	
+	public function update_doc_status($id, $status)
+    {
+        $this->db->where('id', $id);
+		$this->db->update(db_prefix() . 'user_utility_forms', ['status' => $status]);
+		if ($this->db->affected_rows() > 0) {
+            log_activity('Change Team Document Status [ID: ' . $id . ']');
+			return true;
+        }
+		return false;
+    }
 }

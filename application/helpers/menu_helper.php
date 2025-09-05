@@ -222,9 +222,9 @@ function app_init_admin_sidebar_menu_items()
     // Direct Email
     if (is_staff_member() && staff_can('direct_email_view',  'direct_email')) {
 		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
-			'name'     => 'Direct-Email',
+			'name'     => 'Direct Email',
 			'href'     => admin_url('direct_email'),
-			'icon'     => 'fa-regular fa-envelope',
+			'icon'     => 'fa-solid fa-envelopes-bulk',
 			'position' => 45,
 			'badge'    => [],
 		]);
@@ -480,7 +480,7 @@ function app_init_admin_sidebar_menu_items()
 
     if (is_admin() || staff_can('view', 'user_utility')) {
         $CI->app_menu->add_sidebar_menu_item('user-utility', [
-            'name'     => 'User Utility',
+            'name'     => 'Team Document',
             'href'     => admin_url('user_utility'),
             'icon'     => 'fa-solid fa-file-zipper',
             'position' => 40,
@@ -629,13 +629,13 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 
-        $CI->app_menu->add_setup_children_item('support', [
+        /*$CI->app_menu->add_setup_children_item('support', [
             'slug'     => 'departments',
             'name'     => _l('acs_departments'),
             'href'     => admin_url('departments'),
             'position' => 5,
             'badge'    => [],
-        ]);
+        ]);*/
 		
 		$CI->app_menu->add_setup_children_item('support', [
             'slug'     => 'tickets-predefined-replies',
@@ -931,5 +931,13 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa fa-database',
             'badge'    => [],
         ]);
+		$CI->app_menu->add_setup_menu_item('department', [
+            'href'     => admin_url('departments'),
+            'name'     => 'departments',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-address-card',
+            'badge'    => [],
+        ]);
+		
     }
 }

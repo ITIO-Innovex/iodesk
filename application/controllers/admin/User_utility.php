@@ -288,5 +288,26 @@ class User_utility extends AdminController
         redirect(admin_url('user_utility/view/18'));
 		}
     }
+	
+	public function update_doc_status() {
+        if (!$this->input->is_ajax_request() || !$this->input->post('doc_id') || !$this->input->post('status')) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $doc_id = $this->input->post('doc_id');
+        $status_id = $this->input->post('status');
+        $success = $this->user_utility_model->update_doc_status($doc_id, $status_id);
+        $color = null;
+        if ($success) {
+		     if($status_id==1){
+            $status = 'Completed';
+            $color = '#00CC33';
+			}else{
+			$status = 'Process';
+            $color = '#FF0000';
+			}
+        }
+        echo json_encode(['success' => $success, 'color' => $color]);
+    }
 
 }
