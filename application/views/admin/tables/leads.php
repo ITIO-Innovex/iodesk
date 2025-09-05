@@ -279,7 +279,7 @@ return App_table::find('leads')
 
             $row[] = '<div class="checkbox"><input type="checkbox" value="' . $aRow['id'] . '"><label></label></div>';
 
-            $hrefAttr = 'href="' . admin_url('leads/index/' . $aRow['id']) . '" onclick="init_lead(' . $aRow['id'] . ');return false;"';
+            $hrefAttr = 'href="' . admin_url('leads/index/' . $aRow['id']) . '" class="eloader" onclick="init_lead(' . $aRow['id'] . ');return false;"';
             
 			$row[]    = $reminderx .'&nbsp;&nbsp;<a ' . $hrefAttr . '>' . $i++ .'</a>';
 

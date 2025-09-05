@@ -26,7 +26,8 @@
                                         <th><?php echo _l('id'); ?></th>
                                         <th><?php echo _l('name'); ?></th>
                                         <th>Fields Count</th>
-                                        <th>Has Data</th>
+                                        <th>Status</th>
+										<th>Has Data</th>
                                         <th><?php echo _l('date_created'); ?></th>
                                         <th><?php echo _l('options'); ?></th>
                                     </tr>
@@ -36,6 +37,7 @@
                                         $form_fields = json_decode($form->form_fields, true);
                                         $fields_count = is_array($form_fields) ? count($form_fields) : 0;
                                         $has_data = !empty($form->form_data);
+										$status = !empty($form->status) ? $form->status : 2;
                                     ?>
                                     <tr>
                                         <td><?php echo $form->id; ?></td>
@@ -46,6 +48,13 @@
                                         </td>
                                         <td><?php echo $fields_count; ?></td>
                                         <td>
+                                            <?php if ($status==1) { ?>
+                                                <span class="label label-success">Completed</span>
+                                            <?php } else { ?>
+                                                <span class="label label-default">Process</span>
+                                            <?php } ?>
+                                        </td>
+										 <td>
                                             <?php if ($has_data) { ?>
                                                 <span class="label label-success">Yes</span>
                                             <?php } else { ?>

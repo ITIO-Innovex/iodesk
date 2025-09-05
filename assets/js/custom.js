@@ -261,6 +261,43 @@ $(document).on('change', '.task-status-select', function() {
   });
 });
 
+$(document).on('change', '.document-status-select', function() {
+  if (!confirm("Are you sure you want to change document status?")) {return false; }
+  var $select = $(this);
+  var docId = $select.data('doc-id');
+  var newStatus = $select.val();
+  $("#loader-project").fadeIn();
+  $select.prop('disabled', true);
+  //alert(docId);
+  // alert(newStatus);
+  $.ajax({
+    url: window.admin_url + 'user_utility/update_doc_status',
+    method: 'POST',
+    data: { doc_id: docId, status: newStatus },
+    dataType: 'json',
+    success: function(res) {
+      if(res.success) {
+        var color = res.color || '#666';
+        $select.css({background: color});
+		$select.closest('td').css({background: color});
+        showFlashMessage('Document status saved successfully!', 'success');
+      } else {
+        showFlashMessage('Failed to update Document status!', 'failed');
+      
+      }
+	  $("#loader-project").fadeOut();
+    },
+    error: function() {
+      //if(window.toastr) toastr.error('Failed to update task status');
+	  showFlashMessage('Failed to update task status!', 'failed');
+	  $("#loader-project").fadeOut();
+    },
+    complete: function() {
+      $select.prop('disabled', false);
+    }
+  });
+});
+
 $(document).on('change', '.task-priority-select', function() {
   if (!confirm("Are you sure you want to change priority?")) {return false; }
   var $select = $(this);
