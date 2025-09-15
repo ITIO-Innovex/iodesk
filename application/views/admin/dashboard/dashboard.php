@@ -13,7 +13,8 @@
 //$this->load->model('departments_model');
 //$xxx=$this->departments_model->get_staff_departments(get_staff_user_id(), true);
 //echo $xxx[0];
-echo $departmentsID;
+//echo $departmentsID;
+echo get_departments_id();
 ?>
 
 <?php init_head(); ?>
@@ -66,7 +67,7 @@ echo $departmentsID;
 		<div class="col-md-12 mtop20">
 		<a href="<?php echo admin_url('staff/companies');?>" class="fancy-btn"><i class="fa-solid fa-building-user menu-icon"></i> Add New Company</a>
 		</div>
-		<?php }elseif(is_admin()){ ?>
+		<?php }elseif(is_admin() || $departmentsID==8){ ?>
 		<div class="col-md-12 mtop20">
 <a href="<?php echo admin_url('staff');?>" class="fancy-btn"><i class="fa-solid fa-users menu-icon"></i> Add New Staff</a>
 <a href="<?php //echo admin_url('dashboard/testemail');?>" class="fancy-btn hide"><i class="fa-solid fa-users menu-icon"></i> Test Email</a>
@@ -103,11 +104,11 @@ echo $departmentsID;
             <div class="col-md-4" data-container="right-4">
                 <?php render_dashboard_widgets('right-4'); ?>
             </div><?php */?>
-			<?php if($departmentsID!=8){ ?>
+			<?php //if($departmentsID!=8){ ?>
             <div class="col-md-12" data-container="bottom-left-12">
                 <?php render_dashboard_widgets('bottom-left-12'); ?>
             </div>
-			<?php } ?>
+			<?php //} ?>
             <div class="col-md-8" data-container="bottom-left-8">
                 <?php //render_dashboard_widgets('bottom-left-8'); ?>
             </div>

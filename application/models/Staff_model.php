@@ -1073,4 +1073,23 @@ class Staff_model extends App_Model
     {
 	   return $company_id;
 	}
+	
+	public function get_staff_by_department($id = '')
+    {
+	
+	
+		$select_str = 's.*, CONCAT(s.firstname, " ", s.lastname) as full_name';
+		$companyid = (int) get_staff_companyid();
+		$departmentid = (int) get_departments_id();
+		$this->db->select($select_str);
+		$this->db->from(db_prefix() . 'staff as s');
+		$this->db->join('it_crm_staff_departments as d', 'd.staffid = s.staffid', 'inner');
+		$this->db->where('s.company_id', $companyid);
+		$this->db->where('d.departmentid', $departmentid);
+		$this->db->order_by('s.firstname', 'desc');
+		$res = $this->db->get()->result_array();
+		//echo $this->db->get_compiled_select();exit;
+		return $res;//exit;
+		//echo $this->db->last_query();exit;//return
+    }
 }

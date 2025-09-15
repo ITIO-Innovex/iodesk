@@ -3,13 +3,8 @@
 <div class="widget relative" id="widget-<?php echo create_widget_id(); ?>" data-name="<?php echo _l('quick_stats'); ?>">
     <div class="widget-dragger"></div>
     <div class="row">
-	
-        <?php
-         $initial_column = 'col-lg-4';
-         
-         ?>
 		 
-		 <?php if($departmentsID==8){ ?>
+<?php if($departmentsID==8){ ?>
 <?php if (is_staff_member()) { ?>
 <?php
                   $this->db->from(db_prefix() . 'user_utility_forms');
@@ -33,9 +28,10 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 				//echo $row->new_count;
                    
                   ?>
-        <div class="quick-stats-leads col-xs-12 col-md-6 col-sm-6 col-lg-6 tw-mb-2 sm:tw-mb-0">
-            <div class="top_stats_wrapper">
-                
+        <div class="quick-stats-leads col-xs-12 col-md-12 col-sm-12 col-lg-12 tw-mb-2 sm:tw-mb-0">
+		         <div class="rowxx tw-mb-2 sm:tw-mb-0">
+				 <div class=" col-sm-4 m-1">
+                <div class="top_stats_wrapper">
                 <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
                         <i class="fa-solid fa-circle-info menu-icon fa-2x text-info"></i>
@@ -45,6 +41,10 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 <span title="Success Invoice"><?php echo ($row->success_count  + $row->process_count);?></span>
                     </span>
                 </div>
+				</div>
+				</div>
+				<div class=" col-sm-4 m-1">
+				<div class="top_stats_wrapper">
 				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
                         <i class="fa-solid fa-record-vinyl menu-icon fa-2x text-warning"></i>
@@ -54,19 +54,23 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 <span title="Success Invoice"><?php echo ($row->process_count);?></span>
                     </span>
                 </div>
+				</div></div>
+				<div class=" col-sm-4 m-1">
+				<div class="top_stats_wrapper">
 				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
                         <i class="fa-solid fa-circle-check menu-icon fa-2x text-success"></i>
-                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Success Task</span>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Completed Task</span>
                     </div>
                     <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
 <span title="Success Invoice"><?php echo ($row->success_count);?></span>
                     </span>
                 </div>
-				
+				</div></div>
+				</div>
             </div>
         </div>
-		<div class="quick-stats-leads col-xs-12 col-md-6 col-sm-6 col-lg-6 tw-mb-2 sm:tw-mb-0">
+		<div class="quick-stats-leads col-xs-6 col-md-4 col-sm-4 col-lg-4 tw-mb-2 tw-mt-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
                 
                 <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
@@ -103,10 +107,10 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 
         // Set options for Sarah's pie chart.
         var options = {title:'Task by Status',
-		               width:400,
-					   height:400,
+		               width:300,
+					   height:300,
 					   legend:'bottom',
-					   colors: ['#008000', '#FEBE10']
+					   colors: ['#FEBE10','#008000']
 					   };
                        
                        
@@ -119,11 +123,130 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 	<div id="Task_chart_div" style="border: 1px solid #ccc"></div>
             </div>
         </div>
+		<div class="quick-stats-leads col-xs-12 col-md-8 col-sm-8 col-lg-8 tw-mb-2 tw-mt-2 sm:tw-mb-0">
+         
+            <div class="top_stats_wrapper">
+<?php
+$year = $_GET['year'] ?? date('Y');
+?>
+                <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
+                    <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
+                        <i class="fa-solid fa-chart-simple menu-icon fa-2x"></i>
+                        <span class="tw-truncate tw-text-xl">&nbsp;&nbsp;Overall Task Performance</span>
+                    </div>
+                    <span class="tw-font-semibold tw-text-neutral-600 tw-shrink-0">
+<label><select name="leads_length" id="yearSelect" aria-controls="leads" class="form-control input-sm">
+<?php
+for ($i = 2020; $i <= 2030; $i++) {
+?>
+<option value="<?php echo $i;?>" <?php if($i==$year){ ?> selected="selected" <?php } ?> ><?php echo $i;?></option>
+<?php
+}
+?>
+</select></label>
+                    </span>
+                </div>
+<?php
+
+
+// Numeric month values with leading zeros
+$months = [
+    '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
+    '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Aug',
+    '09' => 'Sep', '10' => 'Oct', '11' => 'Nov', '12' => 'Dec'
+];
+
+?>
+
+<script type="text/javascript">
+
+ google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Month', 'Total', 'Process', 'Completed'],
+<?php foreach ($months as $num => $name) {
+
+$monthyear=$name." - ". $year;
+$monthyearnum=$year."-".$num; 
+$swhere="";
+                  
+	//Count Total Process Task
+	$_where = [
+    'status'     => 2,
+    'company_id' => get_staff_company_id(),
+    'created_by' => get_staff_user_id(),
+   ];
+   $this->db->like('date_created', $monthyearnum);
+	$process_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
+	//echo $this->db->last_query();exit;
+		
+	//Count Total Completed Task
+	$_where = [
+    'status'     => 1,
+    'company_id' => get_staff_company_id(),
+    'created_by' => get_staff_user_id(),
+   ];
+   $this->db->like('date_created', $monthyearnum);
+	$completed_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
+	
+	
+	//Count Total Added Task
+	$_where = [
+    'company_id' => get_staff_company_id(),
+    'created_by' => get_staff_user_id(),
+   ];
+   $this->db->like('date_created', $monthyearnum);
+	$total_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
+	//echo $this->db->last_query();exit;
+	
+	
+?>		  
+ ['<?php echo $monthyear;?>', <?php echo $total_task;?>, <?php echo $completed_task;?>, <?php echo $process_task;?>],
+ <?php } ?>         
+		  
+        ]);
+
+        var options = {
+          chart: {
+            title: '',
+            subtitle: 'Tasks: <?php echo $year;?>',
+          },
+          bars: 'vertical',
+          vAxis: {format: 'decimal'},
+          height: 300,
+          colors: ['#00BFFF','#FFD700', '#008000']
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('chart_divXX'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+
+        var btns = document.getElementById('btn-group');
+
+        btns.onclick = function (e) {
+
+          if (e.target.tagName === 'BUTTON') {
+            options.vAxis.format = e.target.id === 'none' ? '' : e.target.id;
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+          }
+        }
+      }
+
+    </script>
+				    <div id="chart_divXX"></div>
+  
+    
+            </div>
+        </div>
+			
+           
         <?php } ?>
 <?php }else{ ?>
 
         <?php if (is_staff_member()) { ?>
-		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 <?php echo e($initial_column); ?> tw-mb-2 sm:tw-mb-0">
+		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 col-lg-4 tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
 			
 			<?php
@@ -210,7 +333,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 		
 		
 		<?php if (is_staff_member()) { ?>
-		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 <?php echo e($initial_column); ?> tw-mb-2 sm:tw-mb-0">
+		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 col-lg-4 tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
 			
 			<?php
@@ -337,7 +460,7 @@ foreach ($data as $item) {
 		
 		
         <?php if (is_staff_member()) { ?>
-        <div class="quick-stats-leads col-xs-12 col-md-6 col-sm-6 <?php echo e($initial_column); ?> tw-mb-2 sm:tw-mb-0">
+        <div class="quick-stats-leads col-xs-12 col-md-6 col-sm-6 col-lg-4 tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
                 <?php
                   $this->db->from(db_prefix() . 'invoices');

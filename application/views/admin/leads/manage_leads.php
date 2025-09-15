@@ -1,6 +1,23 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?> 
+<style>
+.loader {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  z-index: 9999;
+  pointer-events: none; /* allow clicks to pass through */
+}
 
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
 
 <div id="wrapper"> 
     <div class="content">
@@ -845,6 +862,32 @@ function setupChatSocketListener(chatId){
 
 <?php init_tail(); ?>
 <script>
+$(document).on('click', '.eloader', function(e) {
+    e.preventDefault();
+    //alert('Dynamic Button clicked!');
+	// Remove any existing loader
+    $('.loader').remove();
+
+    // Get click position
+    var x = e.pageX;
+    var y = e.pageY;
+
+    // Create loader div and position it
+    var loader = $('<div class="loader"></div>').css({
+        top: (y - 15) + 'px', // center loader
+        left: (x - 15) + 'px',
+        position: 'absolute'
+    });
+
+    // Append to body
+    $('body').append(loader);
+
+    // Example: hide loader after 3 seconds (simulate AJAX complete)
+    setTimeout(function() {
+        loader.remove();
+    }, 3000);
+});
+	
 var openLeadID = '<?php echo e($leadid); ?>';
 $(function() {
     leads_kanban();

@@ -408,6 +408,25 @@ function get_staff_company_id($userid = '')
     return $staff ? $staff->company_id : '';
 }
 
+function get_departments_id($staffid='')
+{   
+        // Fetch company Name from company id
+		if(empty($staffid)){
+		$staffid=get_staff_user_id();
+		}
+		
+		if(isset($staffid)&&$staffid){
+		$CI = & get_instance();
+		$CI->db->where('staffid', $staffid);
+		$com = $CI->db->select('departmentid')->from(db_prefix() . 'staff_departments')->get()->row();
+		if(isset($com)&&$com->departmentid){
+		return $com->departmentid;
+		}
+		}
+		
+		return 0;
+}
+
 function get_company_status($company_id)
 {   
         // Fetch company Name from company id

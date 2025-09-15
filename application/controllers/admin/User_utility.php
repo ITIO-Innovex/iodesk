@@ -79,7 +79,7 @@ class User_utility extends AdminController
                 set_alert('danger', 'Failed to create form');
             }
         }
-        $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
+        $data['staff_members'] = $this->staff_model->get_staff_by_department('');
         $data['title'] = 'Create New Form';
         $this->load->view('admin/user_utility/form', $data);
     }
@@ -140,7 +140,7 @@ class User_utility extends AdminController
         $data['form'] = $form;
         $data['form']->form_fields = json_decode($form->form_fields, true);
         $data['title'] = 'Edit Form: ' . $form->form_name;
-		$data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
+		$data['staff_members'] = $this->staff_model->get_staff_by_department('');
         $this->load->view('admin/user_utility/form', $data);
     }
 

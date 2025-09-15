@@ -16,8 +16,8 @@
                     <div class="col-md-8 text-right mtop20">
 <h4 class=" tw-font-semibold tw-text-lg tw-text-neutral-700  tw-inline-flex tw-items-center tw-mx-2">
 <?php if(isset($_GET['sid'])&&$_GET['sid']){ echo base64_decode($_GET['sid']); }?></h4>
-                        <a class="btn btn-danger _delete"
-                            href="<?php echo admin_url('utilities/clear_activity_log'); ?>"><?php echo _l('clear_activity_log'); ?></a>
+                        <?php /*?><a class="btn btn-danger _delete"
+                            href="<?php echo admin_url('utilities/clear_activity_log'); ?>"><?php echo _l('clear_activity_log'); ?></a><?php */?>
                     </div>
                 </div>
                 <div class="panel_s">

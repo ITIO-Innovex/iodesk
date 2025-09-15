@@ -809,6 +809,13 @@ function app_init_admin_sidebar_menu_items()
             'position' => 55,
             'badge'    => [],
         ]);
+        // Designation setup page
+        $CI->app_menu->add_setup_menu_item('designation', [
+            'href'     => admin_url('designation'),
+            'name'     => 'Designation',
+            'position' => 57,
+            'badge'    => [],
+        ]);
 	 if (staff_can('view',  'settings')) {
         $CI->app_menu->add_setup_menu_item('estimate_request', [
             'collapse' => true,
@@ -936,6 +943,13 @@ function app_init_admin_sidebar_menu_items()
             'name'     => 'departments',
             'position' => 65,
             'icon'     => 'fa-solid fa-address-card',
+            'badge'    => [],
+        ]);
+		$CI->app_menu->add_setup_menu_item('designation', [
+            'href'     => admin_url('designation'),
+            'name'     => 'Designation',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-users-rectangle',
             'badge'    => [],
         ]);
 		
