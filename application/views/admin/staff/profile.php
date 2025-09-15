@@ -75,7 +75,7 @@
                             </select>
                         </div>
                         <?php } ?>
-                        <div class="form-group select-placeholder">
+                        <?php /*?><div class="form-group select-placeholder">
                             <label for="direction"><?php echo _l('document_direction'); ?></label>
                             <select class="selectpicker"
                                 data-none-selected-text="<?php echo _l('system_default_string'); ?>" data-width="100%"
@@ -111,7 +111,7 @@
                             <input type="text" class="form-control" name="skype" value="<?php if (isset($member)) {
         echo e($member->skype);
     } ?>">
-                        </div>
+                        </div><?php */?>
                         <i class="fa-regular fa-circle-question" data-toggle="tooltip"
                             data-title="<?php echo _l('staff_email_signature_help'); ?>"></i>
                         <?php $value = (isset($member) ? $member->email_signature : ''); ?>

@@ -114,7 +114,7 @@
                                 <?php echo render_input('lastname', 'staff_add_edit_lastname', $value); ?>
                                 <?php $value = (isset($member) ? $member->email : ''); ?>
                                 <?php echo render_input('email', 'staff_add_edit_email', $value, 'email', ['autocomplete' => 'off']); ?>
-                                <div class="form-group">
+                                <?php /*?><div class="form-group">
                                     <label for="hourly_rate"><?php echo _l('staff_hourly_rate'); ?></label>
                                     <div class="input-group">
                                         <input type="number" name="hourly_rate" value="<?php if (isset($member)) {
@@ -126,11 +126,11 @@
                                             <?php echo e($base_currency->symbol); ?>
                                         </span>
                                     </div>
-                                </div>
+                                </div><?php */?>
                                 <?php $value = (isset($member) ? $member->phonenumber : ''); ?>
                                 <?php //echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value); ?>
 								 <?php echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value,'number',['maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
-                                <div class="form-group">
+                                <?php /*?><div class="form-group">
                                     <label for="facebook" class="control-label"><i class="fa-brands fa-facebook-f"></i>
                                         <?php echo _l('staff_add_edit_facebook'); ?></label>
                                     <input type="text" class="form-control" name="facebook" value="<?php if (isset($member)) {
@@ -172,13 +172,13 @@
                                         <?php } ?>
                                     </select>
                                 </div>
-                                <?php } ?>
+                                <?php } ?><?php */?>
                                 <i class="fa-regular fa-circle-question pull-left tw-mt-0.5 tw-mr-1"
                                     data-toggle="tooltip"
                                     data-title="<?php echo _l('staff_email_signature_help'); ?>"></i>
                                 <?php $value = (isset($member) ? $member->email_signature : ''); ?>
                                 <?php echo render_textarea('email_signature', 'settings_email_signature', $value, ['data-entities-encode' => 'true']); ?>
-                                <div class="form-group select-placeholder">
+                                <?php /*?><div class="form-group select-placeholder">
                                     <label for="direction"><i class="fa-regular fa-circle-question pull-left tw-mt-0.5 tw-mr-1"
                                     data-toggle="tooltip"
                                     data-title="LTR (Left to Right) - Displays text from left to right. Common for English.
@@ -197,8 +197,10 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                                   echo 'selected';
                               } ?>>RTL</option>
                                     </select>
-                                </div>
-                                <div class="form-group">
+                                </div><?php */?>
+								
+								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '', get_departments_id($member->staffid), ['required' => 'true']); ?>
+                                <?php /*?><div class="form-group">
                                     <?php if (count($departments) > 0) { ?>
                                     <label for="departments"><?php echo _l('staff_add_edit_departments'); ?></label>
                                     <?php } ?>
@@ -221,7 +223,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                                             for="dep_<?php echo e($department['departmentid']); ?>"><?php echo e($department['name']); ?></label>
                                     </div>
                                     <?php } ?>
-                                </div>
+                                </div><?php */?>
                                 <?php $rel_id = (isset($member) ? $member->staffid : false); ?>
                                 <?php echo render_custom_fields('staff', $rel_id); ?>
 

@@ -225,6 +225,12 @@ $route['admin/user_utility/edit/(:num)'] = 'admin/user_utility/edit/$1';
 $route['admin/user_utility/view/(:num)'] = 'admin/user_utility/view/$1';
 $route['admin/user_utility/delete/(:num)'] = 'admin/user_utility/delete/$1';
 
+// Designations routes
+$route['admin/designation'] = 'admin/designations/index';
+$route['admin/designations'] = 'admin/designations/index';
+$route['admin/designation/manage'] = 'admin/designations/manage';
+$route['admin/designation/delete/(:num)'] = 'admin/designations/delete/$1';
+
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';
 $route['admin/database_backups/export_backup'] = 'admin/database_backups/export_backup';
