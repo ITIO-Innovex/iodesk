@@ -95,10 +95,10 @@ function get_available_staff_permissions($data = [])
             'name'         => _l('items'),
             'capabilities' => $withoutViewOwnPermissionsArray,
         ],
-        'knowledge_base' => [
+        /*'knowledge_base' => [
             'name'         => _l('knowledge_base'),
             'capabilities' => $withoutViewOwnPermissionsArray,
-        ],
+        ],*/
         'payments' => [
             'name'         => _l('payments'),
             'capabilities' => $withNotApplicableViewOwn,
@@ -129,12 +129,12 @@ function get_available_staff_permissions($data = [])
 				'project_group' => _l('Group'), ]),
         ],
 		
-        'proposals' => [
+        /*'proposals' => [
             'name'         => _l('proposals'),
             'capabilities' => array_merge($allPermissionsArray, [
                 'view_all_templates' => _l('permission_view_all_templates'),
             ]),
-        ],
+        ],*/
         'reports' => [
             'name'         => _l('reports'),
             'capabilities' => [
@@ -189,7 +189,7 @@ function get_available_staff_permissions($data = [])
             ],
         ],
 		'user_utility' => [
-            'name'         => _l('User Utility'),
+            'name'         => _l('Team Document'),
             'capabilities' => [
                 'view' => $viewGlobalName,
             ],

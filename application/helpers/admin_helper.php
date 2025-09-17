@@ -274,6 +274,35 @@ function is_admin($staffid = '')
 
     return is_admin($staffid);
 }
+function is_department_admin($staffid = '')
+{
+
+    /**
+     * Checking for current user?
+     */
+    if (!is_numeric($staffid)) {
+        if (isset($GLOBALS['current_user'])) {
+            return $GLOBALS['current_user']->admin === '2';
+        }
+
+        $staffid = get_staff_user_id();
+    }
+
+    $CI = & get_instance();
+
+    if ($cache = $CI->app_object_cache->get('is-department-admin-' . $staffid)) {
+        return $cache === 'yes';
+    }
+
+    $CI->db->select('1')
+    ->where('admin', 2)
+    ->where('staffid', $staffid);
+
+    $result = $CI->db->count_all_results(db_prefix() . 'staff') > 0 ? true : false;
+    $CI->app_object_cache->add('is-department-admin-' . $staffid, $result ? 'yes' : 'no');
+
+    return is_department_admin($staffid);
+}
 
 function admin_body_class($class = '')
 {

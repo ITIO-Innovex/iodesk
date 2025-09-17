@@ -400,7 +400,9 @@ function get_user_type()
 	if(is_super()){
 	return "Super Admin";	
 	}elseif(is_admin()){
-	return "Admin";		
+	return "Admin";	
+    }elseif(is_department_admin()){
+	return "Department Admin";	
 	}else{
 	return "Staff";		
     }

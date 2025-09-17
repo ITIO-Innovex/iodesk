@@ -490,7 +490,7 @@ class Staff_model extends App_Model
 
         if (is_admin()) {
             if (isset($data['administrator'])) {
-                $data['admin'] = 1;
+                $data['admin'] = $data['administrator'];
                 unset($data['administrator']);
             }
         }
@@ -599,7 +599,7 @@ class Staff_model extends App_Model
 
         if (is_admin()) {
             if (isset($data['administrator'])) {
-                $data['admin'] = 1;
+                $data['admin'] = $data['administrator'];
                 unset($data['administrator']);
             } else {
                 if ($id != get_staff_user_id()) {
@@ -616,10 +616,11 @@ class Staff_model extends App_Model
                 $data['admin'] = 0;
             }
         }
-
+       // print_r($data['departments'][0]);exit;
         $affectedRows = 0;
         if (isset($data['departments'])) {
             $departments = $data['departments'];
+			$data['department_id'] = $data['departments'][0];
             unset($data['departments']);
         }
 
@@ -1091,5 +1092,18 @@ class Staff_model extends App_Model
 		//echo $this->db->get_compiled_select();exit;
 		return $res;//exit;
 		//echo $this->db->last_query();exit;//return
+    }
+	
+	public function get_designation($id = '')
+    {
+	
+	        echo $companyid = (int) get_staff_companyid();
+	        $this->db->select('title, id');
+            $this->db->from(db_prefix() . 'designations');
+            $this->db->where('company_id', $companyid);
+			$res = $this->db->get()->result_array();
+		    //echo $this->db->last_query();exit;//return
+		    return $res;
+		
     }
 }

@@ -16,11 +16,11 @@ class User_utility extends AdminController
     public function index()
     {
         if (!is_admin() && !staff_can('view', 'user_utility')) {
-            access_denied('User Utility');
+            access_denied('Team Document');
         }
 
         $data['forms'] = $this->user_utility_model->get_all_forms();
-        $data['title'] = 'User Utility Forms';
+        $data['title'] = 'Team Document Forms';
         $this->load->view('admin/user_utility/manage', $data);
     }
 
@@ -30,7 +30,7 @@ class User_utility extends AdminController
     public function create()
     {
         if (!is_admin() && !staff_can('view', 'user_utility')) {
-            access_denied('User Utility');
+            access_denied('Team Document');
         }
 
         if ($this->input->post()) {
@@ -90,7 +90,7 @@ class User_utility extends AdminController
     public function edit($id)
     {
         if (!is_admin() && !staff_can('view', 'user_utility')) {
-            access_denied('User Utility');
+            access_denied('Team Document');
         }
 
         $form = $this->user_utility_model->get($id);
@@ -150,7 +150,7 @@ class User_utility extends AdminController
     public function delete($id)
     {
         if (!is_admin() && !staff_can('view', 'user_utility')) {
-            access_denied('User Utility');
+            access_denied('Team Document');
         }
 
         $form = $this->user_utility_model->get($id);
@@ -175,7 +175,7 @@ class User_utility extends AdminController
     public function view($id)
     {
        if (!is_admin() && !staff_can('view', 'user_utility')) {
-            access_denied('User Utility');
+            access_denied('Team Document');
         }
 
         $form = $this->user_utility_model->get($id);

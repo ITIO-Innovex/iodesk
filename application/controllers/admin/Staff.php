@@ -9,7 +9,7 @@ class Staff extends AdminController
 	
     public function index()
     {
-        if (staff_cant('view', 'staff')) {
+        if (staff_cant('view', 'staff') && !is_department_admin()) {
             access_denied('staff');
         }
         if ($this->input->is_ajax_request()) {
@@ -47,7 +47,7 @@ class Staff extends AdminController
     /* Add new staff member or edit existing */
     public function member($id = '')
     {
-        if (staff_cant('view', 'staff')) {
+        if (staff_cant('view', 'staff')  && !is_department_admin()) {
             access_denied('staff');
         }
         hooks()->do_action('staff_member_edit_view_profile', $id);
@@ -69,7 +69,7 @@ class Staff extends AdminController
             $data['password'] = $this->input->post('password', false);
 
             if ($id == '') {
-                if (staff_cant('create', 'staff')) {
+                if (staff_cant('create', 'staff') && !is_department_admin()) {
                     access_denied('staff');
                 }
 				$data['company_id']=get_staff_company_id();
@@ -80,7 +80,7 @@ class Staff extends AdminController
                     redirect(admin_url('staff/member/' . $id));
                 }
             } else {
-                if (staff_cant('edit', 'staff')) {
+                if (staff_cant('edit', 'staff') && !is_department_admin()) {
                     access_denied('staff');
                 }
                 handle_staff_profile_image_upload($id);
@@ -128,6 +128,7 @@ class Staff extends AdminController
         $data['roles']         = $this->roles_model->get();
         $data['user_notes']    = $this->misc_model->get_notes($id, 'staff');
         $data['departments']   = $this->departments_model->get();
+		$data['designation']   = $this->staff_model->get_designation();
         $data['title']         = $title;
 
         $this->load->view('admin/staff/member', $data);
