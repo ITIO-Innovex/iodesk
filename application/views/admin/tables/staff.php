@@ -35,16 +35,18 @@ if (count($custom_fields) > 4) {
 
 //$where = hooks()->apply_filters('staff_table_sql_where', []);
 $where = [];
-if(!is_super()){
-$where = ['AND (company_id = ' . get_staff_company_id() . ')'];
-}else{
-  
+if(is_super()){
 if(isset($_GET['cid'])&&$_GET['cid']){	
 $where = ['AND (company_id = ' . $_GET['cid'] . ')'];
 }elseif(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 $where = ['AND (company_id = ' . $_SESSION['super_view_company_id'] . ')'];
  }
-
+ 
+}elseif(is_department_admin()){
+$departmentid = (int) get_departments_id();
+$where = ['AND (company_id = ' . get_staff_company_id() . ') AND department_id='.$departmentid]; 
+}else{
+ $where = ['AND (company_id = ' . get_staff_company_id() . ')']; 
 }
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [

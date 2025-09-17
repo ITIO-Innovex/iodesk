@@ -2,7 +2,7 @@
 <?php init_head(); ?>
 <div id="wrapper">
     <div class="content">
-        <?php if (isset($member)) { ?>
+        <?php if (isset($member)) { //print_r($member); ?>
         <?php //$this->load->view('admin/staff/stats'); ?>
         <div class="member">
             <?php echo form_hidden('isedit'); ?>
@@ -198,52 +198,72 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                               } ?>>RTL</option>
                                     </select>
                                 </div><?php */?>
+								<?php 
+								$departmentid="";
+								if(isset($member)&&$member->staffid){
+								$departmentid=get_departments_id($member->staffid);
+								} 
 								
-								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '', get_departments_id($member->staffid), ['required' => 'true']); ?>
-                                <?php /*?><div class="form-group">
-                                    <?php if (count($departments) > 0) { ?>
-                                    <label for="departments"><?php echo _l('staff_add_edit_departments'); ?></label>
-                                    <?php } ?>
-                                    <?php foreach ($departments as $department) { ?>
-                                    <div class="checkbox checkbox-primary">
-                                        <?php
-                              $checked = '';
-                              if (isset($member)) {
-                                  foreach ($staff_departments as $staff_department) {
-                                      if ($staff_department['departmentid'] == $department['departmentid']) {
-                                          $checked = ' checked';
-                                      }
-                                  }
-                              }
-                              ?>
-                                        <input type="checkbox" id="dep_<?php echo e($department['departmentid']); ?>"
-                                            name="departments[]" value="<?php echo e($department['departmentid']); ?>"
-                                            <?php echo e($checked); ?>>
-                                        <label
-                                            for="dep_<?php echo e($department['departmentid']); ?>"><?php echo e($department['name']); ?></label>
-                                    </div>
-                                    <?php } ?>
-                                </div><?php */?>
+								if(is_department_admin()){
+								//$departmentsID==8
+								$departments = array_filter($departments, function ($dept) {
+								$departmentid = (int) get_departments_id();
+                                return $dept['departmentid'] == $departmentid;
+                                });
+								}
+								
+								?>
+								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '<label for="email" class="control-label"> <small class="req text-danger">* </small>Department</label>', $departmentid, ['required' => 'true']); ?>
+								
+								<?php 
+								$designation_id="";
+								if(isset($member)&&$member->designation_id){
+								$designation_id=$member->designation_id;
+								} 
+								?>
+								<?php echo render_select('designation_id', $designation, ['id', 'title'], '<label for="email" class="control-label"> <small class="req text-danger">* </small>Designation</label>', $designation_id, ['required' => 'true']); ?>
+                                
                                 <?php $rel_id = (isset($member) ? $member->staffid : false); ?>
                                 <?php echo render_custom_fields('staff', $rel_id); ?>
 
                                 <div class="row">
                                     <div class="col-md-12">
                                         <hr class="hr-10" />
-                                        <?php if (is_admin()) { ?>
-                                        <div class="checkbox checkbox-primary">
-                                            <?php
-                                 $isadmin = '';
-                                 if (isset($member) && ($member->staffid == get_staff_user_id() || is_admin($member->staffid))) {
-                                     $isadmin = ' checked';
-                                 }
-                              ?>
-                                            <input type="checkbox" name="administrator" id="administrator"
-                                                <?php echo e($isadmin); ?>>
-                                            <label
-                                                for="administrator"><?php echo _l('staff_add_edit_administrator'); ?></label>
-                                        </div>
-                                        <?php } ?>
+										 <?php if (is_admin()) { ?>
+										<div class="form-group">
+    <label for="rtl_support_admin" class="control-label clearfix">
+        Staff Type    </label>
+    <div class="radio radio-primary radio-inline">
+        <input type="radio"  id="administrator0" name="administrator" value="0" checked="">
+        <label for="administrator">
+            None</label>
+    </div>
+    <div class="radio radio-primary radio-inline">
+        <input type="radio"  id="administrator2" name="administrator" value="2" >
+        <label for="administrator">
+            Department Admin</label>
+    </div>
+	<div class="radio radio-primary radio-inline">
+        <input type="radio" id="administrator1" name="administrator" value="1">
+        <label for="administrator">
+            <?php echo _l('staff_add_edit_administrator'); ?></label>
+    </div>
+</div>
+<?php
+if (isset($member) && ($member->admin)) {
+?>
+<script>
+var radioButton = document.getElementById('administrator' + <?php echo $member->admin; ?>);
+radioButton.checked = true;  // Check the radio button
+</script>
+<?php
+
+}
+?>
+								 
+                                         <?php } ?>
+										 
+                                        
                                         <?php if (!isset($member) && is_email_template_active('new-staff-created')) { ?>
                                         <div class="checkbox checkbox-primary">
                                             <input type="checkbox" name="send_welcome_email" id="send_welcome_email"
@@ -254,7 +274,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                                         <?php } ?>
                                     </div>
                                 </div>
-                                <?php if (!isset($member) || is_admin() || !is_admin() && $member->admin == 0) { ?>
+                                <?php if (!isset($member) || is_admin() || is_department_admin() || !is_admin() && $member->admin == 0) { ?>
                                 <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
                                 <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value=''
                                     tabindex="-1" />

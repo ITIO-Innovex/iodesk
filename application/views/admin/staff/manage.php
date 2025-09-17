@@ -5,7 +5,7 @@
         <div class="row">
             <div class="col-md-12">
             <div id="" class="alert d-none ajaxAlert" role="alert"></div>
-                <?php if (staff_can('create',  'staff')) { ?>
+                <?php if (staff_can('create',  'staff') || is_department_admin()) { ?>
                 <div class="tw-mb-2 sm:tw-mb-4">
                     <a href="<?php echo admin_url('staff/member'); ?>" class="btn btn-primary">
                         <i class="fa-regular fa-plus tw-mr-1"></i>
