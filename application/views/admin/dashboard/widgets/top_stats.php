@@ -5,7 +5,7 @@
     <div class="row">
 <?php if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==6) {  
 redirect(admin_url('project/dashboard'));  ?>		 
-<?php }elseif(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==5) {   ?>
+<?php }elseif((isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==5) || is_admin()) {   ?>
 
 <?php if (is_staff_member()) { ?>
 <?php
