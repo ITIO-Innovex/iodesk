@@ -247,7 +247,7 @@ $swhere="";
         <?php } ?>
 <?php 
 ?>
-<?php }elseif(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8) {   ?>
+<?php }elseif((isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8) || is_admin()) {   ?>
 
         <?php if (is_staff_member()) { ?>
 		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 col-lg-4 tw-mb-2 sm:tw-mb-0">
