@@ -144,7 +144,13 @@ class Project_model extends App_Model
 		}elseif(is_admin()){
 		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
+		
+		$this->db->group_start()
+         ->where('pm.owner', get_staff_user_id())
+         ->or_where("FIND_IN_SET(".get_staff_user_id().", pt.task_owner) !=", 0)
+         ->group_end();
+		
+		
 		}
 		$this->db->where('pm.is_deleted', 0);
         $this->db->order_by('pm.id', 'desc');
@@ -152,31 +158,38 @@ class Project_model extends App_Model
 		//echo $this->db->get_compiled_select(); 
 		
         return $this->db->get()->result_array();
+		//echo $this->db->last_query();exit;//return
     }
 	
-		public function get_task_list($id)
-    {
-	  //echo $id;exit;
-        $this->db->select('pt.*, pm.project_title as project_title');
-        $this->db->from(db_prefix() . 'project_task pt');
-        $this->db->join(db_prefix() . 'project_master pm', 'pt.project_id = pm.id', 'left');
-		if(isset($id)&&$id){
-		$this->db->where('pm.id', $id);
-		}
-        //echo $this->db->get_compiled_select(); exit;
-        if(is_super()){
-			if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-		    $this->db->where('pm.company_id', $_SESSION['super_view_company_id']);	// Use condition
-		    }
-		
-		}elseif(is_admin()){
-		$this->db->where('pm.company_id', get_staff_company_id());
-		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
-		}
-		$this->db->where('pt.task_is_deleted', 0);
-        $this->db->order_by('pt.id', 'desc');
-        return $this->db->get()->result_array();
+public function get_task_list($id){
+
+$this->db->select('pt.*, pm.project_title as project_title');
+$this->db->from(db_prefix() . 'project_task pt');
+$this->db->join(db_prefix() . 'project_master pm', 'pt.project_id = pm.id', 'left');
+
+if (isset($id) && $id) {
+    $this->db->where('pm.id', $id);
+}
+
+if (is_super()) {
+    if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+        $this->db->where('pm.company_id', $_SESSION['super_view_company_id']);
+    }
+	
+} elseif (is_admin()) {
+    $this->db->where('pm.company_id', get_staff_company_id());
+    
+} else {
+// Instead of where_in, use FIND_IN_SET
+    $this->db->where("FIND_IN_SET(".get_staff_user_id().", pt.task_owner) !=", 0);
+}
+
+$this->db->where('pt.task_is_deleted', 0);
+$this->db->order_by('pt.id', 'desc');
+
+return $result = $this->db->get()->result_array();
+		 
+		//echo $this->db->last_query();exit;//return
     }
 	
 
