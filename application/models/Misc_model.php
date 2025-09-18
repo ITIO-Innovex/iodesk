@@ -348,13 +348,16 @@ class Misc_model extends App_Model
     {
         $this->db->limit($limit);
         $this->db->order_by('date', 'desc');
-		if (!is_super()) {
-		$this->db->where('company_id',get_staff_company_id()); 
-		}else{
-				  if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+		if (is_super()) {
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 				  $this->db->where('company_id', $_SESSION['super_view_company_id']);
 				  }
+		}elseif (is_admin()) {
+		$this->db->where('company_id',get_staff_company_id()); 		  
+		}else{
+		$this->db->where('staffid',get_staff_full_name()); 
 		}
+		
         return $this->db->get(db_prefix() . 'activity_log')->result_array();
     }
 

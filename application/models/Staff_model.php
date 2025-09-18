@@ -1097,7 +1097,7 @@ class Staff_model extends App_Model
 	public function get_designation($id = '')
     {
 	
-	        echo $companyid = (int) get_staff_companyid();
+	        $companyid = (int) get_staff_companyid();
 	        $this->db->select('title, id');
             $this->db->from(db_prefix() . 'designations');
             $this->db->where('company_id', $companyid);

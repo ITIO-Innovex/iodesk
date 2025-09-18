@@ -220,7 +220,7 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }*/
     // Direct Email
-    if (is_staff_member() && staff_can('direct_email_view',  'direct_email')) {
+    if (is_staff_member() && staff_can('view',  'direct_email')) {
 		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
 			'name'     => 'Direct Email',
 			'href'     => admin_url('direct_email'),

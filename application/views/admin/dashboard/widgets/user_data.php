@@ -8,15 +8,15 @@
                 <div class="scroller scroller-right arrow-right"><i class="fa fa-angle-right"></i></div>
                 <div class="horizontal-tabs" id="global">
                     <ul class="nav nav-tabs nav-tabs-horizontal" role="tablist">
-					<?php if (is_admin() || $departmentsID==8) { ?>
+					<?php //if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8) {   ?>
                         <li role="presentation" class="active">
                             <a href="#home_tab_activity" aria-controls="home_tab_activity" role="tab" data-toggle="tab">
                                 <i class="fa-solid fa-clock menu-icon" style="color: #edeff3;"></i>
                                 <?php echo _l('home_latest_activity'); ?>
                             </a>
                         </li>
-                        <?php } ?>
-						<?php if ($departmentsID!=8) { ?>
+                        <?php //} ?>
+						<?php if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8) {   ?>
                         <li role="presentation" >
                             <a href="#home_tab_tasks" aria-controls="home_tab_tasks" role="tab" data-toggle="tab">
                                 <i class="fa fa-tasks menu-icon"></i> <?php echo _l('home_my_tasks'); ?>
@@ -241,7 +241,7 @@ if ($currentDateTime > $assignDateTime) {
                     
                 </div>
                 <?php } ?>
-                <?php if (is_admin() || $departmentsID==8) { ?>
+                <?php //if (is_admin() || $departmentsID==8) { ?>
                 <div role="tabpanel" class="tab-pane active" id="home_tab_activity">
                     <a href="<?php echo admin_url('utilities/activity_log'); ?>"
                         class="mbot20 inline-block full-width"><?php echo _l('home_widget_view_all'); ?></a>
@@ -263,7 +263,7 @@ if ($currentDateTime > $assignDateTime) {
                         <?php } ?>
                     </div>
                 </div>
-                <?php } ?>
+                <?php //} ?>
                 <?php hooks()->do_action('after_user_data_widge_tabs_content'); ?>
             </div>
         </div>
