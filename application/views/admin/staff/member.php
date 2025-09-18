@@ -606,7 +606,20 @@ radioButton.checked = true;  // Check the radio button
         $('input[name="administrator"]').on('change', function() {
             var checked = $(this).prop('checked');
             var isNotStaffMember = $('.is-not-staff');
-            if (checked == true) {
+			let adminValue = $(this).val();
+			//alert(adminValue);
+			
+            if (checked == true && adminValue==1) {
+			
+			if (confirm("Are you sure you want to change to Admin? If confirmed, all previous settings will be removed.")) {
+            // User clicked OK
+            //console.log("Confirmed: " + selectedValue);
+            } else {
+           // User clicked Cancel - reset the selection
+            $('#administrator0').prop('checked', true);
+			return; // <-- stop process here
+            }
+	
                 isNotStaffMember.addClass('hide');
                 $('.roles').find('input').prop('disabled', true).prop('checked', false);
             } else {

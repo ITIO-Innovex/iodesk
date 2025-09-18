@@ -3,8 +3,10 @@
 <div class="widget relative" id="widget-<?php echo create_widget_id(); ?>" data-name="<?php echo _l('quick_stats'); ?>">
     <div class="widget-dragger"></div>
     <div class="row">
-		 
-<?php if($departmentsID==8){ ?>
+<?php if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==6) {  
+redirect(admin_url('project/dashboard'));  ?>		 
+<?php }elseif(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==5) {   ?>
+
 <?php if (is_staff_member()) { ?>
 <?php
                   $this->db->from(db_prefix() . 'user_utility_forms');
@@ -243,7 +245,9 @@ $swhere="";
 			
            
         <?php } ?>
-<?php }else{ ?>
+<?php 
+?>
+<?php }elseif(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8) {   ?>
 
         <?php if (is_staff_member()) { ?>
 		<div class="quick-stats-invoices col-xs-12 col-md-6 col-sm-6 col-lg-4 tw-mb-2 sm:tw-mb-0">
@@ -652,7 +656,11 @@ $iwhere="";
         <?php } ?>
 		
 		
-<?php } ?>        
+<?php }else{ ?>  
+<h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutral-700">   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?> Dashboard comming Soon.....
+</h4>
+<?php } ?>    
         
     </div>
 </div>

@@ -15,6 +15,8 @@
 //echo $xxx[0];
 //echo $departmentsID;
 //echo get_departments_id();
+
+//print_r($activity_log);
 ?>
 
 <?php init_head(); ?>
@@ -36,7 +38,7 @@
 	</div>
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
 	<i class="fa-regular fa-circle-check menu-icon fa-2x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Role : <?php //echo get_staff_rolex(); ?> [<?=get_user_type();?>]
+	<span class="tw-truncate tw-text-xl">Role : <?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?> [<?=get_user_type();?>]
 	</span>                     
 	</div> 
 	
