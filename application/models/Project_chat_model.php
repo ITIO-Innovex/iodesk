@@ -12,15 +12,42 @@ class Project_chat_model extends App_Model
     // Get all conversations with project and participant info
     public function get_conversations()
     {
-        $this->db->select('pc.*, p.project_title as project_name, s.firstname, s.lastname');
+        /*$this->db->select('pc.*, p.project_title as project_name, s.firstname, s.lastname');
         $this->db->from(db_prefix() . 'project_conversations pc');
         $this->db->join(db_prefix() . 'project_master p', 'p.id = pc.project_id', 'left');
         $this->db->join(db_prefix() . 'staff s', 's.staffid = pc.created_by', 'left');
         $this->db->where('p.company_id', get_staff_company_id());
         $this->db->where('p.is_deleted', 0);
         $this->db->order_by('pc.last_activity', 'DESC');
-        $conversations = $this->db->get()->result_array();
+        $conversations = $this->db->get()->result_array();*/
+		
+		$this->db->select('pc.*, p.project_title as project_name, s.firstname, s.lastname');
+$this->db->from(db_prefix() . 'project_conversations pc');
+$this->db->join(db_prefix() . 'project_master p', 'p.id = pc.project_id', 'left');
+$this->db->join(db_prefix() . 'staff s', 's.staffid = pc.created_by', 'left');
 
+// Join conversation_participants
+$this->db->join(
+    db_prefix() . 'conversation_participants cp',
+    'cp.conversation_id = pc.id',
+    'left'
+);
+
+$this->db->where('p.company_id', get_staff_company_id());
+$this->db->where('p.is_deleted', 0);
+
+// Condition: either participant or creator
+$this->db->group_start()
+         ->where('pc.created_by', get_staff_user_id())
+         ->or_where('FIND_IN_SET(' . get_staff_user_id() . ', cp.staff_id) !=', 0, FALSE)
+         ->group_end();
+
+$this->db->group_by('pc.id');
+$this->db->order_by('pc.last_activity', 'DESC');
+
+$conversations = $this->db->get()->result_array();
+
+//echo $this->db->last_query();exit;
         // Get participants for each conversation
         foreach ($conversations as &$conversation) {
             $conversation['participants'] = $this->get_conversation_participants($conversation['id']);
