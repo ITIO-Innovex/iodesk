@@ -387,74 +387,49 @@ class Webmail_model extends App_Model
     ]);
 	
 	
-	try {
-		 
-		 $cm = new ClientManager();
-
-    // Define the IMAP connection settings
-    $client = $cm->make([
-        'host'          => $mailer_imap_host,
-        'port'          => $mailer_imap_port,
-        'encryption'    => $encryption,
-        'validate_cert' => true,
-        'username'      => $mailer_username,
-        'password'      => $mailer_password,
-        'protocol'      => 'imap', 
-		'timeout'       => 60
-		//'authentication' => "oauth"            // Protocol (imap/pop3)
-    ]);
+	if ($client->connect()) {
 	
-// convert warnings to exceptions
-set_error_handler(function($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) return;
-    throw new ErrorException($message, 0, $severity, $file, $line);
-});
-
-$cnt=0;	
-$connection=false;
-             // Check IMAP connection
-			try {
-			if ($client->connect()) {
-			$connection=true;
-			} else {
-			$data['msg']="IMAP Error :-".$e->getMessage();
-			$data['cnt']=0;
-			return $data;
-			
-			}
-			} catch (\Exception $e) {
-			$data['msg']="IMAP Error :-".$e->getMessage();
-			$data['cnt']=0;
-			return $data;
-			}
-
 	
-	if ($connection) {
- 
+	
+$folders = $client->getFolders();
+$cnt=0;
+foreach ($folders as $folder) {
+    $folder=$folder->name; // e.g., INBOX, Sent, Trash
+	//$folder="Sent"; 
 	$mailbox = $client->getFolder($folder);
 	 if ($mailbox === null) {
-      die("The ".$folder." folder could not be found.");exit;
+      die("The ".$folder." folder could not be found.");
       }
 	  $data['folder']=$folder;
 
 
      
-	  //$total_Email=$mailbox->query()->all()->count();
+	 // $total_Email=$mailbox->query()->all()->count();
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
-      $pg=floor($last_email_id / 10) +1;
+//// Fetch Emails
+//echo  $last_email_id."============>";exit;
+      
+	  
+	  
+try {
+
+     $pg=floor($last_email_id / 5) +1;	  
 	  $messages = $mailbox->query()
-    ->all()->limit($limit = 10, $page = $pg)
+    ->all()->limit($limit = 5, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
     });
+	
+	
 
-   
 
 
 //print_r($messages);exit;
+//$this->db->query("SET SESSION wait_timeout=600;");
+//$this->db->reconnect();
 foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
@@ -516,11 +491,23 @@ foreach ($messages as $message) {
 		$data['attachments'] = implode(',', $attachments_paths);//exit;
  }
  $cnt++;
+        $data['isfalg']=0;
+		$data['status']=1;
+		$data['is_deleted']=0;
+        $this->db->reconnect();
 		$this->db->insert(db_prefix() . 'emails', $data);
 		//echo $this->db->last_query();exit;
  
 }
 
+} catch (\Webklex\PHPIMAP\Exceptions\GetMessagesFailedException $e) {
+    log_message('error', 'Failed to get messages: ' . $e->getMessage());
+    //$messages = collect(); // fallback to empty collection
+}
+//exit;	  
+ //echo $folder." -> ". $cnt;
+	  
+}
     
 $client->disconnect();	   
 	    // Get the inbox folder
