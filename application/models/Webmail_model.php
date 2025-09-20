@@ -529,7 +529,7 @@ $client->disconnect();
        //echo "ERROR 103";exit;
         //return $this->db->get(db_prefix().'webmail_setup')->result_array();
       }
-	  public function downloadmail($id)
+public function downloadmail($id)
 {
     if (!isset($id) || !$id) {
         return "Invalid Mailbox ID!";
@@ -557,7 +557,7 @@ $client->disconnect();
             'username'      => $mailer_username,
             'password'      => $mailer_password,
             'protocol'      => 'imap',
-            'timeout'       => 60
+            'timeout'       => 300 // longer timeout
         ]);
 
         if ($client->connect()) {
@@ -565,78 +565,92 @@ $client->disconnect();
             $cnt = 0;
 
             foreach ($folders as $folder) {
-                $folder = $folder->name;
-                $mailbox = $client->getFolder($folder);
-                if ($mailbox === null) {
-                    continue; // skip if folder not found
-                }
-
-                $data['folder'] = $folder;
-                $last_email_id  = $this->webmail_model->lastemailid($mailer_username, $folder);
-                $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
-
                 try {
+                    $mailbox = $client->getFolder($folder->name);
+                    if ($mailbox === null) {
+                        continue; // skip invalid folder
+                    }
+
+                    $data['folder'] = $folder->name;
+                    $last_email_id  = $this->webmail_model->lastemailid($mailer_username, $folder->name);
+                    $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
                     $pg = floor($last_email_id / 10) + 1;
-                    $messages = $mailbox->query()
-                        ->all()->limit(10, $pg)
-                        ->get()
-                        ->filter(function ($message) use ($last_email_id) {
+
+                    try {
+                        // Fetch messages safely
+                        $messages = $mailbox->query()
+                            ->all()
+                            ->limit(10, $pg)
+                            ->get();
+
+                        if ($messages->count() == 0) {
+                            continue; // no new messages
+                        }
+
+                        // Filter only new UIDs
+                        $messages = $messages->filter(function ($message) use ($last_email_id) {
                             return $message->getUid() > $last_email_id;
                         });
 
-                    foreach ($messages as $message) {
-                        $data['subject']    = $message->getSubject();
-                        $data['date']       = $message->getDate();
-                        $data['body']       = $message->getHtmlBody() ?? $message->getTextBody() ?? '';
-                        $data['uniqid']     = $message->uid;
-                        $data['messageid']  = $message->getMessageId();
+                        foreach ($messages as $message) {
+                            $data['subject']    = $message->getSubject();
+                            $data['date']       = $message->getDate();
+                            $data['body']       = $message->getHtmlBody() ?? $message->getTextBody() ?? '';
+                            $data['uniqid']     = $message->uid;
+                            $data['messageid']  = $message->getMessageId();
 
-                        $from               = $message->getFrom();
-                        $data['from_email'] = $from[0]->mail ?? '';
-                        $data['from_name']  = $from[0]->personal ?? '';
+                            $from               = $message->getFrom();
+                            $data['from_email'] = $from[0]->mail ?? '';
+                            $data['from_name']  = $from[0]->personal ?? '';
 
-                        $to_list            = $message->getTo();
-                        $data['to_emails']  = $to_list[0]->mail ?? '';
+                            $to_list            = $message->getTo();
+                            $data['to_emails']  = $to_list[0]->mail ?? '';
 
-                        $cc_list            = $message->getCc();
-                        $data['cc_emails']  = $cc_list[0]->mail ?? '';
+                            $cc_list            = $message->getCc();
+                            $data['cc_emails']  = $cc_list[0]->mail ?? '';
 
-                        $bcc_list           = $message->getBcc();
-                        $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+                            $bcc_list           = $message->getBcc();
+                            $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
 
-                        // Handle attachments
-                        $attachments_paths  = [];
-                        $data['isattachments'] = 0;
-                        $uid = uniqid();
-                        $attachmentDir = 'attachments';
-                        $filePath = $attachmentDir . '/' . $uid;
+                            // Handle attachments
+                            $attachments_paths  = [];
+                            $data['isattachments'] = 0;
+                            $uid = uniqid();
+                            $attachmentDir = 'attachments';
+                            $filePath = $attachmentDir . '/' . $uid;
 
-                        foreach ($message->getAttachments() as $attachment) {
-                            if (!file_exists($filePath)) {
-                                mkdir($filePath, 0777, true);
+                            foreach ($message->getAttachments() as $attachment) {
+                                if (!file_exists($filePath)) {
+                                    mkdir($filePath, 0777, true);
+
+                                }
+                                $fileName = $attachment->name;
+                                $attachment->save($filePath);
+                                $data['isattachments'] = 1;
+                                $attachments_paths[] = $filePath . "/" . $fileName;
                             }
-                            $fileName = $attachment->name;
-                            $attachment->save($filePath);
-                            $data['isattachments'] = 1;
-                            $attachments_paths[] = $filePath . "/" . $fileName;
+
+                            $data['attachments'] = implode(',', $attachments_paths);
+
+                            // Force reconnect before insert
+                            $this->db->close();
+                            $this->db->initialize();
+
+                            try {
+                                $this->db->insert(db_prefix() . 'emails', $data);
+                                $cnt++;
+                            } catch (Exception $e) {
+                                log_message('error', 'DB Insert Failed: ' . $e->getMessage());
+                                continue;
+                            }
                         }
-
-                        $data['attachments'] = implode(',', $attachments_paths);
-
-                        //Force reconnect before insert
-                        $this->db->close();
-                        $this->db->initialize();
-
-                        try {
-                            $this->db->insert(db_prefix() . 'emails', $data);
-                            $cnt++;
-                        } catch (Exception $e) {
-                            log_message('error', 'DB Insert Failed: ' . $e->getMessage());
-                            continue; // skip this message
-                        }
+                    } catch (\Webklex\PHPIMAP\Exceptions\GetMessagesFailedException $e) {
+                        log_message('error', "IMAP error in folder {$folder->name}: " . $e->getMessage());
+                        continue;
                     }
                 } catch (Exception $e) {
-                    log_message('error', 'Mailbox fetch error: ' . $e->getMessage());
+                    log_message('error', "Folder skipped: " . $e->getMessage());
+                    continue;
                 }
             }
 
@@ -647,6 +661,7 @@ $client->disconnect();
         return "Error: " . $e->getMessage();
     }
 }
+
 
 	  
 	  // function for get inbox mail list
