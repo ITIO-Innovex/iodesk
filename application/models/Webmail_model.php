@@ -340,7 +340,7 @@ class Webmail_model extends App_Model
    
    
    // function for get inbox mail list
-        public function downloadmail($id)
+        public function downloadmailxxx($id)
         {
 		
 		if(isset($id)&&$id){
@@ -529,6 +529,125 @@ $client->disconnect();
        //echo "ERROR 103";exit;
         //return $this->db->get(db_prefix().'webmail_setup')->result_array();
       }
+	  public function downloadmail($id)
+{
+    if (!isset($id) || !$id) {
+        return "Invalid Mailbox ID!";
+    }
+
+    $mailers = $this->webmail_model->get_imap_details($id);
+    if (empty($mailers)) {
+        return "Email SMTP Details Not Found !!";
+    }
+
+    $mailer_imap_host = trim($mailers[0]['mailer_imap_host']);
+    $mailer_imap_port = trim($mailers[0]['mailer_imap_port']);
+    $mailer_username  = trim($mailers[0]['mailer_username']);
+    $mailer_password  = trim($mailers[0]['mailer_password']);
+    $encryption       = trim($mailers[0]['encryption']);
+    $data['email']    = $mailer_username;
+
+    try {
+        $cm = new ClientManager();
+        $client = $cm->make([
+            'host'          => $mailer_imap_host,
+            'port'          => $mailer_imap_port,
+            'encryption'    => $encryption,
+            'validate_cert' => true,
+            'username'      => $mailer_username,
+            'password'      => $mailer_password,
+            'protocol'      => 'imap',
+            'timeout'       => 60
+        ]);
+
+        if ($client->connect()) {
+            $folders = $client->getFolders();
+            $cnt = 0;
+
+            foreach ($folders as $folder) {
+                $folder = $folder->name;
+                $mailbox = $client->getFolder($folder);
+                if ($mailbox === null) {
+                    continue; // skip if folder not found
+                }
+
+                $data['folder'] = $folder;
+                $last_email_id  = $this->webmail_model->lastemailid($mailer_username, $folder);
+                $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
+
+                try {
+                    $pg = floor($last_email_id / 10) + 1;
+                    $messages = $mailbox->query()
+                        ->all()->limit(10, $pg)
+                        ->get()
+                        ->filter(function ($message) use ($last_email_id) {
+                            return $message->getUid() > $last_email_id;
+                        });
+
+                    foreach ($messages as $message) {
+                        $data['subject']    = $message->getSubject();
+                        $data['date']       = $message->getDate();
+                        $data['body']       = $message->getHtmlBody() ?? $message->getTextBody() ?? '';
+                        $data['uniqid']     = $message->uid;
+                        $data['messageid']  = $message->getMessageId();
+
+                        $from               = $message->getFrom();
+                        $data['from_email'] = $from[0]->mail ?? '';
+                        $data['from_name']  = $from[0]->personal ?? '';
+
+                        $to_list            = $message->getTo();
+                        $data['to_emails']  = $to_list[0]->mail ?? '';
+
+                        $cc_list            = $message->getCc();
+                        $data['cc_emails']  = $cc_list[0]->mail ?? '';
+
+                        $bcc_list           = $message->getBcc();
+                        $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+
+                        // Handle attachments
+                        $attachments_paths  = [];
+                        $data['isattachments'] = 0;
+                        $uid = uniqid();
+                        $attachmentDir = 'attachments';
+                        $filePath = $attachmentDir . '/' . $uid;
+
+                        foreach ($message->getAttachments() as $attachment) {
+                            if (!file_exists($filePath)) {
+                                mkdir($filePath, 0777, true);
+                            }
+                            $fileName = $attachment->name;
+                            $attachment->save($filePath);
+                            $data['isattachments'] = 1;
+                            $attachments_paths[] = $filePath . "/" . $fileName;
+                        }
+
+                        $data['attachments'] = implode(',', $attachments_paths);
+
+                        //Force reconnect before insert
+                        $this->db->close();
+                        $this->db->initialize();
+
+                        try {
+                            $this->db->insert(db_prefix() . 'emails', $data);
+                            $cnt++;
+                        } catch (Exception $e) {
+                            log_message('error', 'DB Insert Failed: ' . $e->getMessage());
+                            continue; // skip this message
+                        }
+                    }
+                } catch (Exception $e) {
+                    log_message('error', 'Mailbox fetch error: ' . $e->getMessage());
+                }
+            }
+
+            $client->disconnect();
+            return "Total Added: " . $cnt;
+        }
+    } catch (Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+}
+
 	  
 	  // function for get inbox mail list
         public function downloadmailbyfolder()
