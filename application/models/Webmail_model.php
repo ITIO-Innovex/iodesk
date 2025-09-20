@@ -494,7 +494,7 @@ foreach ($messages as $message) {
         $data['isfalg']=0;
 		$data['status']=1;
 		$data['is_deleted']=0;
-        
+        $this->db->reconnect();
 		$this->db->insert(db_prefix() . 'emails', $data);
 		//echo $this->db->last_query();exit;
  
