@@ -12,7 +12,7 @@ class Hrd extends AdminController
     /* View Interview Status */
     public function setting($type = '')
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('HRD Settings');
         }
 
@@ -54,7 +54,7 @@ class Hrd extends AdminController
     /* View Interview Status */
     public function interview_status()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Interview Status');
         }
 
@@ -76,7 +76,7 @@ class Hrd extends AdminController
     // Add/Edit Interview Status
     public function interviewstatus()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Interview Status');
         }
 
@@ -102,7 +102,7 @@ class Hrd extends AdminController
     // Delete Interview Status
     public function delete_interview_status($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Interview Status');
         }
         // Soft delete: set status to 0 (Deactive) instead of removing the record
@@ -115,7 +115,7 @@ class Hrd extends AdminController
     // Toggle Interview Status Status (AJAX)
     public function toggle_interview_status($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -128,7 +128,7 @@ class Hrd extends AdminController
     // Add/Edit Events & Announcements
     public function eventsannouncements()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Events & Announcements');
         }
 
@@ -157,7 +157,7 @@ class Hrd extends AdminController
     // Delete Events & Announcements (soft)
     public function delete_events_announcements($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Events & Announcements');
         }
         $this->db->where('id', $id);
@@ -169,7 +169,7 @@ class Hrd extends AdminController
     // Toggle Events & Announcements Status (AJAX)
     public function toggle_events_announcements($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -182,7 +182,7 @@ class Hrd extends AdminController
     /* View Interview Process */
     public function interview_process()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Interview Process');
         }
 
@@ -204,7 +204,7 @@ class Hrd extends AdminController
     // Add/Edit Interview Process
     public function interviewprocess()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Interview Process');
         }
 
@@ -230,7 +230,7 @@ class Hrd extends AdminController
     // Delete Interview Process
     public function delete_interview_process($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Interview Process');
         }
         // Soft delete: set status to 0 (Deactive) instead of removing the record
@@ -243,7 +243,7 @@ class Hrd extends AdminController
     // Toggle Interview Process Status (AJAX)
     public function toggle_interview_process($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -256,7 +256,7 @@ class Hrd extends AdminController
     /* View Leave Type */
     public function leave_type()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Leave Type');
         }
 
@@ -278,7 +278,7 @@ class Hrd extends AdminController
     // Add/Edit Leave Type
     public function leavetype()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Leave Type');
         }
 
@@ -305,7 +305,7 @@ class Hrd extends AdminController
     // Delete Leave Type
     public function delete_leave_type($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Leave Type');
         }
         // Soft delete: set status to 0 (Deactive) instead of removing the record
@@ -318,7 +318,7 @@ class Hrd extends AdminController
     // Toggle Leave Type Status (AJAX)
     public function toggle_leave_type($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -331,7 +331,7 @@ class Hrd extends AdminController
     /* View Employee Type */
     public function employee_type()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Employee Type');
         }
 
@@ -353,7 +353,7 @@ class Hrd extends AdminController
     /* View Shift Type */
     public function shift_type()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Shift Type');
         }
 
@@ -375,7 +375,7 @@ class Hrd extends AdminController
     /* View Shift Manager */
     public function shift_manager()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Shift Manager');
         }
 
@@ -411,7 +411,7 @@ class Hrd extends AdminController
     // Add/Edit Employee Type
     public function employeetype()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Employee Type');
         }
 
@@ -438,7 +438,7 @@ class Hrd extends AdminController
     // Add/Edit Shift Type
     public function shifttype()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Shift Type');
         }
 
@@ -464,7 +464,7 @@ class Hrd extends AdminController
     // Add/Edit Shift Manager
     public function shiftmanager()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Shift Manager');
         }
 
@@ -498,7 +498,7 @@ class Hrd extends AdminController
     // Delete Shift Manager (soft)
     public function delete_shift_manager($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Shift Manager');
         }
         $this->db->where('shift_id', $id);
@@ -510,7 +510,7 @@ class Hrd extends AdminController
     // Toggle Shift Manager Status (AJAX)
     public function toggle_shift_manager($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -523,7 +523,7 @@ class Hrd extends AdminController
     // Delete Shift Type (soft)
     public function delete_shift_type($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Shift Type');
         }
         $this->db->where('id', $id);
@@ -535,7 +535,7 @@ class Hrd extends AdminController
     // Toggle Shift Type Status (AJAX)
     public function toggle_shift_type($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -548,7 +548,7 @@ class Hrd extends AdminController
     // Delete Employee Type
     public function delete_employee_type($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Employee Type');
         }
         // Soft delete: set status to 0 (Deactive) instead of removing the record
@@ -561,7 +561,7 @@ class Hrd extends AdminController
     // Toggle Employee Type Status (AJAX)
     public function toggle_employee_type($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -574,7 +574,7 @@ class Hrd extends AdminController
     /* View Branch Manager */
     public function branch_manager()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Branch Manager');
         }
 
@@ -596,7 +596,7 @@ class Hrd extends AdminController
     // Add/Edit Branch Manager
     public function branchmanager()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Branch Manager');
         }
 
@@ -623,7 +623,7 @@ class Hrd extends AdminController
     // Delete Branch Manager
     public function delete_branch_manager($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Branch Manager');
         }
         // Soft delete: set status to 0 (Deactive) instead of removing the record
@@ -636,7 +636,7 @@ class Hrd extends AdminController
     // Toggle Branch Manager Status (AJAX)
     public function toggle_branch_manager($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -649,7 +649,7 @@ class Hrd extends AdminController
     /* View Holiday List */
     public function holiday_list()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Holiday List');
         }
 
@@ -671,8 +671,8 @@ class Hrd extends AdminController
     /* View Today's Thought */
     public function todays_thought()
     {
-        if (!is_admin()) {
-            access_denied('Today\'s Thought');
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Today`s Thought');
         }
 
         if (!is_super()) {
@@ -693,7 +693,7 @@ class Hrd extends AdminController
     /* View Leave Rule */
     public function leave_rule()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Leave Rule');
         }
 
@@ -715,7 +715,7 @@ class Hrd extends AdminController
     /* View Corporate Guidelines */
     public function corporate_guidelines()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Corporate Guidelines');
         }
 
@@ -749,7 +749,7 @@ class Hrd extends AdminController
     /* View Company Policies */
     public function company_policies()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Company Policies');
         }
 
@@ -785,7 +785,7 @@ class Hrd extends AdminController
     /* View Events & Announcements */
     public function events_announcements()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Events & Announcements');
         }
 
@@ -821,7 +821,7 @@ class Hrd extends AdminController
     /* View Attendance Status */
     public function attendance_status()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Attendance Status');
         }
 
@@ -843,7 +843,7 @@ class Hrd extends AdminController
     // Add/Edit Holiday List
     public function holidaylist()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Holiday List');
         }
 
@@ -871,7 +871,7 @@ class Hrd extends AdminController
     // Add/Edit Today's Thought
     public function todaysthought()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied("Today's Thought");
         }
 
@@ -900,7 +900,7 @@ class Hrd extends AdminController
     // Add/Edit Attendance Status
     public function attendancestatus()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Attendance Status');
         }
 
@@ -928,7 +928,7 @@ class Hrd extends AdminController
     // Delete Attendance Status (soft)
     public function delete_attendance_status($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Attendance Status');
         }
         $this->db->where('id', $id);
@@ -940,7 +940,7 @@ class Hrd extends AdminController
     // Toggle Attendance Status (AJAX)
     public function toggle_attendance_status($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -953,7 +953,7 @@ class Hrd extends AdminController
     // Add/Edit Leave Rule
     public function leaverule()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Leave Rule');
         }
 
@@ -983,7 +983,7 @@ class Hrd extends AdminController
     {
 	
 	//log_message('error', 'hhhhhhhhhhhhhhhh');
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Corporate Guidelines');
         }
 
@@ -1012,7 +1012,7 @@ class Hrd extends AdminController
     // Add/Edit Company Policies
     public function companypolicies()
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Company Policies');
         }
 
@@ -1041,7 +1041,7 @@ class Hrd extends AdminController
     // Delete Company Policy (soft)
     public function delete_company_policies($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Company Policies');
         }
         $this->db->where('id', $id);
@@ -1053,7 +1053,7 @@ class Hrd extends AdminController
     // Toggle Company Policy Status (AJAX)
     public function toggle_company_policies($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -1066,7 +1066,7 @@ class Hrd extends AdminController
     // Delete Corporate Guidelines (soft)
     public function delete_corporate_guidelines($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Corporate Guidelines');
         }
         $this->db->where('id', $id);
@@ -1078,7 +1078,7 @@ class Hrd extends AdminController
     // Toggle Corporate Guidelines Status (AJAX)
     public function toggle_corporate_guidelines($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -1091,7 +1091,7 @@ class Hrd extends AdminController
     // Delete Leave Rule (soft)
     public function delete_leave_rule($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Leave Rule');
         }
         $this->db->where('id', $id);
@@ -1103,7 +1103,7 @@ class Hrd extends AdminController
     // Toggle Leave Rule Status (AJAX)
     public function toggle_leave_rule($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -1116,7 +1116,7 @@ class Hrd extends AdminController
     // Delete Today's Thought (soft)
     public function delete_todays_thought($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied("Today's Thought");
         }
         $this->db->where('id', $id);
@@ -1128,7 +1128,7 @@ class Hrd extends AdminController
     // Toggle Today's Thought Status (AJAX)
     public function toggle_todays_thought($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
@@ -1141,7 +1141,7 @@ class Hrd extends AdminController
     // Delete Holiday List
     public function delete_holiday_list($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Holiday List');
         }
         // Soft delete: set status to 0 (Deactive) instead of removing the record
@@ -1154,7 +1154,7 @@ class Hrd extends AdminController
     // Toggle Holiday List Status (AJAX)
     public function toggle_holiday_list($id)
     {
-        if (!is_admin()) {
+        if (!staff_can('view_setting',  'hr_department')) {
             echo json_encode(['success' => false]);
             return;
         }
