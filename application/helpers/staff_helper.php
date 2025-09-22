@@ -129,6 +129,18 @@ function get_available_staff_permissions($data = [])
 				'project_group' => _l('Group'), ]),
         ],
 		
+		'hr_department' => [
+            'name'         => _l('hr_department'),
+            'capabilities' => array_merge( [ 
+			    'view_own' => _l('permission_view_own'),
+                /*'hrd_dashboard'=> _l('Dashboard'), 
+				'hrd_attendance'=> _l('Attendance'),
+				'hrd_leave' => _l('Leave Application'),*/
+				'view_interviews' => _l('Interviews'),
+				'view_setting' => _l('settings'),
+				'view_reports' => _l('Reports'), ]),
+        ],
+		
         /*'proposals' => [
             'name'         => _l('proposals'),
             'capabilities' => array_merge($allPermissionsArray, [
