@@ -126,6 +126,7 @@
     $('#additional').append(hidden_input('id', id));
     $('#leave_rule input[name="title"]').val($(invoker).data('title'));
     $('#leave_rule textarea[name="details"]').jqteVal($(invoker).data('details'));
+	$('#leave_rule textarea[name="details"]').val($(invoker).data('details'));
     $('#leave_rule').modal('show');
     $('.add-title').addClass('hide');
   }
