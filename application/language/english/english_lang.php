@@ -4166,4 +4166,6 @@ $lang['employee_type'] = 'Employee Type';
 $lang['leave_rule'] = 'Leave Rule';
 $lang['shift_type'] = 'Shift Type';
 $lang['attendance_status'] = 'Attendance Status';
+$lang['attendance_manager'] = 'Attendance Management';
+$lang['leave_manager'] = 'Leave Management';
 ?>

@@ -1024,3 +1024,54 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
   display:none;
   z-index: 9999;
 }
+
+/* Simple, sleek clock styling */
+     .digital-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+      user-select: none;
+      font-size: 1.05rem;
+    }
+    .digital-clock {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #111827; /* dark card */
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.45);
+      user-select: none;
+      font-size: 1.05rem;
+    }
+
+    .dc-time {
+      font-weight: 700;
+      letter-spacing: 1px;
+      font-size: 1.3rem;
+    }
+
+    .dc-seconds {
+      font-weight: 500;
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    .dc-ampm {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+
+    /* responsive */
+    @media (max-width:420px){
+      .digital-clock { font-size: 0.95rem; padding: 8px 12px; }
+      .dc-time { font-size: 1.05rem; }
+    }

@@ -940,6 +940,27 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
        }
+	   
+	    if (staff_can('view_setting',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'leave_manager',
+            'name'     => _l('leave_manager'),
+            'href'     => admin_url('hrd/leave_manager'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+		
+		if (staff_can('view_setting',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'attendance_manager',
+            'name'     => _l('attendance_manager'),
+            'href'     => admin_url('hrd/attendance_manager'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+		
 		if (staff_can('view_setting',  'hr_department')) {
 		$CI->app_menu->add_setup_children_item('hr_department', [
             'slug'     => 'corporate_guidelines',

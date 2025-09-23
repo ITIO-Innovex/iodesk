@@ -560,4 +560,61 @@ class Hrd_model extends App_Model
         $this->db->order_by('shift_id', 'asc');
         return $this->db->get(db_prefix() . 'hrd_shift_manager')->result_array();
     }
+
+    /**
+     * Get leave application(s)
+     * @param mixed $id Optional - leave_id
+     * @param array $where Optional filters
+     * @return mixed object if id passed else array
+     */
+    public function get_leave_application($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('leave_id', $id);
+            return $this->db->get(db_prefix() . 'hrd_leave_master')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('leave_id', 'desc');
+        return $this->db->get(db_prefix() . 'hrd_leave_master')->result_array();
+    }
+
+    /**
+     * Get attendance records
+     * @param mixed $id Optional - attendance_id
+     * @param array $where Optional filters
+     * @return mixed object if id passed else array
+     */
+    public function get_attendance($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('attendance_id', $id);
+            return $this->db->get(db_prefix() . 'hrd_attendance')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('attendance_id', 'desc');
+        return $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+    }
+
+    /**
+     * Get interviews records
+     * @param mixed $id Optional - id
+     * @param array $where Optional filters
+     * @return mixed object if id passed else array
+     */
+    public function get_interviews($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'hrd_interviews_master')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('id', 'desc');
+        return $this->db->get(db_prefix() . 'hrd_interviews_master')->result_array();
+    }
 }
