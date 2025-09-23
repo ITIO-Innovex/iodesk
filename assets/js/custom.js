@@ -345,3 +345,33 @@ function showFlashMessage(message, type = 'success') {
         $flash.fadeOut();
     }, 2000);
 }
+
+(function($){
+      // Helper to pad numbers
+      function pad(n){ return n < 10 ? '0' + n : '' + n; }
+
+      // Update clock (uses client's local time)
+      function updateClock(){
+        var now = new Date(); // uses user's browser time
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+
+        // 12-hour format with AM/PM
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        var hours12 = hours % 12;
+        if (hours12 === 0) hours12 = 12;
+
+        // Set text
+        $('#dc-hours-min').text(pad(hours12) + ':' + pad(minutes));
+        $('#dc-seconds').text(':' + pad(seconds));
+        $('#dc-ampm').text(ampm);
+      }
+
+      // Start: update immediately and then every 1 second
+      $(function(){
+        updateClock();
+        // Use setInterval to update every 1000ms. This is fine for clocks.
+        setInterval(updateClock, 1000);
+      });
+    })(jQuery);

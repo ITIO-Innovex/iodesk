@@ -839,7 +839,429 @@ class Hrd extends AdminController
         $data['title'] = 'Attendance Status';
         $this->load->view('admin/hrd/setting/attendance_status', $data);
     }
+/* View Leave Application */
+    public function leave_manager()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Leave Application');
+        }
 
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+
+        // Filters
+        $staffid    = trim((string)$this->input->get('staffid'));
+        $fdate      = trim((string)$this->input->get('from_date'));
+        $tdate      = trim((string)$this->input->get('to_date'));
+        $ltype      = trim((string)$this->input->get('leave_type'));
+        $lstatus    = trim((string)$this->input->get('leave_status'));
+
+        if ($staffid !== '') { $this->db->where('staffid', (int)$staffid); }
+        if ($ltype !== '') { $this->db->where('leave_type', $ltype); }
+        if ($lstatus !== '') { $this->db->where('leave_status', (int)$lstatus); }
+        if ($fdate !== '') { $this->db->where('from_date >=', $fdate); }
+        if ($tdate !== '') { $this->db->where('to_date <=', $tdate); }
+
+        $data['leave_list'] = $this->hrd_model->get_leave_application();
+        $data['filters'] = [
+            'staffid' => $staffid,
+            'from_date' => $fdate,
+            'to_date' => $tdate,
+            'leave_type' => $ltype,
+            'leave_status' => $lstatus,
+        ];
+
+        // Load active leave types for dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['leave_types'] = $this->hrd_model->get_leave_type();
+
+        $data['title'] = 'Leave Application Manager';
+        $this->load->view('admin/hrd/leave_manager', $data);
+    }
+	
+	
+    /* View Leave Application */
+    public function leave_application()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Leave Application');
+        }
+
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+		} elseif (is_admin()) {
+		$this->db->where('company_id', get_staff_company_id());   
+        } else {
+         $this->db->where('staffid', get_staff_user_id());   
+        }
+
+        $data['leave_list'] = $this->hrd_model->get_leave_application();
+
+        // Load active leave types for dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['leave_types'] = $this->hrd_model->get_leave_type();
+
+        // Load active staff for filter dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('active', 1);
+        $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        $data['title'] = 'Leave Application';
+        $this->load->view('admin/hrd/leave_application', $data);
+    }
+
+    // Add/Edit Leave Application
+    public function leaveapplication()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Leave Application');
+        }
+
+        $leave_id = $this->input->post('leave_id');
+        $data = [
+            'staffid'      => ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id(),
+            'company_id'   => get_staff_company_id(),
+            'from_date'    => $this->input->post('from_date'),
+            'to_date'      => $this->input->post('to_date'),
+            'leave_type'   => $this->input->post('leave_type'),
+            'leave_for'    => $this->input->post('leave_for') !== null ? (int)$this->input->post('leave_for') : 1,
+            'leave_reson'  => $this->input->post('leave_reson'),
+        ];
+
+        // Optional reply and status updates (e.g., by manager)
+        if ($this->input->post('leave_reply') !== null) {
+            $data['leave_reply'] = $this->input->post('leave_reply');
+			$data['approved_by'] = get_staff_user_id();
+        }
+        if ($this->input->post('leave_status') !== null) {
+            $data['leave_status'] = (int)$this->input->post('leave_status');
+        }
+
+        if ($leave_id) {
+            $this->db->where('leave_id', $leave_id);
+            $this->db->update('it_crm_hrd_leave_master', $data);
+            set_alert('success', 'Leave application updated successfully');
+            exit;
+        } else {
+            // Default new leave status to Pending (0)
+            if (!isset($data['leave_status'])) {
+                $data['leave_status'] = 0;
+            }
+            $this->db->insert('it_crm_hrd_leave_master', $data);
+            set_alert('success', 'Leave application submitted successfully');
+            exit;
+        }
+        redirect(admin_url('hrd/leave_application'));
+    }
+
+    /* View Attendance */
+    public function attendance()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Attendance');
+        }
+
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } elseif (is_admin()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            $this->db->where('staffid', get_staff_user_id());
+        }
+
+        // Filters
+        $staffid   = trim((string)$this->input->get('staffid'));
+        $date_from = trim((string)$this->input->get('date_from'));
+        $date_to   = trim((string)$this->input->get('date_to'));
+        $shift_id  = trim((string)$this->input->get('shift_id'));
+        $portion   = trim((string)$this->input->get('portion'));
+        $late_mark = trim((string)$this->input->get('late_mark'));
+        $fh        = trim((string)$this->input->get('first_half'));
+        $sh        = trim((string)$this->input->get('second_half'));
+
+        if ($staffid !== '') { $this->db->where('staffid', (int)$staffid); }
+        if ($shift_id !== '') { $this->db->where('shift_id', (int)$shift_id); }
+        if ($portion !== '') { $this->db->where('portion', $portion); }
+        if ($fh !== '') { $this->db->where('first_half', $fh); }
+        if ($sh !== '') { $this->db->where('second_half', $sh); }
+        if ($late_mark !== '') { $this->db->where('late_mark', (int)$late_mark); }
+        if ($date_from !== '') { $this->db->where('attendance_date >=', $date_from); }
+        if ($date_to !== '') { $this->db->where('attendance_date <=', $date_to); }
+
+        $data['attendance_list'] = $this->hrd_model->get_attendance();
+        $data['filters'] = [
+            'staffid' => $staffid,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+            'shift_id' => $shift_id,
+            'portion' => $portion,
+            'late_mark' => $late_mark,
+            'first_half' => $fh,
+            'second_half' => $sh,
+        ];
+
+        // Load active shifts for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['shifts'] = $this->hrd_model->get_shift_manager();
+
+        // Load active staff for filter dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        $data['title'] = 'Attendance';
+        $this->load->view('admin/hrd/attendance', $data);
+    }
+
+    // Add/Edit Attendance Entry
+    public function attendanceentry()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Attendance');
+        }
+
+        $attendance_id = $this->input->post('attendance_id');
+        $in_time  = $this->input->post('in_time');
+        $out_time = $this->input->post('out_time');
+        $total_hours = $this->input->post('total_hours');
+
+        // Compute total_hours if not provided and both datetimes present
+        if (!$total_hours && $in_time && $out_time) {
+            $start = strtotime($in_time);
+            $end   = strtotime($out_time);
+            if ($start && $end && $end >= $start) {
+                $diff = ($end - $start) / 3600; // hours
+                $total_hours = number_format($diff, 2, '.', '');
+            } else {
+                $total_hours = '0.00';
+            }
+        }
+
+        $data = [
+            'staffid'         => ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id(),
+            'company_id'      => get_staff_company_id(),
+            'shift_id'        => (int)$this->input->post('shift_id'),
+            'attendance_date' => $this->input->post('attendance_date'),
+            'in_time'         => $in_time ?: null,
+            'out_time'        => $out_time ?: null,
+            'first_half'      => $this->input->post('first_half') ?: 'Absent',
+            'second_half'     => $this->input->post('second_half') ?: 'Absent',
+            'portion'         => $this->input->post('portion') ?: 'None',
+            'total_hours'     => $total_hours ?: '0.00',
+            'late_mark'       => $this->input->post('late_mark') ? 1 : 0,
+            'remarks'         => $this->input->post('remarks'),
+        ];
+
+        if ($attendance_id) {
+            $this->db->where('attendance_id', $attendance_id);
+            $this->db->update('it_crm_hrd_attendance', $data);
+            set_alert('success', 'Attendance updated successfully');
+            exit;
+        } else {
+            $this->db->insert('it_crm_hrd_attendance', $data);
+            set_alert('success', 'Attendance added successfully');
+            exit;
+        }
+        redirect(admin_url('hrd/attendance'));
+    }
+
+    // Bulk update attendance status (0=open,1=fixed)
+    public function bulk_update_attendance_status()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $ids = $this->input->post('ids');
+        $status = (int)$this->input->post('status');
+
+        if (!is_array($ids) || empty($ids)) {
+            echo json_encode(['success' => false, 'message' => 'No items selected']);
+            return;
+        }
+
+        // Scope by company for safety
+        if (is_super()) {
+            $company_id = isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id'] ? $_SESSION['super_view_company_id'] : get_staff_company_id();
+        } else {
+            $company_id = get_staff_company_id();
+        }
+
+        $this->db->where_in('attendance_id', $ids);
+        $this->db->where('company_id', $company_id);
+        $this->db->update('it_crm_hrd_attendance', ['status' => $status]);
+
+        echo json_encode(['success' => true]);
+    }
+
+    /* View Interviews */
+    public function interviews()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Interviews');
+        }
+
+        // Company scope
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+
+        // Filters (multi-field)
+        $full_name     = trim((string)$this->input->get('full_name'));
+        $phone         = trim((string)$this->input->get('phone_number'));
+        $email         = trim((string)$this->input->get('email_id'));
+        $qualification = trim((string)$this->input->get('qualification'));
+        $designation   = trim((string)$this->input->get('designation'));
+        $experience    = trim((string)$this->input->get('total_experience'));
+        $salary        = trim((string)$this->input->get('current_salary'));
+        $notice_from   = trim((string)$this->input->get('notice_from'));
+        $notice_to     = trim((string)$this->input->get('notice_to'));
+        $location      = trim((string)$this->input->get('location'));
+        $city          = trim((string)$this->input->get('city'));
+        $status        = trim((string)$this->input->get('status'));
+        $added_from    = trim((string)$this->input->get('added_from'));
+        $added_to      = trim((string)$this->input->get('added_to'));
+
+        if ($full_name !== '') { $this->db->like('full_name', $full_name); }
+        if ($phone !== '') { $this->db->like('phone_number', $phone); }
+        if ($email !== '') { $this->db->like('email_id', $email); }
+        if ($qualification !== '') { $this->db->like('qualification', $qualification); }
+        if ($designation !== '') { $this->db->like('designation', $designation); }
+        if ($experience !== '') { $this->db->like('total_experience', $experience); }
+        if ($salary !== '') { $this->db->like('current_salary', $salary); }
+        if ($notice_from !== '') { $this->db->where('notice_period_in_days >=', (int)$notice_from); }
+        if ($notice_to !== '') { $this->db->where('notice_period_in_days <=', (int)$notice_to); }
+        if ($location !== '') { $this->db->like('location', $location); }
+        if ($city !== '') { $this->db->like('city', $city); }
+        if ($status !== '') { $this->db->where('status', (int)$status); }
+        if ($added_from !== '') { $this->db->where('addedon >=', $added_from . ' 00:00:00'); }
+        if ($added_to !== '') { $this->db->where('addedon <=', $added_to . ' 23:59:59'); }
+
+        $data['interviews'] = $this->hrd_model->get_interviews();
+        $data['filters'] = [
+            'full_name' => $full_name,
+            'phone_number' => $phone,
+            'email_id' => $email,
+            'qualification' => $qualification,
+            'designation' => $designation,
+            'total_experience' => $experience,
+            'current_salary' => $salary,
+            'notice_from' => $notice_from,
+            'notice_to' => $notice_to,
+            'location' => $location,
+            'city' => $city,
+            'status' => $status,
+            'added_from' => $added_from,
+            'added_to' => $added_to,
+        ];
+
+        $data['title'] = 'Interviews';
+        $this->load->view('admin/hrd/interviews', $data);
+    }
+
+    // Add/Edit Interview
+    public function interviewentry()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Interviews');
+        }
+
+        $id = $this->input->post('id');
+
+        $data = [
+            'company_id'            => get_staff_company_id(),
+            'full_name'             => $this->input->post('full_name'),
+            'phone_number'          => $this->input->post('phone_number'),
+            'email_id'              => $this->input->post('email_id'),
+            'qualification'         => $this->input->post('qualification'),
+            'designation'           => $this->input->post('designation'),
+            'total_experience'      => $this->input->post('total_experience'),
+            'current_salary'        => $this->input->post('current_salary'),
+            'notice_period_in_days' => ($this->input->post('notice_period_in_days')!=='') ? (int)$this->input->post('notice_period_in_days') : null,
+            'location'              => $this->input->post('location'),
+            'city'                  => $this->input->post('city'),
+            'comments'              => $this->input->post('comments'),
+            'status'                => ($this->input->post('status')!=='') ? (int)$this->input->post('status') : 1,
+            'addedby'               => get_staff_user_id(),
+        ];
+
+        if ($id) {
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_hrd_interviews_master', $data);
+            set_alert('success', 'Interview updated successfully');
+            exit;
+        } else {
+            $this->db->insert('it_crm_hrd_interviews_master', $data);
+            set_alert('success', 'Interview added successfully');
+            exit;
+        }
+        redirect(admin_url('hrd/interviews'));
+    }
     // Add/Edit Holiday List
     public function holidaylist()
     {

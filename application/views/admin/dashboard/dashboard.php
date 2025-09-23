@@ -60,8 +60,21 @@
 	</div>
 	
 	</div>
-    <div class="screen-options-btn box-shadow-bg">
+    <div class="screen-options-btn box-shadow-bg tw-mt-2">
         <i class="fa-solid fa-user  menu-icon tw-mx-2 fa-2x" title="View Profile - <?=get_user_type();?>"></i>
+    </div>
+	<div class="tw-mt-2" style="margin-left: 30px;">
+        <!-- Place this where you want the clock to appear -->
+  <div class="digital-clock" aria-live="polite" title="Local time">
+    <div class="dc-time" id="dc-hours-min">00:00</div>
+    <div class="dc-seconds" id="dc-seconds">:00</div>
+    <div class="dc-ampm" id="dc-ampm">AM</div>
+  </div>
+  <?php $mark_in=1; if($mark_in==1){ ?>
+  <button type="submit" class="digital-btn btn-success"  name="attendance" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
+  <?php }else{ ?>
+  <button type="submit" class="digital-btn btn-danger"  name="attendance" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
+  <?php } ?>
     </div>
     <div class="content">
         <div class="row">
