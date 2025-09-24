@@ -50,6 +50,70 @@ class Hrd extends AdminController
             $this->load->view('admin/hrd/setting/setting_home', $data);
         }
     }
+	
+	 public function dashboard()
+    {
+        /*if(is_admin() || (is_staff_member() && staff_can('project_dashboard',  'project'))) { 
+        }else{
+		access_denied('Project Dashboard');
+		}
+        
+        $this->load->model('project_model');
+        $this->load->model('staff_model');
+        
+        // Get dashboard statistics
+        $data['stats'] = $this->project_model->get_dashboard_stats();
+        
+        // Get latest projects and tasks
+        $data['latest_projects'] = $this->project_model->get_latest_projects(5);
+        $data['latest_tasks'] = $this->project_model->get_latest_tasks(5);
+        
+        // Get chart data
+        $data['project_status_chart'] = $this->project_model->get_project_status_chart_data();
+        $data['task_status_chart'] = $this->project_model->get_task_status_chart_data();
+        $data['monthly_projects'] = $this->project_model->get_monthly_projects_chart();
+        */
+		
+		// Get get events announcements
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$this->db->limit(1);
+        $data['events_announcements'] = $this->hrd_model->get_events_announcements();
+		
+		
+		// Get get company policies
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$this->db->limit(1);
+        $data['company_policies'] = $this->hrd_model->get_company_policies();
+		
+		
+		// Get get todays thought
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$this->db->limit(1);
+        $data['corporate_guidelines'] = $this->hrd_model->get_corporate_guidelines();
+		
+		
+        // Get get todays thought
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$this->db->limit(1);
+        $data['todays_thought'] = $this->hrd_model->get_todays_thought();
+		
+		// Get get holiday list
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->where('YEAR(holiday_date)', date('Y')); // filter by year
+		$this->db->order_by('holiday_date', 'asc');
+        $data['holiday_lists'] = $this->hrd_model->get_holiday_list();
+        $data['title'] = 'My Desk - HR & Policy';
+        $this->load->view('admin/hrd/dashboard', $data);
+    }
 
     /* View Interview Status */
     public function interview_status()
@@ -870,6 +934,19 @@ class Hrd extends AdminController
         if ($tdate !== '') { $this->db->where('to_date <=', $tdate); }
 
         $data['leave_list'] = $this->hrd_model->get_leave_application();
+		
+        // Load active staff for filter dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('active', 1);
+        $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
         $data['filters'] = [
             'staffid' => $staffid,
             'from_date' => $fdate,
@@ -1069,6 +1146,86 @@ class Hrd extends AdminController
 
         $data['title'] = 'Attendance';
         $this->load->view('admin/hrd/attendance', $data);
+    }
+	
+	/* View Attendance */
+    public function attendance_manager()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Attendance');
+        }
+
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } elseif (is_admin()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            $this->db->where('staffid', get_staff_user_id());
+        }
+
+        // Filters
+        $staffid   = trim((string)$this->input->get('staffid'));
+        $date_from = trim((string)$this->input->get('date_from'));
+        $date_to   = trim((string)$this->input->get('date_to'));
+        $shift_id  = trim((string)$this->input->get('shift_id'));
+        $portion   = trim((string)$this->input->get('portion'));
+        $late_mark = trim((string)$this->input->get('late_mark'));
+        $fh        = trim((string)$this->input->get('first_half'));
+        $sh        = trim((string)$this->input->get('second_half'));
+
+        if ($staffid !== '') { $this->db->where('staffid', (int)$staffid); }
+        if ($shift_id !== '') { $this->db->where('shift_id', (int)$shift_id); }
+        if ($portion !== '') { $this->db->where('portion', $portion); }
+        if ($fh !== '') { $this->db->where('first_half', $fh); }
+        if ($sh !== '') { $this->db->where('second_half', $sh); }
+        if ($late_mark !== '') { $this->db->where('late_mark', (int)$late_mark); }
+        if ($date_from !== '') { $this->db->where('attendance_date >=', $date_from); }
+        if ($date_to !== '') { $this->db->where('attendance_date <=', $date_to); }
+
+        $data['attendance_list'] = $this->hrd_model->get_attendance();
+        $data['filters'] = [
+            'staffid' => $staffid,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+            'shift_id' => $shift_id,
+            'portion' => $portion,
+            'late_mark' => $late_mark,
+            'first_half' => $fh,
+            'second_half' => $sh,
+        ];
+
+        // Load active shifts for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['shifts'] = $this->hrd_model->get_shift_manager();
+
+        // Load active staff for filter dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        $data['title'] = 'Attendance Manager';
+        $this->load->view('admin/hrd/attendance_manager', $data);
     }
 
     // Add/Edit Attendance Entry

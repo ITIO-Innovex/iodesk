@@ -11,23 +11,24 @@
         </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <form method="get" action="" class="mbot15">
+		  <div class="row">
+		  <div class="col-sm-11">
+            <form method="get" action="" class="mbot15 togglesearch" style="border: 1px solid rgb(204, 204, 204);
+    padding: 25px 10px 10px;background: lightsteelblue; display:none;">
               <div class="row">
-                <div class="col-md-3"><div class="form-group"><label>Full Name</label><input type="text" name="full_name" class="form-control" value="<?php echo e($filters['full_name'] ?? ''); ?>" /></div></div>
+                <div class="col-md-2"><div class="form-group"><label>Full Name</label><input type="text" name="full_name" class="form-control" value="<?php echo e($filters['full_name'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Phone</label><input type="text" name="phone_number" class="form-control" value="<?php echo e($filters['phone_number'] ?? ''); ?>" /></div></div>
-                <div class="col-md-3"><div class="form-group"><label>Email</label><input type="text" name="email_id" class="form-control" value="<?php echo e($filters['email_id'] ?? ''); ?>" /></div></div>
+                <div class="col-md-2"><div class="form-group"><label>Email</label><input type="text" name="email_id" class="form-control" value="<?php echo e($filters['email_id'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Qualification</label><input type="text" name="qualification" class="form-control" value="<?php echo e($filters['qualification'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Designation</label><input type="text" name="designation" class="form-control" value="<?php echo e($filters['designation'] ?? ''); ?>" /></div></div>
-              </div>
-              <div class="row">
+             
                 <div class="col-md-2"><div class="form-group"><label>Total Experience</label><input type="text" name="total_experience" class="form-control" value="<?php echo e($filters['total_experience'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Current Salary</label><input type="text" name="current_salary" class="form-control" value="<?php echo e($filters['current_salary'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Notice From (days)</label><input type="number" name="notice_from" class="form-control" value="<?php echo e($filters['notice_from'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Notice To (days)</label><input type="number" name="notice_to" class="form-control" value="<?php echo e($filters['notice_to'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Location</label><input type="text" name="location" class="form-control" value="<?php echo e($filters['location'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>City</label><input type="text" name="city" class="form-control" value="<?php echo e($filters['city'] ?? ''); ?>" /></div></div>
-              </div>
-              <div class="row">
+             
                 <div class="col-md-2"><div class="form-group"><label>Status</label>
                   <?php $st = (string)($filters['status'] ?? ''); ?>
                   <select name="status" class="form-control">
@@ -38,11 +39,17 @@
                 </div></div>
                 <div class="col-md-2"><div class="form-group"><label>Added From</label><input type="date" name="added_from" class="form-control" value="<?php echo e($filters['added_from'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Added To</label><input type="date" name="added_to" class="form-control" value="<?php echo e($filters['added_to'] ?? ''); ?>" /></div></div>
-                <div class="col-md-2"><label>&nbsp;</label><div class="form-group"><button type="submit" class="btn btn-default btn-block">Filter</button></div></div>
-                <div class="col-md-2"><label>&nbsp;</label><div class="form-group"><a href="<?php echo admin_url('hrd/interviews'); ?>" class="btn btn-default btn-block">Reset</a></div></div>
+                <div class="col-md-2">
+                  <label>&nbsp;</label><div class="form-group">
+                    <button type="submit" class="btn btn-default"><i class="fa-solid fa-magnifying-glass" title="Search"></i></button>
+					<a href="<?php echo admin_url('hrd/leave_manager'); ?>" class="btn btn-default" title="Reset"><i class="fa-solid fa-rotate"></i></a>
+                  </div>
+                </div>
               </div>
             </form>
-
+            </div>
+			<div class="col-sm-1 tw-text-right"><i class="fa-solid fa-filter tw-py-2" style="color: lightsteelblue;" id="toggleBtn" title="Search"></i></div>
+		  </div>
             <?php if (!empty($interviews)) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
@@ -189,4 +196,11 @@
   function manage_interview(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
 </script>
 <?php init_tail(); ?>
+<script>
+$(document).ready(function(){
+    $('#toggleBtn').click(function(){
+        $('.togglesearch').slideToggle(); // smoothly show/hide form
+    });
+});
+</script>
 </body></html>

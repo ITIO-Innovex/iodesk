@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -11,6 +12,69 @@
         </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
+		  <div class="row">
+		  <div class="col-sm-11">
+          
+			<form method="get" action="" class="mbot15 togglesearch" style="border: 1px solid rgb(204, 204, 204);
+    padding: 25px 10px 10px;background: lightsteelblue; display:none;">
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <select name="staffid" class="form-control">
+                      <option value="">-- By Staff --</option>
+                      <?php if (!empty($staff_list)) { foreach ($staff_list as $stf) { 
+                        $sid = isset($stf['staffid']) ? (int)$stf['staffid'] : (isset($stf['id'])?(int)$stf['id']:0);
+                        $sel = (isset($filters['staffid']) && (int)$filters['staffid']===$sid) ? 'selected="selected"' : '';
+                        $name = function_exists('get_staff_full_name') ? get_staff_full_name($sid) : ((isset($stf['firstname'])?$stf['firstname']:'').' '.(isset($stf['lastname'])?$stf['lastname']:''));
+                      ?>
+                        <option value="<?php echo $sid; ?>" <?php echo $sel; ?>><?php echo e(trim($name)) . ' (#'.$sid.')'; ?></option>
+                      <?php } } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <input type="date" name="from_date" class="form-control" value="<?php echo isset($filters['from_date']) ? e($filters['from_date']) : '' ; ?>" placeholder="From Date " />
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <input type="date" name="to_date" class="form-control" value="<?php echo isset($filters['to_date']) ? e($filters['to_date']) : '' ; ?>" />
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <select name="leave_type" class="form-control">
+                      <option value="">-- Leave Type --</option>
+                      <?php if (!empty($leave_types)) { foreach ($leave_types as $t) { $sel = (isset($filters['leave_type']) && $filters['leave_type']==$t['title'])?'selected="selected"':''; ?>
+                        <option value="<?php echo e($t['title']); ?>" <?php echo $sel; ?>><?php echo e($t['title']); ?></option>
+                      <?php } } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <select name="leave_status" class="form-control">
+                      <?php $st = isset($filters['leave_status'])?$filters['leave_status']:''; ?>
+                      <option value="" <?php echo ($st==='')?'selected="selected"':''; ?>>-- By Status --</option>
+                      <option value="0" <?php echo ($st==='0')?'selected="selected"':''; ?>>Pending</option>
+                      <option value="1" <?php echo ($st==='1')?'selected="selected"':''; ?>>Approved</option>
+                      <option value="2" <?php echo ($st==='2')?'selected="selected"':''; ?>>Rejected</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-default"><i class="fa-solid fa-magnifying-glass" title="Search"></i></button>
+					<a href="<?php echo admin_url('hrd/leave_manager'); ?>" class="btn btn-default" title="Reset"><i class="fa-solid fa-rotate"></i></a>
+                  </div>
+                </div>
+                
+              </div>
+            </form>
+			</div>
+			<div class="col-sm-1 tw-text-right"><i class="fa-solid fa-filter tw-py-2" style="color: lightsteelblue;" id="toggleBtn" title="Search"></i></div>
+		  </div>
             <?php if (!empty($leave_list)) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
@@ -151,4 +215,11 @@
   function manage_leave(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
 </script>
 <?php init_tail(); ?>
+<script>
+$(document).ready(function(){
+    $('#toggleBtn').click(function(){
+        $('.togglesearch').slideToggle(); // smoothly show/hide form
+    });
+});
+</script>
 </body></html>

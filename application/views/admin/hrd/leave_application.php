@@ -11,7 +11,7 @@
         </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <form method="get" action="" class="mbot15">
+            <?php /*?><form method="get" action="" class="mbot15">
               <div class="row">
                 <div class="col-md-3">
                   <div class="form-group">
@@ -76,7 +76,7 @@
                   </div>
                 </div>
               </div>
-            </form>
+            </form><?php */?>
             <?php if (!empty($leave_list)) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
@@ -136,8 +136,8 @@
             <div class="form-group"><label>Leave Type</label>
               <select name="leave_type" class="form-control" required>
                 <option value="">-- Select Leave Type --</option>
-                <?php if (!empty($leave_types)) { foreach ($leave_types as $t) { ?>
-                  <option value="<?php echo e($t['title']); ?>"><?php echo e($t['title']); ?></option>
+                <?php  if (!empty($leave_types)) { foreach ($leave_types as $t) { ?>
+                  <option value="<?php echo e($t['title']); ?>"><?php echo e($t['title']); ?> - <?php echo e($t['remark']); ?></option>
                 <?php } } ?>
               </select>
             </div>
