@@ -4,14 +4,14 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <?php /*?><div class="tw-mb-2 sm:tw-mb-4">
+        <div class="tw-mb-2 sm:tw-mb-4">
           <a href="#" onclick="new_attendance(); return false;" class="btn btn-primary">
             <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Attendance Entry'); ?>
           </a>
-        </div><?php */?>
+        </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <?php /*?><form method="get" action="" class="mbot15">
+            <form method="get" action="" class="mbot15">
               <div class="row">
                 <div class="col-md-3">
                   <div class="form-group">
@@ -112,11 +112,19 @@
                   </div>
                 </div>
               </div>
-            </form><?php */?>
-            
+            </form>
+            <div class="row mtop10">
+              <div class="col-md-12">
+                <div class="tw-flex tw-gap-2">
+                  <button type="button" class="btn btn-default" onclick="bulkUpdateAttendanceStatus(0)">Mark Open</button>
+                  <button type="button" class="btn btn-default" onclick="bulkUpdateAttendanceStatus(1)">Mark Fixed</button>
+                </div>
+              </div>
+            </div>
             <?php if (!empty($attendance_list)) { ?>
             <table class="table dt-table" data-order-col="1" data-order-type="desc">
               <thead>
+                <th><input type="checkbox" id="select-all" onclick="toggleSelectAll(this)"></th>
                 <th>#</th>
                 <th>Employee</th>
                 <th>Date</th>
@@ -134,6 +142,7 @@
               <tbody>
                 <?php foreach ($attendance_list as $a) { ?>
                 <tr>
+                  <td><input type="checkbox" class="row-check" value="<?php echo (int)$a['attendance_id']; ?>"></td>
                   <td><?php echo (int)$a['attendance_id']; ?></td>
                   <td><?php echo function_exists('get_staff_full_name') ? e(get_staff_full_name($a['staffid'])) : (int)$a['staffid']; ?></td>
                   <td><?php echo e($a['attendance_date']); ?></td>
