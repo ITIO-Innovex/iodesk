@@ -8,75 +8,13 @@
           <a href="#" onclick="new_leave(); return false;" class="btn btn-primary">
             <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Leave Application'); ?>
           </a>
+		  <span class="btn btn-warning" onclick="leave_rule(); return false;">
+            <i class="fa-solid fa-circle-info tw-mr-1"></i> <?php echo _l('Leave Rule'); ?>
+          </span>
         </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <?php /*?><form method="get" action="" class="mbot15">
-              <div class="row">
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>Staff</label>
-                    <select name="staffid" class="form-control">
-                      <option value="">-- All --</option>
-                      <?php if (!empty($staff_list)) { foreach ($staff_list as $stf) { 
-                        $sid = isset($stf['staffid']) ? (int)$stf['staffid'] : (isset($stf['id'])?(int)$stf['id']:0);
-                        $sel = (isset($filters['staffid']) && (int)$filters['staffid']===$sid) ? 'selected="selected"' : '';
-                        $name = function_exists('get_staff_full_name') ? get_staff_full_name($sid) : ((isset($stf['firstname'])?$stf['firstname']:'').' '.(isset($stf['lastname'])?$stf['lastname']:''));
-                      ?>
-                        <option value="<?php echo $sid; ?>" <?php echo $sel; ?>><?php echo e(trim($name)) . ' (#'.$sid.')'; ?></option>
-                      <?php } } ?>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>From</label>
-                    <input type="date" name="from_date" class="form-control" value="<?php echo isset($filters['from_date']) ? e($filters['from_date']) : '' ; ?>" />
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>To</label>
-                    <input type="date" name="to_date" class="form-control" value="<?php echo isset($filters['to_date']) ? e($filters['to_date']) : '' ; ?>" />
-                  </div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-group">
-                    <label>Leave Type</label>
-                    <select name="leave_type" class="form-control">
-                      <option value="">-- All --</option>
-                      <?php if (!empty($leave_types)) { foreach ($leave_types as $t) { $sel = (isset($filters['leave_type']) && $filters['leave_type']==$t['title'])?'selected="selected"':''; ?>
-                        <option value="<?php echo e($t['title']); ?>" <?php echo $sel; ?>><?php echo e($t['title']); ?></option>
-                      <?php } } ?>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>Status</label>
-                    <select name="leave_status" class="form-control">
-                      <?php $st = isset($filters['leave_status'])?$filters['leave_status']:''; ?>
-                      <option value="" <?php echo ($st==='')?'selected="selected"':''; ?>>-- All --</option>
-                      <option value="0" <?php echo ($st==='0')?'selected="selected"':''; ?>>Pending</option>
-                      <option value="1" <?php echo ($st==='1')?'selected="selected"':''; ?>>Approved</option>
-                      <option value="2" <?php echo ($st==='2')?'selected="selected"':''; ?>>Rejected</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-1">
-                  <label>&nbsp;</label>
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-default btn-block">Filter</button>
-                  </div>
-                </div>
-                <div class="col-md-1">
-                  <label>&nbsp;</label>
-                  <div class="form-group">
-                    <a href="<?php echo admin_url('hrd/leave_application'); ?>" class="btn btn-default btn-block">Reset</a>
-                  </div>
-                </div>
-              </div>
-            </form><?php */?>
+           
             <?php if (!empty($leave_list)) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
@@ -200,11 +138,30 @@
   </div>
 </div>
 
+<div class="modal fade" id="leave_rule" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Leave Rule</h4>
+      </div>
+      <div class="modal-body"><?php echo $leave_rule[0]['details'] ?? ''; ?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+function leave_rule(){ $('#leave_rule').modal('show');}
+
   window.addEventListener('load', function () {
     appValidateForm($("body").find('#leave-application-form'), {from_date:'required',to_date:'required',leave_type:'required',leave_for:'required',leave_reson:'required'}, manage_leave);
     $('#leave_application').on("hidden.bs.modal", function () { $('#additional').html(''); $('#leave_application input, #leave_application textarea').val(''); $('#leave_application select').val(''); $('.add-title').removeClass('hide'); $('.edit-title').removeClass('hide'); });
   });
+  
   function new_leave(){ $('#leave_application').modal('show'); $('.edit-title').addClass('hide'); }
   function edit_leave(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('leave_id', it.leave_id)); $('#leave_application input[name=from_date]').val(it.from_date); $('#leave_application input[name=to_date]').val(it.to_date); $('#leave_application select[name=leave_type]').val(it.leave_type); $('#leave_application select[name=leave_for]').val(it.leave_for); $('#leave_application textarea[name=leave_reson]').val(it.leave_reson); $('#leave_application textarea[name=leave_reply]').val(it.leave_reply||''); $('#leave_application select[name=leave_status]').val(it.leave_status||0); $('#leave_application').modal('show'); $('.add-title').addClass('hide'); }
   function view_leave(invoker){ var it=$(invoker).data('all'); $('#d-employee').text(it.staffid); $('#d-from').text(it.from_date); $('#d-to').text(it.to_date); $('#d-type').text(it.leave_type); $('#d-for').text((parseInt(it.leave_for,10)===2)?'Half Day':'Full Day'); var st=parseInt(it.leave_status||0,10); var label='Pending', cls='label-warning'; if(st===1){label='Approved';cls='label-success';} else if(st===2){label='Rejected';cls='label-danger';} $('#d-status').removeClass('label-warning label-success label-danger').addClass(cls).text(label); $('#d-reason').text(it.leave_reson||''); $('#d-reply').text(it.leave_reply||''); $('#leave_details').modal('show'); }

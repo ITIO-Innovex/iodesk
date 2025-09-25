@@ -29,6 +29,7 @@
                 <th>Branch</th>
                 <th>Title</th>
                 <th>Details</th>
+                <th>Attachments</th>
                 <th><?php echo _l('status'); ?></th>
                 <th><?php echo _l('options'); ?></th>
               </thead>
@@ -45,6 +46,25 @@
                     ><?php echo e($p['title']); ?></a>
                   </td>
                   <td><?php echo nl2br($p['details']); ?></td>
+                  <td>
+                    <?php if (!empty($p['attachments'])) { ?>
+                      <div class="attachments-list">
+                        <?php foreach ($p['attachments'] as $attachment) { ?>
+                          <div class="attachment-item" style="margin-bottom: 5px;">
+                            <a href="<?php echo base_url($attachment['file_path']); ?>" target="_blank" class="text-primary">
+                              <i class="fa fa-file"></i> <?php echo e($attachment['original_name']); ?>
+                            </a>
+                            <a href="<?php echo admin_url('hrd/delete_policy_attachment/' . $attachment['id']); ?>" 
+                               class="text-danger ml-2 _delete" title="Delete">
+                              <i class="fa fa-trash"></i>
+                            </a>
+                          </div>
+                        <?php } ?>
+                      </div>
+                    <?php } else { ?>
+                      <span class="text-muted">No attachments</span>
+                    <?php } ?>
+                  </td>
                   <td>
                     <a href="javascript:void(0);" onclick="togglePolicyStatus(<?php echo $p['id']; ?>, <?php echo (int)$p['status']; ?>)" id="status-label-<?php echo $p['id']; ?>">
                       <?php if (!empty($p['status'])) { ?>
@@ -86,7 +106,7 @@
 
 <div class="modal fade" id="company_policies" tabindex="-1" role="dialog">
   <div class="modal-dialog">
-    <?php echo form_open(admin_url('hrd/companypolicies'), ['id' => 'company-policies-form']); ?>
+    <?php echo form_open_multipart(admin_url('hrd/companypolicies'), ['id' => 'company-policies-form']); ?>
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -113,6 +133,11 @@
               <label for="details">Details</label>
               <textarea name="details" id="details" class="form-control editor" rows="5" required></textarea>
             </div>
+            <div class="form-group">
+              <label for="attachments">Attachments</label>
+              <input type="file" name="attachments[]" id="attachments" class="form-control" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif">
+              <small class="text-muted">You can select multiple files. Supported formats: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF</small>
+            </div>
           </div>
         </div>
       </div>
@@ -137,6 +162,7 @@
       $('#company_policies select[name="branch"]').val('');
       $('#company_policies input[name="title"]').val('');
       $('#company_policies textarea[name="details"]').val('');
+      $('#company_policies input[name="attachments[]"]').val('');
       $('.add-title').removeClass('hide');
       $('.edit-title').removeClass('hide');
     });
@@ -161,10 +187,21 @@
 
   // Form handler
   function manage_policy(form) {
-    var data = $(form).serialize();
+    var formData = new FormData(form);
     var url = form.action;
-    $.post(url, data).done(function () {
-      window.location.reload();
+    
+    $.ajax({
+      url: url,
+      type: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        window.location.reload();
+      },
+      error: function(xhr, status, error) {
+        alert('Error uploading files: ' + error);
+      }
     });
     return false;
   }

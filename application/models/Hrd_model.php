@@ -617,4 +617,75 @@ class Hrd_model extends App_Model
         $this->db->order_by('id', 'desc');
         return $this->db->get(db_prefix() . 'hrd_interviews_master')->result_array();
     }
+
+    /**
+     * Get interview source
+     * @param  mixed $id Optional - source id
+     * @param  array $where Optional - where conditions
+     * @return mixed object if id passed else array
+     */
+    public function get_interview_source($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'hrd_interview_source')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('id', 'asc');
+        return $this->db->get(db_prefix() . 'hrd_interview_source')->result_array();
+    }
+
+    /**
+     * Get company policy attachments
+     * @param  mixed $policy_id Optional - policy id
+     * @param  array $where Optional - where conditions
+     * @return mixed object if id passed else array
+     */
+    public function get_company_policy_attachments($policy_id = '', $where = [])
+    {
+        if (is_numeric($policy_id)) {
+            $this->db->where($where);
+            $this->db->where('policy_id', $policy_id);
+            $this->db->where('status', 1);
+            return $this->db->get(db_prefix() . 'hrd_company_policy_attachments')->result_array();
+        }
+
+        $this->db->where($where);
+        $this->db->where('status', 1);
+        $this->db->order_by('id', 'desc');
+        return $this->db->get(db_prefix() . 'hrd_company_policy_attachments')->result_array();
+    }
+
+    /**
+     * Add company policy attachment
+     * @param array $data attachment data
+     */
+    public function add_company_policy_attachment($data)
+    {
+        $this->db->insert(db_prefix() . 'hrd_company_policy_attachments', $data);
+        $insert_id = $this->db->insert_id();
+        if ($insert_id) {
+            log_activity('New Company Policy Attachment Added [AttachmentID: ' . $insert_id . ', File: ' . $data['original_name'] . ']');
+            return $insert_id;
+        }
+        return false;
+    }
+
+    /**
+     * Delete company policy attachment
+     * @param  mixed $id attachment id
+     * @return boolean
+     */
+    public function delete_company_policy_attachment($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'hrd_company_policy_attachments', ['status' => 0]);
+        if ($this->db->affected_rows() > 0) {
+            log_activity('Company Policy Attachment Deleted [AttachmentID: ' . $id . ']');
+            return true;
+        }
+        return false;
+    }
 }

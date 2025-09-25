@@ -371,6 +371,16 @@ function app_init_admin_sidebar_menu_items()
 	  
 	  if (staff_can('view_own',  'hr_department')){
         $CI->app_menu->add_sidebar_children_item('hr_department', [
+            'slug'     => 'attendance',
+            'name'     => _l('Attendance'),
+            'href'     => admin_url('hrd/attendance'),
+            'position' => 10,
+            'badge'    => [],
+        ]);
+      }
+	  
+	  if (staff_can('view_own',  'hr_department')){
+        $CI->app_menu->add_sidebar_children_item('hr_department', [
             'slug'     => 'leave_application',
             'name'     => _l('Leave Application'),
             'href'     => admin_url('hrd/leave_application'),
@@ -379,15 +389,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
       }
 	  
-	  if (staff_can('view_own',  'hr_department')){
-        $CI->app_menu->add_sidebar_children_item('hr_department', [
-            'slug'     => 'attendance',
-            'name'     => _l('Attendance'),
-            'href'     => admin_url('hrd/attendance'),
-            'position' => 10,
-            'badge'    => [],
-        ]);
-      }
+	  
 	  if (staff_can('view_interviews',  'hr_department')){
         $CI->app_menu->add_sidebar_children_item('hr_department', [
             'slug'     => 'interviews',
@@ -1025,9 +1027,9 @@ function app_init_admin_sidebar_menu_items()
         ]);
 		
 		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'interview_status',
-            'name'     => _l('interview_status'),
-            'href'     => admin_url('hrd/setting/interview_status'),
+            'slug'     => 'interview_source',
+            'name'     => _l('interview_source'),
+            'href'     => admin_url('hrd/setting/interview_source'),
             'position' => 5,
             'badge'    => [],
         ]);

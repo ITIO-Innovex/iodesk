@@ -18,7 +18,7 @@
 <div class="col-sm-12 tw-my-2"><h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-warning-300"><i class="fa-solid fa-comments menu-icon tw-mr-2"></i>Interviews</h4></div>                        
 <div class="col-sm-3 tw-my-2"> <a href="<?php echo admin_url('hrd/setting/interview_process');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-gears tw-mx-2"></i><?php echo _l('interview_process');?></a> 
 		  </div>
-<div class="col-sm-3 tw-my-2"> <a href="<?php echo admin_url('hrd/setting/interview_status');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-gears tw-mx-2"></i><?php echo _l('interview_status');?></a> 
+<div class="col-sm-3 tw-my-2"> <a href="<?php echo admin_url('hrd/setting/interview_source');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-gears tw-mx-2"></i><?php echo _l('interview_source');?></a> 
 		  </div>
 		  
 <div class="col-sm-12 tw-my-2"><h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-warning-300"><i class="fa-solid fa-file-pen menu-icon tw-mr-2"></i>Leave</h4></div>                        
