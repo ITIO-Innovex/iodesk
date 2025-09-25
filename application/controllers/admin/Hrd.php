@@ -20,6 +20,8 @@ class Hrd extends AdminController
             $this->interview_status();
         } elseif ($type == 'interview_process') {
             $this->interview_process();
+        } elseif ($type == 'interview_source') {
+            $this->interview_source();
         } elseif ($type == 'leave_type') {
             $this->leave_type();
         } elseif ($type == 'employee_type') {
@@ -82,12 +84,24 @@ class Hrd extends AdminController
         $data['events_announcements'] = $this->hrd_model->get_events_announcements();
 		
 		
-		// Get get company policies
+		// Get latest company policy
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
 		$this->db->order_by('id', 'desc');
 		$this->db->limit(1);
-        $data['company_policies'] = $this->hrd_model->get_company_policies();
+		$policy = $this->db->get(db_prefix() . 'hrd_company_policies')->row_array();
+		
+		if ($policy) {
+			// Get all active attachments for that policy
+			$this->db->where('policy_id', $policy['id']);
+			$this->db->where('status', 1);
+			$attachments = $this->db->get(db_prefix() . 'hrd_company_policy_attachments')->result_array();
+		
+			$policy['attachments'] = $attachments;
+		}
+
+        $data['company_policies'] = $policy;
+        //$data['company_policies'] = $this->hrd_model->get_company_policies();
 		
 		
 		// Get get todays thought
@@ -96,6 +110,13 @@ class Hrd extends AdminController
 		$this->db->order_by('id', 'desc');
 		$this->db->limit(1);
         $data['corporate_guidelines'] = $this->hrd_model->get_corporate_guidelines();
+		
+		// Get get leave rule
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$this->db->limit(1);
+        $data['leave_rule'] = $this->hrd_model->get_leave_rule();
 		
 		
         // Get get todays thought
@@ -314,6 +335,79 @@ class Hrd extends AdminController
         $new_status = $this->input->post('status') == 1 ? 1 : 0;
         $this->db->where('id', $id);
         $this->db->update('it_crm_hrd_interview_process', ['status' => $new_status]);
+        echo json_encode(['success' => true, 'new_status' => $new_status]);
+    }
+
+    /* View Interview Source */
+    public function interview_source()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Interview Source');
+        }
+
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+
+        $data['sources'] = $this->hrd_model->get_interview_source();
+        $data['title'] = 'Interview Source';
+        $this->load->view('admin/hrd/setting/interview_source', $data);
+    }
+
+    // Add/Edit Interview Source
+    public function interviewsource()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Interview Source');
+        }
+
+        $id = $this->input->post('id');
+        $data = [
+            'title' => $this->input->post('name'),
+            'company_id' => get_staff_company_id(),
+        ];
+
+        if ($id) {
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_hrd_interview_source', $data);
+            set_alert('success', 'Interview source updated successfully');exit;
+        } else {
+            // Default new interview sources to Active (status=1)
+            $data['status'] = 1;
+            $this->db->insert('it_crm_hrd_interview_source', $data);
+            set_alert('success', 'Interview source added successfully');exit;
+        }
+        redirect(admin_url('hrd/setting/interview_source'));
+    }
+
+    // Delete Interview Source (soft)
+    public function delete_interview_source($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Interview Source');
+        }
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_hrd_interview_source', ['status' => 0]);
+        set_alert('success', 'Interview source deactivated successfully');
+        redirect(admin_url('hrd/setting/interview_source'));
+    }
+
+    // Toggle Interview Source Status (AJAX)
+    public function toggle_interview_source($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $new_status = $this->input->post('status') == 1 ? 1 : 0;
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_hrd_interview_source', ['status' => $new_status]);
         echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
 
@@ -829,6 +923,11 @@ class Hrd extends AdminController
 
         $data['policies'] = $this->hrd_model->get_company_policies();
 
+        // Load attachments for each policy
+        foreach ($data['policies'] as &$policy) {
+            $policy['attachments'] = $this->hrd_model->get_company_policy_attachments($policy['id']);
+        }
+
         // Fetch active branches for dropdown
         if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
@@ -1020,6 +1119,13 @@ class Hrd extends AdminController
         $this->db->where('active', 1);
         $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
 
+        // Get get leave rule
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$this->db->limit(1);
+        $data['leave_rule'] = $this->hrd_model->get_leave_rule();
+		
         $data['title'] = 'Leave Application';
         $this->load->view('admin/hrd/leave_application', $data);
     }
@@ -1340,7 +1446,7 @@ class Hrd extends AdminController
         $notice_to     = trim((string)$this->input->get('notice_to'));
         $location      = trim((string)$this->input->get('location'));
         $city          = trim((string)$this->input->get('city'));
-        $status        = trim((string)$this->input->get('status'));
+        $process_status        = trim((string)$this->input->get('process_status'));
         $added_from    = trim((string)$this->input->get('added_from'));
         $added_to      = trim((string)$this->input->get('added_to'));
 
@@ -1355,7 +1461,7 @@ class Hrd extends AdminController
         if ($notice_to !== '') { $this->db->where('notice_period_in_days <=', (int)$notice_to); }
         if ($location !== '') { $this->db->like('location', $location); }
         if ($city !== '') { $this->db->like('city', $city); }
-        if ($status !== '') { $this->db->where('status', (int)$status); }
+        if ($process_status !== '') { $this->db->where('process_status', (int)$process_status); }
         if ($added_from !== '') { $this->db->where('addedon >=', $added_from . ' 00:00:00'); }
         if ($added_to !== '') { $this->db->where('addedon <=', $added_to . ' 23:59:59'); }
 
@@ -1372,10 +1478,36 @@ class Hrd extends AdminController
             'notice_to' => $notice_to,
             'location' => $location,
             'city' => $city,
-            'status' => $status,
+            'process_status' => $process_status,
             'added_from' => $added_from,
             'added_to' => $added_to,
         ];
+
+        // Load interview sources for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['interview_sources'] = $this->hrd_model->get_interview_source();
+
+        // Load interview processes for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['interview_processes'] = $this->hrd_model->get_interview_process();
 
         $data['title'] = 'Interviews';
         $this->load->view('admin/hrd/interviews', $data);
@@ -1402,8 +1534,9 @@ class Hrd extends AdminController
             'notice_period_in_days' => ($this->input->post('notice_period_in_days')!=='') ? (int)$this->input->post('notice_period_in_days') : null,
             'location'              => $this->input->post('location'),
             'city'                  => $this->input->post('city'),
+            'source'                => ($this->input->post('source')!=='') ? (int)$this->input->post('source') : null,
+            'process_status'        => ($this->input->post('process_status')!=='') ? (int)$this->input->post('process_status') : null,
             'comments'              => $this->input->post('comments'),
-            'status'                => ($this->input->post('status')!=='') ? (int)$this->input->post('status') : 1,
             'addedby'               => get_staff_user_id(),
         ];
 
@@ -1607,13 +1740,82 @@ class Hrd extends AdminController
         if ($id) {
             $this->db->where('id', $id);
             $this->db->update('it_crm_hrd_company_policies', $data);
-            set_alert('success', 'Company policy updated successfully');exit;
+            $policy_id = $id;
+            set_alert('success', 'Company policy updated successfully');
         } else {
             // Default new policies to Active (status=1)
             $data['status'] = 1;
             $this->db->insert('it_crm_hrd_company_policies', $data);
-            set_alert('success', 'Company policy added successfully');exit;
+            $policy_id = $this->db->insert_id();
+            set_alert('success', 'Company policy added successfully');
         }
+
+        // Handle file uploads
+        if (!empty($_FILES['attachments']['name'][0])) {
+            $this->handle_policy_attachments($policy_id);
+        }
+
+        exit;
+    }
+
+    // Handle policy attachments upload
+    private function handle_policy_attachments($policy_id)
+    {
+        $upload_path = FCPATH . 'uploads/company_policies/';
+        
+        // Create directory if it doesn't exist
+        if (!is_dir($upload_path)) {
+            mkdir($upload_path, 0755, true);
+        }
+
+        $files = $_FILES['attachments'];
+        $file_count = count($files['name']);
+
+        for ($i = 0; $i < $file_count; $i++) {
+            if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                $file_name = $files['name'][$i];
+                $file_tmp = $files['tmp_name'][$i];
+                $file_size = $files['size'][$i];
+                $file_type = $files['type'][$i];
+                
+                // Generate unique filename
+                $file_extension = pathinfo($file_name, PATHINFO_EXTENSION);
+                $unique_filename = uniqid() . '_' . time() . '.' . $file_extension;
+                $file_path = $upload_path . $unique_filename;
+                
+                // Move uploaded file
+                if (move_uploaded_file($file_tmp, $file_path)) {
+                    $attachment_data = [
+                        'policy_id' => $policy_id,
+                        'company_id' => get_staff_company_id(),
+                        'file_name' => $unique_filename,
+                        'original_name' => $file_name,
+                        'file_path' => 'uploads/company_policies/' . $unique_filename,
+                        'file_size' => $file_size,
+                        'file_type' => $file_type,
+                        'uploaded_by' => get_staff_user_id(),
+                        'status' => 1
+                    ];
+                    
+                    $this->hrd_model->add_company_policy_attachment($attachment_data);
+                }
+            }
+        }
+    }
+
+    // Delete policy attachment
+    public function delete_policy_attachment($attachment_id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Company Policies');
+        }
+
+        if ($this->hrd_model->delete_company_policy_attachment($attachment_id)) {
+            set_alert('success', 'Attachment deleted successfully');
+        } else {
+            set_alert('danger', 'Failed to delete attachment');
+        }
+        
         redirect(admin_url('hrd/setting/company_policies'));
     }
 

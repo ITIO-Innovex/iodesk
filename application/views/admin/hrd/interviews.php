@@ -24,17 +24,17 @@
              
                 <div class="col-md-2"><div class="form-group"><label>Total Experience</label><input type="text" name="total_experience" class="form-control" value="<?php echo e($filters['total_experience'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>Current Salary</label><input type="text" name="current_salary" class="form-control" value="<?php echo e($filters['current_salary'] ?? ''); ?>" /></div></div>
-                <div class="col-md-2"><div class="form-group"><label>Notice From (days)</label><input type="number" name="notice_from" class="form-control" value="<?php echo e($filters['notice_from'] ?? ''); ?>" /></div></div>
-                <div class="col-md-2"><div class="form-group"><label>Notice To (days)</label><input type="number" name="notice_to" class="form-control" value="<?php echo e($filters['notice_to'] ?? ''); ?>" /></div></div>
+                
                 <div class="col-md-2"><div class="form-group"><label>Location</label><input type="text" name="location" class="form-control" value="<?php echo e($filters['location'] ?? ''); ?>" /></div></div>
                 <div class="col-md-2"><div class="form-group"><label>City</label><input type="text" name="city" class="form-control" value="<?php echo e($filters['city'] ?? ''); ?>" /></div></div>
              
                 <div class="col-md-2"><div class="form-group"><label>Status</label>
-                  <?php $st = (string)($filters['status'] ?? ''); ?>
-                  <select name="status" class="form-control">
+                  <?php $st = (string)($filters['process_status'] ?? ''); ?>
+                  <select name="process_status" class="form-control">
                     <option value="" <?php echo ($st==='')?'selected="selected"':''; ?>>-- All --</option>
-                    <option value="0" <?php echo ($st==='0')?'selected="selected"':''; ?>>Inactive</option>
-                    <option value="1" <?php echo ($st==='1')?'selected="selected"':''; ?>>Active</option>
+                    <?php foreach ($interview_processes as $process) { ?>
+                    <option value="<?php echo $process['id']; ?>" <?php echo ($st===$process['id'])?'selected="selected"':''; ?>><?php echo e($process['title']); ?></option>
+                    <?php } ?>
                   </select>
                 </div></div>
                 <div class="col-md-2"><div class="form-group"><label>Added From</label><input type="date" name="added_from" class="form-control" value="<?php echo e($filters['added_from'] ?? ''); ?>" /></div></div>
@@ -42,7 +42,7 @@
                 <div class="col-md-2">
                   <label>&nbsp;</label><div class="form-group">
                     <button type="submit" class="btn btn-default"><i class="fa-solid fa-magnifying-glass" title="Search"></i></button>
-					<a href="<?php echo admin_url('hrd/leave_manager'); ?>" class="btn btn-default" title="Reset"><i class="fa-solid fa-rotate"></i></a>
+					<a href="<?php echo admin_url('hrd/interviews'); ?>" class="btn btn-default" title="Reset"><i class="fa-solid fa-rotate"></i></a>
                   </div>
                 </div>
               </div>
@@ -64,12 +64,36 @@
                 <th>Notice (days)</th>
                 <th>Location</th>
                 <th>City</th>
-                <th>Status</th>
+                <th>Source</th>
+                <th>Process</th>
+                <?php /*?><th>Status</th><?php */?>
                 <th>Added On</th>
                 <th><?php echo _l('options'); ?></th>
               </thead>
               <tbody>
-                <?php foreach ($interviews as $it) { $st=(int)($it['status']??1); ?>
+                <?php foreach ($interviews as $it) { $st=(int)($it['status']??1); 
+                  // Get source name
+                  $source_name = '';
+                  if (!empty($it['source'])) {
+                    foreach ($interview_sources as $source) {
+                      if ($source['id'] == $it['source']) {
+                        $source_name = $source['title'];
+                        break;
+                      }
+                    }
+                  }
+                  
+                  // Get process name
+                  $process_name = '';
+                  if (!empty($it['process_status'])) {
+                    foreach ($interview_processes as $process) {
+                      if ($process['id'] == $it['process_status']) {
+                        $process_name = $process['title'];
+                        break;
+                      }
+                    }
+                  }
+                ?>
                 <tr>
                   <td><?php echo (int)$it['id']; ?></td>
                   <td><?php echo e($it['full_name']); ?></td>
@@ -82,7 +106,9 @@
                   <td><?php echo (int)$it['notice_period_in_days']; ?></td>
                   <td><?php echo e($it['location']); ?></td>
                   <td><?php echo e($it['city']); ?></td>
-                  <td><?php echo $st===1?'<span class="label label-success">Active</span>':'<span class="label label-danger">Inactive</span>'; ?></td>
+                  <td><?php echo e($source_name); ?></td>
+                  <td><?php echo e($process_name); ?></td>
+                 <?php /*?> <td><?php echo $st===1?'<span class="label label-success">Active</span>':'<span class="label label-danger">Inactive</span>'; ?></td><?php */?>
                   <td><?php echo e($it['addedon']); ?></td>
                   <td>
                     <div class="tw-flex tw-items-center tw-space-x-3">
@@ -103,7 +129,7 @@
 </div>
 
 <div class="modal fade" id="interviews_modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <?php echo form_open(admin_url('hrd/interviewentry'), ['id' => 'interviews-form']); ?>
     <div class="modal-content">
       <div class="modal-header">
@@ -129,14 +155,32 @@
         </div>
         <div class="row">
           <div class="col-md-4"><div class="form-group"><label>City</label><input type="text" name="city" class="form-control"></div></div>
-          <div class="col-md-8"><div class="form-group"><label>Comments</label><input type="text" name="comments" class="form-control"></div></div>
+          <div class="col-md-4"><div class="form-group"><label>Source</label>
+            <select name="source" class="form-control">
+              <option value="">-- Select Source --</option>
+              <?php foreach ($interview_sources as $source) { ?>
+                <option value="<?php echo $source['id']; ?>"><?php echo e($source['title']); ?></option>
+              <?php } ?>
+            </select>
+          </div></div>
+          <div class="col-md-4"><div class="form-group"><label>Process Status</label>
+            <select name="process_status" class="form-control">
+              <option value="">-- Select Process --</option>
+              <?php foreach ($interview_processes as $process) { ?>
+                <option value="<?php echo $process['id']; ?>"><?php echo e($process['title']); ?></option>
+              <?php } ?>
+            </select>
+          </div></div>
         </div>
-        <div class="form-group"><label>Status</label>
+        <div class="row">
+          <div class="col-md-12"><div class="form-group"><label>Comments</label><textarea  name="comments" rows="5" class="form-control"></textarea></div></div>
+        </div>
+        <?php /*?><div class="form-group"><label>Status</label>
           <select name="status" class="form-control">
             <option value="1">Active</option>
             <option value="0">Inactive</option>
           </select>
-        </div>
+        </div><?php */?>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
@@ -175,6 +219,10 @@
           <div class="col-md-6"><strong>City:</strong> <span id="d-city"></span></div>
         </div>
         <div class="row mtop10">
+          <div class="col-md-6"><strong>Source:</strong> <span id="d-source"></span></div>
+          <div class="col-md-6"><strong>Process:</strong> <span id="d-process"></span></div>
+        </div>
+        <div class="row mtop10">
           <div class="col-md-12"><strong>Comments:</strong> <span id="d-comments"></span></div>
         </div>
       </div>
@@ -191,8 +239,33 @@
     $('#interviews_modal').on("hidden.bs.modal", function () { $('#additional').html(''); $('#interviews_modal input, #interviews_modal textarea').val(''); $('#interviews_modal select').val(''); $('.add-title').removeClass('hide'); $('.edit-title').removeClass('hide'); });
   });
   function new_interview(){ $('#interviews_modal').modal('show'); $('.edit-title').addClass('hide'); }
-  function edit_interview(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('id', it.id)); $('#interviews_modal input[name=full_name]').val(it.full_name); $('#interviews_modal input[name=phone_number]').val(it.phone_number); $('#interviews_modal input[name=email_id]').val(it.email_id); $('#interviews_modal input[name=qualification]').val(it.qualification); $('#interviews_modal input[name=designation]').val(it.designation); $('#interviews_modal input[name=total_experience]').val(it.total_experience); $('#interviews_modal input[name=current_salary]').val(it.current_salary); $('#interviews_modal input[name=notice_period_in_days]').val(it.notice_period_in_days); $('#interviews_modal input[name=location]').val(it.location); $('#interviews_modal input[name=city]').val(it.city); $('#interviews_modal input[name=comments]').val(it.comments); $('#interviews_modal select[name=status]').val(it.status||1); $('#interviews_modal').modal('show'); $('.add-title').addClass('hide'); }
-  function view_interview(invoker){ var it=$(invoker).data('all'); $('#d-name').text(it.full_name); $('#d-phone').text(it.phone_number); $('#d-email').text(it.email_id||''); $('#d-qual').text(it.qualification||''); $('#d-desig').text(it.designation||''); $('#d-exp').text(it.total_experience||''); $('#d-salary').text(it.current_salary||''); $('#d-notice').text(it.notice_period_in_days||''); var st=parseInt(it.status||1,10); $('#d-status').removeClass('label-success label-danger').addClass(st===1?'label-success':'label-danger').text(st===1?'Active':'Inactive'); $('#d-location').text(it.location||''); $('#d-city').text(it.city||''); $('#d-comments').text(it.comments||''); $('#interviews_details').modal('show'); }
+  function edit_interview(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('id', it.id)); $('#interviews_modal input[name=full_name]').val(it.full_name); $('#interviews_modal input[name=phone_number]').val(it.phone_number); $('#interviews_modal input[name=email_id]').val(it.email_id); $('#interviews_modal input[name=qualification]').val(it.qualification); $('#interviews_modal input[name=designation]').val(it.designation); $('#interviews_modal input[name=total_experience]').val(it.total_experience); $('#interviews_modal input[name=current_salary]').val(it.current_salary); $('#interviews_modal input[name=notice_period_in_days]').val(it.notice_period_in_days); $('#interviews_modal input[name=location]').val(it.location); $('#interviews_modal input[name=city]').val(it.city); $('#interviews_modal select[name=source]').val(it.source||''); $('#interviews_modal select[name=process_status]').val(it.process_status||''); $('#interviews_modal textarea[name=comments]').val(it.comments); $('#interviews_modal select[name=status]').val(it.status||1); $('#interviews_modal').modal('show'); $('.add-title').addClass('hide'); }
+  function view_interview(invoker){ var it=$(invoker).data('all'); $('#d-name').text(it.full_name); $('#d-phone').text(it.phone_number); $('#d-email').text(it.email_id||''); $('#d-qual').text(it.qualification||''); $('#d-desig').text(it.designation||''); $('#d-exp').text(it.total_experience||''); $('#d-salary').text(it.current_salary||''); $('#d-notice').text(it.notice_period_in_days||''); var st=parseInt(it.status||1,10); $('#d-status').removeClass('label-success label-danger').addClass(st===1?'label-success':'label-danger').text(st===1?'Active':'Inactive'); $('#d-location').text(it.location||''); $('#d-city').text(it.city||''); 
+  // Get source name
+  var source_name = '';
+  if (it.source) {
+    $('select[name=source] option').each(function() {
+      if ($(this).val() == it.source) {
+        source_name = $(this).text();
+        return false;
+      }
+    });
+  }
+  $('#d-source').text(source_name);
+  
+  // Get process name
+  var process_name = '';
+  if (it.process_status) {
+    $('select[name=process_status] option').each(function() {
+      if ($(this).val() == it.process_status) {
+        process_name = $(this).text();
+        return false;
+      }
+    });
+  }
+  $('#d-process').text(process_name);
+  
+  $('#d-comments').text(it.comments||''); $('#interviews_details').modal('show'); }
   function manage_interview(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
 </script>
 <?php init_tail(); ?>

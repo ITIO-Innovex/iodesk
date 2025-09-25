@@ -4168,4 +4168,5 @@ $lang['shift_type'] = 'Shift Type';
 $lang['attendance_status'] = 'Attendance Status';
 $lang['attendance_manager'] = 'Attendance Management';
 $lang['leave_manager'] = 'Leave Management';
+$lang['interview_source'] = 'Interview Source';
 ?>

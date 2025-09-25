@@ -122,34 +122,31 @@
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
                     <div class="panel-body">
                         <h4 class="panel-title">
-                            <i class="fa-solid fa-tasks tw-mr-2"></i>Company Policy
+                            <i class="fa-solid fa-tasks tw-mr-2"></i><?php echo $company_policies['title'] ?? ''; ?>
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
-                          <div class="tw-px-2"><?php echo $company_policies[0]['details'] ?? ''; ?></div>
+                          <div class="tw-px-2">
+						  <h4><?php echo $company_policies['details'] ?? ''; ?></h4>
+						  <?php if (!empty($company_policies['attachments'])){ ?>
+                          <?php foreach ($company_policies['attachments'] as $attachment){ ?>
+						  <div class="attachment-item" style="margin-bottom: 5px;">
+                            <a href="<?php echo base_url($attachment['file_path']); ?>" target="_blank" class="text-primary">
+                              <i class="fa fa-file"></i> <?php echo e($attachment['original_name']); ?>
+                            </a>
+                            
+                          </div>
+						  
+						  <?php } ?>
+						  <?php } ?>
+						  
+						  </div>
                         </div>
                         
                     </div>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
-                    <div class="panel-body">
-                        <h4 class="panel-title">
-                            <i class="fa-solid fa-tasks tw-mr-2"></i>Event & Announcement
-                        </h4>
-                        <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
-                          <div class="tw-px-2"><?php echo $events_announcements[0]['details'] ?? ''; ?></div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-        </div>
-		
-		  <!-- Latest Listings -->
-        <div class="row">
-            <div class="col-md-6">
+			
+			<div class="col-md-6">
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%;">
                     <div class="panel-body">
                         <h4 class="panel-title">
@@ -190,6 +187,55 @@ $today = strtotime(date("Y-m-d"));
                 </div>
             </div>
 
+            
+        </div>
+		
+		  <!-- Latest Listings -->
+        <div class="row">
+            
+<div class="col-md-6">
+                <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
+                    <div class="panel-body">
+                        <h4 class="panel-title">
+                            <i class="fa-solid fa-tasks tw-mr-2"></i>Event & Announcement
+                        </h4>
+                        <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
+                          <div class="tw-px-2"><?php echo $events_announcements[0]['details'] ?? ''; ?></div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
+                    <div class="panel-body">
+                        <h4 class="panel-title">
+                            <i class="fa-solid fa-tasks tw-mr-2"></i>Corporate Guide
+                        </h4>
+                        <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
+                          <div class="tw-px-2"><?php echo $corporate_guidelines[0]['details'] ?? ''; ?></div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+		
+		<div class="row">
+            
+<div class="col-md-6">
+                <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
+                    <div class="panel-body">
+                        <h4 class="panel-title">
+                            <i class="fa-solid fa-tasks tw-mr-2"></i>Leave Rule
+                        </h4>
+                        <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
+                          <div class="tw-px-2"><?php echo $leave_rule[0]['details'] ?? ''; ?></div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
             <div class="col-md-6">
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
                     <div class="panel-body">
