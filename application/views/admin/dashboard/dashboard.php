@@ -71,9 +71,9 @@
     <div class="dc-ampm" id="dc-ampm">AM</div>
   </div>
   <?php $mark_in=1; if($mark_in==1){ ?>
-  <button type="submit" class="digital-btn btn-success"  name="attendance" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
+  <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
   <?php }else{ ?>
-  <button type="submit" class="digital-btn btn-danger"  name="attendance" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
+  <button type="submit" class="digital-btn btn-danger attendance-submit"  name="attendance" data-mode="Out" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
   <?php } ?>
     </div>
     <div class="content">

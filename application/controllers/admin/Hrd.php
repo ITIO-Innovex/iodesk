@@ -1944,4 +1944,17 @@ class Hrd extends AdminController
         $this->db->update('it_crm_hrd_holiday_list', ['status' => $new_status]);
         echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
+	
+	
+	public function add_attendance() {
+        
+        $mode = $this->input->get('mode');
+        if (!$mode) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $this->load->model('hrd_model');
+        $data = $this->hrd_model->addattendance($mode);
+        echo json_encode(['success' => $data ? true : false, 'data' => $data]);
+    }
 }
