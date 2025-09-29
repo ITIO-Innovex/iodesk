@@ -177,6 +177,36 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
   });
 });
 
+// Add Attendance
+$(document).on('click', '.attendance-submit', function(e) {
+  e.preventDefault();
+  //alert(11);
+  var mode = $(this).attr('data-mode');
+  //alert(mode);
+  //var projectId = url.split('/').pop();
+  // Fetch project data
+  $.ajax({
+    url: window.admin_url + 'hrd/add_attendance',
+    method: 'GET',
+    data: { mode: mode },
+    dataType: 'json',
+    success: function(res) {
+      if(res.success && res.data) {
+       // var p = res.data;
+		var p = res.data[0]; 
+		showFlashMessage('Attendance Completed', 'success');
+      } else {
+        //if(window.toastr) toastr.error('Failed to load project data');
+		showFlashMessage('Failed to load project data!', 'failed');
+      }
+    },
+    error: function() {
+      //if(window.toastr) toastr.error('Failed to load project data');
+	  showFlashMessage('Failed to load project data!', 'failed');
+    }
+  });
+});
+
 // Edit Project modal form submit
 $(document).on('submit', '#edit-project-form', function(e) {
   e.preventDefault();

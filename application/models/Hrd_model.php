@@ -688,4 +688,41 @@ class Hrd_model extends App_Model
         }
         return false;
     }
+	
+	public function addattendance($data)
+    {
+        
+        $ip = $_SERVER['REMOTE_ADDR'];
+		$staffid = get_staff_user_id();
+		$company_id = get_staff_company_id();
+		$mode = $data;
+		
+		
+        $insert = [
+            'staffid'        	=> $staffid,
+            'company_id'       	=> $company_id,
+            'shift_id'     		=> isset($data['status']) ? (int)$data['status'] : 1,
+			'mode'     			=> $mode,
+			'ip'     			=> $ip,
+            'in_time' 			=> date("H:i:s"),
+			'out_time' 			=> date("H:i:s"),
+			'entry_date' 		=> date("Y-m-d"),
+        ];
+
+        $this->db->insert(db_prefix() . 'hrd_attendance', $insert);
+        $insert_id = $this->db->insert_id();
+		
+		if(isset($insert_id)){
+		
+		 $logs = [
+		    'attendance_id' 	=> $insert_id,
+			'punch_type'  		=> $mode,
+			'ip'     			=> $ip,
+			'punch_time' 		=> date("H:i:s"),
+        ];
+		$this->db->insert(db_prefix() . 'hrd_attendance_logs', $logs);
+		return $insert_id = $this->db->insert_id();
+		}
+         //return $this->db->get()->result_array();
+    }
 }

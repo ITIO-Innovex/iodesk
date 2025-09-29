@@ -123,9 +123,6 @@
                 <th>Shift</th>
                 <th>In</th>
                 <th>Out</th>
-                <th>First Half</th>
-                <th>Second Half</th>
-                <th>Portion</th>
                 <th>Total Hrs</th>
                 <th>Late</th>
                 <th>Status</th>
@@ -136,13 +133,10 @@
                 <tr>
                   <td><?php echo (int)$a['attendance_id']; ?></td>
                   <td><?php echo function_exists('get_staff_full_name') ? e(get_staff_full_name($a['staffid'])) : (int)$a['staffid']; ?></td>
-                  <td><?php echo e($a['attendance_date']); ?></td>
+                  <td><?php echo e($a['entry_date']); ?></td>
                   <td><?php echo (int)$a['shift_id']; ?></td>
                   <td><?php echo e($a['in_time']); ?></td>
                   <td><?php echo e($a['out_time']); ?></td>
-                  <td><?php echo e($a['first_half']); ?></td>
-                  <td><?php echo e($a['second_half']); ?></td>
-                  <td><?php echo e($a['portion']); ?></td>
                   <td><?php echo e($a['total_hours']); ?></td>
                   <td><?php echo ((int)($a['late_mark']??0)===1)?'<span class="label label-danger">Yes</span>':'<span class="label label-success">No</span>'; ?></td>
                   <td><?php $st = (int)($a['status']??0); echo $st===1?'<span class="label label-success">Fixed</span>':'<span class="label label-warning">Open</span>'; ?></td>
@@ -280,8 +274,8 @@
   });
 
   function new_attendance(){ $('#attendance_modal').modal('show'); $('.edit-title').addClass('hide'); }
-  function edit_attendance(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('attendance_id', it.attendance_id)); $('#attendance_modal input[name=attendance_date]').val(it.attendance_date); $('#attendance_modal select[name=shift_id]').val(it.shift_id); $('#attendance_modal input[name=in_time]').val(it.in_time ? it.in_time.replace(' ', 'T') : ''); $('#attendance_modal input[name=out_time]').val(it.out_time ? it.out_time.replace(' ', 'T') : ''); $('#attendance_modal select[name=first_half]').val(it.first_half||'Absent'); $('#attendance_modal select[name=second_half]').val(it.second_half||'Absent'); $('#attendance_modal select[name=portion]').val(it.portion||'None'); $('#attendance_modal input[name=total_hours]').val(it.total_hours||''); $('#attendance_modal input[name=late_mark]').prop('checked', parseInt(it.late_mark||0,10)===1); $('#attendance_modal input[name=remarks]').val(it.remarks||''); $('#attendance_modal').modal('show'); $('.add-title').addClass('hide'); }
-  function view_attendance(invoker){ var it=$(invoker).data('all'); $('#d-emp').text(it.staffid); $('#d-date').text(it.attendance_date); $('#d-shift').text(it.shift_id); $('#d-in').text(it.in_time||''); $('#d-out').text(it.out_time||''); $('#d-fh').text(it.first_half||''); $('#d-sh').text(it.second_half||''); $('#d-portion').text(it.portion||''); $('#d-hrs').text(it.total_hours||''); $('#d-remarks').text(it.remarks||''); $('#attendance_details').modal('show'); }
+  function edit_attendance(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('attendance_id', it.attendance_id)); $('#attendance_modal input[name=entry_date]').val(it.entry_date); $('#attendance_modal select[name=shift_id]').val(it.shift_id); $('#attendance_modal input[name=in_time]').val(it.in_time ? it.in_time.replace(' ', 'T') : ''); $('#attendance_modal input[name=out_time]').val(it.out_time ? it.out_time.replace(' ', 'T') : ''); $('#attendance_modal select[name=first_half]').val(it.first_half||'Absent'); $('#attendance_modal select[name=second_half]').val(it.second_half||'Absent'); $('#attendance_modal select[name=portion]').val(it.portion||'None'); $('#attendance_modal input[name=total_hours]').val(it.total_hours||''); $('#attendance_modal input[name=late_mark]').prop('checked', parseInt(it.late_mark||0,10)===1); $('#attendance_modal input[name=remarks]').val(it.remarks||''); $('#attendance_modal').modal('show'); $('.add-title').addClass('hide'); }
+  function view_attendance(invoker){ var it=$(invoker).data('all'); $('#d-emp').text(it.staffid); $('#d-date').text(it.entry_date); $('#d-shift').text(it.shift_id); $('#d-in').text(it.in_time||''); $('#d-out').text(it.out_time||''); $('#d-fh').text(it.first_half||''); $('#d-sh').text(it.second_half||''); $('#d-portion').text(it.portion||''); $('#d-hrs').text(it.total_hours||''); $('#d-remarks').text(it.remarks||''); $('#attendance_details').modal('show'); }
   function manage_attendance(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
   function toggleSelectAll(cb){ $('.row-check').prop('checked', cb.checked); }
   function bulkUpdateAttendanceStatus(status){
