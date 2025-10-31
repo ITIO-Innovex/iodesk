@@ -697,6 +697,15 @@ class Hrd_model extends App_Model
 		$company_id = get_staff_company_id();
 		$mode = $data;
 		
+		$late_time = "09:30:00"; // Allowed time
+		$in = new DateTime(date("H:i:s"));
+		$limit = new DateTime($late_time);
+		$late_mark=0;
+		if ($in > $limit) { $late_mark=1;}
+		
+		
+		
+		if(isset($mode)&&$mode=='In'){
 		
         $insert = [
             'staffid'        	=> $staffid,
@@ -705,12 +714,39 @@ class Hrd_model extends App_Model
 			'mode'     			=> $mode,
 			'ip'     			=> $ip,
             'in_time' 			=> date("H:i:s"),
-			'out_time' 			=> date("H:i:s"),
 			'entry_date' 		=> date("Y-m-d"),
         ];
 
         $this->db->insert(db_prefix() . 'hrd_attendance', $insert);
         $insert_id = $this->db->insert_id();
+		}else{
+		
+		$attendance = $this->hrd_model->get_todays_attendance();
+		$attendance_id  = $attendance[0]['attendance_id'];
+		$in_time  = $attendance[0]['in_time'];
+		
+		$time1 = new DateTime($in_time);
+        $time2 = new DateTime(date("H:i:s"));
+        $interval = $time1->diff($time2);
+		// Format interval as H:i:s
+        $totalHours = $interval->format('%H:%I:%S');
+
+//echo $interval->format('%H hours %I minutes %S seconds');
+		
+		$update = [
+			'out_time' 			=> date("H:i:s"),
+			'total_hours' 			=> $totalHours,
+        ];
+		
+		
+		
+		
+		$this->db->where('attendance_id', $attendance_id);
+		$this->db->update(db_prefix() . 'hrd_attendance', $update);
+		
+		$insert_id=$attendance_id;
+		
+		}
 		
 		if(isset($insert_id)){
 		
@@ -725,4 +761,40 @@ class Hrd_model extends App_Model
 		}
          //return $this->db->get()->result_array();
     }
+	
+	
+	 public function get_todays_attendance()
+    {
+      
+	    $staffid = get_staff_user_id();
+		$company_id = get_staff_company_id();
+		$this->db->select('in_time,out_time,attendance_id');
+        $this->db->where('entry_date', date('Y-m-d'));
+		$this->db->where('staffid', $staffid);
+		$this->db->where('company_id', $company_id);
+        return $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+    }
+	
+	public function get_attendance_stats(){
+	$staffid = get_staff_user_id();
+	
+	$month = 10;
+$year  = 2025;
+
+$sql = "
+  SUM(CASE WHEN (position = 1 || position = 4 || position = 5) THEN 1 ELSE 0 END) AS fullday,
+  SUM(CASE WHEN (position = 2 || position = 3)  THEN 1 ELSE 0 END) AS half,
+  SUM(CASE WHEN position = 6 THEN 1 ELSE 0 END) AS absent
+";
+
+$this->db->select($sql, false); // false -> do NOT escape the expression
+$this->db->where('staffid', $staffid);
+$this->db->where("MONTH(entry_date) = {$month}", null, false);
+$this->db->where("YEAR(entry_date) = {$year}",  null, false);
+$this->db->from(db_prefix() . 'hrd_attendance');
+//echo $compiled = $this->db->get_compiled_select();exit;
+//log_message('debug', 'Attendance SQL: ' . $compiled);
+$result = $this->db->get()->row_array(); // single-row aggregate
+return $result;
+	}
 }

@@ -17,6 +17,11 @@
 //echo get_departments_id();
 
 //print_r($activity_log);
+
+// Get Attendance Time
+$in_time  = $attendance[0]['in_time']  ?? '';
+$out_time = $attendance[0]['out_time'] ?? '';
+
 ?>
 
 <?php init_head(); ?>
@@ -70,10 +75,10 @@
     <div class="dc-seconds" id="dc-seconds">:00</div>
     <div class="dc-ampm" id="dc-ampm">AM</div>
   </div>
-  <?php $mark_in=1; if($mark_in==1){ ?>
-  <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
+  <?php if(isset($in_time)&&$in_time){ ?>
+ <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
   <?php }else{ ?>
-  <button type="submit" class="digital-btn btn-danger attendance-submit"  name="attendance" data-mode="Out" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
+   <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
   <?php } ?>
     </div>
     <div class="content">

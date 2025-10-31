@@ -1,5 +1,15 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); 
+// Get Attendance Time
+$in_time  = $attendance[0]['in_time']  ?? '';
+$out_time = $attendance[0]['out_time'] ?? '';
+echo "========>";
+//print_r($attendance_stats);
+$fullday=$attendance_stats['fullday'] ?? 0;
+$half=$attendance_stats['half'] ?? 0;
+$absent=$attendance_stats['absent'] ?? 0;
+$totaldays=($fullday +($half / 2)) ?? 0;
+?>
 
 <div id="wrapper">
     <div class="content">
@@ -7,12 +17,20 @@
             <div class="col-md-12">
                 <div class="tw-mb-2 sm:tw-mb-4">
                     <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
-                        <i class="fa-solid fa-chart-line tw-mr-2"></i><?php echo $title; ?>
+                        <i class="fa-solid fa-chart-line tw-mr-2"></i><?php echo $title; ?> - Login Time :: <?php echo $in_time; ?>
                     </h4>
                 </div>
             </div>
         </div>
-
+<div class="pb-[10px]">
+  <div class="tw-flex tw-justify-end tw-gap-2">
+ <?php if(isset($in_time)&&$in_time){ ?>
+ <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
+  <?php }else{ ?>
+   <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
+  <?php } ?>
+ </div></div> 
+  
         <!-- Statistics Cards -->
         <div class="row">
             <div class="col-md-3">
@@ -22,7 +40,7 @@
                             <i class="fa-solid fa-calendar"></i>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php //echo $title; ?> 11</h3>
+                            <h3><?php echo $totaldays; ?></h3>
                             <p>Total Present</p>
                         </div>
                     </div>
@@ -35,7 +53,7 @@
                             <i class="fa-solid fa-calendar"></i>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php //echo $stats['active_projects']; ?> 11</h3>
+                            <h3><?php echo $fullday; ?></h3>
                             <p>Total Full Present</p>
                         </div>
                     </div>
@@ -48,7 +66,7 @@
                             <i class="fa-solid fa-calendar"></i>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php //echo $stats['total_tasks']; ?> 11</h3>
+                            <h3><?php echo $half; ?></h3>
                             <p>Total Half Present</p>
                         </div>
                     </div>
@@ -61,7 +79,7 @@
                             <i class="fa-solid fa-calendar"></i>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php //echo $stats['task_completion_rate']; ?> 11</h3>
+                            <h3><?php echo $absent; ?></h3>
                             <p>Total Absent</p>
                         </div>
                     </div>
