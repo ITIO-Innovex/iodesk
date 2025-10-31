@@ -182,6 +182,7 @@ $(document).on('click', '.attendance-submit', function(e) {
   e.preventDefault();
   //alert(11);
   var mode = $(this).attr('data-mode');
+  
   //alert(mode);
   //var projectId = url.split('/').pop();
   // Fetch project data
@@ -195,14 +196,17 @@ $(document).on('click', '.attendance-submit', function(e) {
        // var p = res.data;
 		var p = res.data[0]; 
 		showFlashMessage('Attendance Completed', 'success');
+		setTimeout(function() {
+        window.location.href = window.admin_url + 'hrd/dashboard';
+      }, 2000); // 1 second delay
       } else {
         //if(window.toastr) toastr.error('Failed to load project data');
-		showFlashMessage('Failed to load project data!', 'failed');
+		showFlashMessage('Attendance Failed , Try Again', 'failed');
       }
     },
     error: function() {
       //if(window.toastr) toastr.error('Failed to load project data');
-	  showFlashMessage('Failed to load project data!', 'failed');
+	  showFlashMessage('Attendance Failed , Try Again', 'failed');
     }
   });
 });

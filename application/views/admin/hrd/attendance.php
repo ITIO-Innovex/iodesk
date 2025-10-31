@@ -1,156 +1,147 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style media="print">
+/* Show only the calendar when printing */
+body * { visibility: hidden !important; }
+#calendar-section, #calendar-section * { visibility: visible !important; }
+/* Let it flow normally for full multi-page print */
+#calendar-section { width: 100%; }
+/* Ensure full table prints, not clipped by responsive wrapper */
+#calendar-section .table-responsive { overflow: visible !important; }
+/* Improve pagination */
+#calendar-section table { page-break-inside: auto; }
+#calendar-section tr    { page-break-inside: avoid; page-break-after: auto; }
+#calendar-section thead { display: table-header-group; }
+#calendar-section tfoot { display: table-footer-group; }
+/* Better spacing/colors in print */
+@page { size: auto; margin: 12mm; }
+html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+<style>
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #calendar-section, #calendar-section * {
+    visibility: visible;
+  }
+  #calendar-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
+</style>
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <?php /*?><div class="tw-mb-2 sm:tw-mb-4">
-          <a href="#" onclick="new_attendance(); return false;" class="btn btn-primary">
-            <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Attendance Entry'); ?>
-          </a>
-        </div><?php */?>
+        
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <?php /*?><form method="get" action="" class="mbot15">
+            <form method="get" action="" class="mbot15" style="margin-bottom:15px;">
               <div class="row">
                 <div class="col-md-3">
                   <div class="form-group">
-                    <label>Staff</label>
-                    <select name="staffid" class="form-control">
-                      <option value="">-- All --</option>
-                      <?php if (!empty($staff_list)) { foreach ($staff_list as $stf) { 
-                        $sid = isset($stf['staffid']) ? (int)$stf['staffid'] : (isset($stf['id'])?(int)$stf['id']:0);
-                        $sel = (isset($filters['staffid']) && (int)$filters['staffid']===$sid) ? 'selected="selected"' : '';
-                        $name = function_exists('get_staff_full_name') ? get_staff_full_name($sid) : ((isset($stf['firstname'])?$stf['firstname']:'').' '.(isset($stf['lastname'])?$stf['lastname']:''));
-                      ?>
-                        <option value="<?php echo $sid; ?>" <?php echo $sel; ?>><?php echo e(trim($name)) . ' (#'.$sid.')'; ?></option>
-                      <?php } } ?>
-                    </select>
+                    <label>Month - Year</label>
+                    <?php $my = isset($filters['month_year']) ? $filters['month_year'] : ''; ?>
+                    <input type="month" name="month_year" class="form-control" value="<?php echo e($my); ?>" />
                   </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-6">
                   <div class="form-group">
-                    <label>Date From</label>
-                    <input type="date" name="date_from" class="form-control" value="<?php echo isset($filters['date_from']) ? e($filters['date_from']) : '' ; ?>" />
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>Date To</label>
-                    <input type="date" name="date_to" class="form-control" value="<?php echo isset($filters['date_to']) ? e($filters['date_to']) : '' ; ?>" />
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>Shift</label>
-                    <select name="shift_id" class="form-control">
-                      <option value="">-- All --</option>
-                      <?php if (!empty($shifts)) { foreach ($shifts as $s) { $sel = (isset($filters['shift_id']) && (int)$filters['shift_id']==(int)$s['shift_id'])?'selected="selected"':''; ?>
-                        <option value="<?php echo (int)$s['shift_id']; ?>" <?php echo $sel; ?>><?php echo e($s['shift_name']); ?></option>
-                      <?php } } ?>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>Portion</label>
-                    <?php $portion = isset($filters['portion']) ? $filters['portion'] : ''; ?>
-                    <select name="portion" class="form-control">
-                      <option value="" <?php echo ($portion==='')?'selected="selected"':''; ?>>-- All --</option>
-                      <option value="None" <?php echo ($portion==='None')?'selected="selected"':''; ?>>None</option>
-                      <option value="Full" <?php echo ($portion==='Full')?'selected="selected"':''; ?>>Full</option>
-                      <option value="First Half" <?php echo ($portion==='First Half')?'selected="selected"':''; ?>>First Half</option>
-                      <option value="Second Half" <?php echo ($portion==='Second Half')?'selected="selected"':''; ?>>Second Half</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>First Half</label>
-                    <?php $fh = isset($filters['first_half']) ? $filters['first_half'] : ''; ?>
-                    <select name="first_half" class="form-control">
-                      <option value="" <?php echo ($fh==='')?'selected="selected"':''; ?>>-- All --</option>
-                      <option value="Absent" <?php echo ($fh==='Absent')?'selected="selected"':''; ?>>Absent</option>
-                      <option value="Present" <?php echo ($fh==='Present')?'selected="selected"':''; ?>>Present</option>
-                      <option value="HalfDay" <?php echo ($fh==='HalfDay')?'selected="selected"':''; ?>>HalfDay</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>Second Half</label>
-                    <?php $sh = isset($filters['second_half']) ? $filters['second_half'] : ''; ?>
-                    <select name="second_half" class="form-control">
-                      <option value="" <?php echo ($sh==='')?'selected="selected"':''; ?>>-- All --</option>
-                      <option value="Absent" <?php echo ($sh==='Absent')?'selected="selected"':''; ?>>Absent</option>
-                      <option value="Present" <?php echo ($sh==='Present')?'selected="selected"':''; ?>>Present</option>
-                      <option value="HalfDay" <?php echo ($sh==='HalfDay')?'selected="selected"':''; ?>>HalfDay</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="form-group">
-                    <label>Late Mark</label>
-                    <?php $lm = isset($filters['late_mark']) ? (string)$filters['late_mark'] : ''; ?>
-                    <select name="late_mark" class="form-control">
-                      <option value="" <?php echo ($lm==='')?'selected="selected"':''; ?>>-- All --</option>
-                      <option value="1" <?php echo ($lm==='1')?'selected="selected"':''; ?>>Yes</option>
-                      <option value="0" <?php echo ($lm==='0')?'selected="selected"':''; ?>>No</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="col-md-1">
-                  <label>&nbsp;</label>
-                  <div class="form-group">
-                    <button type="submit" class="btn btn-default btn-block">Filter</button>
-                  </div>
-                </div>
-                <div class="col-md-1">
-                  <label>&nbsp;</label>
-                  <div class="form-group">
-                    <a href="<?php echo admin_url('hrd/attendance'); ?>" class="btn btn-default btn-block">Reset</a>
+                    <label>&nbsp;</label>
+                    <div>
+                      <button type="submit" class="btn btn-default">Search</button>
+                      <a href="<?php echo admin_url('hrd/attendance'); ?>" class="btn btn-default">Reset</a>
+                      <button type="button" class="btn btn-success" onclick="printDiv('calendar-section')"><i class="fa-solid fa-print"></i> Print</button>
+                      <?php /*?><button type="button" class="btn btn-danger" onclick="window.print()"><i class="fa-regular fa-file-pdf"></i> Download PDF</button><?php */?>
+                    </div>
                   </div>
                 </div>
               </div>
-            </form><?php */?>
+            </form>
+
+<script>
+function printDiv(divId) { 
+  var divContents = document.getElementById(divId).innerHTML;
+  var printWindow = window.open('', '', 'height=600,width=800');
+  printWindow.document.write('<html><head><title>Print</title>');
+  printWindow.document.write('</head><body>');
+  printWindow.document.write(divContents);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+}
+</script>
+            <?php if (!empty($calendar)) { $cal = $calendar; ?>
+            <div id="calendar-section" class="row" style="margin-bottom:15px;">
+              <div class="col-md-12">
+                <h4 style="margin-top:0;"><?php echo e(get_staff_full_name()); ?> : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></h4>
+                <div class="table-responsive">
+                  <table class="table table-bordered" style="background:#fff;">
+                    <thead>
+                      <tr>
+                        <th style="width:150px;">Date</th>
+                        <th>Day</th>
+                        <th>Shift</th>
+                        <th>InTime</th>
+                        <th>OutTime	</th>
+                        <th>First Half</th>
+						<th>Second Half</th>
+                        <th>Portion</th>
+						<th>Tot. Hrs.</th>
+                        <th>LateMark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php foreach ($cal['days'] as $cell) { 
+					  $bgClass="bg-light";
+					  if(date('l', strtotime($cell['date']))=='Sunday'){
+					  $bgClass="bg-danger";
+					  }elseif(date('l', strtotime($cell['date']))=='Saturday'){
+					  $bgClass="bg-warning";
+					  }
+					  ?>
+                        <tr class="<?php echo $bgClass;?>">
+                          <td><strong><?php echo date('D, d M Y', strtotime($cell['date'])); ?></strong></td>
+                          <td ><?php echo date('l', strtotime($cell['date'])); ?></td>
+                          <?php
+                            if (!empty($cell['items'])) {
+                              $shifts = [];$ins=[];$outs=[];$totals=[];$lates=[];$portions=[];$statuses=[];
+                              foreach ($cell['items'] as $it) {
+                                $shifts[] = (string)(int)($it['shift_id']??'');
+                                $ins[] = e($it['in_time']??'');
+                                $outs[] = e($it['out_time']??'');
+                                $totals[] = e($it['total_hours']??'');
+                                $lates[] = ((int)($it['late_mark']??0)===1)?'<span class="label label-danger">Yes</span>':'<span class="label label-success">No</span>';
+                                $portions[] = isset($it['position'])?'<span class="label label-default">'.e($it['position']).'</span>':'';
+                                $st = (int)($it['status']??0);
+                                $statuses[] = $st===1?'<span class="label label-success">Fixed</span>':'<span class="label label-warning">Open</span>';
+                              }
+                              echo '<td>'.implode('<br>', array_map('e',$shifts)).'</td>';
+                              echo '<td>'.implode('<br>', $ins).'</td>';
+                              echo '<td>'.implode('<br>', $outs).'</td>';
+                              echo '<td>'.implode('<br>', $statuses).'</td>';
+							  echo '<td>'.implode('<br>', $statuses).'</td>';
+                              echo '<td>'.implode('<br>', $portions).'</td>';
+							  echo '<td>'.implode('<br>', $totals).'</td>';
+                              echo '<td>'.implode('<br>', $lates).'</td>';
+                            } else {
+                              echo '<td></td><td></td><td></td><td></td><td><span class="label label-success">No</span></td><td></td><td></td><td>-</td>';
+                            }
+                          ?>
+                        </tr>
+                      <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <?php } ?>
             
-            <?php if (!empty($attendance_list)) { ?>
-            <table class="table dt-table" data-order-col="1" data-order-type="desc">
-              <thead>
-                <th>#</th>
-                <th>Employee</th>
-                <th>Date</th>
-                <th>Shift</th>
-                <th>In</th>
-                <th>Out</th>
-                <th>Total Hrs</th>
-                <th>Late</th>
-                <th>Status</th>
-                <th><?php echo _l('options'); ?></th>
-              </thead>
-              <tbody>
-                <?php foreach ($attendance_list as $a) { ?>
-                <tr>
-                  <td><?php echo (int)$a['attendance_id']; ?></td>
-                  <td><?php echo function_exists('get_staff_full_name') ? e(get_staff_full_name($a['staffid'])) : (int)$a['staffid']; ?></td>
-                  <td><?php echo e($a['entry_date']); ?></td>
-                  <td><?php echo (int)$a['shift_id']; ?></td>
-                  <td><?php echo e($a['in_time']); ?></td>
-                  <td><?php echo e($a['out_time']); ?></td>
-                  <td><?php echo e($a['total_hours']); ?></td>
-                  <td><?php echo ((int)($a['late_mark']??0)===1)?'<span class="label label-danger">Yes</span>':'<span class="label label-success">No</span>'; ?></td>
-                  <td><?php $st = (int)($a['status']??0); echo $st===1?'<span class="label label-success">Fixed</span>':'<span class="label label-warning">Open</span>'; ?></td>
-                  <td>
-                    <div class="tw-flex tw-items-center tw-space-x-3">
-                      <a href="#" onclick="view_attendance(this);return false;" data-all='<?php echo json_encode($a, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a>
-                      <a href="#" onclick="edit_attendance(this);return false;" data-all='<?php echo json_encode($a, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-pen-to-square fa-lg"></i></a>
-                    </div>
-                  </td>
-                </tr>
-                <?php } ?>
-              </tbody>
-            </table>
-            <?php } else { ?><p class="no-margin">No records found.</p><?php } ?>
+            
+            
           </div>
         </div>
       </div>
@@ -158,6 +149,7 @@
   </div>
 </div>
 
+<?php /*?>
 <div class="modal fade" id="attendance_modal" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <?php echo form_open(admin_url('hrd/attendanceentry'), ['id' => 'attendance-form']); ?>
@@ -254,10 +246,10 @@
       </div>
     </div>
   </div>
-</div>
+</div><?php */?>
 
 <script>
-  window.addEventListener('load', function () {
+  <?php /*?>window.addEventListener('load', function () {
     appValidateForm($("body").find('#attendance-form'), {
       attendance_date: 'required',
       shift_id: 'required'
@@ -284,7 +276,9 @@
     $.post(admin_url + 'hrd/bulk_update_attendance_status', {ids: ids, status: status}, function(resp){
       if(resp && resp.success){ window.location.reload(); } else { alert('Failed to update'); }
     }, 'json');
-  }
+  }<?php */?>
+  /* Print handled by CSS to show only calendar */
 </script>
 <?php init_tail(); ?>
+
 </body></html>

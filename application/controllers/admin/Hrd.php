@@ -119,6 +119,7 @@ class Hrd extends AdminController
         $data['leave_rule'] = $this->hrd_model->get_leave_rule();
 		
 		
+		
         // Get get todays thought
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
@@ -133,6 +134,13 @@ class Hrd extends AdminController
 		$this->db->order_by('holiday_date', 'asc');
         $data['holiday_lists'] = $this->hrd_model->get_holiday_list();
         $data['title'] = 'My Desk - HR & Policy';
+		
+		// Get todays Attendance
+		$data['attendance']                = $this->hrd_model->get_todays_attendance();
+		
+		// Get chart data
+        $data['attendance_stats'] = $this->hrd_model->get_attendance_stats();
+		
         $this->load->view('admin/hrd/dashboard', $data);
     }
 
@@ -1197,20 +1205,45 @@ class Hrd extends AdminController
         $staffid   = trim((string)$this->input->get('staffid'));
         $date_from = trim((string)$this->input->get('date_from'));
         $date_to   = trim((string)$this->input->get('date_to'));
+        $month_year = trim((string)$this->input->get('month_year'));
+
+        // If month_year (YYYY-MM) provided, derive date_from/to
+        if ($month_year !== '') {
+            // Expected format YYYY-MM from <input type="month">
+            $parts = explode('-', $month_year);
+            if (count($parts) === 2) {
+                $y = (int)$parts[0];
+                $m = (int)$parts[1];
+                if ($y > 1900 && $m >= 1 && $m <= 12) {
+                    $start = sprintf('%04d-%02d-01', $y, $m);
+                    $end   = date('Y-m-t', strtotime($start));
+                    $date_from = $date_from === '' ? $start : $date_from;
+                    $date_to   = $date_to === '' ? $end   : $date_to;
+                }
+            }
+        }
+        // Default to current month when nothing provided
+        if ($month_year === '' && $date_from === '' && $date_to === '') {
+            $month_year = date('Y-m');
+            $start = date('Y-m-01');
+            $end   = date('Y-m-t');
+            $date_from = $start;
+            $date_to   = $end;
+        }
         $shift_id  = trim((string)$this->input->get('shift_id'));
-        $portion   = trim((string)$this->input->get('portion'));
+        $position   = trim((string)$this->input->get('position'));
         $late_mark = trim((string)$this->input->get('late_mark'));
         $fh        = trim((string)$this->input->get('first_half'));
         $sh        = trim((string)$this->input->get('second_half'));
 
         if ($staffid !== '') { $this->db->where('staffid', (int)$staffid); }
         if ($shift_id !== '') { $this->db->where('shift_id', (int)$shift_id); }
-        if ($portion !== '') { $this->db->where('portion', $portion); }
+        if ($position !== '') { $this->db->where('position', $position); }
         if ($fh !== '') { $this->db->where('first_half', $fh); }
         if ($sh !== '') { $this->db->where('second_half', $sh); }
         if ($late_mark !== '') { $this->db->where('late_mark', (int)$late_mark); }
-        if ($date_from !== '') { $this->db->where('attendance_date >=', $date_from); }
-        if ($date_to !== '') { $this->db->where('attendance_date <=', $date_to); }
+        if ($date_from !== '') { $this->db->where('entry_date >=', $date_from); }
+        if ($date_to !== '') { $this->db->where('entry_date <=', $date_to); }
 
         $data['attendance_list'] = $this->hrd_model->get_attendance();
         $data['filters'] = [
@@ -1218,11 +1251,55 @@ class Hrd extends AdminController
             'date_from' => $date_from,
             'date_to' => $date_to,
             'shift_id' => $shift_id,
-            'portion' => $portion,
+            'position' => $position,
             'late_mark' => $late_mark,
             'first_half' => $fh,
             'second_half' => $sh,
+            'month_year' => $month_year,
         ];
+
+        // Prepare calendar context when month_year provided (or when date_from indicates a single month)
+        $calendarYear = null; $calendarMonth = null;
+        if ($month_year !== '') {
+            $parts = explode('-', $month_year);
+            if (count($parts) === 2) { $calendarYear = (int)$parts[0]; $calendarMonth = (int)$parts[1]; }
+        } elseif ($date_from !== '' && $date_to !== '') {
+            $yf = (int)date('Y', strtotime($date_from));
+            $mf = (int)date('n', strtotime($date_from));
+            $yt = (int)date('Y', strtotime($date_to));
+            $mt = (int)date('n', strtotime($date_to));
+            if ($yf === $yt && $mf === $mt) { $calendarYear = $yf; $calendarMonth = $mf; }
+        }
+
+        $data['calendar'] = null;
+        if ($calendarYear && $calendarMonth) {
+            $firstDay = sprintf('%04d-%02d-01', $calendarYear, $calendarMonth);
+            $lastDay  = date('Y-m-t', strtotime($firstDay));
+            // Build day slots
+            $daysInMonth = (int)date('t', strtotime($firstDay));
+            $startWeekday = (int)date('N', strtotime($firstDay)); // 1=Mon..7=Sun
+            $calendar = [
+                'year' => $calendarYear,
+                'month' => $calendarMonth,
+                'days' => [],
+                'start_weekday' => $startWeekday,
+                'days_in_month' => $daysInMonth,
+            ];
+            // Group attendance by date
+            $byDate = [];
+            foreach ((array)$data['attendance_list'] as $row) {
+                $d = isset($row['entry_date']) ? $row['entry_date'] : (isset($row['attendance_date']) ? $row['attendance_date'] : null);
+                if ($d) { $byDate[$d][] = $row; }
+            }
+            for ($d = 1; $d <= $daysInMonth; $d++) {
+                $date = sprintf('%04d-%02d-%02d', $calendarYear, $calendarMonth, $d);
+                $calendar['days'][] = [
+                    'date' => $date,
+                    'items' => isset($byDate[$date]) ? $byDate[$date] : [],
+                ];
+            }
+            $data['calendar'] = $calendar;
+        }
 
         // Load active shifts for dropdown
         if (is_super()) {
@@ -1278,14 +1355,14 @@ class Hrd extends AdminController
         $date_from = trim((string)$this->input->get('date_from'));
         $date_to   = trim((string)$this->input->get('date_to'));
         $shift_id  = trim((string)$this->input->get('shift_id'));
-        $portion   = trim((string)$this->input->get('portion'));
+        $position   = trim((string)$this->input->get('position'));
         $late_mark = trim((string)$this->input->get('late_mark'));
         $fh        = trim((string)$this->input->get('first_half'));
         $sh        = trim((string)$this->input->get('second_half'));
 
         if ($staffid !== '') { $this->db->where('staffid', (int)$staffid); }
         if ($shift_id !== '') { $this->db->where('shift_id', (int)$shift_id); }
-        if ($portion !== '') { $this->db->where('portion', $portion); }
+        if ($position !== '') { $this->db->where('position', $position); }
         if ($fh !== '') { $this->db->where('first_half', $fh); }
         if ($sh !== '') { $this->db->where('second_half', $sh); }
         if ($late_mark !== '') { $this->db->where('late_mark', (int)$late_mark); }
@@ -1298,7 +1375,7 @@ class Hrd extends AdminController
             'date_from' => $date_from,
             'date_to' => $date_to,
             'shift_id' => $shift_id,
-            'portion' => $portion,
+            'position' => $position,
             'late_mark' => $late_mark,
             'first_half' => $fh,
             'second_half' => $sh,
@@ -1330,6 +1407,19 @@ class Hrd extends AdminController
         $this->db->where('active', 1);
         $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
 
+        // Load active attendance statuses for first/second half dropdowns
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['attendance_statuses'] = $this->hrd_model->get_attendance_status();
+
         $data['title'] = 'Attendance Manager';
         $this->load->view('admin/hrd/attendance_manager', $data);
     }
@@ -1340,40 +1430,52 @@ class Hrd extends AdminController
         if (!staff_can('view_own',  'hr_department')) {
             access_denied('Attendance');
         }
-
+        
         $attendance_id = $this->input->post('attendance_id');
         $in_time  = $this->input->post('in_time');
         $out_time = $this->input->post('out_time');
         $total_hours = $this->input->post('total_hours');
 
         // Compute total_hours if not provided and both datetimes present
-        if (!$total_hours && $in_time && $out_time) {
-            $start = strtotime($in_time);
-            $end   = strtotime($out_time);
-            if ($start && $end && $end >= $start) {
-                $diff = ($end - $start) / 3600; // hours
-                $total_hours = number_format($diff, 2, '.', '');
-            } else {
-                $total_hours = '0.00';
-            }
-        }
+        if ($in_time && $out_time) {
+			$start = strtotime($in_time);
+			$end   = strtotime($out_time);
+	
+			if ($start && $end && $end >= $start) {
+			$diff_seconds = $end - $start;          // difference in seconds
+			$total_hours = gmdate('H:i:s', $diff_seconds); // convert to HH:MM:SS
+			} else {
+			$total_hours = '00:00:00';
+			}
+		}
+	
 
         $data = [
-            'staffid'         => ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id(),
-            'company_id'      => get_staff_company_id(),
             'shift_id'        => (int)$this->input->post('shift_id'),
-            'attendance_date' => $this->input->post('attendance_date'),
+            'entry_date'      => $this->input->post('entry_date'),
             'in_time'         => $in_time ?: null,
             'out_time'        => $out_time ?: null,
             'first_half'      => $this->input->post('first_half') ?: 'Absent',
             'second_half'     => $this->input->post('second_half') ?: 'Absent',
-            'portion'         => $this->input->post('portion') ?: 'None',
+            'position'         => $this->input->post('position') ?: 'None',
             'total_hours'     => $total_hours ?: '0.00',
             'late_mark'       => $this->input->post('late_mark') ? 1 : 0,
             'remarks'         => $this->input->post('remarks'),
         ];
+		
+		// Add staffid and company_id only if new record (no attendance_id)
+        if (!$attendance_id) {
+        $data['staffid']    = ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id();
+        $data['company_id'] = get_staff_company_id();
+        }
+		
+		
+		
 
         if ($attendance_id) {
+		   ///log_message('error', 'API call failed: ' . json_encode($data));
+		//set_alert('success', 'Attendance updated successfully');
+        //exit;
             $this->db->where('attendance_id', $attendance_id);
             $this->db->update('it_crm_hrd_attendance', $data);
             set_alert('success', 'Attendance updated successfully');
