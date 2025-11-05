@@ -797,3 +797,44 @@ function get_staff_role_name($roleid = NULL)
 	// If no matching role is found, return nothing (NULL)
 	return;
 }
+
+/**
+ * Get attendance status title by status ID
+ * @param int|string $statusId
+ * @return string
+ */
+function get_attendance_status_title($statusId)
+{
+	$numericId = (int) $statusId;
+	if ($numericId <= 0) {
+		return '';
+	}
+
+	$CI = & get_instance();
+	$row = $CI->db
+    ->select('title, color, remark')
+		->from(db_prefix() . 'hrd_attendance_status')
+		->where('id', $numericId)
+		->get()
+		->row();
+
+	return $row ? "<span title='".(string) $row->remark."' style='color:".(string) $row->color.";font-weight: 900;'>".(string) $row->title ."</span>" : "";
+}
+
+function get_attendance_status($statusId)
+{
+	$numericId = (int) $statusId;
+	if ($numericId <= 0) {
+		return '';
+	}
+
+	$CI = & get_instance();
+	$row = $CI->db
+    ->select('title, color, remark')
+		->from(db_prefix() . 'hrd_attendance_status')
+		->where('id', $numericId)
+		->get()
+		->row();
+
+	return $row ? $row : "";
+}

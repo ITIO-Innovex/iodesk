@@ -597,6 +597,49 @@ radioButton.checked = true;  // Check the radio button
     <?php init_tail(); ?>
     <script>
     $(function() {
+        function loadDesignationsByDept(deptId, preselectId){
+            if(!deptId){ return; }
+            $.get(admin_url + 'hrd/designations_by_department', { department_id: deptId }, function(resp){
+                var $sel = $('select[name="designation_id"]');
+                $sel.empty();
+                $sel.append($('<option>', { value: '', text: '-- Select Designation --' }));
+
+                var items = [];
+                if (Array.isArray(resp)) { items = resp; }
+                else if (resp && resp.success && Array.isArray(resp.data)) { items = resp.data; }
+
+                items.forEach(function(item){
+                    var $opt = $('<option>', { value: item.id, text: item.title });
+                    if (preselectId && String(preselectId) === String(item.id)) { $opt.prop('selected', true); }
+                    $sel.append($opt);
+                });
+
+                // Refresh selectpicker if used
+                if ($sel.hasClass('selectpicker')) { $sel.selectpicker('refresh'); }
+                $sel.trigger('change');
+            }, 'json');
+        }
+
+
+        $(document).on('change', 'select[name="departments[]"]', function(){
+            var deptVal = $(this).val();
+            if($.isArray(deptVal)) { deptVal = deptVal[0] || ''; }
+            loadDesignationsByDept(deptVal, null);
+        });
+
+        // Initial load
+        (function(){
+            var $dept = $('select[name="departments[]"]');
+            if($dept.length){
+                var deptVal = $dept.val();
+                if($.isArray(deptVal)) { deptVal = deptVal[0] || ''; }
+                var preselect = $('select[name="designation_id"]').val();
+                if(deptVal){ loadDesignationsByDept(deptVal, preselect); }
+                // Ensure designation selectpicker shows current value
+                var $sel = $('select[name="designation_id"]');
+                if ($sel.hasClass('selectpicker')) { $sel.selectpicker('refresh'); }
+            }
+        })();
 
         $('select[name="role"]').on('change', function() {
             var roleid = $(this).val();

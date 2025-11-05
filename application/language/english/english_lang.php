@@ -4169,4 +4169,6 @@ $lang['attendance_status'] = 'Attendance Status';
 $lang['attendance_manager'] = 'Attendance Management';
 $lang['leave_manager'] = 'Leave Management';
 $lang['interview_source'] = 'Interview Source';
+$lang['staff_manager'] = 'Staff Management';
+$lang['manage_attendance_by_date'] = 'Manage Attendance By Date';
 ?>

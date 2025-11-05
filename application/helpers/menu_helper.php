@@ -945,6 +945,15 @@ function app_init_admin_sidebar_menu_items()
 	   
 	    if (staff_can('view_setting',  'hr_department')) {
 		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'staff_manager',
+            'name'     => _l('staff_manager'),
+            'href'     => admin_url('hrd/staff_manager'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+		if (staff_can('view_setting',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
             'slug'     => 'leave_manager',
             'name'     => _l('leave_manager'),
             'href'     => admin_url('hrd/leave_manager'),
@@ -958,6 +967,16 @@ function app_init_admin_sidebar_menu_items()
             'slug'     => 'attendance_manager',
             'name'     => _l('attendance_manager'),
             'href'     => admin_url('hrd/attendance_manager'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+		
+		if (staff_can('view_setting',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'manage_attendance_by_date',
+            'name'     => _l('manage_attendance_by_date'),
+            'href'     => admin_url('hrd/manage_attendance_by_date'),
             'position' => 5,
             'badge'    => [],
         ]);

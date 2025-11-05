@@ -3,8 +3,8 @@
 // Get Attendance Time
 $in_time  = $attendance[0]['in_time']  ?? '';
 $out_time = $attendance[0]['out_time'] ?? '';
-echo "========>";
 //print_r($attendance_stats);
+//print_r($status_counter);
 $fullday=$attendance_stats['fullday'] ?? 0;
 $half=$attendance_stats['half'] ?? 0;
 $absent=$attendance_stats['absent'] ?? 0;
@@ -475,8 +475,16 @@ $(document).ready(function() {
 
     // Task Status Chart
     const taskStatusCtx = document.getElementById('taskStatusChart').getContext('2d');
-    <?php /*?>const taskStatusData = <?php echo json_encode($task_status_chart); ?>;<?php */?>
-	const taskStatusData = [{"name":"CL","color":"#2cc8ba","count":"8"},{"name":"PL","color":"#08aeea","count":"1"},{"name":"EL","color":"#a593ff","count":"2"},{"name":"LWP","color":"#4fd3e5","count":"12"}];
+	const taskStatusData = [
+	<?php foreach ($status_counter as $sts){ 
+	$dt=get_attendance_status($sts['first_half']);
+	$title=$dt->title;
+	$colors=$dt->color;
+	$total_count=$sts['total_count'];
+	?>
+	{"name":"<?php echo $title;?>","color":"<?php echo $colors;?>","count":"<?php echo $total_count;?>"},
+	<?php }?>
+	];
     
     new Chart(taskStatusCtx, {
         type: 'doughnut',

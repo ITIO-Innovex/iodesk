@@ -141,6 +141,9 @@ class Hrd extends AdminController
 		// Get chart data
         $data['attendance_stats'] = $this->hrd_model->get_attendance_stats();
 		
+		// Get stats counter
+		$data['status_counter'] = $this->hrd_model->get_status_counter();
+		
         $this->load->view('admin/hrd/dashboard', $data);
     }
 
@@ -1244,8 +1247,8 @@ class Hrd extends AdminController
         if ($late_mark !== '') { $this->db->where('late_mark', (int)$late_mark); }
         if ($date_from !== '') { $this->db->where('entry_date >=', $date_from); }
         if ($date_to !== '') { $this->db->where('entry_date <=', $date_to); }
-
-        $data['attendance_list'] = $this->hrd_model->get_attendance();
+        $data['attendance_list'] = $this->hrd_model->get_attendance('',get_staff_user_id());
+		//print_r($data['attendance_list']);exit;
         $data['filters'] = [
             'staffid' => $staffid,
             'date_from' => $date_from,
@@ -1300,7 +1303,7 @@ class Hrd extends AdminController
             }
             $data['calendar'] = $calendar;
         }
-
+        //print_r($data['calendar']);exit;
         // Load active shifts for dropdown
         if (is_super()) {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
@@ -1326,6 +1329,22 @@ class Hrd extends AdminController
         }
         $this->db->where('active', 1);
         $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
+		
+		
+		$this->db->where('shift_id', 1);
+        $data['shift_details'] = $this->db->get(db_prefix() . 'hrd_shift_manager')->result_array();
+		
+		// Get Status by counter
+		/*$this->db->select('first_half, second_half, COUNT(*) AS total_count');
+		$this->db->from(db_prefix() . 'hrd_attendance');
+		$this->db->where('staffid', get_staff_user_id());
+		$this->db->like('entry_date', $month_year, 'after'); // matches e.g. 2025-11-01, 2025-11-15
+		$this->db->group_by(['first_half', 'second_half']);
+        $query = $this->db->get();
+        $data['status_counter'] = $query->result_array();*/
+		
+		$data['status_counter'] = $this->hrd_model->get_status_counter($month_year);
+		
 
         $data['title'] = 'Attendance';
         $this->load->view('admin/hrd/attendance', $data);
@@ -1424,6 +1443,145 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/attendance_manager', $data);
     }
 
+    /* View Staff Management */
+    public function staff_manager()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Staff Management');
+        }
+
+        // Company scope
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('s.company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('s.company_id', get_staff_company_id());
+            }
+        } elseif (is_admin()) {
+            $this->db->where('s.company_id', get_staff_company_id());
+        } else {
+            $this->db->where('s.company_id', get_staff_company_id());
+        }
+
+        // Build listing query
+        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, d.name AS department, des.title AS designation, br.branch_name AS branch_name');
+        $this->db->from(db_prefix() . 'staff s');
+        $this->db->join(db_prefix() . 'departments d', 'd.departmentid = s.department_id', 'left');
+        $this->db->join(db_prefix() . 'designations des', 'des.id = s.designation_id', 'left');
+		$this->db->join(db_prefix() . 'hrd_branch_manager br', 'br.id = s.branch', 'left');
+        $this->db->order_by('s.firstname', 'asc');
+        $data['staff_rows'] = $this->db->get()->result_array();
+
+        // Load dropdown data: branches, departments, designations
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['branches'] = $this->hrd_model->get_branch_manager();
+
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $data['departments'] = $this->db->get(db_prefix() . 'departments')->result_array();
+
+        $this->load->model('staff_model');
+        $data['designations'] = $this->staff_model->get_designation();
+
+        $data['title'] = 'Staff Management';
+        $this->load->view('admin/hrd/staff_manager', $data);
+    }
+
+    // Add/Edit Staff basic details (from Staff Management modal)
+    public function staffentry()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            access_denied('Staff Management');
+        }
+
+        $staffid = (int)$this->input->post('staffid');
+        if ($staffid <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid staff']);
+            return;
+        }
+
+        $firstname = trim((string)$this->input->post('firstname'));
+        $lastname  = trim((string)$this->input->post('lastname'));
+
+        $data = [
+            'title'          => $this->input->post('title'),
+            'firstname'      => $firstname,
+            'lastname'       => $lastname,
+            'employee_code'  => $this->input->post('employee_code'),
+            'branch'         => ($this->input->post('branch')!=='') ? (int)$this->input->post('branch') : null,
+            'department_id'  => ($this->input->post('department')!=='') ? (int)$this->input->post('department') : null,
+            'designation_id' => ($this->input->post('designation')!=='') ? (int)$this->input->post('designation') : null,
+            'phonenumber'    => $this->input->post('phonenumber'),
+            'joining_date'   => $this->input->post('joining_date'),
+            'date_of_birth'  => $this->input->post('dob'),
+            'gender'         => $this->input->post('gender'),
+        ];
+
+        $this->db->where('staffid', $staffid);
+        $this->db->update(db_prefix() . 'staff', $data);
+
+        // If AJAX, set alert and return JSON so it shows after client-side redirect
+        if ($this->input->is_ajax_request()) {
+            set_alert('success', 'Staff updated successfully');
+            echo json_encode(['success' => true]);
+            return;
+        }
+        set_alert('success', 'Staff updated successfully');
+        redirect(admin_url('hrd/staff_manager'));
+    }
+
+    // Ajax: get designations filtered by department (if column exists)
+    public function designations_by_department()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            echo json_encode([]);
+            return;
+        }
+
+        $department_id = (int)$this->input->get('department_id');
+        log_message('error', 'department_id333-' . $department_id);
+        // Company scope
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+
+        // Filter by department
+        if ($department_id > 0) {
+            $this->db->where('department_id', $department_id);
+        }
+
+        $this->db->select('id, title');
+        $this->db->from(db_prefix() . 'designations');
+        // Only active designations if column exists
+        $this->db->where('is_active', 1);
+        $this->db->order_by('title', 'asc');
+        $rows = $this->db->get()->result_array();
+		//log_message('error', 'API call failed: ' . $this->db->last_query());
+        echo json_encode($rows);
+    }
+
     // Add/Edit Attendance Entry
     public function attendanceentry()
     {
@@ -1514,6 +1672,82 @@ class Hrd extends AdminController
         $this->db->where_in('attendance_id', $ids);
         $this->db->where('company_id', $company_id);
         $this->db->update('it_crm_hrd_attendance', ['status' => $status]);
+
+        echo json_encode(['success' => true]);
+    }
+
+    // Update or create in/out time for a single staff on a date
+    public function attendance_update_inout_by_date()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $staffid  = (int)$this->input->post('staffid');
+        $date     = $this->input->post('date');
+        $in_time  = $this->input->post('in_time');
+        $out_time = $this->input->post('out_time');
+
+        if ($staffid <= 0 || !$date) {
+            echo json_encode(['success' => false, 'message' => 'Missing data']);
+            return;
+        }
+
+        // Compute total hours if both present
+        $total_hours = null;
+        if ($in_time && $out_time) {
+            $start = strtotime($in_time);
+            $end   = strtotime($out_time);
+            if ($start && $end && $end >= $start) {
+                $diff_seconds = $end - $start;
+                $total_hours = gmdate('H:i:s', $diff_seconds);
+            } else {
+                $total_hours = '00:00:00';
+            }
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Try fetch existing row
+        $this->db->from(db_prefix() . 'hrd_attendance');
+        $this->db->where('staffid', $staffid);
+        $this->db->where('company_id', $company_id);
+        $this->db->where('entry_date', $date);
+        $row = $this->db->get()->row_array();
+
+        if ($row) {
+            $upd = [];
+            if ($in_time !== null)  { $upd['in_time'] = $in_time; }
+            if ($out_time !== null) { $upd['out_time'] = $out_time; }
+            if ($total_hours !== null) { $upd['total_hours'] = $total_hours; }
+            if (!empty($upd)) {
+                $this->db->where('attendance_id', (int)$row['attendance_id']);
+                $this->db->update(db_prefix() . 'hrd_attendance', $upd);
+            }
+        } else {
+            // Determine a default shift id
+            $this->db->where('company_id', $company_id);
+            $this->db->where('status', 1);
+            $this->db->order_by('shift_id', 'asc');
+            $shiftRow = $this->db->get(db_prefix() . 'hrd_shift_manager')->row_array();
+            $default_shift_id = $shiftRow && isset($shiftRow['shift_id']) ? (int)$shiftRow['shift_id'] : 1;
+
+            $ins = [
+                'staffid'     => $staffid,
+                'company_id'  => $company_id,
+                'shift_id'    => $default_shift_id,
+                'entry_date'  => $date,
+                'in_time'     => $in_time ?: null,
+                'out_time'    => $out_time ?: null,
+                'total_hours' => $total_hours ?: null,
+            ];
+            $this->db->insert(db_prefix() . 'hrd_attendance', $ins);
+        }
 
         echo json_encode(['success' => true]);
     }
@@ -2058,5 +2292,170 @@ class Hrd extends AdminController
         $this->load->model('hrd_model');
         $data = $this->hrd_model->addattendance($mode);
         echo json_encode(['success' => $data ? true : false, 'data' => $data]);
+    }
+
+    /* Manage Attendance by Date */
+    public function manage_attendance_by_date()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Manage Attendance by Date');
+        }
+
+        $date = $this->input->get('date');
+        if (!$date) { $date = date('Y-m-d'); }
+
+        // Company scope for staff
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->order_by('firstname', 'asc');
+        $staff = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        // Fetch attendance for the date for these staff
+        $attendanceByStaff = [];
+        if (!empty($staff)) {
+            $staffIds = array_column($staff, 'staffid');
+            if (!empty($staffIds)) {
+                $this->db->from(db_prefix() . 'hrd_attendance');
+                $this->db->where('entry_date', $date);
+                $this->db->where_in('staffid', $staffIds);
+                $rows = $this->db->get()->result_array();
+                foreach ($rows as $r) {
+                    $attendanceByStaff[(int)$r['staffid']] = $r;
+                }
+            }
+        }
+
+        // Load attendance statuses for listboxes
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $attendanceStatuses = $this->hrd_model->get_attendance_status();
+
+        $data['date'] = $date;
+        $data['staff'] = $staff;
+        $data['attendance_map'] = $attendanceByStaff;
+        $data['attendance_statuses'] = $attendanceStatuses;
+        $data['title'] = 'Manage Attendance by Date';
+        $this->load->view('admin/hrd/manage_attendance_by_date', $data);
+    }
+
+    // Bulk add/update attendance for selected staff on a given date
+    public function attendance_bulk_update_by_date()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $date = $this->input->post('date');
+        $staff_data = $this->input->post('staff_data');
+
+        if (!$date || !is_array($staff_data) || empty($staff_data)) {
+            echo json_encode(['success' => false, 'message' => 'Missing data']);
+            return;
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Default shift
+        $this->db->where('company_id', $company_id);
+        $this->db->where('status', 1);
+        $this->db->order_by('shift_id', 'asc');
+        $shiftRow = $this->db->get(db_prefix() . 'hrd_shift_manager')->row_array();
+        $default_shift_id = $shiftRow && isset($shiftRow['shift_id']) ? (int)$shiftRow['shift_id'] : 1;
+
+        foreach ($staff_data as $item) {
+            $sid = isset($item['staffid']) ? (int)$item['staffid'] : 0;
+            if ($sid <= 0) { continue; }
+
+            $in_time = isset($item['in_time']) ? trim($item['in_time']) : '';
+            $out_time = isset($item['out_time']) ? trim($item['out_time']) : '';
+            $first_half = isset($item['first_half']) ? trim($item['first_half']) : '';
+            $second_half = isset($item['second_half']) ? trim($item['second_half']) : '';
+
+            // Calculate total hours if both in_time and out_time are provided
+            $total_hours = null;
+            if ($in_time && $out_time) {
+                $inTimestamp = strtotime($date . ' ' . $in_time);
+                $outTimestamp = strtotime($date . ' ' . $out_time);
+                if ($inTimestamp && $outTimestamp && $outTimestamp >= $inTimestamp) {
+                    $diffSeconds = $outTimestamp - $inTimestamp;
+                    $total_hours = gmdate('H:i:s', $diffSeconds);
+                } else {
+                    $total_hours = '00:00:00';
+                }
+            }
+
+            // Check if record exists
+            $this->db->from(db_prefix() . 'hrd_attendance');
+            $this->db->where('staffid', $sid);
+            $this->db->where('company_id', $company_id);
+            $this->db->where('entry_date', $date);
+            $row = $this->db->get()->row_array();
+
+            if ($row) {
+                // Update existing record
+                $upd = [];
+                if ($in_time !== '') { $upd['in_time'] = $in_time; }
+                if ($out_time !== '') { $upd['out_time'] = $out_time; }
+                if ($first_half !== '') { $upd['first_half'] = $first_half; }
+                //if ($second_half !== '') { $upd['second_half'] = $second_half; }
+				$upd['second_half'] = $second_half;
+                if ($total_hours !== null) { $upd['total_hours'] = $total_hours; }
+				$upd['position'] = 1;
+				if($first_half==8 or $first_half==4 ){
+				$upd['position'] = 0.00;
+				}elseif($second_half==8 or $second_half==4 ){
+				$upd['position'] = 0.50;
+				}
+				
+                
+                if (!empty($upd)) {
+                    $this->db->where('attendance_id', (int)$row['attendance_id']);
+                    $this->db->update(db_prefix() . 'hrd_attendance', $upd);
+                }
+            } else {
+                // Insert new record
+				$ip=$ip_address = $this->input->ip_address();
+                $ins = [
+                    'staffid' => $sid,
+                    'company_id' => $company_id,
+                    'shift_id' => $default_shift_id,
+                    'entry_date' => $date,
+                    'in_time' => $in_time ?: null,
+                    'out_time' => $out_time ?: null,
+                    'first_half' => $first_half ?: '',
+                    'second_half' => $second_half ?: '',
+					'ip' => $ip,
+					'remarks' => 'Added By HRD - '.get_staff_user_id(),
+                ];
+                if ($total_hours !== null) {
+                    $ins['total_hours'] = $total_hours;
+                }
+				$ins['position'] = 1;
+                $this->db->insert(db_prefix() . 'hrd_attendance', $ins);
+            }
+        }
+
+        echo json_encode(['success' => true]);
     }
 }
