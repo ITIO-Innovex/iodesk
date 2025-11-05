@@ -945,6 +945,16 @@ function app_init_admin_sidebar_menu_items()
 	   
 	    if (staff_can('view_setting',  'hr_department')) {
 		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'dashboard',
+            'name'     => _l('Dashboard'),
+            'href'     => admin_url('hrd/setting/dashboard'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+	   
+	    if (staff_can('view_setting',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
             'slug'     => 'staff_manager',
             'name'     => _l('staff_manager'),
             'href'     => admin_url('hrd/staff_manager'),
@@ -952,6 +962,7 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 		}
+		
 		if (staff_can('view_setting',  'hr_department')) {
 		$CI->app_menu->add_setup_children_item('hr_department', [
             'slug'     => 'leave_manager',
@@ -964,140 +975,19 @@ function app_init_admin_sidebar_menu_items()
 		
 		if (staff_can('view_setting',  'hr_department')) {
 		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'attendance_manager',
-            'name'     => _l('attendance_manager'),
-            'href'     => admin_url('hrd/attendance_manager'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		}
-		
-		if (staff_can('view_setting',  'hr_department')) {
-		$CI->app_menu->add_setup_children_item('hr_department', [
             'slug'     => 'manage_attendance_by_date',
-            'name'     => _l('manage_attendance_by_date'),
+            'name'     => _l('attendance_manager'),
             'href'     => admin_url('hrd/manage_attendance_by_date'),
             'position' => 5,
             'badge'    => [],
         ]);
 		}
 		
-		if (staff_can('view_setting',  'hr_department')) {
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'corporate_guidelines',
-            'name'     => _l('corporate_guidelines'),
-            'href'     => admin_url('hrd/setting/corporate_guidelines'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
 		
 		
 		
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'company_policies',
-            'name'     => _l('company_policies'),
-            'href'     => admin_url('hrd/setting/company_policies'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'events_announcements',
-            'name'     => _l('events_announcements'),
-            'href'     => admin_url('hrd/setting/events_announcements'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
 		
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'holiday_list',
-            'name'     => _l('holiday_list'),
-            'href'     => admin_url('hrd/setting/holiday_list'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'leave_type',
-            'name'     => _l('leave_type'),
-            'href'     => admin_url('hrd/setting/leave_type'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'todays_thought',
-            'name'     => _l('todays_thought'),
-            'href'     => admin_url('hrd/setting/todays_thought'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
 		
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'shift_manager',
-            'name'     => _l('shift_manager'),
-            'href'     => admin_url('hrd/setting/shift_manager'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'shift_type',
-            'name'     => _l('shift_type'),
-            'href'     => admin_url('hrd/setting/shift_type'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'interview_source',
-            'name'     => _l('interview_source'),
-            'href'     => admin_url('hrd/setting/interview_source'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'interview_process',
-            'name'     => _l('interview_process'),
-            'href'     => admin_url('hrd/setting/interview_process'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'branch_manager',
-            'name'     => _l('branch_manager'),
-            'href'     => admin_url('hrd/setting/branch_manager'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'employee_type',
-            'name'     => _l('employee_type'),
-            'href'     => admin_url('hrd/setting/employee_type'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'leave_rule',
-            'name'     => _l('leave_rule'),
-            'href'     => admin_url('hrd/setting/leave_rule'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'attendance_status',
-            'name'     => _l('attendance_status'),
-            'href'     => admin_url('hrd/setting/attendance_status'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'setting',
-            'name'     => _l('settings'),
-            'href'     => admin_url('hrd/setting/'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		
-		}
         
   
 	

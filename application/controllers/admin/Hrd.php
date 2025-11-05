@@ -1676,6 +1676,49 @@ class Hrd extends AdminController
         echo json_encode(['success' => true]);
     }
 
+    // Submit request to update attendance in/out times (user-initiated)
+    public function attendance_update_request_add()
+    {
+        if (!staff_can('view_own',  'hr_department')) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $staffid      = get_staff_user_id();
+        $attendanceId = (int)$this->input->post('attendance_id');
+        $entry_date   = $this->input->post('entry_date');
+        $in_time      = $this->input->post('in_time');
+        $out_time     = $this->input->post('out_time');
+        $remarks      = $this->input->post('remarks');
+
+        if (!$entry_date) {
+            echo json_encode(['success' => false, 'message' => 'Missing date']);
+            return;
+        }
+
+        // If attendance_id not provided, try to find it
+        if ($attendanceId <= 0) {
+            $this->db->from(db_prefix() . 'hrd_attendance');
+            $this->db->where('staffid', $staffid);
+            $this->db->where('entry_date', $entry_date);
+            $row = $this->db->get()->row_array();
+            if ($row) { $attendanceId = (int)$row['attendance_id']; }
+        }
+
+        $ins = [
+            'attendance_id' => $attendanceId > 0 ? $attendanceId : null,
+            'staffid'       => $staffid,
+            'entry_date'    => $entry_date,
+            'in_time'       => $in_time ?: null,
+            'out_time'      => $out_time ?: null,
+            'remarks'       => $remarks ?: null,
+            'status'        => 1,
+        ];
+
+        $this->db->insert(db_prefix() . 'hrd_attendance_update_request', $ins);
+        echo json_encode(['success' => true]);
+    }
+
     // Update or create in/out time for a single staff on a date
     public function attendance_update_inout_by_date()
     {
@@ -2303,6 +2346,8 @@ class Hrd extends AdminController
 
         $date = $this->input->get('date');
         if (!$date) { $date = date('Y-m-d'); }
+        
+        $staff_filter = (int)$this->input->get('staff_id');
 
         // Company scope for staff
         if (is_super()) {
@@ -2315,8 +2360,29 @@ class Hrd extends AdminController
             $this->db->where('company_id', get_staff_company_id());
         }
         $this->db->where('active', 1);
+        
+        // Filter by staff if provided
+        if ($staff_filter > 0) {
+            $this->db->where('staffid', $staff_filter);
+        }
+        
         $this->db->order_by('firstname', 'asc');
         $staff = $this->db->get(db_prefix() . 'staff')->result_array();
+        
+        // Load all active staff for dropdown (for filter)
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $all_staff = $this->db->get(db_prefix() . 'staff')->result_array();
 
         // Fetch attendance for the date for these staff
         $attendanceByStaff = [];
@@ -2348,6 +2414,8 @@ class Hrd extends AdminController
 
         $data['date'] = $date;
         $data['staff'] = $staff;
+        $data['all_staff'] = $all_staff;
+        $data['staff_filter'] = $staff_filter;
         $data['attendance_map'] = $attendanceByStaff;
         $data['attendance_statuses'] = $attendanceStatuses;
         $data['title'] = 'Manage Attendance by Date';
@@ -2457,5 +2525,74 @@ class Hrd extends AdminController
         }
 
         echo json_encode(['success' => true]);
+    }
+
+    /* HRD Setting Dashboard */
+    public function setting_dashboard()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('HRD Setting Dashboard');
+        }
+
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        $today = date('Y-m-d');
+
+        // Total active staff
+        $this->db->where('company_id', $company_id);
+        $this->db->where('active', 1);
+        $totalActiveStaff = (int)$this->db->count_all_results(db_prefix() . 'staff');
+
+        // Present today: attendance with any in/out time or any half selected
+        $this->db->from(db_prefix() . 'hrd_attendance');
+        $this->db->where('company_id', $company_id);
+        $this->db->where('entry_date', $today);
+        $this->db->group_start();
+        $this->db->where("(in_time IS NOT NULL AND in_time != '')", null, false);
+        $this->db->or_where("(out_time IS NOT NULL AND out_time != '')", null, false);
+        $this->db->or_where("(first_half IS NOT NULL AND first_half != '')", null, false);
+        $this->db->or_where("(second_half IS NOT NULL AND second_half != '')", null, false);
+        $this->db->group_end();
+        $presentToday = (int)$this->db->count_all_results();
+
+        // On Leave today (best-effort): overlap and approved (status=1 if exists)
+        $onLeaveToday = 0;
+        if ($this->db->table_exists(db_prefix() . 'hrd_leave_master')) {
+            $this->db->from(db_prefix() . 'hrd_leave_master');
+            $this->db->where('company_id', $company_id);
+            if ($this->db->field_exists('status', db_prefix() . 'hrd_leave_master')) {
+                $this->db->where('status', 1);
+            }
+            $this->db->where('from_date <=', $today);
+            $this->db->where('to_date >=', $today);
+            $onLeaveToday = (int)$this->db->count_all_results();
+        }
+
+        // Absent = Active - (Present + On Leave), min 0
+        $absentToday = max(0, $totalActiveStaff - ($presentToday + $onLeaveToday));
+
+        // Today present employee list
+        $this->db->select('s.staffid, s.firstname, s.lastname, a.in_time, a.out_time, a.first_half, a.second_half, a.total_hours, a.late_mark');
+        $this->db->from(db_prefix() . 'staff s');
+        $this->db->join(db_prefix() . 'hrd_attendance a', 'a.staffid = s.staffid AND a.entry_date = ' . $this->db->escape($today), 'inner');
+        $this->db->where('s.company_id', $company_id);
+        $this->db->where('s.active', 1);
+        $this->db->order_by('s.firstname', 'asc');
+        $presentRows = $this->db->get()->result_array();
+
+        $data = [];
+        $data['title'] = 'HRD Setting Dashboard';
+        $data['today'] = $today;
+        $data['counters'] = [
+            'present' => $presentToday,
+            'absent' => $absentToday,
+            'on_leave' => $onLeaveToday,
+        ];
+        $data['present_rows'] = $presentRows;
+
+        $this->load->view('admin/hrd/setting_dashboard', $data);
     }
 }

@@ -132,7 +132,26 @@ function printDiv(divId) {
                       </tr>
                     </thead>
                     <tbody>
-                      <?php foreach ($cal['days'] as $cell) { 
+                      <?php 
+                      // Accumulators for footer totals
+                      $sumPortion = 0.0; 
+                      $sumTotSecs = 0; 
+                      $sumLateSecs = 0; 
+                      $parseHms = function($hms){
+                        if (!$hms || $hms==='-') { return 0; }
+                        $parts = explode(':', $hms);
+                        if (count($parts) !== 3) { return 0; }
+                        return ((int)$parts[0])*3600 + ((int)$parts[1])*60 + (int)$parts[2];
+                      };
+                      $fmtHms = function($secs){
+                        if ($secs < 0) { $secs = 0; }
+                        $h = floor($secs/3600);
+                        $m = floor(($secs%3600)/60);
+                        $s = $secs%60;
+                        return sprintf('%02d:%02d:%02d', $h, $m, $s);
+                      };
+                      foreach ($cal['days'] as $cell) { 
+                      if (strtotime($cell['date']) > time()) { continue; }
 					  $bgClass="bg-light";
 					  if(date('l', strtotime($cell['date']))=='Sunday'){
 					  $bgClass="tw-bg-danger-200";
@@ -142,7 +161,7 @@ function printDiv(divId) {
 					  //print_r($cell['items']);
 					  ?>
                         <tr class="<?php echo $bgClass;?>">
-                          <td><strong><?php echo date('D, d M Y', strtotime($cell['date'])); ?></strong></td>
+                          <td><strong><a href="#" class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
                           <td ><?php echo date('l', strtotime($cell['date'])); ?></td>
                           <?php
                             if (!empty($cell['items'])) {
@@ -207,13 +226,56 @@ function printDiv(divId) {
                               echo '<td>'.($position ?: '-').'</td>';
                               echo '<td>'.($totals ?: '-').'</td>';
                               echo '<td>'.($lates ?: '-').'</td>';
+                              // accumulate
+                              $portionVal = 0.0; 
+                              if ($position !== '-' && $position !== '') { $portionVal = (float)$position; }
+                              $sumPortion += $portionVal;
+                              $sumTotSecs += $parseHms($totals ?: '00:00:00');
+                              $sumLateSecs += $parseHms($lates ?: '00:00:00');
                             } else {
-                              echo '<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>';
+							 if(date('l', strtotime($cell['date']))=='Sunday'){
+					         $bgClass="tw-bg-danger-200";
+					         }elseif(date('l', strtotime($cell['date']))=='Saturday'){
+					         $bgClass="tw-bg-warning-200";
+					         }
+							 
+							$inTime="";$outTime="";$firstHalf="4";$secondHalf="";$position="0.00";
+							
+							
+							
+							
+							
+							 if(date('l', strtotime($cell['date']))=='Sunday'){
+					         $inTime="00.00";$outTime="00.00";$firstHalf="2";$secondHalf="";$position="1.00";
+					         }elseif(date('l', strtotime($cell['date']))=='Saturday'){
+					         $inTime="00.00";$outTime="00.00";$firstHalf="2";$secondHalf="";$position="1.00";
+					         }
+							 
+                              echo '<td>'.$inTime.'</td><td>'.$outTime.'</td><td>'.get_attendance_status_title($firstHalf).'</td><td>'.get_attendance_status_title($secondHalf).'</td><td>'.$position.'</td><td>00:00:00</td><td>00:00:00</td>';
+                              // accumulate defaults
+                              $sumPortion += (float)$position;
+                              $sumTotSecs += 0;
+                              $sumLateSecs += 0;
                             }
                           ?>
                         </tr>
-                      <?php } ?>
+                      <?php } 
+                      $sumTotStr = $fmtHms($sumTotSecs);
+                      $sumLateStr = $fmtHms($sumLateSecs);
+                      ?>
+					  <tr>
+                        <td>&nbsp;</th>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+						<td>&nbsp;</td>
+                        <td title="Portion"><?php echo number_format($sumPortion, 2); ?></td>
+							<td title="Tot. Hrs."><?php echo $sumTotStr; ?></td>
+                        <td title="LateMark"><?php echo $sumLateStr; ?></td>
+                      </tr>
                     </tbody>
+					
                   </table>
                 </div>
               </div>
@@ -229,136 +291,70 @@ function printDiv(divId) {
   </div>
 </div>
 
-<?php /*?>
-<div class="modal fade" id="attendance_modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <?php echo form_open(admin_url('hrd/attendanceentry'), ['id' => 'attendance-form']); ?>
+<!-- Update Request Modal -->
+<div class="modal fade" id="att_req_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><span class="edit-title">Edit Attendance</span><span class="add-title"><?php echo _l('Add Attendance'); ?></span></h4>
+        <h4 class="modal-title">Request Attendance Update</h4>
       </div>
       <div class="modal-body">
-        <div id="additional"></div>
-        <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>Date</label><input type="date" name="attendance_date" class="form-control" required></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Shift</label>
-            <select name="shift_id" class="form-control" required>
-              <option value="">-- Select Shift --</option>
-              <?php if (!empty($shifts)) { foreach ($shifts as $s) { ?>
-                <option value="<?php echo (int)$s['shift_id']; ?>"><?php echo e($s['shift_name']); ?></option>
-              <?php } } ?>
-            </select>
-          </div></div>
-          <div class="col-md-4"><div class="form-group"><label>Late Mark</label><br><input type="checkbox" name="late_mark" value="1"></div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6"><div class="form-group"><label>In Time</label><input type="datetime-local" name="in_time" class="form-control"></div></div>
-          <div class="col-md-6"><div class="form-group"><label>Out Time</label><input type="datetime-local" name="out_time" class="form-control"></div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>First Half</label>
-            <select name="first_half" class="form-control">
-              <option value="Absent">Absent</option>
-              <option value="Present">Present</option>
-              <option value="HalfDay">HalfDay</option>
-            </select>
-          </div></div>
-          <div class="col-md-4"><div class="form-group"><label>Second Half</label>
-            <select name="second_half" class="form-control">
-              <option value="Absent">Absent</option>
-              <option value="Present">Present</option>
-              <option value="HalfDay">HalfDay</option>
-            </select>
-          </div></div>
-          <div class="col-md-4"><div class="form-group"><label>Portion</label>
-            <select name="portion" class="form-control">
-              <option value="None">None</option>
-              <option value="Full">Full</option>
-              <option value="First Half">First Half</option>
-              <option value="Second Half">Second Half</option>
-            </select>
-          </div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>Total Hours</label><input type="text" name="total_hours" class="form-control" placeholder="e.g. 8.00"></div></div>
-          <div class="col-md-8"><div class="form-group"><label>Remarks</label><input type="text" name="remarks" class="form-control" maxlength="255"></div></div>
-        </div>
+        <form id="att-req-form">
+          <input type="hidden" name="attendance_id" id="req-att-id" value="0">
+          <div class="row">
+            <div class="col-md-4"><div class="form-group"><label>Date</label><input type="date" name="entry_date" id="req-entry-date" class="form-control" readonly></div></div>
+            <div class="col-md-4"><div class="form-group"><label>In Time</label><input type="time" name="in_time" id="req-in-time" class="form-control"></div></div>
+            <div class="col-md-4"><div class="form-group"><label>Out Time</label><input type="time" name="out_time" id="req-out-time" class="form-control"></div></div>
+          </div>
+          <div class="row">
+            <div class="col-md-12"><div class="form-group"><label>Remarks</label><input type="text" name="remarks" id="req-remarks" class="form-control" maxlength="255"></div></div>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
-      </div>
-    </div>
-    <?php echo form_close(); ?>
-  </div>
-</div>
-
-<div class="modal fade" id="attendance_details" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Attendance Details</h4>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-4"><strong>Employee:</strong> <span id="d-emp"></span></div>
-          <div class="col-md-4"><strong>Date:</strong> <span id="d-date"></span></div>
-          <div class="col-md-4"><strong>Shift:</strong> <span id="d-shift"></span></div>
-        </div>
-        <div class="row mtop10">
-          <div class="col-md-6"><strong>In:</strong> <span id="d-in"></span></div>
-          <div class="col-md-6"><strong>Out:</strong> <span id="d-out"></span></div>
-        </div>
-        <div class="row mtop10">
-          <div class="col-md-3"><strong>First Half:</strong> <span id="d-fh"></span></div>
-          <div class="col-md-3"><strong>Second Half:</strong> <span id="d-sh"></span></div>
-          <div class="col-md-3"><strong>Portion:</strong> <span id="d-portion"></span></div>
-          <div class="col-md-3"><strong>Total Hrs:</strong> <span id="d-hrs"></span></div>
-        </div>
-        <div class="row mtop10">
-          <div class="col-md-12"><strong>Remarks:</strong> <span id="d-remarks"></span></div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="att-req-submit">Submit Request</button>
       </div>
     </div>
   </div>
-</div><?php */?>
+  </div>
 
+
+
+<?php init_tail(); ?>
 <script>
-  <?php /*?>window.addEventListener('load', function () {
-    appValidateForm($("body").find('#attendance-form'), {
-      attendance_date: 'required',
-      shift_id: 'required'
-    }, manage_attendance);
-
-    $('#attendance_modal').on("hidden.bs.modal", function () {
-      $('#additional').html('');
-      $('#attendance_modal input, #attendance_modal textarea').val('');
-      $('#attendance_modal select').val('');
-      $('#attendance_modal input[name=late_mark]').prop('checked', false);
-      $('.add-title').removeClass('hide');
-      $('.edit-title').removeClass('hide');
-    });
+$(function(){
+  $(document).on('click', 'a.open-att-req', function(){
+    var entry = $(this).data('entry_date');
+    var attId = $(this).data('att_id') || 0;
+    $('#req-entry-date').val(entry);
+    $('#req-att-id').val(attId);
+    $('#req-in-time').val('');
+    $('#req-out-time').val('');
+    $('#req-remarks').val('');
+    $('#att_req_modal').modal('show');
+    return false;
   });
 
-  function new_attendance(){ $('#attendance_modal').modal('show'); $('.edit-title').addClass('hide'); }
-  function edit_attendance(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('attendance_id', it.attendance_id)); $('#attendance_modal input[name=entry_date]').val(it.entry_date); $('#attendance_modal select[name=shift_id]').val(it.shift_id); $('#attendance_modal input[name=in_time]').val(it.in_time ? it.in_time.replace(' ', 'T') : ''); $('#attendance_modal input[name=out_time]').val(it.out_time ? it.out_time.replace(' ', 'T') : ''); $('#attendance_modal select[name=first_half]').val(it.first_half||'Absent'); $('#attendance_modal select[name=second_half]').val(it.second_half||'Absent'); $('#attendance_modal select[name=portion]').val(it.portion||'None'); $('#attendance_modal input[name=total_hours]').val(it.total_hours||''); $('#attendance_modal input[name=late_mark]').prop('checked', parseInt(it.late_mark||0,10)===1); $('#attendance_modal input[name=remarks]').val(it.remarks||''); $('#attendance_modal').modal('show'); $('.add-title').addClass('hide'); }
-  function view_attendance(invoker){ var it=$(invoker).data('all'); $('#d-emp').text(it.staffid); $('#d-date').text(it.entry_date); $('#d-shift').text(it.shift_id); $('#d-in').text(it.in_time||''); $('#d-out').text(it.out_time||''); $('#d-fh').text(it.first_half||''); $('#d-sh').text(it.second_half||''); $('#d-portion').text(it.portion||''); $('#d-hrs').text(it.total_hours||''); $('#d-remarks').text(it.remarks||''); $('#attendance_details').modal('show'); }
-  function manage_attendance(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
-  function toggleSelectAll(cb){ $('.row-check').prop('checked', cb.checked); }
-  function bulkUpdateAttendanceStatus(status){
-    var ids = $('.row-check:checked').map(function(){ return this.value; }).get();
-    if(ids.length===0){ alert('Select at least one record'); return; }
-    $.post(admin_url + 'hrd/bulk_update_attendance_status', {ids: ids, status: status}, function(resp){
-      if(resp && resp.success){ window.location.reload(); } else { alert('Failed to update'); }
+  $('#att-req-submit').on('click', function(){
+    var payload = {
+      attendance_id: $('#req-att-id').val(),
+      entry_date: $('#req-entry-date').val(),
+      in_time: $('#req-in-time').val(),
+      out_time: $('#req-out-time').val(),
+      remarks: $('#req-remarks').val()
+    };
+    $.post(admin_url + 'hrd/attendance_update_request_add', payload, function(resp){
+      if (resp && resp.success) {
+        alert('Request submitted');
+        $('#att_req_modal').modal('hide');
+      } else {
+        alert('Failed to submit');
+      }
     }, 'json');
-  }<?php */?>
-  /* Print handled by CSS to show only calendar */
+  });
+});
 </script>
-<?php init_tail(); ?>
 
 </body></html>

@@ -2,15 +2,12 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
+  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"><i class="fa-solid fa-users menu-icon"></i>  Staff Management</h4>
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <div class="row">
-              <div class="col-md-12">
-                <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Staff Management</h4>
-              </div>
-            </div>
+            
             <div class="row">
               <div class="col-md-12">
                 <table class="table dt-table" data-order-col="1" data-order-type="asc">
@@ -70,12 +67,12 @@
 </div>
 <!-- Staff Edit Modal -->
 <div class="modal fade" id="staff_modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <?php echo form_open(admin_url('hrd/staffentry'), ['id' => 'staff-form']); ?>
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Edit Staff</h4>
+        <h4 class="modal-title">Edit Staff : <span id="sidx"></span></h4>
       </div>
       <div class="modal-body">
         <div id="additional"></div>
@@ -172,6 +169,7 @@ function openStaffModal(data){
   var $f = $m.find('form');
   $f.find('#additional').html('<input type="hidden" name="staffid" value="'+(data.staffid||'')+'"/>');
   //$f.find('input[name=title]').val(data.title||'');
+  $('#sidx').text(data.firstname + ' ' + data.lastname + ' (' + data.staffid + ') ');
   $f.find('select[name=title]').val(data.title||'');
   $f.find('input[name=firstname]').val(data.firstname||'');
   $f.find('input[name=lastname]').val(data.lastname||'');
