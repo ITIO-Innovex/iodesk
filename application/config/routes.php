@@ -235,6 +235,8 @@ $route['admin/designation/delete/(:num)'] = 'admin/designations/delete/$1';
 $route['admin/hrd/manage_attendance_by_date'] = 'admin/hrd/manage_attendance_by_date';
 $route['admin/hrd/attendance_bulk_update_by_date'] = 'admin/hrd/attendance_bulk_update_by_date';
 $route['admin/hrd/attendance_update_inout_by_date'] = 'admin/hrd/attendance_update_inout_by_date';
+$route['admin/hrd/setting/dashboard'] = 'admin/hrd/setting_dashboard';
+$route['admin/hrd/attendance_update_request_add'] = 'admin/hrd/attendance_update_request_add';
 
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';
