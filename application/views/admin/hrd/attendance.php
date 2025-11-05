@@ -1,5 +1,14 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); 
+
+
+//print_r($status_counter); 
+//print_r($calendar);
+
+$get_shift_code  = $shift_details[0]['shift_code']  ?? '-';
+$get_shift_in = $shift_details[0]['shift_in'] ?? '-';
+$get_shift_out = $shift_details[0]['shift_out'] ?? '-';
+?>
 <style media="print">
 /* Show only the calendar when printing */
 body * { visibility: hidden !important; }
@@ -79,12 +88,40 @@ function printDiv(divId) {
               <div class="col-md-12">
                 <h4 style="margin-top:0;"><?php echo e(get_staff_full_name()); ?> : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></h4>
                 <div class="table-responsive">
+				<table class="table table-bordered" style="background:#fff;">
+				   <thead>
+                      <tr class="tw-bg-neutral-200 tw-text-xs">
+                        <th>Month for : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></th>
+                        <th><?php echo e(get_staff_full_name()); ?></th>
+						<th>Employee Code : <?php echo get_staff_fields('','employee_code');?></th>
+						<th>Shift Code    : <?php echo $get_shift_code;?></th>
+                        <th>Shift InTime  : <?php echo $get_shift_in;?></th>
+						<th>Shift OutTime : <?php echo $get_shift_out;?></th>
+						
+					  </tr>
+                    </thead>
+				  </table>
+					<?php
+					foreach ($status_counter as $sc) {
+						$fhTitle = '';
+						if (isset($sc['first_half']) && is_numeric($sc['first_half'])) {
+							$fhTitle = get_attendance_status_title((int)$sc['first_half']);
+						}
+						if (isset($sc['second_half']) && is_numeric($sc['second_half']) && ($sc['second_half']==8 or $sc['second_half']==4)) {  $fhTitle = get_attendance_status_title((int)$sc['second_half']);
+						 
+						 
+						}
+						
+						$label = $fhTitle !== '' ? $fhTitle : (isset($sc['first_half']) ? e($sc['first_half']) : '-');
+						echo "<a class='btn btn-default mx-2'>".$label." (".$sc['total_count'].")&nbsp;</a>&nbsp;";
+					}
+					?>
                   <table class="table table-bordered" style="background:#fff;">
+				   
                     <thead>
                       <tr>
                         <th style="width:150px;">Date</th>
                         <th>Day</th>
-                        <th>Shift</th>
                         <th>InTime</th>
                         <th>OutTime	</th>
                         <th>First Half</th>
@@ -98,37 +135,80 @@ function printDiv(divId) {
                       <?php foreach ($cal['days'] as $cell) { 
 					  $bgClass="bg-light";
 					  if(date('l', strtotime($cell['date']))=='Sunday'){
-					  $bgClass="bg-danger";
+					  $bgClass="tw-bg-danger-200";
 					  }elseif(date('l', strtotime($cell['date']))=='Saturday'){
-					  $bgClass="bg-warning";
+					  $bgClass="tw-bg-warning-200";
 					  }
+					  //print_r($cell['items']);
 					  ?>
                         <tr class="<?php echo $bgClass;?>">
                           <td><strong><?php echo date('D, d M Y', strtotime($cell['date'])); ?></strong></td>
                           <td ><?php echo date('l', strtotime($cell['date'])); ?></td>
                           <?php
                             if (!empty($cell['items'])) {
-                              $shifts = [];$ins=[];$outs=[];$totals=[];$lates=[];$portions=[];$statuses=[];
-                              foreach ($cell['items'] as $it) {
-                                $shifts[] = (string)(int)($it['shift_id']??'');
-                                $ins[] = e($it['in_time']??'');
-                                $outs[] = e($it['out_time']??'');
-                                $totals[] = e($it['total_hours']??'');
-                                $lates[] = ((int)($it['late_mark']??0)===1)?'<span class="label label-danger">Yes</span>':'<span class="label label-success">No</span>';
-                                $portions[] = isset($it['position'])?'<span class="label label-default">'.e($it['position']).'</span>':'';
-                                $st = (int)($it['status']??0);
-                                $statuses[] = $st===1?'<span class="label label-success">Fixed</span>':'<span class="label label-warning">Open</span>';
+                              // Take only the first record to avoid duplicates
+                              $it = $cell['items'][0];
+                              
+                              // Format in_time - handle both time and datetime formats
+                              $inTimeRaw = $it['in_time'] ?? null;
+                              if ($inTimeRaw) {
+                                // If it's a datetime, extract time part; if it's already time, use as is
+                                if (strpos($inTimeRaw, ' ') !== false) {
+                                  $inTime = date('H:i:s', strtotime($inTimeRaw));
+                                } else {
+                                  $inTime = $inTimeRaw;
+                                }
+                                $inTime = e($inTime);
+                              } else {
+                                $inTime = '-';
                               }
-                              echo '<td>'.implode('<br>', array_map('e',$shifts)).'</td>';
-                              echo '<td>'.implode('<br>', $ins).'</td>';
-                              echo '<td>'.implode('<br>', $outs).'</td>';
-                              echo '<td>'.implode('<br>', $statuses).'</td>';
-							  echo '<td>'.implode('<br>', $statuses).'</td>';
-                              echo '<td>'.implode('<br>', $portions).'</td>';
-							  echo '<td>'.implode('<br>', $totals).'</td>';
-                              echo '<td>'.implode('<br>', $lates).'</td>';
+                              
+                              // Format out_time - handle both time and datetime formats
+                              $outTimeRaw = $it['out_time'] ?? null;
+                              if ($outTimeRaw) {
+                                // If it's a datetime, extract time part; if it's already time, use as is
+                                if (strpos($outTimeRaw, ' ') !== false) {
+                                  $outTime = date('H:i:s', strtotime($outTimeRaw));
+                                } else {
+                                  $outTime = $outTimeRaw;
+                                }
+                                $outTime = e($outTime);
+                              } else {
+                                $outTime = '-';
+                              }
+                              
+                              $fhRaw = $it['first_half'] ?? '';
+                              $shRaw = $it['second_half'] ?? '';
+                              
+                              // Process first_half: if numeric, get formatted title, otherwise show raw value
+                              if ($fhRaw !== '' && is_numeric($fhRaw)) {
+                                $fhTitle = get_attendance_status_title((int)$fhRaw);
+                                $firstHalf = $fhTitle !== '' ? $fhTitle : e($fhRaw);
+                              } else {
+                                $firstHalf = $fhRaw !== '' ? e($fhRaw) : '-';
+                              }
+                              
+                              // Process second_half: if numeric, get formatted title, otherwise show raw value
+                              if ($shRaw !== '' && is_numeric($shRaw)) {
+                                $shTitle = get_attendance_status_title((int)$shRaw);
+                                $secondHalf = $shTitle !== '' ? $shTitle : e($shRaw);
+                              } else {
+                                $secondHalf = $shRaw !== '' ? e($shRaw) : '-';
+                              }
+                              
+                              $position = e($it['position']??'');
+                              $totals = e($it['total_hours']??'');
+                              $lates = e($it['late_mark']??'');
+                              
+                              echo '<td>'.$inTime.'</td>';
+                              echo '<td>'.$outTime.'</td>';
+                              echo '<td>'.$firstHalf.'</td>';
+                              echo '<td>'.$secondHalf.'</td>';
+                              echo '<td>'.($position ?: '-').'</td>';
+                              echo '<td>'.($totals ?: '-').'</td>';
+                              echo '<td>'.($lates ?: '-').'</td>';
                             } else {
-                              echo '<td></td><td></td><td></td><td></td><td><span class="label label-success">No</span></td><td></td><td></td><td>-</td>';
+                              echo '<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>';
                             }
                           ?>
                         </tr>

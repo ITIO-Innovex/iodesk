@@ -586,12 +586,20 @@ class Hrd_model extends App_Model
      * @param array $where Optional filters
      * @return mixed object if id passed else array
      */
-    public function get_attendance($id = '', $where = [])
+    public function get_attendance($id = '', $staffid='', $where = [])
     {
         if (is_numeric($id)) {
             $this->db->where($where);
             $this->db->where('attendance_id', $id);
             return $this->db->get(db_prefix() . 'hrd_attendance')->row();
+			//echo $this->db->last_query();exit;
+        }
+		
+		if (is_numeric($staffid)) {
+            $this->db->where($where);
+            $this->db->where('staffid', $staffid);
+            return $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+			//echo $this->db->last_query();exit;
         }
 
         $this->db->where($where);
@@ -697,11 +705,22 @@ class Hrd_model extends App_Model
 		$company_id = get_staff_company_id();
 		$mode = $data;
 		
-		$late_time = "09:30:00"; // Allowed time
+		/*$late_time = "09:30:00"; // Allowed time
 		$in = new DateTime(date("H:i:s"));
 		$limit = new DateTime($late_time);
 		$late_mark=0;
-		if ($in > $limit) { $late_mark=1;}
+		if ($in > $limit) { $late_mark=1;}*/
+		
+$in_time = new DateTime(date("H:i:s")); // or from DB
+$start_time = new DateTime('09:30:00');
+$end_time   = new DateTime('13:00:00');
+
+if ($in_time >= $start_time && $in_time <= $end_time) {
+    $diff = $start_time->diff($in_time);
+    $difference = $diff->format('%H:%I:%S');
+} else {
+    $difference = "00:00:00";
+}
 		
 		
 		
@@ -713,8 +732,11 @@ class Hrd_model extends App_Model
             'shift_id'     		=> isset($data['status']) ? (int)$data['status'] : 1,
 			'mode'     			=> $mode,
 			'ip'     			=> $ip,
+			'first_half'     	=> 4,
+			'position'     		=> 1,
             'in_time' 			=> date("H:i:s"),
 			'entry_date' 		=> date("Y-m-d"),
+			'late_mark' 		=> $difference,
         ];
 
         $this->db->insert(db_prefix() . 'hrd_attendance', $insert);
@@ -776,25 +798,42 @@ class Hrd_model extends App_Model
     }
 	
 	public function get_attendance_stats(){
-	$staffid = get_staff_user_id();
-	
-	$month = 10;
-$year  = 2025;
-
-$sql = "
-  SUM(CASE WHEN (position = 1 || position = 4 || position = 5) THEN 1 ELSE 0 END) AS fullday,
-  SUM(CASE WHEN (position = 2 || position = 3)  THEN 1 ELSE 0 END) AS half,
-  SUM(CASE WHEN position = 6 THEN 1 ELSE 0 END) AS absent
-";
-
-$this->db->select($sql, false); // false -> do NOT escape the expression
-$this->db->where('staffid', $staffid);
-$this->db->where("MONTH(entry_date) = {$month}", null, false);
-$this->db->where("YEAR(entry_date) = {$year}",  null, false);
-$this->db->from(db_prefix() . 'hrd_attendance');
-//echo $compiled = $this->db->get_compiled_select();exit;
-//log_message('debug', 'Attendance SQL: ' . $compiled);
-$result = $this->db->get()->row_array(); // single-row aggregate
-return $result;
+			$staffid = get_staff_user_id();
+			
+			$month = date("m");
+		$year  = date("Y");
+		
+		$sql = "
+		  SUM(CASE WHEN (first_half = 1 || first_half = 2 || first_half = 3 || first_half = 7) THEN 1 ELSE 0 END) AS fullday,
+		  SUM(CASE WHEN (second_half = 8 || second_half = 4)  THEN 1 ELSE 0 END) AS half,
+		  SUM(CASE WHEN (first_half = 8 || first_half = 4) THEN 1 ELSE 0 END) AS absent
+		";
+		
+		$this->db->select($sql, false); // false -> do NOT escape the expression
+		$this->db->where('staffid', $staffid);
+		$this->db->where("MONTH(entry_date) = {$month}", null, false);
+		$this->db->where("YEAR(entry_date) = {$year}",  null, false);
+		$this->db->from(db_prefix() . 'hrd_attendance');
+		//echo $compiled = $this->db->get_compiled_select();exit;
+		//log_message('debug', 'Attendance SQL: ' . $compiled);
+		$result = $this->db->get()->row_array(); // single-row aggregate
+		return $result;
 	}
+	
+	  public function get_status_counter($month_year="")
+    { 
+	
+	    if($month_year==""){
+		$month_year=date("Y-m");
+		}
+      
+	    $staffid = get_staff_user_id();
+		$company_id = get_staff_company_id();
+		$this->db->select('first_half, second_half, COUNT(*) AS total_count');
+		$this->db->where('staffid', get_staff_user_id());
+		$this->db->like('entry_date', $month_year, 'after'); // matches e.g. 2025-11-01, 2025-11-15
+		$this->db->group_by(['first_half', 'second_half']);
+        return $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+    }
+	
 }

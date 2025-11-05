@@ -231,6 +231,11 @@ $route['admin/designations'] = 'admin/designations/index';
 $route['admin/designation/manage'] = 'admin/designations/manage';
 $route['admin/designation/delete/(:num)'] = 'admin/designations/delete/$1';
 
+// HRD - Manage Attendance by Date
+$route['admin/hrd/manage_attendance_by_date'] = 'admin/hrd/manage_attendance_by_date';
+$route['admin/hrd/attendance_bulk_update_by_date'] = 'admin/hrd/attendance_bulk_update_by_date';
+$route['admin/hrd/attendance_update_inout_by_date'] = 'admin/hrd/attendance_update_inout_by_date';
+
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';
 $route['admin/database_backups/export_backup'] = 'admin/database_backups/export_backup';
