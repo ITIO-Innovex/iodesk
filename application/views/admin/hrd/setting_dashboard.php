@@ -67,6 +67,21 @@
                     </div>
                 </div>
               </div>
+			  <div class="col-md-3">
+                
+				
+				<div class="widget-card bg-info text-white">
+                    <div class="widget-card-body">
+                        <div class="widget-card-icon">
+                            <i class="fa-solid fa-calendar"></i>
+                        </div>
+                        <div class="widget-card-content">
+                            <h3><?php echo (int)$counters['on_leave']; ?></h3>
+                            <a name="<?php echo admin_url('hrd/uploaded_document');?>" id=""><p>Uploaded Document</p></a>
+                        </div>
+                    </div>
+                </div>
+              </div>
 			  
             </div>
 
@@ -120,7 +135,10 @@
                     <i class="fa-solid fa-file-pen menu-icon tw-mr-2"></i> Leave Settings <span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span>
                   </div>
                   <div id="leave-settings" class="panel-body" style="display:none;">
-                    <div class="col-sm-3 tw-my-2"> <a target="_blank"  href="<?php echo admin_url('hrd/setting/leave_type');?>" class="btn btn-danger mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_type');?></a> 
+				  
+<div class="col-sm-3 tw-my-2"> <a target="_blank"  href="<?php echo admin_url('hrd/setting/leave_balance');?>" class="btn btn-danger mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_balance');?></a> 
+		  </div>
+<div class="col-sm-3 tw-my-2"> <a target="_blank"  href="<?php echo admin_url('hrd/setting/leave_type');?>" class="btn btn-danger mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_type');?></a> 
 		  </div>
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-danger mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_rule');?></a> 
 		  </div>

@@ -2642,4 +2642,315 @@ class Hrd extends AdminController
         $data['holidays'] = $holidays;
         $this->load->view('admin/hrd/holidays_list', $data);
     }
+
+    /* My Documents - list & upload for current staff */
+    public function my_document()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('My Document');
+        }
+
+        $staffid = get_staff_user_id();
+
+        $this->db->where('staff', $staffid);
+        // Only active (status != 0), default 2 is pending/active per spec
+        if ($this->db->field_exists('status', db_prefix() . 'hrd_documents')) {
+            $this->db->where('status !=', 0);
+        }
+        $this->db->order_by('addedon', 'desc');
+        $docs = $this->db->get(db_prefix() . 'hrd_documents')->result_array();
+
+        $data = [];
+        $data['title'] = 'My Documents';
+        $data['documents'] = $docs;
+        $this->load->view('admin/hrd/my_document', $data);
+    }
+
+    public function my_document_add()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $staffid = get_staff_user_id();
+        $title = trim((string)$this->input->post('document_title'));
+        $relPath = '';
+
+        if (!empty($_FILES['document']['name'])) {
+            $uploadDir = FCPATH . 'uploads/hrd_documents/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+            $ext = pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION);
+            $safeName = 'doc_' . $staffid . '_' . time() . '_' . mt_rand(1000,9999) . ($ext ? ('.' . $ext) : '');
+            $dest = $uploadDir . $safeName;
+            if (move_uploaded_file($_FILES['document']['tmp_name'], $dest)) {
+                $relPath = 'uploads/hrd_documents/' . $safeName;
+            }
+        }
+
+        $ins = [
+            'staff' => $staffid,
+            'document_title' => $title !== '' ? $title : null,
+            'document_path' => $relPath !== '' ? $relPath : null,
+            'status' => 2,
+        ];
+        $this->db->insert(db_prefix() . 'hrd_documents', $ins);
+
+        if ($this->input->is_ajax_request()) {
+            echo json_encode(['success' => true]);
+            return;
+        }
+        set_alert('success', 'Document added');
+        redirect(admin_url('hrd/my_document'));
+    }
+
+    /* Leave Balance listing for current staff with month filter */
+    public function leave_balance()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Leave Balance');
+        }
+
+        $staffid = get_staff_user_id();
+        $month_year = $this->input->get('month_year');
+
+        $this->db->where('staffid', $staffid);
+        if ($month_year) {
+            $this->db->where('month_year', $month_year);
+        }
+        $this->db->order_by('addedon', 'desc');
+        $rows = $this->db->get(db_prefix() . 'hrd_leave_balance')->result_array();
+
+        $data = [];
+        $data['title'] = 'Leave Balance';
+        $data['rows'] = $rows;
+        $data['month_year'] = $month_year ?: '';
+        $this->load->view('admin/hrd/leave_balance', $data);
+    }
+
+    /* Settings: Leave Balance with staff filter and add modal */
+    public function setting_leave_balance()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Setting Leave Balance');
+        }
+
+        $month_year = $this->input->get('month_year');
+        $staff_filter = (int)$this->input->get('staff_id');
+
+        if ($staff_filter > 0) {
+            $this->db->where('staffid', $staff_filter);
+        }
+        if ($month_year) {
+            $this->db->where('month_year', $month_year);
+        }
+        $this->db->order_by('addedon', 'desc');
+        $rows = $this->db->get(db_prefix() . 'hrd_leave_balance')->result_array();
+
+        // Staff dropdown
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $this->db->where('company_id', $_SESSION['super_view_company_id']);
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $all_staff = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        $data = [];
+        $data['title'] = 'Leave Balance (Settings)';
+        $data['rows'] = $rows;
+        $data['month_year'] = $month_year ?: '';
+        $data['all_staff'] = $all_staff;
+        $data['staff_filter'] = $staff_filter;
+        $this->load->view('admin/hrd/setting/leave_balance', $data);
+    }
+
+    public function setting_leave_balance_add()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+        $staffid = (int)$this->input->post('staffid');
+        $pl = (int)$this->input->post('pl');
+        $wl = (int)$this->input->post('wl');
+        $ad = (int)$this->input->post('ad');
+        $month_year = date('Y-m');
+        if ($staffid <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid staff']);
+            return;
+        }
+
+        $total_balance_pl = $pl;
+        $total_balance_wl = $wl;
+        $total_pl_wl = $pl + $wl;
+        $adjust_leave = $ad;
+        $balanced = $total_pl_wl - $adjust_leave;
+
+        $ins = [
+            'staffid' => $staffid,
+            'month_year' => $month_year,
+            'PL' => $pl,
+            'WL' => $wl,
+            'AD' => $ad,
+            'total_balance_pl' => $total_balance_pl,
+            'total_balance_wl' => $total_balance_wl,
+            'total_pl_wl' => $total_pl_wl,
+            'adjust_leave' => $adjust_leave,
+            'balanced' => $balanced,
+            'addedby' => get_staff_user_id(),
+        ];
+        $this->db->insert(db_prefix() . 'hrd_leave_balance', $ins);
+        echo json_encode(['success' => true]);
+    }
+
+    /* Uploaded Documents - admin/staff view with approve & remarks */
+    public function uploaded_document()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Uploaded Document');
+        }
+
+        // Company scope staff list join
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $this->db->where('s.company_id', $_SESSION['super_view_company_id']);
+        } else {
+            $this->db->where('s.company_id', get_staff_company_id());
+        }
+        $this->db->select('d.*, s.firstname, s.lastname');
+        $this->db->from(db_prefix() . 'hrd_documents d');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = d.staff', 'left');
+        $this->db->order_by('d.addedon', 'desc');
+        $docs = $this->db->get()->result_array();
+
+        $data = [];
+        $data['title'] = 'Uploaded Documents';
+        $data['documents'] = $docs;
+        $this->load->view('admin/hrd/uploaded_document', $data);
+    }
+
+    public function document_update_status()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $id = (int)$this->input->post('id');
+        $status = (int)$this->input->post('status');
+        $remarks = trim((string)$this->input->post('remarks'));
+        if ($id <= 0) { echo json_encode(['success' => false]); return; }
+
+        $upd = ['status' => $status];
+        // Store remarks if column exists
+        if ($this->db->field_exists('remarks', db_prefix() . 'hrd_documents')) {
+            $upd['remarks'] = ($remarks !== '') ? $remarks : null;
+        }
+        // Always bump updatedon if the column exists
+        if ($this->db->field_exists('updatedon', db_prefix() . 'hrd_documents')) {
+            $upd['updatedon'] = date('Y-m-d H:i:s');
+        }
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'hrd_documents', $upd);
+        echo json_encode(['success' => true]);
+    }
+
+    /* HRD Profile */
+    public function profile()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('HRD Profile');
+        }
+        $staffid = get_staff_user_id();
+
+        $this->db->where('staffid', $staffid);
+        $row = $this->db->get(db_prefix() . 'staff')->row_array();
+
+        // joins for labels
+        $deptName = '';$desigName='';$branchName='';
+        if ($row && !empty($row['department_id'])) {
+            $d = $this->db->select('name')->where('departmentid', (int)$row['department_id'])->get(db_prefix().'departments')->row_array();
+            $deptName = $d['name'] ?? '';
+        }
+        if ($row && !empty($row['designation_id'])) {
+            $ds = $this->db->select('title')->where('id', (int)$row['designation_id'])->get(db_prefix().'designations')->row_array();
+            $desigName = $ds['title'] ?? '';
+        }
+        if ($row && !empty($row['branch'])) {
+            $br = $this->db->select('branch_name')->where('id', (int)$row['branch'])->get(db_prefix().'hrd_branch_manager')->row_array();
+            $branchName = $br['branch_name'] ?? '';
+        }
+
+        $data = [];
+        $data['title'] = 'My HR Profile';
+        $data['me'] = $row ?: [];
+        $data['deptName'] = $deptName;
+        $data['desigName'] = $desigName;
+        $data['branchName'] = $branchName;
+        $this->load->view('admin/hrd/profile', $data);
+    }
+
+    public function profile_update_personal()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $staffid = get_staff_user_id();
+        $upd = [
+            'father_name' => $this->input->post('father_name'),
+            'email_personal' => $this->input->post('email_personal'),
+            'mobile' => $this->input->post('mobile'),
+            'aadhar' => $this->input->post('aadhar'),
+            'pan' => $this->input->post('pan'),
+        ];
+        $this->db->where('staffid', $staffid);
+        $this->db->update(db_prefix().'staff', $upd);
+        echo json_encode(['success' => true]);
+    }
+
+    public function profile_update_social()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $staffid = get_staff_user_id();
+        $upd = [
+            'linkedin' => $this->input->post('linkedin'),
+            'facebook' => $this->input->post('facebook'),
+            'twitter' => $this->input->post('twitter'),
+        ];
+        $this->db->where('staffid', $staffid);
+        $this->db->update(db_prefix().'staff', $upd);
+        echo json_encode(['success' => true]);
+    }
+
+    public function profile_image_update()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $staffid = get_staff_user_id();
+        if (!empty($_FILES['profile_image']['name'])) {
+            $dir = FCPATH . 'uploads/staff_profile/';
+            if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
+            $ext = pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION);
+            $filename = 'staff_'.$staffid.'.'.strtolower($ext ?: 'jpg');
+            $dest = $dir.$filename;
+            if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $dest)) {
+                if ($this->db->field_exists('profile_image', db_prefix().'staff')) {
+                    $this->db->where('staffid', $staffid);
+                    $this->db->update(db_prefix().'staff', ['profile_image' => 'uploads/staff_profile/'.$filename]);
+                }
+                echo json_encode(['success' => true]);
+                return;
+            }
+        }
+        echo json_encode(['success' => false]);
+    }
 }
