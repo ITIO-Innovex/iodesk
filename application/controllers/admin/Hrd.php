@@ -2595,4 +2595,15 @@ class Hrd extends AdminController
 
         $this->load->view('admin/hrd/setting_dashboard', $data);
     }
+
+    /* HRD Self Service */
+    public function self_service()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('HRD Self Service');
+        }
+
+        $data['title'] = 'HRD Self Service';
+        $this->load->view('admin/hrd/self_service', $data);
+    }
 }

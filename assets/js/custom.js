@@ -194,8 +194,13 @@ $(document).on('click', '.attendance-submit', function(e) {
     success: function(res) {
       if(res.success && res.data) {
        // var p = res.data;
-		var p = res.data[0]; 
-		showFlashMessage('Attendance Completed', 'success');
+		var p = res.data[0];
+		//alert(mode);
+		if(mode=='Out'){
+		showFlashMessage('Mark Out Completed', 'success');
+		}else{
+		showFlashMessage('Mark In Completed', 'success');	
+		}
 		setTimeout(function() {
         window.location.href = window.admin_url + 'hrd/dashboard';
       }, 2000); // 1 second delay

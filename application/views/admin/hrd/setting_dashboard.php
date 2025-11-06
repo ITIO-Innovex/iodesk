@@ -10,7 +10,7 @@
             
 
             <div class="row mtop15">
-              <div class="col-md-4">
+              <div class="col-md-3">
 			  <div class="widget-card bg-success text-white">
                     <div class="widget-card-body">
                         <div class="widget-card-icon">
@@ -18,13 +18,13 @@
                         </div>
                         <div class="widget-card-content">
                             <h3><?php echo (int)$counters['present']; ?></h3>
-                            <p>Total Present Today (<?php echo e($today); ?>)</p>
+                            <p>Present Today (<?php echo e($today); ?>)</p>
                         </div>
                     </div>
                 </div>
                 
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
 				<div class="widget-card bg-warning text-white">
                     <div class="widget-card-body">
                         <div class="widget-card-icon">
@@ -32,12 +32,12 @@
                         </div>
                         <div class="widget-card-content">
                             <h3><?php echo (int)$counters['absent']; ?></h3>
-                            <p>Total Absent Today</p>
+                            <p>Absent Today</p>
                         </div>
                     </div>
                 </div>
               </div>
-              <div class="col-md-4">
+              <div class="col-md-3">
                 
 				
 				<div class="widget-card bg-info text-white">
@@ -47,11 +47,27 @@
                         </div>
                         <div class="widget-card-content">
                             <h3><?php echo (int)$counters['on_leave']; ?></h3>
-                            <p>Total on Leave Today</p>
+                            <p>Leave Application</p>
                         </div>
                     </div>
                 </div>
               </div>
+			  <div class="col-md-3">
+                
+				
+				<div class="widget-card bg-info text-white">
+                    <div class="widget-card-body">
+                        <div class="widget-card-icon">
+                            <i class="fa-solid fa-calendar"></i>
+                        </div>
+                        <div class="widget-card-content">
+                            <h3><?php echo (int)$counters['on_leave']; ?></h3>
+                            <p>Attendance Request</p>
+                        </div>
+                    </div>
+                </div>
+              </div>
+			  
             </div>
 
             <div class="row mtop20">
