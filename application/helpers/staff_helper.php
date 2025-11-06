@@ -439,6 +439,25 @@ function get_departments_id($staffid='')
 		return 0;
 }
 
+function get_staff_branch_name($branchid='')
+{   
+        // Fetch company Name from company id
+		if(empty($branchid)){
+		$branchid=1;
+		}
+		
+		if(isset($branchid)&&$branchid){
+		$CI = & get_instance();
+		$CI->db->where('id', $branchid);
+		$com = $CI->db->select('branch_name')->from(db_prefix() . 'hrd_branch_manager')->get()->row();
+		if(isset($com)&&$com->branch_name){
+		return $com->branch_name;
+		}
+		}
+		
+		return 0;
+}
+
 function get_company_status($company_id)
 {   
         // Fetch company Name from company id

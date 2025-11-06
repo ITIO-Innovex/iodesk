@@ -26,7 +26,12 @@
                 <label for="password" class="tw-text-white">
                     <?php echo _l('admin_auth_login_password'); ?>
                 </label>
-                <input type="password" id="password" name="password" class="form-control">
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control">
+                    <span class="input-group-addon" id="toggle-password" style="cursor:pointer;">
+                        <i class="fa fa-eye" aria-hidden="true"></i>
+                    </span>
+                </div>
             </div>
 
             <?php if (show_recaptcha()) { ?>
@@ -61,3 +66,20 @@
 </body>
 
 </html>
+<script>
+(function(){
+  var toggle = document.getElementById('toggle-password');
+  if (toggle) {
+    toggle.addEventListener('click', function(){
+      var input = document.getElementById('password');
+      if (!input) return;
+      var isPwd = input.getAttribute('type') === 'password';
+      input.setAttribute('type', isPwd ? 'text' : 'password');
+      var icon = this.querySelector('i');
+      if (icon) {
+        icon.className = isPwd ? 'fa fa-eye-slash' : 'fa fa-eye';
+      }
+    });
+  }
+})();
+</script>

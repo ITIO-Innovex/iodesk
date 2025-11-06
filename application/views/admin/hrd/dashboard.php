@@ -10,15 +10,22 @@ $half=$attendance_stats['half'] ?? 0;
 $absent=$attendance_stats['absent'] ?? 0;
 $totaldays=($fullday +($half / 2)) ?? 0;
 ?>
-
+<style>
+.box-gradient-bg1{background-image: radial-gradient(circle, #eaedb4 0%, #daeaed 100%);}
+.box-gradient-bg2{
+    background: conic-gradient(from 210deg, rgb(197, 187, 184) 0deg, rgb(197, 187, 184) 24deg, rgb(184, 181, 184) 24deg, rgb(184, 181, 184) 48deg, rgb(169, 175, 183) 48deg, rgb(169, 175, 183) 72deg, rgb(154, 168, 181) 72deg, rgb(154, 168, 181) 96deg, rgb(139, 161, 179) 96deg, rgb(139, 161, 179) 120deg, rgb(125, 152, 175) 120deg, rgb(125, 152, 175) 144deg, rgb(112, 144, 171) 144deg, rgb(112, 144, 171) 168deg, rgb(101, 135, 166) 168deg, rgb(101, 135, 166) 192deg, rgb(135 156 178 / 82%) 192deg, rgb(92, 126, 161) 216deg, rgb(85 117 155 / 80%) 216deg, rgb(85, 117, 155) 240deg, rgb(81 108 148 / 58%) 240deg, rgb(81 108 148 / 46%) 264deg, rgb(79 99 141 / 55%) 264deg, rgb(79 99 141 / 24%) 288deg, rgb(183 195 245) 288deg, rgb(234 225 228) 312deg, rgb(202 243 213) 312deg, rgb(238 237 241) 336deg, rgb(228 222 145) 336deg, rgb(221 215 231) 360deg);
+}
+.box-gradient-bg3{background-image: linear-gradient(to right top, #dcb8cc, #c7adc4, #b2a2ba, #9e97af, #8b8ca2, #8b8ca2, #8b8ca2, #8b8ca2, #9e97af, #b2a2ba, #c7adc4, #dcb8cc);}
+</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
             <div class="col-md-12">
                 <div class="tw-mb-2 sm:tw-mb-4">
                     <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
-                        <i class="fa-solid fa-chart-line tw-mr-2"></i><?php echo $title; ?> - Login Time :: <?php echo $in_time; ?>
+                        <span class="pull-left display-block mright5"><i class="fa-solid fa-chart-line tw-mr-2"></i><?php echo $title; ?> - Login Time :: <?php echo $in_time; ?></span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span>
                     </h4>
+					
                 </div>
             </div>
         </div>
@@ -86,6 +93,7 @@ $totaldays=($fullday +($half / 2)) ?? 0;
                 </div>
             </div>
         </div>
+		
 
         <!-- Charts Row -->
         <div class="row">
@@ -133,12 +141,59 @@ $totaldays=($fullday +($half / 2)) ?? 0;
                 </div>
             </div>
         </div>
-
+		
+		<!-- Menus -->
+<div class="row tw-mb-4">
+      <div class="col-sm-4">
+	
+	  <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-chart-area tw-mx-2"></i> Profile</h4>
+        <ul class="reports tw-space-y-1">
+        
+		  <a href="#" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-rounded-md">Profile</a> 
+		  
+		  
+		  
+        </ul>
+      </div>
+	  </div>
+	  <div class="col-sm-4">
+      <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-chart-pie tw-mx-2"></i> Quick Info</h4>
+        <ul class="reports tw-space-y-1">
+		  <a href="#" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-rounded-md">Leave Balance</a> 
+		  | <a href="#" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200  tw-rounded-md">My Document</a> 
+		  |<a href="#" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-rounded-md">Holidays List</a> 
+		  
+		</ul>  
+        
+      </div>
+	  </div>
+	  <div class="col-sm-4">
+	  <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-chart-line tw-mx-2"></i> Pay Slip</h4>
+        <ul class="reports tw-space-y-1">
+          <a href="#" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-rounded-md">CTC</a> 
+		  |
+		  <a href="#" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-rounded-md">Pay Slip</a> 
+		  
+		 
+		  
+		  
+		
+		  
+        </ul>
+      </div>
+	  </div>
+	  
+	  
+    
+  </div>
         <!-- Latest Listings -->
         <div class="row">
             <div class="col-md-6">
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
-                    <div class="panel-body">
+<div class="panel-body box-gradient-bg1">
                         <h4 class="panel-title">
                             <i class="fa-solid fa-tasks tw-mr-2"></i><?php echo $company_policies['title'] ?? ''; ?>
                         </h4>
@@ -213,7 +268,7 @@ $today = strtotime(date("Y-m-d"));
             
 <div class="col-md-6">
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
-                    <div class="panel-body">
+                    <div class="panel-body box-gradient-bg2">
                         <h4 class="panel-title">
                             <i class="fa-solid fa-tasks tw-mr-2"></i>Event & Announcement
                         </h4>
@@ -226,8 +281,8 @@ $today = strtotime(date("Y-m-d"));
             </div>
             <div class="col-md-6">
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
-                    <div class="panel-body">
-                        <h4 class="panel-title">
+                    <div class="panel-body box-gradient-bg3">
+                        <h4 class="panel-title ">
                             <i class="fa-solid fa-tasks tw-mr-2"></i>Corporate Guide
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">

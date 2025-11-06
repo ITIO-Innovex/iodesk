@@ -237,6 +237,7 @@ $route['admin/hrd/attendance_bulk_update_by_date'] = 'admin/hrd/attendance_bulk_
 $route['admin/hrd/attendance_update_inout_by_date'] = 'admin/hrd/attendance_update_inout_by_date';
 $route['admin/hrd/setting/dashboard'] = 'admin/hrd/setting_dashboard';
 $route['admin/hrd/attendance_update_request_add'] = 'admin/hrd/attendance_update_request_add';
+$route['admin/hrd/self_service'] = 'admin/hrd/self_service';
 
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';

@@ -6,9 +6,10 @@
   </style>
 <div id="wrapper">
   <div class="content">
+  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"><i class="fa-solid fa-calendar-days menu-icon tw-mr-2"></i> Leave Type</h4>
     <div class="row">
       <div class="col-md-12">
-        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" onclick="new_leave_type(); return false;" class="btn btn-primary"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Leave Type'); ?> </a> </div>
+        <?php /*?><div class="tw-mb-2 sm:tw-mb-4"> <a href="#" onclick="new_leave_type(); return false;" class="btn btn-primary"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Leave Type'); ?> </a> </div><?php */?>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (count($leave_types) > 0) { ?>
@@ -17,7 +18,7 @@
                                 <th>Leave Type Title</th>
                                 <th>Remark</th>
                                 <th><?php echo _l('status'); ?></th>
-                                <th><?php echo _l('options'); ?></th>
+                               <?php /*?> <th><?php echo _l('options'); ?></th><?php */?>
                             </thead>
                             <tbody>
                                 <?php foreach ($leave_types as $leave_type) { ?>
@@ -31,7 +32,8 @@
                                     </td>
                                     <td><?php echo isset($leave_type['remark']) ? e($leave_type['remark']) : ''; ?></td>
                                     <td>
-                                        <a href="javascript:void(0);" onclick="toggleLeaveTypeStatus(<?php echo $leave_type['id']; ?>, <?php echo $leave_type['status']; ?>)" id="status-label-<?php echo $leave_type['id']; ?>">
+<a href="javascript:void(0);"  id="status-label-<?php echo $leave_type['id']; ?>">
+<?php /*?>onclick="toggleLeaveTypeStatus(<?php echo $leave_type['id']; ?>, <?php echo $leave_type['status']; ?>)"<?php */?>
                                         <?php if ($leave_type['status']) { ?>
                                             <span class="label label-success">Active</span>
                                         <?php } else { ?>
@@ -39,7 +41,7 @@
                                         <?php } ?>
                                         </a>
                                     </td>
-                                    <td>
+                                    <?php /*?><td>
                                         <div class="tw-flex tw-items-center tw-space-x-3">
                                             <a href="#"
                                                 onclick="edit_leave_type(this,<?php echo e($leave_type['id']); ?>);return false;"
@@ -53,7 +55,7 @@
                                                 <i class="fa-regular fa-trash-can fa-lg"></i>
                                             </a>
                                         </div>
-                                    </td>
+                                    </td><?php */?>
                                 </tr>
                                 <?php } ?>
                             </tbody>
