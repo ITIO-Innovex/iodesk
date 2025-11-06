@@ -2606,4 +2606,40 @@ class Hrd extends AdminController
         $data['title'] = 'HRD Self Service';
         $this->load->view('admin/hrd/self_service', $data);
     }
+
+    /* Holidays List - simple listing page */
+    public function holidays_list()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Holidays List');
+        }
+
+        // Company scope
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+
+        // Active holidays first; show all (status column used previously)
+        if ($this->db->field_exists('status', db_prefix() . 'hrd_holiday_list')) {
+            $this->db->where('status !=', 0);
+        }
+        // Order by available date column
+        if ($this->db->field_exists('date', db_prefix() . 'hrd_holiday_list')) {
+            $this->db->order_by('date', 'asc');
+        } elseif ($this->db->field_exists('holiday_date', db_prefix() . 'hrd_holiday_list')) {
+            $this->db->order_by('holiday_date', 'asc');
+        }
+        $holidays = $this->db->get(db_prefix() . 'hrd_holiday_list')->result_array();
+
+        $data = [];
+        $data['title'] = 'Holidays List';
+        $data['holidays'] = $holidays;
+        $this->load->view('admin/hrd/holidays_list', $data);
+    }
 }

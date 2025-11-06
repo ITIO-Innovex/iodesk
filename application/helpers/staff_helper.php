@@ -419,6 +419,29 @@ function get_staff_company_id($userid = '')
     $staff = $CI->app_object_cache->get('staff-roll-data-' . $userid);
     return $staff ? $staff->company_id : '';
 }
+function get_branch_id($staffid='')
+{   
+        // Fetch company Name from company id
+		// check company id is found or not
+		if($staffid==""){
+				$tmpStaffUserId = get_staff_user_id();
+				if(isset($GLOBALS['current_user'])) {
+				$branch_id=$GLOBALS['current_user']->branch;
+				}
+		 }
+	
+		
+		if(isset($staffid)&&$staffid){
+			$CI = & get_instance();
+			$CI->db->where('staffid', $staffid);
+			$com = $CI->db->select('branch')->from(db_prefix() . 'staff')->get()->row();
+			if(isset($com)&&$com->branch){
+			return $com->branch;
+			}
+		}
+		
+		return $branch_id;
+}
 
 function get_departments_id($staffid='')
 {   
