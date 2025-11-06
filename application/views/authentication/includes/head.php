@@ -10,6 +10,12 @@
         <?php echo e(get_option('companyname')); ?> - <?php echo _l('admin_auth_login_heading'); ?>
     </title>
     <?php echo app_compile_css('admin-auth'); ?>
+    <link href="<?php echo base_url('assets/plugins/font-awesome/css/fontawesome.min.css'); ?>" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" id="fontawesome-css" href="<?php echo base_url('assets/plugins/font-awesome/css/fontawesome.min.css'); ?>">
+<link rel="stylesheet" type="text/css" id="fontawesome-brands" href="<?php echo base_url('assets/plugins/font-awesome/css/brands.min.css'); ?>">
+<link rel="stylesheet" type="text/css" id="fontawesome-solid" href="<?php echo base_url('assets/plugins/font-awesome/css/solid.min.css'); ?>">
+<link rel="stylesheet" type="text/css" id="fontawesome-regular" href="<?php echo base_url('assets/plugins/font-awesome/css/regular.min.css'); ?>">
+
     <style>
     body,
     html {
