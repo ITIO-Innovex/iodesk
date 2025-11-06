@@ -239,6 +239,17 @@ $route['admin/hrd/setting/dashboard'] = 'admin/hrd/setting_dashboard';
 $route['admin/hrd/attendance_update_request_add'] = 'admin/hrd/attendance_update_request_add';
 $route['admin/hrd/self_service'] = 'admin/hrd/self_service';
 $route['admin/hrd/holidays_list'] = 'admin/hrd/holidays_list';
+$route['admin/hrd/my_document'] = 'admin/hrd/my_document';
+$route['admin/hrd/my_document_add'] = 'admin/hrd/my_document_add';
+$route['admin/hrd/leave_balance'] = 'admin/hrd/leave_balance';
+$route['admin/hrd/setting/leave_balance'] = 'admin/hrd/setting_leave_balance';
+$route['admin/hrd/setting/leave_balance_add'] = 'admin/hrd/setting_leave_balance_add';
+$route['admin/hrd/uploaded_document'] = 'admin/hrd/uploaded_document';
+$route['admin/hrd/document_update_status'] = 'admin/hrd/document_update_status';
+$route['admin/hrd/profile'] = 'admin/hrd/profile';
+$route['admin/hrd/profile_update_personal'] = 'admin/hrd/profile_update_personal';
+$route['admin/hrd/profile_update_social'] = 'admin/hrd/profile_update_social';
+$route['admin/hrd/profile_image_update'] = 'admin/hrd/profile_image_update';
 
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';
