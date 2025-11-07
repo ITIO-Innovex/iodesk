@@ -467,6 +467,25 @@ class Hrd_model extends App_Model
     }
 
     /**
+     * Get staff type(s)
+     * @param  mixed $id Optional - staff type id
+     * @param  array $where Optional - where conditions
+     * @return mixed object if id passed else array
+     */
+    public function get_staff_type($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'hrd_staff_type')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('id', 'asc');
+        return $this->db->get(db_prefix() . 'hrd_staff_type')->result_array();
+    }
+
+    /**
      * Get corporate guideline(s)
      * @param  mixed $id Optional - guideline id
      * @param  array $where Optional - where conditions

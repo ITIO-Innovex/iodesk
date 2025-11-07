@@ -154,7 +154,7 @@ $totaldays=($fullday +($half / 2)) ?? 0;
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
 <div class="panel-body box-gradient-bg11">
                         <h4 class="panel-title">
-                            <i class="fa-solid fa-tasks tw-mr-2"></i><?php echo $company_policies['title'] ?? ''; ?>
+                            <i class="fa-solid fa-tasks tw-mr-2"></i><?php echo $company_policies['title'] ?? 'Company Policies'; ?>
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
                           <div class="tw-px-2">

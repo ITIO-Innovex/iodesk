@@ -77,7 +77,7 @@
                         </div>
                         <div class="widget-card-content">
                             <h3><?php echo (int)$counters['on_leave']; ?></h3>
-                            <a name="<?php echo admin_url('hrd/uploaded_document');?>" id=""><p>Uploaded Document</p></a>
+                            <a href="<?php echo admin_url('hrd/uploaded_document');?>"  target="_blank"><p>Uploaded Document</p></a>
                         </div>
                     </div>
                 </div>
@@ -126,7 +126,9 @@
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/attendance_status');?>" class="btn btn-success mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('attendance_status');?></a> 
 		  </div>	
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/staff_manager');?>" class="btn btn-success mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('staff_manager');?></a> 
-		  </div>	
+</div>
+<div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/staff_type');?>" class="btn btn-success mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('staff_type');?></a> 
+</div>	
                   </div>
                 </div>
 

@@ -21,6 +21,7 @@
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
                 <th>Details</th>
+                <th>Branch</th>
                 <th><?php echo _l('status'); ?></th>
                 <th><?php echo _l('options'); ?></th>
               </thead>
@@ -30,6 +31,7 @@
                
                   <td><strong>Title : <?php echo e($r['title']); ?></strong><br /><br />
 <?php echo nl2br($r['details']); ?></td>
+                  <td><?php echo e($r['branch_name'] ?? '-'); ?></td>
                   <td>
                     <a href="javascript:void(0);" onclick="toggleRuleStatus(<?php echo $r['id']; ?>, <?php echo (int)$r['status']; ?>)" id="status-label-<?php echo $r['id']; ?>">
                       <?php if (!empty($r['status'])) { ?>
@@ -45,6 +47,7 @@
                          onclick="edit_rule(this,<?php echo e($r['id']); ?>);return false;"
                          data-title="<?php echo e($r['title']); ?>"
                          data-details="<?php echo e($r['details']); ?>"
+                         data-branch="<?php echo e($r['branch'] ?? ''); ?>"
                          class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700">
                         <i class="fa-regular fa-pen-to-square fa-lg"></i>
                       </a>
@@ -85,6 +88,15 @@
             <div id="additional"></div>
             <?php echo render_input('title', 'Title'); ?>
             <div class="form-group">
+              <label for="branch">Branch</label>
+              <select name="branch" id="branch" class="form-control">
+                <option value="">-- Select Branch --</option>
+                <?php if (!empty($branches)) { foreach ($branches as $b) { ?>
+                  <option value="<?php echo (int)$b['id']; ?>"><?php echo e($b['branch_name']); ?></option>
+                <?php } } ?>
+              </select>
+            </div>
+            <div class="form-group">
               <label for="details">Details</label>
               <textarea name="details" id="details" class="form-control editor" rows="5" required></textarea>
             </div>
@@ -109,6 +121,7 @@
     $('#leave_rule').on("hidden.bs.modal", function () {
       $('#additional').html('');
       $('#leave_rule input[name="title"]').val('');
+      $('#leave_rule select[name="branch"]').val('');
       $('#leave_rule textarea[name="details"]').val('');
       $('.add-title').removeClass('hide');
       $('.edit-title').removeClass('hide');
@@ -125,6 +138,7 @@
   function edit_rule(invoker, id) {
     $('#additional').append(hidden_input('id', id));
     $('#leave_rule input[name="title"]').val($(invoker).data('title'));
+    $('#leave_rule select[name="branch"]').val($(invoker).data('branch') || '');
     $('#leave_rule textarea[name="details"]').jqteVal($(invoker).data('details'));
 	$('#leave_rule textarea[name="details"]').val($(invoker).data('details'));
     $('#leave_rule').modal('show');
