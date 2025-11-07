@@ -4,10 +4,12 @@
 
 //print_r($status_counter); 
 //print_r($calendar);
-
+//print_r($shift_details);
 $get_shift_code  = $shift_details[0]['shift_code']  ?? '-';
 $get_shift_in = $shift_details[0]['shift_in'] ?? '-';
 $get_shift_out = $shift_details[0]['shift_out'] ?? '-';
+$get_saturday_rule = $shift_details[0]['saturday_rule'] ?? '-';
+if(empty($shift_details)){ echo "Shift Not Mapped. contact web admin"; exit;} ?>
 ?>
 <style media="print">
 /* Show only the calendar when printing */
@@ -43,6 +45,7 @@ html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </style>
 <div id="wrapper">
   <div class="content">
+  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  My Attendance</span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
     <div class="row">
       <div class="col-md-12">
         
@@ -97,8 +100,11 @@ function printDiv(divId) {
 						<th>Shift Code    : <?php echo $get_shift_code;?></th>
                         <th>Shift InTime  : <?php echo $get_shift_in;?></th>
 						<th>Shift OutTime : <?php echo $get_shift_out;?></th>
-						
-					  </tr>
+					    <th>Shift OutTime : <?php echo $get_shift_out;?></th>
+					    <th>Staff Type : <?php  if(isset($GLOBALS['current_user']->staff_type)&&$GLOBALS['current_user']->staff_type) { echo "[ ".get_staff_staff_type($GLOBALS['current_user']->staff_type)." ]";} ?></th>
+						<th>Saturday Rule : <?php echo get_saturday_rule($get_saturday_rule);?></th>
+					   </tr>
+					  
                     </thead>
 				  </table>
 					<?php
@@ -150,6 +156,7 @@ function printDiv(divId) {
                         $s = $secs%60;
                         return sprintf('%02d:%02d:%02d', $h, $m, $s);
                       };
+					  $sat_count=0;
                       foreach ($cal['days'] as $cell) { 
                       if (strtotime($cell['date']) > time()) { continue; }
 					  $bgClass="bg-light";
@@ -157,12 +164,25 @@ function printDiv(divId) {
 					  $bgClass="tw-bg-danger-200";
 					  }elseif(date('l', strtotime($cell['date']))=='Saturday'){
 					  $bgClass="tw-bg-warning-200";
+					  $sat_count++;
 					  }
+					  
+	///////////////////////////All Condation By Shift///////////////
+	
+	
+	
+	/////////////////////////////////////////////////////////////////				  
+					  
+					  
+					  
+					  
+					  
+					  
 					  //print_r($cell['items']);
 					  ?>
                         <tr class="<?php echo $bgClass;?>">
                           <td><strong><a href="#" class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
-                          <td ><?php echo date('l', strtotime($cell['date'])); ?></td>
+                          <td ><?php echo date('l', strtotime($cell['date'])); ?> - <?php echo $sat_count;?></td>
                           <?php
                             if (!empty($cell['items'])) {
                               // Take only the first record to avoid duplicates

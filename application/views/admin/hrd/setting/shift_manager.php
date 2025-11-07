@@ -20,6 +20,13 @@
                   $shiftTypeMap[$t['id']] = $t['title'];
                 }
               }
+              // Build saturday rule map id => title
+              $saturdayRuleMap = [];
+              if (!empty($saturday_rules)) {
+                foreach ($saturday_rules as $sr) {
+                  $saturdayRuleMap[$sr['id']] = $sr['title'];
+                }
+              }
             ?>
             <table class="table dt-table" data-order-col="0" data-order-type="asc">
               <thead>
@@ -27,7 +34,14 @@
                 <th>Shift Name</th>
                 <th>Shift In</th>
                 <th>Shift Out</th>
-                <th>Grace (min)</th>
+                <th>First Half Start</th>
+                <th>First Half End</th>
+                <th>Second Half Start</th>
+                <th>Second Half End</th>
+                <th>Saturday Rule</th>
+                <th>Sat Work Start</th>
+                <th>Sat Work End</th>
+				<th>Grace (min)</th>
                 <th>Shift Type</th>
                 <th>Tea (min)</th>
                 <th>Lunch (min)</th>
@@ -50,12 +64,27 @@
                        data-tea_break_in_minut="<?php echo e($row['tea_break_in_minut']); ?>"
                        data-lunch_break_in_minut="<?php echo e($row['lunch_break_in_minut']); ?>"
                        data-dinner_break_in_minut="<?php echo e($row['dinner_break_in_minut']); ?>"
+                       data-first_half_start="<?php echo e($row['first_half_start'] ?? ''); ?>"
+                       data-first_half_end="<?php echo e($row['first_half_end'] ?? ''); ?>"
+                       data-second_half_start="<?php echo e($row['second_half_start'] ?? ''); ?>"
+                       data-second_half_end="<?php echo e($row['second_half_end'] ?? ''); ?>"
+                       data-saturday_rule="<?php echo e($row['saturday_rule'] ?? ''); ?>"
+                       data-saturday_work_start="<?php echo e($row['saturday_work_start'] ?? ''); ?>"
+                       data-saturday_work_end="<?php echo e($row['saturday_work_end'] ?? ''); ?>"
                     ><?php echo e($row['shift_code']); ?></a>
                   </td>
                   <td><?php echo e($row['shift_name']); ?></td>
                   <td><?php echo e($row['shift_in']); ?></td>
                   <td><?php echo e($row['shift_out']); ?></td>
-                  <td><?php echo (int)$row['grace_period']; ?></td>
+                  
+                  <td><?php echo e($row['first_half_start'] ?? ''); ?></td>
+                  <td><?php echo e($row['first_half_end'] ?? ''); ?></td>
+                  <td><?php echo e($row['second_half_start'] ?? ''); ?></td>
+                  <td><?php echo e($row['second_half_end'] ?? ''); ?></td>
+                  <td><?php echo isset($saturdayRuleMap[$row['saturday_rule'] ?? '']) ? e($saturdayRuleMap[$row['saturday_rule']]) : '-'; ?></td>
+                  <td><?php echo e($row['saturday_work_start'] ?? ''); ?></td>
+                  <td><?php echo e($row['saturday_work_end'] ?? ''); ?></td>
+				  <td><?php echo (int)$row['grace_period']; ?></td>
                   <td><?php echo isset($shiftTypeMap[$row['shift_type']]) ? e($shiftTypeMap[$row['shift_type']]) : '-'; ?></td>
                   <td><?php echo (int)$row['tea_break_in_minut']; ?></td>
                   <td><?php echo (int)$row['lunch_break_in_minut']; ?></td>
@@ -82,6 +111,13 @@
                          data-tea_break_in_minut="<?php echo e($row['tea_break_in_minut']); ?>"
                          data-lunch_break_in_minut="<?php echo e($row['lunch_break_in_minut']); ?>"
                          data-dinner_break_in_minut="<?php echo e($row['dinner_break_in_minut']); ?>"
+						  data-first_half_start="<?php echo e($row['first_half_start'] ?? ''); ?>"
+                       data-first_half_end="<?php echo e($row['first_half_end'] ?? ''); ?>"
+                       data-second_half_start="<?php echo e($row['second_half_start'] ?? ''); ?>"
+                       data-second_half_end="<?php echo e($row['second_half_end'] ?? ''); ?>"
+                       data-saturday_rule="<?php echo e($row['saturday_rule'] ?? ''); ?>"
+                       data-saturday_work_start="<?php echo e($row['saturday_work_start'] ?? ''); ?>"
+                       data-saturday_work_end="<?php echo e($row['saturday_work_end'] ?? ''); ?>"
                          class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700">
                         <i class="fa-regular fa-pen-to-square fa-lg"></i>
                       </a>
@@ -106,9 +142,9 @@
 </div>
 
 <div class="modal fade" id="shift_manager" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-xl">
     <?php echo form_open(admin_url('hrd/shiftmanager'), ['id' => 'shift-manager-form']); ?>
-    <div class="modal-content">
+    <div class="modal-content ">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">
@@ -118,19 +154,26 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-12">
+          
             <div id="additional"></div>
+			<div class="col-md-4">
             <?php echo render_input('shift_code', 'Shift Code'); ?>
+			</div>
+			<div class="col-md-4">
             <?php echo render_input('shift_name', 'Shift Name'); ?>
+			</div><div class="col-md-4">
             <div class="form-group">
               <label for="shift_in">Shift In</label>
               <input type="time" name="shift_in" id="shift_in" class="form-control" />
             </div>
+			</div><div class="col-md-4">
             <div class="form-group">
               <label for="shift_out">Shift Out</label>
               <input type="time" name="shift_out" id="shift_out" class="form-control" />
             </div>
+			</div><div class="col-md-4">
             <?php echo render_input('grace_period', 'Grace Period (minutes)', '', 'number'); ?>
+			</div><div class="col-md-4">
             <div class="form-group">
               <label for="shift_type">Shift Type</label>
               <select name="shift_type" id="shift_type" class="form-control">
@@ -140,10 +183,61 @@
                 <?php } } ?>
               </select>
             </div>
+			</div><div class="col-md-4">
             <?php echo render_input('tea_break_in_minut', 'Tea Break (minutes)', '', 'number'); ?>
+			</div><div class="col-md-4">
             <?php echo render_input('lunch_break_in_minut', 'Lunch Break (minutes)', '', 'number'); ?>
+			</div><div class="col-md-4">
             <?php echo render_input('dinner_break_in_minut', 'Dinner Break (minutes)', '', 'number'); ?>
-          </div>
+			</div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="first_half_start">First Half Start</label>
+                <input type="time" name="first_half_start" id="first_half_start" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="first_half_end">First Half End</label>
+                <input type="time" name="first_half_end" id="first_half_end" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="second_half_start">Second Half Start</label>
+                <input type="time" name="second_half_start" id="second_half_start" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="second_half_end">Second Half End</label>
+                <input type="time" name="second_half_end" id="second_half_end" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="saturday_rule">Saturday Rule</label>
+                <select name="saturday_rule" id="saturday_rule" class="form-control">
+                  <option value="">-- Select Saturday Rule --</option>
+                  <?php if (!empty($saturday_rules)) { foreach ($saturday_rules as $sr) { ?>
+                    <option value="<?php echo (int)$sr['id']; ?>"><?php echo e($sr['title']); ?></option>
+                  <?php } } ?>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="saturday_work_start">Saturday Work Start</label>
+                <input type="time" name="saturday_work_start" id="saturday_work_start" class="form-control" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="saturday_work_end">Saturday Work End</label>
+                <input type="time" name="saturday_work_end" id="saturday_work_end" class="form-control" />
+              </div>
+            </div>
+          
         </div>
       </div>
       <div class="modal-footer">
@@ -190,6 +284,13 @@
     $('#shift_manager input[name="tea_break_in_minut"]').val($(invoker).data('tea_break_in_minut'));
     $('#shift_manager input[name="lunch_break_in_minut"]').val($(invoker).data('lunch_break_in_minut'));
     $('#shift_manager input[name="dinner_break_in_minut"]').val($(invoker).data('dinner_break_in_minut'));
+    $('#shift_manager input[name="first_half_start"]').val($(invoker).data('first_half_start'));
+    $('#shift_manager input[name="first_half_end"]').val($(invoker).data('first_half_end'));
+    $('#shift_manager input[name="second_half_start"]').val($(invoker).data('second_half_start'));
+    $('#shift_manager input[name="second_half_end"]').val($(invoker).data('second_half_end'));
+    $('#shift_manager select[name="saturday_rule"]').val($(invoker).data('saturday_rule'));
+    $('#shift_manager input[name="saturday_work_start"]').val($(invoker).data('saturday_work_start'));
+    $('#shift_manager input[name="saturday_work_end"]').val($(invoker).data('saturday_work_end'));
     $('#shift_manager').modal('show');
     $('.add-title').addClass('hide');
   }

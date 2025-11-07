@@ -101,7 +101,7 @@
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/attendance_request');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('attendance_request');?></a> 
 		  </div>
 
-<div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/leave_application');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_application');?></a> 
+<div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/leave_manager');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_application');?></a> 
 		  </div>
 		  
 		  <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/uploaded_document');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('uploaded_document');?></a> 
@@ -149,6 +149,8 @@
 </div>
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/staff_type');?>" class="btn btn-success mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('staff_type');?></a> 
 </div>	
+<div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/saturday_rule');?>" class="btn btn-success mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('saturday_rule');?></a> 
+</div>
                   </div>
                 </div>
 

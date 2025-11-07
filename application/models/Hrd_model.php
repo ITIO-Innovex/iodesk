@@ -162,6 +162,25 @@ class Hrd_model extends App_Model
     }
 
     /**
+     * Get saturday rule(s)
+     * @param  mixed $id Optional - saturday rule id
+     * @param  array $where Optional - where conditions
+     * @return mixed object if id passed else array
+     */
+    public function get_saturday_rule($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'hrd_saturday_rule')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('id', 'asc');
+        return $this->db->get(db_prefix() . 'hrd_saturday_rule')->result_array();
+    }
+
+    /**
      * Add new leave type
      * @param array $data leave type data
      */
@@ -578,6 +597,17 @@ class Hrd_model extends App_Model
         $this->db->where($where);
         $this->db->order_by('shift_id', 'asc');
         return $this->db->get(db_prefix() . 'hrd_shift_manager')->result_array();
+    }
+	
+	public function get_shift_details($id = '', $where = [])
+    {
+            $this->db->select('s.*, b.*');
+			$this->db->from(db_prefix() . 'hrd_shift_manager s');
+			$this->db->join(db_prefix() . 'hrd_branch_manager b', 's.shift_id = b.shift');
+			$this->db->where('b.shift', get_branch_id());
+			$query = $this->db->get();
+			return $query->result_array();
+        
     }
 
     /**

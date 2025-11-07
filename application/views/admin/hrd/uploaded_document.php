@@ -5,7 +5,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">
-          <div class="panel-body panel-table-full">
+          <div class="panel-body panel-table-fullxx">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
               <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Uploaded Documents</h4>
             </div>

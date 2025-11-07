@@ -16,6 +16,7 @@
                             <thead>
                                 <th>Branch Name</th>
                                 <th>Branch Address</th>
+                                <th>Shift</th>
                                 <th><?php echo _l('status'); ?></th>
                                 <th><?php echo _l('options'); ?></th>
                             </thead>
@@ -27,9 +28,11 @@
                                             onclick="edit_branch_manager(this,<?php echo e($branch_manager['id']); ?>);return false;"
                                             data-branch-name="<?php echo e($branch_manager['branch_name']); ?>"
                                             data-branch-address="<?php echo e($branch_manager['branch_address']); ?>"
+                                            data-shift="<?php echo e($branch_manager['shift'] ?? ''); ?>"
                                         ><?php echo e($branch_manager['branch_name']); ?></a><br />
                                     </td>
                                     <td><?php echo e($branch_manager['branch_address']); ?></td>
+                                    <td><?php echo e($branch_manager['shift_display'] ?? '-'); ?></td>
                                     <td>
                                         <a href="javascript:void(0);" onclick="toggleBranchManagerStatus(<?php echo $branch_manager['id']; ?>, <?php echo $branch_manager['status']; ?>)" id="status-label-<?php echo $branch_manager['id']; ?>">
                                         <?php if ($branch_manager['status']) { ?>
@@ -45,6 +48,7 @@
                                                 onclick="edit_branch_manager(this,<?php echo e($branch_manager['id']); ?>);return false;"
                                                 data-branch-name="<?php echo e($branch_manager['branch_name']); ?>"
                                                 data-branch-address="<?php echo e($branch_manager['branch_address']); ?>"
+                                                data-shift="<?php echo e($branch_manager['shift'] ?? ''); ?>"
                                                 class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700">
                                                 <i class="fa-regular fa-pen-to-square fa-lg"></i>
                                             </a>
@@ -83,6 +87,15 @@
                 <label for="branch_address">Branch Address</label>
                 <textarea name="branch_address" id="branch_address" class="form-control" rows="3" required></textarea>
             </div>
+            <div class="form-group">
+                <label for="shift">Shift</label>
+                <select name="shift" id="shift" class="form-control">
+                    <option value="">-- Select Shift --</option>
+                    <?php if (!empty($shifts)) { foreach ($shifts as $s) { ?>
+                        <option value="<?php echo (int)$s['shift_id']; ?>"><?php echo e($s['shift_code'] . ' - ' . $s['shift_name']); ?></option>
+                    <?php } } ?>
+                </select>
+            </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -105,6 +118,7 @@
         $('#additional').html('');
         $('#branch_manager input[name="branch_name"]').val('');
         $('#branch_manager textarea[name="branch_address"]').val('');
+        $('#branch_manager select[name="shift"]').val('');
         $('.add-title').removeClass('hide');
         $('.edit-title').removeClass('hide');
     });
@@ -121,6 +135,7 @@ function edit_branch_manager(invoker, id) {
     $('#additional').append(hidden_input('id', id));
     $('#branch_manager input[name="branch_name"]').val($(invoker).data('branch-name'));
     $('#branch_manager textarea[name="branch_address"]').val($(invoker).data('branch-address'));
+    $('#branch_manager select[name="shift"]').val($(invoker).data('shift') || '');
     $('#branch_manager').modal('show');
     $('.add-title').addClass('hide');
 }

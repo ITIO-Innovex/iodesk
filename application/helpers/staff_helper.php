@@ -481,6 +481,41 @@ function get_staff_branch_name($branchid='')
 		return 0;
 }
 
+function get_staff_staff_type($staffid='')
+{   
+        // Fetch company Name from company id
+		if(empty($staffid)){
+		$staffid=get_staff_user_id();
+		}
+		
+		if(isset($staffid)&&$staffid){
+		$CI = & get_instance();
+		$CI->db->where('id', $staffid);
+		$com = $CI->db->select('title')->from(db_prefix() . 'hrd_staff_type')->get()->row();
+		if(isset($com)&&$com->title){
+		return $com->title;
+		}
+		}
+		
+		return 0;
+}
+
+function get_saturday_rule($tableid='')
+{   
+        
+		
+		if(isset($tableid)&&$tableid){
+		$CI = & get_instance();
+		$CI->db->where('id', $tableid);
+		$com = $CI->db->select('title')->from(db_prefix() . 'hrd_saturday_rule')->get()->row();
+		if(isset($com)&&$com->title){
+		return $com->title;
+		}
+		}
+		
+		return 0;
+}
+
 function get_company_status($company_id)
 {   
         // Fetch company Name from company id
