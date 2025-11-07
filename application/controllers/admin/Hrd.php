@@ -24,6 +24,8 @@ class Hrd extends AdminController
             $this->interview_source();
         } elseif ($type == 'leave_type') {
             $this->leave_type();
+        } elseif ($type == 'saturday_rule') {
+            $this->saturday_rule();
         } elseif ($type == 'employee_type') {
             $this->employee_type();
         } elseif ($type == 'branch_manager') {
@@ -46,6 +48,8 @@ class Hrd extends AdminController
             $this->events_announcements();
         } elseif ($type == 'attendance_status') {
             $this->attendance_status();
+        } elseif ($type == 'attendance_request') {
+            $this->attendance_request();
         } elseif ($type == 'shift_manager') {
             $this->shift_manager();
         } else {
@@ -484,6 +488,81 @@ class Hrd extends AdminController
         echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
 
+    /* View Saturday Rule */
+    public function saturday_rule()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Saturday Rule');
+        }
+
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+
+        $data['saturday_rules'] = $this->hrd_model->get_saturday_rule();
+        $data['title'] = 'Saturday Rule';
+        $this->load->view('admin/hrd/setting/saturday_rule', $data);
+    }
+
+    // Add/Edit Saturday Rule
+    public function saturdayrule()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Saturday Rule');
+        }
+
+        $id = $this->input->post('id');
+        $data = [
+            'title' => $this->input->post('name'),
+            'remark' => $this->input->post('remark'),
+            'company_id' => get_staff_company_id(),
+        ];
+
+        if ($id) {
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_hrd_saturday_rule', $data);
+            set_alert('success', 'Saturday rule updated successfully');exit;
+        } else {
+            // Default new saturday rules to Active (status=1)
+            $data['status'] = 1;
+            $this->db->insert('it_crm_hrd_saturday_rule', $data);
+            set_alert('success', 'Saturday rule added successfully');exit;
+        }
+        redirect(admin_url('hrd/setting/saturday_rule'));
+    }
+
+    // Delete Saturday Rule
+    public function delete_saturday_rule($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Saturday Rule');
+        }
+        // Soft delete: set status to 0 (Deactive) instead of removing the record
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_hrd_saturday_rule', ['status' => 0]);
+        set_alert('success', 'Saturday rule deactivated successfully');
+        redirect(admin_url('hrd/setting/saturday_rule'));
+    }
+
+    // Toggle Saturday Rule Status (AJAX)
+    public function toggle_saturday_rule($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $new_status = $this->input->post('status') == 1 ? 1 : 0;
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_hrd_saturday_rule', ['status' => $new_status]);
+        echo json_encode(['success' => true, 'new_status' => $new_status]);
+    }
+
     /* View Employee Type */
     public function employee_type()
     {
@@ -581,6 +660,19 @@ class Hrd extends AdminController
         }
         $this->db->where('status', 1);
         $data['shift_types'] = $this->hrd_model->get_shift_type();
+
+        // Load saturday rules for dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['saturday_rules'] = $this->hrd_model->get_saturday_rule();
 
         $data['title'] = 'Shift Manager';
         $this->load->view('admin/hrd/setting/shift_manager', $data);
@@ -683,6 +775,13 @@ class Hrd extends AdminController
             'tea_break_in_minut' => $this->input->post('tea_break_in_minut'),
             'lunch_break_in_minut' => $this->input->post('lunch_break_in_minut'),
             'dinner_break_in_minut' => $this->input->post('dinner_break_in_minut'),
+            'first_half_start' => $this->input->post('first_half_start'),
+            'first_half_end' => $this->input->post('first_half_end'),
+            'second_half_start' => $this->input->post('second_half_start'),
+            'second_half_end' => $this->input->post('second_half_end'),
+            'saturday_rule' => $this->input->post('saturday_rule'),
+            'saturday_work_start' => $this->input->post('saturday_work_start'),
+            'saturday_work_end' => $this->input->post('saturday_work_end'),
             'company_id' => get_staff_company_id(),
         ];
 
@@ -817,7 +916,37 @@ class Hrd extends AdminController
             }
         }
 
-        $data['branch_managers'] = $this->hrd_model->get_branch_manager();
+        $branch_managers = $this->hrd_model->get_branch_manager();
+        
+        // Join shift data for each branch
+        if (!empty($branch_managers)) {
+            foreach ($branch_managers as &$bm) {
+                $shiftName = '';
+                if (!empty($bm['shift'])) {
+                    $shift = $this->db->select('shift_code, shift_name')->where('shift_id', (int)$bm['shift'])->get(db_prefix().'hrd_shift_manager')->row_array();
+                    if ($shift) {
+                        $shiftName = $shift['shift_code'] . ' - ' . $shift['shift_name'];
+                    }
+                }
+                $bm['shift_display'] = $shiftName;
+            }
+        }
+        
+        $data['branch_managers'] = $branch_managers;
+
+        // Load shifts for dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['shifts'] = $this->hrd_model->get_shift_manager();
+        
         $data['title'] = 'Branch Manager';
         $this->load->view('admin/hrd/setting/branch_manager', $data);
     }
@@ -833,6 +962,7 @@ class Hrd extends AdminController
         $data = [
             'branch_name' => $this->input->post('branch_name'),
             'branch_address' => $this->input->post('branch_address'),
+            'shift' => ($this->input->post('shift')!=='') ? (int)$this->input->post('shift') : null,
             'company_id' => get_staff_company_id(),
         ];
 
@@ -1100,6 +1230,130 @@ class Hrd extends AdminController
         $data['attendance_statuses'] = $this->hrd_model->get_attendance_status();
         $data['title'] = 'Attendance Status';
         $this->load->view('admin/hrd/setting/attendance_status', $data);
+    }
+
+    /* View Attendance Request */
+    public function attendance_request()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Attendance Request');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Fetch attendance update requests with staff names
+        $this->db->select('aur.*, s.firstname, s.lastname, s.employee_code');
+        $this->db->from(db_prefix() . 'hrd_attendance_update_request aur');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = aur.staffid', 'left');
+        $this->db->where('s.company_id', $company_id);
+        $this->db->order_by('aur.addedon', 'desc');
+        $data['requests'] = $this->db->get()->result_array();
+
+        $data['title'] = 'Attendance Request';
+        $this->load->view('admin/hrd/setting/attendance_request', $data);
+    }
+
+    // Approve/Update Attendance Request
+    public function attendance_request_update()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $request_id = (int)$this->input->post('request_id');
+        $update_remark = $this->input->post('update_remark');
+        $status = (int)$this->input->post('status'); // 2 = approved, 0 = rejected
+
+        if ($request_id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid request']);
+            return;
+        }
+
+        // Get request details
+        $this->db->where('id', $request_id);
+        $request = $this->db->get(db_prefix() . 'hrd_attendance_update_request')->row_array();
+
+        if (!$request) {
+            echo json_encode(['success' => false, 'message' => 'Request not found']);
+            return;
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Update attendance record if status is approved (2)
+        if ($status == 2) {
+            // Compute total hours if both present
+            $total_hours = null;
+            if ($request['in_time'] && $request['out_time']) {
+                $start = strtotime($request['in_time']);
+                $end   = strtotime($request['out_time']);
+                if ($start && $end && $end >= $start) {
+                    $diff_seconds = $end - $start;
+                    $total_hours = gmdate('H:i:s', $diff_seconds);
+                } else {
+                    $total_hours = '00:00:00';
+                }
+            }
+
+            // Check if attendance record exists
+            $this->db->where('staffid', (int)$request['staffid']);
+            $this->db->where('company_id', $company_id);
+            $this->db->where('entry_date', $request['entry_date']);
+            $attendance = $this->db->get(db_prefix() . 'hrd_attendance')->row_array();
+
+            if ($attendance) {
+                // Update existing attendance
+                $upd = [
+                    'in_time' => $request['in_time'] ?: null,
+                    'out_time' => $request['out_time'] ?: null,
+                ];
+                if ($total_hours !== null) {
+                    $upd['total_hours'] = $total_hours;
+                }
+                $this->db->where('attendance_id', (int)$attendance['attendance_id']);
+                $this->db->update(db_prefix() . 'hrd_attendance', $upd);
+            } else {
+                // Create new attendance record
+                // Get default shift_id
+                $this->db->where('company_id', $company_id);
+                $this->db->where('status', 1);
+                $this->db->limit(1);
+                $shift = $this->db->get(db_prefix() . 'hrd_shift_manager')->row_array();
+                $shift_id = $shift ? (int)$shift['shift_id'] : 1;
+
+                $ins = [
+                    'staffid' => (int)$request['staffid'],
+                    'company_id' => $company_id,
+                    'shift_id' => $shift_id,
+                    'entry_date' => $request['entry_date'],
+                    'in_time' => $request['in_time'] ?: null,
+                    'out_time' => $request['out_time'] ?: null,
+                    'total_hours' => $total_hours ?: '00:00:00',
+                    'remarks' => $request['remarks'] ?: null,
+                ];
+                $this->db->insert(db_prefix() . 'hrd_attendance', $ins);
+            }
+        }
+
+        // Update request record
+        $upd_req = [
+            'update_remark' => $update_remark ?: null,
+            'updatedon' => date('Y-m-d H:i:s'),
+            'status' => $status,
+        ];
+        $this->db->where('id', $request_id);
+        $this->db->update(db_prefix() . 'hrd_attendance_update_request', $upd_req);
+
+        echo json_encode(['success' => true]);
     }
 /* View Leave Application */
     public function leave_manager()
@@ -1419,18 +1673,14 @@ class Hrd extends AdminController
         $data['staff_list'] = $this->db->get(db_prefix() . 'staff')->result_array();
 		
 		
-		$this->db->where('shift_id', 1);
-        $data['shift_details'] = $this->db->get(db_prefix() . 'hrd_shift_manager')->result_array();
+		//$this->db->where('shift_id', 1);
+        //$data['shift_details'] = $this->db->get(db_prefix() . 'hrd_shift_manager')->result_array();
 		
-		// Get Status by counter
-		/*$this->db->select('first_half, second_half, COUNT(*) AS total_count');
-		$this->db->from(db_prefix() . 'hrd_attendance');
-		$this->db->where('staffid', get_staff_user_id());
-		$this->db->like('entry_date', $month_year, 'after'); // matches e.g. 2025-11-01, 2025-11-15
-		$this->db->group_by(['first_half', 'second_half']);
-        $query = $this->db->get();
-        $data['status_counter'] = $query->result_array();*/
-		
+			
+			
+		// Get shift details	
+		$data['shift_details'] = $this->hrd_model->get_shift_details();
+		//print_r($data['shift_details']);exit;
 		$data['status_counter'] = $this->hrd_model->get_status_counter($month_year);
 		
 

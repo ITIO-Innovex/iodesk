@@ -4176,4 +4176,5 @@ $lang['leave_balance'] = 'Leave Balance';
 $lang['attendance_request'] = 'Attendance Request';
 $lang['uploaded_document'] = 'Uploaded Document';
 $lang['leave_application'] = 'Leave Application';
+$lang['saturday_rule'] = 'Saturday Rule';
 ?>
