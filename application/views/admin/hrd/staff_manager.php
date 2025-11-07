@@ -20,6 +20,7 @@
                       <th>Branch</th>
                       <th>Department</th>
                       <th>Designation</th>
+                      <th>Staff Type</th>
                       <th>Phone</th>
                       <th>Joining Date</th>
                       <th><?php echo _l('options'); ?></th>
@@ -35,6 +36,7 @@
                         <td><?php echo e($row['branch_name'] ?? ''); ?></td>
                         <td><?php echo e($row['department'] ?? ''); ?></td>
                         <td><?php echo e($row['designation'] ?? ''); ?></td>
+                        <td><?php echo e($row['staff_type_name'] ?? ''); ?></td>
                         <td><?php echo e($row['phonenumber'] ?? ''); ?></td>
                         <td><?php echo isset($row['joining_date']) ? $row['joining_date'] : ''; ?></td>
                         <td>
@@ -47,6 +49,7 @@
                             'branch' => (string)($row['branch'] ?? ''),
                             'department' => (string)($row['department_id'] ?? ''),
                             'designation' => (string)($row['designation_id'] ?? ''),
+                            'staff_type' => (string)($row['staff_type'] ?? ''),
                             'phonenumber' => (string)($row['phonenumber'] ?? ''),
                             'joining_date' => (string)($row['joining_date'] ?? ''),
                             'dob' => (string)($row['dob'] ?? ''),
@@ -67,7 +70,7 @@
 </div>
 <!-- Staff Edit Modal -->
 <div class="modal fade" id="staff_modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <?php echo form_open(admin_url('hrd/staffentry'), ['id' => 'staff-form']); ?>
     <div class="modal-content">
       <div class="modal-header">
@@ -126,10 +129,18 @@
             </select>
           </div></div>
         </div>
+      
         <div class="row">
-          
-          <div class="col-md-6"><div class="form-group"><label>Date of Birth</label><input type="date" name="dob" class="form-control"></div></div>
-		  <div class="col-md-6"><div class="form-group"><label>Joining Date</label><input type="date" name="joining_date" class="form-control"></div></div>
+          <div class="col-md-4"><div class="form-group"><label>Staff Type</label>
+            <select name="staff_type" class="form-control">
+              <option value="">-- Select Staff Type --</option>
+              <?php if (!empty($staff_types)) { foreach ($staff_types as $st) { ?>
+                <option value="<?php echo (int)$st['id']; ?>"><?php echo e($st['title']); ?></option>
+              <?php } } ?>
+            </select>
+          </div></div>
+          <div class="col-md-4"><div class="form-group"><label>Date of Birth</label><input type="date" name="dob" class="form-control"></div></div>
+		  <div class="col-md-4"><div class="form-group"><label>Joining Date</label><input type="date" name="joining_date" class="form-control"></div></div>
         </div>
         <div class="row">
           
@@ -182,6 +193,7 @@ function openStaffModal(data){
     var $des = $f.find('select[name=designation]');
     if ($des.hasClass('selectpicker')) { $des.selectpicker('refresh'); }
   });
+  $f.find('select[name=staff_type]').val(data.staff_type||'');
   $f.find('input[name=joining_date]').val((data.joining_date||'').substring(0,10));
   $f.find('input[name=dob]').val((data.dob||'').substring(0,10));
   $f.find('select[name=gender]').val(data.gender||'');
