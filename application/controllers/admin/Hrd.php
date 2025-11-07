@@ -36,6 +36,8 @@ class Hrd extends AdminController
             $this->leave_rule();
         } elseif ($type == 'shift_type') {
             $this->shift_type();
+        } elseif ($type == 'staff_type') {
+            $this->staff_type();
         } elseif ($type == 'corporate_guidelines') {
             $this->corporate_guidelines();
         } elseif ($type == 'company_policies') {
@@ -55,30 +57,12 @@ class Hrd extends AdminController
 	
 	 public function dashboard()
     {
-        /*if(is_admin() || (is_staff_member() && staff_can('project_dashboard',  'project'))) { 
-        }else{
-		access_denied('Project Dashboard');
-		}
-        
-        $this->load->model('project_model');
-        $this->load->model('staff_model');
-        
-        // Get dashboard statistics
-        $data['stats'] = $this->project_model->get_dashboard_stats();
-        
-        // Get latest projects and tasks
-        $data['latest_projects'] = $this->project_model->get_latest_projects(5);
-        $data['latest_tasks'] = $this->project_model->get_latest_tasks(5);
-        
-        // Get chart data
-        $data['project_status_chart'] = $this->project_model->get_project_status_chart_data();
-        $data['task_status_chart'] = $this->project_model->get_task_status_chart_data();
-        $data['monthly_projects'] = $this->project_model->get_monthly_projects_chart();
-        */
+      
 		
 		// Get get events announcements
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
+		$this->db->where('branch', get_branch_id());
 		$this->db->order_by('id', 'desc');
 		$this->db->limit(1);
         $data['events_announcements'] = $this->hrd_model->get_events_announcements();
@@ -87,6 +71,7 @@ class Hrd extends AdminController
 		// Get latest company policy
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
+		$this->db->where('branch', get_branch_id());
 		$this->db->order_by('id', 'desc');
 		$this->db->limit(1);
 		$policy = $this->db->get(db_prefix() . 'hrd_company_policies')->row_array();
@@ -107,6 +92,7 @@ class Hrd extends AdminController
 		// Get get todays thought
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
+		$this->db->where('branch', get_branch_id());
 		$this->db->order_by('id', 'desc');
 		$this->db->limit(1);
         $data['corporate_guidelines'] = $this->hrd_model->get_corporate_guidelines();
@@ -114,6 +100,7 @@ class Hrd extends AdminController
 		// Get get leave rule
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
+		$this->db->where('branch', get_branch_id());
 		$this->db->order_by('id', 'desc');
 		$this->db->limit(1);
         $data['leave_rule'] = $this->hrd_model->get_leave_rule();
@@ -127,12 +114,12 @@ class Hrd extends AdminController
 		$this->db->limit(1);
         $data['todays_thought'] = $this->hrd_model->get_todays_thought();
 		
-		// Get get holiday list
+		/*// Get get holiday list
 		$this->db->where('company_id', get_staff_company_id());
 		$this->db->where('status', 1);
 		$this->db->where('YEAR(holiday_date)', date('Y')); // filter by year
 		$this->db->order_by('holiday_date', 'asc');
-        $data['holiday_lists'] = $this->hrd_model->get_holiday_list();
+        $data['holiday_lists'] = $this->hrd_model->get_holiday_list();*/
         $data['title'] = 'My Desk - HR & Policy';
 		
 		// Get todays Attendance
@@ -541,6 +528,28 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/setting/shift_type', $data);
     }
 
+    /* View Staff Type */
+    public function staff_type()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Staff Type');
+        }
+
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+
+        $data['staff_types'] = $this->hrd_model->get_staff_type();
+        $data['title'] = 'Staff Type';
+        $this->load->view('admin/hrd/setting/staff_type', $data);
+    }
+
     /* View Shift Manager */
     public function shift_manager()
     {
@@ -630,6 +639,32 @@ class Hrd extends AdminController
         redirect(admin_url('hrd/setting/shift_type'));
     }
 
+    // Add/Edit Staff Type
+    public function stafftype()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Staff Type');
+        }
+
+        $id = $this->input->post('id');
+        $data = [
+            'title' => $this->input->post('name'),
+            'company_id' => get_staff_company_id(),
+        ];
+
+        if ($id) {
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_hrd_staff_type', $data);
+            set_alert('success', 'Staff type updated successfully');exit;
+        } else {
+            // Default new staff types to Active (status=1)
+            $data['status'] = 1;
+            $this->db->insert('it_crm_hrd_staff_type', $data);
+            set_alert('success', 'Staff type added successfully');exit;
+        }
+        redirect(admin_url('hrd/setting/staff_type'));
+    }
+
     // Add/Edit Shift Manager
     public function shiftmanager()
     {
@@ -711,6 +746,31 @@ class Hrd extends AdminController
         $new_status = $this->input->post('status') == 1 ? 1 : 0;
         $this->db->where('id', $id);
         $this->db->update('it_crm_hrd_shift_type', ['status' => $new_status]);
+        echo json_encode(['success' => true, 'new_status' => $new_status]);
+    }
+
+    // Delete Staff Type
+    public function delete_staff_type($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Staff Type');
+        }
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_hrd_staff_type', ['status' => 0]);
+        set_alert('success', 'Staff type deactivated successfully');
+        redirect(admin_url('hrd/setting/staff_type'));
+    }
+
+    // Toggle Staff Type Status (AJAX)
+    public function toggle_staff_type($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $new_status = $this->input->post('status') == 1 ? 1 : 0;
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_hrd_staff_type', ['status' => $new_status]);
         echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
 
@@ -876,7 +936,35 @@ class Hrd extends AdminController
             }
         }
 
-        $data['rules'] = $this->hrd_model->get_leave_rule();
+        $rules = $this->hrd_model->get_leave_rule();
+        
+        // Join branch data for each rule
+        if (!empty($rules)) {
+            foreach ($rules as &$rule) {
+                $branchName = '';
+                if (!empty($rule['branch'])) {
+                    $br = $this->db->select('branch_name')->where('id', (int)$rule['branch'])->get(db_prefix().'hrd_branch_manager')->row_array();
+                    $branchName = $br['branch_name'] ?? '';
+                }
+                $rule['branch_name'] = $branchName;
+            }
+        }
+        
+        $data['rules'] = $rules;
+        
+        // Fetch active branches for dropdown
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['branches'] = $this->hrd_model->get_branch_manager();
+        
         $data['title'] = 'Leave Rule';
         $this->load->view('admin/hrd/setting/leave_rule', $data);
     }
@@ -2052,6 +2140,7 @@ class Hrd extends AdminController
         $data = [
             'title' => $this->input->post('title'),
             'details' => $this->input->post('details'),
+            'branch' => $this->input->post('branch') ? (int)$this->input->post('branch') : null,
             'company_id' => get_staff_company_id(),
             'addedby' => get_staff_user_id(),
         ];
