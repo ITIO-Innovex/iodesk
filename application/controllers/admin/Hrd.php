@@ -1552,11 +1552,12 @@ class Hrd extends AdminController
         }
 
         // Build listing query
-        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, d.name AS department, des.title AS designation, br.branch_name AS branch_name');
+        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.staff_type, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, d.name AS department, des.title AS designation, br.branch_name AS branch_name, st.title AS staff_type_name');
         $this->db->from(db_prefix() . 'staff s');
         $this->db->join(db_prefix() . 'departments d', 'd.departmentid = s.department_id', 'left');
         $this->db->join(db_prefix() . 'designations des', 'des.id = s.designation_id', 'left');
 		$this->db->join(db_prefix() . 'hrd_branch_manager br', 'br.id = s.branch', 'left');
+		$this->db->join(db_prefix() . 'hrd_staff_type st', 'st.id = s.staff_type', 'left');
         $this->db->order_by('s.firstname', 'asc');
         $data['staff_rows'] = $this->db->get()->result_array();
 
@@ -1587,6 +1588,19 @@ class Hrd extends AdminController
         $this->load->model('staff_model');
         $data['designations'] = $this->staff_model->get_designation();
 
+        // Load staff types for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['staff_types'] = $this->hrd_model->get_staff_type();
+
         $data['title'] = 'Staff Management';
         $this->load->view('admin/hrd/staff_manager', $data);
     }
@@ -1615,6 +1629,7 @@ class Hrd extends AdminController
             'branch'         => ($this->input->post('branch')!=='') ? (int)$this->input->post('branch') : null,
             'department_id'  => ($this->input->post('department')!=='') ? (int)$this->input->post('department') : null,
             'designation_id' => ($this->input->post('designation')!=='') ? (int)$this->input->post('designation') : null,
+            'staff_type'     => ($this->input->post('staff_type')!=='') ? (int)$this->input->post('staff_type') : null,
             'phonenumber'    => $this->input->post('phonenumber'),
             'joining_date'   => $this->input->post('joining_date'),
             'date_of_birth'  => $this->input->post('dob'),
@@ -2641,11 +2656,20 @@ class Hrd extends AdminController
         $this->db->where('entry_date', $today);
         $this->db->group_start();
         $this->db->where("(in_time IS NOT NULL AND in_time != '')", null, false);
-        $this->db->or_where("(out_time IS NOT NULL AND out_time != '')", null, false);
-        $this->db->or_where("(first_half IS NOT NULL AND first_half != '')", null, false);
-        $this->db->or_where("(second_half IS NOT NULL AND second_half != '')", null, false);
+        //$this->db->or_where("(out_time IS NOT NULL AND out_time != '')", null, false);
+        //$this->db->or_where("(first_half IS NOT NULL AND first_half != '')", null, false);
+        //$this->db->or_where("(second_half IS NOT NULL AND second_half != '')", null, false);
         $this->db->group_end();
         $presentToday = (int)$this->db->count_all_results();
+		
+		// Out today: attendance with any in/out time or any half selected
+        $this->db->from(db_prefix() . 'hrd_attendance');
+        $this->db->where('company_id', $company_id);
+        $this->db->where('entry_date', $today);
+        $this->db->group_start();
+        $this->db->where("(out_time IS NOT NULL AND out_time != '')", null, false);
+        $this->db->group_end();
+        $outToday = (int)$this->db->count_all_results();
 
         // On Leave today (best-effort): overlap and approved (status=1 if exists)
         $onLeaveToday = 0;
@@ -2677,6 +2701,7 @@ class Hrd extends AdminController
         $data['today'] = $today;
         $data['counters'] = [
             'present' => $presentToday,
+			'outtoday' => $outToday,
             'absent' => $absentToday,
             'on_leave' => $onLeaveToday,
         ];

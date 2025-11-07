@@ -1,5 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+.fa-2xs{font-size: 50px;}
+</style>
 <div id="wrapper">
   <div class="content">
   <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"><i class="fa-solid fa-person-booth menu-icon"></i> HRD Setting Dashboard</h4>
@@ -10,87 +13,104 @@
             
 
             <div class="row mtop15">
-              <div class="col-md-3">
-			  <div class="widget-card bg-success text-white">
+              <div class="col-md-4">
+			  <div class="widget-card bg-success text-white" style="padding: 40px;">
                     <div class="widget-card-body">
-                        <div class="widget-card-icon">
-                            <i class="fa-solid fa-calendar"></i>
+                        <div class="widget-card-icon tw-pr-2">
+                            <?php echo (int)$counters['present']; ?>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php echo (int)$counters['present']; ?></h3>
-                            <p>Present Today (<?php echo e($today); ?>)</p>
+                            <h3><i class="fa-solid fa-user-check fa-2xs"></i></h3>
+                            <p>Punch IN Today</p>
                         </div>
                     </div>
                 </div>
                 
               </div>
-              <div class="col-md-3">
-				<div class="widget-card bg-warning text-white">
+              <div class="col-md-4">
+				<div class="widget-card bg-warning text-white" style="padding: 40px;">
                     <div class="widget-card-body">
-                        <div class="widget-card-icon">
-                            <i class="fa-solid fa-calendar"></i>
+                        <div class="widget-card-icon tw-pr-2">
+                            <?php echo (int)$counters['outtoday']; ?>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php echo (int)$counters['absent']; ?></h3>
-                            <p>Absent Today</p>
+                            <h3><i class="fa-solid fa-right-from-bracket fa-2xs"></i></h3>
+                            <p>Punch OUT for Today</p>
                         </div>
                     </div>
                 </div>
               </div>
-              <div class="col-md-3">
-                
-				
-				<div class="widget-card bg-info text-white">
-                    <div class="widget-card-body">
-                        <div class="widget-card-icon">
-                            <i class="fa-solid fa-calendar"></i>
-                        </div>
-                        <div class="widget-card-content">
-                            <h3><?php echo (int)$counters['on_leave']; ?></h3>
-                            <p>Leave Application</p>
-                        </div>
-                    </div>
-                </div>
-              </div>
-			  <div class="col-md-3">
+              <div class="col-md-4">
                 
 				
-				<div class="widget-card bg-info text-white">
+				<div class="widget-card bg-info text-white" style="padding: 40px;">
                     <div class="widget-card-body">
                         <div class="widget-card-icon">
-                            <i class="fa-solid fa-calendar"></i>
+                            <?php echo ((int)$counters['present'] -(int)$counters['outtoday']) ; ?>
                         </div>
                         <div class="widget-card-content">
-                            <h3><?php echo (int)$counters['on_leave']; ?></h3>
-                            <p>Attendance Request</p>
-                        </div>
-                    </div>
-                </div>
-              </div>
-			  <div class="col-md-3">
-                
-				
-				<div class="widget-card bg-info text-white">
-                    <div class="widget-card-body">
-                        <div class="widget-card-icon">
-                            <i class="fa-solid fa-calendar"></i>
-                        </div>
-                        <div class="widget-card-content">
-                            <h3><?php echo (int)$counters['on_leave']; ?></h3>
-                            <a href="<?php echo admin_url('hrd/uploaded_document');?>"  target="_blank"><p>Uploaded Document</p></a>
+                            <h3><i class="fa-solid fa-users fa-2xs"></i></h3>
+                            <p>Punch OUT not Available</p>
                         </div>
                     </div>
                 </div>
               </div>
 			  
             </div>
-
+<div class="row mtop15">
+<div class="col-md-4">
+                <div class="panel_s">
+                    <div class="panel-body">
+                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Attendance Punch Stats</h4>
+                        <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="taskStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="col-md-4">
+                <div class="panel_s">
+                    <div class="panel-body">
+                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Attendance Stats</h4>
+                        <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="taskStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="col-md-4">
+                <div class="panel_s">
+                    <div class="panel-body">
+                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Attendance Stats</h4>
+                        <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                            <canvas id="taskStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+</div>
             <div class="row mtop20">
               <div class="col-md-12">
-			 
-			  
 			  
                 <div class="panel panel-default">
+                  <div class="alert alert-info" onclick="toggleSection('#requests');return false;">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Requests <span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span>
+                  </div>
+                  <div id="requests" class="panel-body tw-bg-neutral-100" style="display:none;">
+				  
+<div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/attendance_request');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('attendance_request');?></a> 
+		  </div>
+
+<div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/leave_application');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('leave_application');?></a> 
+		  </div>
+		  
+		  <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/uploaded_document');?>" class="btn btn-info mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('uploaded_document');?></a> 
+		  </div>
+
+                  </div>
+                </div>
+				
+				<div class="panel panel-default">
                   <div class="alert alert-warning" onclick="toggleSection('#company-settings');return false;">
                   <i class="fa fa-users"></i> Company Settings <span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span>
                   </div>
@@ -243,6 +263,44 @@ function toggleSection(id){
 }
 </script>
 <?php init_tail(); ?>
+<script>
+$(document).ready(function() {
+
+
+    // Task Status Chart
+    const taskStatusCtx = document.getElementById('taskStatusChart').getContext('2d');
+	const taskStatusData = [
+	
+	{"name":"IN ","color":"#22c55e","count":"<?php echo (int)$counters['present']; ?>"},
+	{"name":"OUT","color":"#ca8a04","count":"<?php echo (int)$counters['outtoday']; ?>"},
+	{"name":"Not OUT","color":"#0284c7","count":"<?php echo ((int)$counters['present'] -(int)$counters['outtoday']) ; ?>"},
+	
+	];
+    
+    new Chart(taskStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: taskStatusData.map(item => item.name),
+            datasets: [{
+                data: taskStatusData.map(item => item.count),
+                backgroundColor: taskStatusData.map(item => item.color || '#28a745'),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+});
+</script>
 </body></html>
 
 

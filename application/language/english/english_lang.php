@@ -4173,4 +4173,7 @@ $lang['staff_manager'] = 'Staff Management';
 $lang['manage_attendance_by_date'] = 'Manage Attendance By Date';
 $lang['staff_type'] = 'Staff Type';
 $lang['leave_balance'] = 'Leave Balance';
+$lang['attendance_request'] = 'Attendance Request';
+$lang['uploaded_document'] = 'Uploaded Document';
+$lang['leave_application'] = 'Leave Application';
 ?>
