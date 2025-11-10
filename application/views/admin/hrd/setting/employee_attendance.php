@@ -1,7 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); 
 
-
 //print_r($status_counter); 
 //print_r($calendar);
 //print_r($shift_details);
@@ -10,10 +9,15 @@ $get_shift_code  = $shift_details[0]['shift_code']  ?? '-';
 $get_shift_in = $shift_details[0]['shift_in'] ?? '-';
 $get_shift_out = $shift_details[0]['shift_out'] ?? '-';
 $get_saturday_rule = $shift_details[0]['saturday_rule'] ?? '-';
-$staff_type = (isset($GLOBALS['current_user']->staff_type) && $GLOBALS['current_user']->staff_type)? $GLOBALS['current_user']->staff_type: null;
-$staff_type_title =get_staff_staff_type($staff_type);
+$staff_type = (isset($staff->staff_type) && $staff->staff_type) ? $staff->staff_type : null;
+$staff_type_title = get_staff_staff_type($staff_type);
+$staff_full_name = trim($staff->firstname . ' ' . $staff->lastname);
+$staff_branch_name = '';
+if (isset($staff->branch) && $staff->branch) {
+    $staff_branch_name = get_staff_branch_name($staff->branch);
+}
 
-if(empty($shift_details)){ echo "Shift Not Mapped. contact web admin"; exit;} ?>
+if(empty($shift_details)){ echo "Shift Not Mapped. contact web admin"; exit; } ?>
 
 <style media="print">
 /* Show only the calendar when printing */
@@ -49,13 +53,22 @@ html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </style>
 <div id="wrapper">
   <div class="content">
-  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  My Attendance</span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
+  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2">
+    <span class="pull-left display-block mright5 tw-mb-2">
+      <i class="fa-solid fa-chart-gantt tw-mr-2"></i> Employee Attendance
+    </span>
+    <span class="tw-inline pull-right">
+      <?php echo e($staff_full_name); ?> 
+      <?php if ($staff_branch_name) { echo "[ " . e($staff_branch_name) . " ]"; } ?>
+    </span>
+  </h4>
     <div class="row">
       <div class="col-md-12">
         
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <form method="get" action="" class="mbot15" style="margin-bottom:15px;">
+              <input type="hidden" name="staffid" value="<?php echo (int)$staffid; ?>">
               <div class="row">
                 <div class="col-md-3">
                   <div class="form-group">
@@ -69,9 +82,8 @@ html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                     <label>&nbsp;</label>
                     <div>
                       <button type="submit" class="btn btn-default">Search</button>
-                      <a href="<?php echo admin_url('hrd/attendance'); ?>" class="btn btn-default">Reset</a>
+                      <a href="<?php echo admin_url('hrd/setting/employee_attendance?staffid=' . (int)$staffid); ?>" class="btn btn-default">Reset</a>
                       <button type="button" class="btn btn-success" onclick="printDiv('calendar-section')"><i class="fa-solid fa-print"></i> Print</button>
-                      <?php /*?><button type="button" class="btn btn-danger" onclick="window.print()"><i class="fa-regular fa-file-pdf"></i> Download PDF</button><?php */?>
                     </div>
                   </div>
                 </div>
@@ -93,20 +105,19 @@ function printDiv(divId) {
             <?php if (!empty($calendar)) { $cal = $calendar; ?>
             <div id="calendar-section" class="row" style="margin-bottom:15px;">
               <div class="col-md-12">
-                <h4 style="margin-top:0;"><?php echo e(get_staff_full_name()); ?> : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></h4>
+                <h4 style="margin-top:0;"><?php echo e($staff_full_name); ?> : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></h4>
                 <div class="table-responsive">
 				<table class="table table-bordered" style="background:#fff;">
 				   <thead>
                       <tr class="tw-bg-neutral-200 tw-text-xs">
                         <th>Month for : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></th>
-                        <th><?php echo e(get_staff_full_name()); ?></th>
-						<th>Employee Code : <?php echo get_staff_fields('','employee_code');?></th>
-						<th>Shift Code    : <?php echo $get_shift_code;?></th>
-                        <th>Shift InTime  : <?php echo $get_shift_in;?></th>
-						<th>Shift OutTime : <?php echo $get_shift_out;?></th>
-					    <th>Shift OutTime : <?php echo $get_shift_out;?></th>
-					    <th>Staff Type : <?php  if(isset($GLOBALS['current_user']->staff_type)&&$GLOBALS['current_user']->staff_type) { echo "[ ".get_staff_staff_type($GLOBALS['current_user']->staff_type)." ]";} ?></th>
-						<th>Saturday Rule : <?php echo get_saturday_rule($get_saturday_rule);?></th>
+                        <th><?php echo e($staff_full_name); ?></th>
+						<th>Employee Code : <?php echo e($staff->employee_code ?? '-'); ?></th>
+						<th>Shift Code    : <?php echo $get_shift_code; ?></th>
+                        <th>Shift InTime  : <?php echo $get_shift_in; ?></th>
+						<th>Shift OutTime : <?php echo $get_shift_out; ?></th>
+					    <th>Staff Type : <?php if ($staff_type_title) { echo "[ " . e($staff_type_title) . " ]"; } ?></th>
+						<th>Saturday Rule : <?php echo get_saturday_rule($get_saturday_rule); ?></th>
 					   </tr>
 					  
                     </thead>
@@ -117,9 +128,8 @@ function printDiv(divId) {
 						if (isset($sc['first_half']) && is_numeric($sc['first_half'])) {
 							$fhTitle = get_attendance_status_title((int)$sc['first_half']);
 						}
-						if (isset($sc['second_half']) && is_numeric($sc['second_half']) && ($sc['second_half']==8 or $sc['second_half']==4)) {  $fhTitle = get_attendance_status_title((int)$sc['second_half']);
-						 
-						 
+						if (isset($sc['second_half']) && is_numeric($sc['second_half']) && ($sc['second_half']==8 or $sc['second_half']==4)) {  
+							$fhTitle = get_attendance_status_title((int)$sc['second_half']);
 						}
 						
 						$label = $fhTitle !== '' ? $fhTitle : (isset($sc['first_half']) ? e($sc['first_half']) : '-');
@@ -133,7 +143,7 @@ function printDiv(divId) {
                         <th style="width:150px;">Date</th>
                         <th>Day</th>
                         <th>InTime</th>
-                        <th>OutTime	</th>
+                        <th>OutTime</th>
                         <th>First Half</th>
 						<th>Second Half</th>
                         <th>Portion</th>
@@ -163,11 +173,6 @@ function printDiv(divId) {
                       };
 					  $sat_count=0;
                       foreach ($cal['days'] as $cell) { 
-					  $staffid = get_staff_user_id();
-		              $company_id = get_staff_company_id();
-					  
-			
-                      if (strtotime($cell['date']) > time()) { continue; }
 					  $bgClass="bg-light";
 					  if(date('l', strtotime($cell['date']))=='Sunday'){
 					  $bgClass="tw-bg-danger-200";
@@ -176,30 +181,16 @@ function printDiv(divId) {
 					  $sat_count++;
 					  }
 					  
-	///////////////////////////All Condation By Shift///////////////
-	
-	
-	
-	/////////////////////////////////////////////////////////////////				  
-					  
-					  
-					  
-					  
-					  
-					  
-					  //print_r($cell['items']);
+                      if (strtotime($cell['date']) > time()) { continue; }
 					  ?>
                         <tr class="<?php echo $bgClass;?>">
                           <td><strong><a href="#" class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
-                          <td ><?php echo date('l', strtotime($cell['date'])); ?> </td>
+                          <td><?php echo date('l', strtotime($cell['date'])); ?><?php //echo $sat_count; ?></td>
                           <?php
                             if (!empty($cell['items'])) {
                               // Take only the first record to avoid duplicates
-                              $it = $cell['items'][0];$it = $cell['items'][0];
+                              $it = $cell['items'][0];
 							  
-			
-			
-                              
                               // Format in_time - handle both time and datetime formats
                               $inTimeRaw = $it['in_time'] ?? null;
                               if ($inTimeRaw) {
@@ -228,36 +219,16 @@ function printDiv(divId) {
                                 $outTime = '-';
                               }
                               
-                              $fhRaw = $it['first_half'] ?? '';
-                              $shRaw = $it['second_half'] ?? '';
-                              
-                              // Process first_half: if numeric, get formatted title, otherwise show raw value
-                              if ($fhRaw !== '' && is_numeric($fhRaw)) {
-                                $fhTitle = get_attendance_status_title((int)$fhRaw);
-                                $firstHalf = $fhTitle !== '' ? $fhTitle : e($fhRaw);
-                              } else {
-                                $firstHalf = $fhRaw !== '' ? e($fhRaw) : '-';
-                              }
-                              
-                              // Process second_half: if numeric, get formatted title, otherwise show raw value
-                              if ($shRaw !== '' && is_numeric($shRaw)) {
-                                $shTitle = get_attendance_status_title((int)$shRaw);
-                                $secondHalf = $shTitle !== '' ? $shTitle : e($shRaw);
-                              } else {
-                                $secondHalf = $shRaw !== '' ? e($shRaw) : '-';
-                              }
-                              
                               $position = number_format($it['position'],2)??'';
                               $totals = e($it['total_hours']??'');
                               $lates = e($it['late_mark']??'');
 							  
-		
-$result=getAttendanceStatus($staffid, $shift_id, $cell['date'], $staff_type, $it['attendance_id']);
-$firstHalf=get_attendance_status_title($result['status']);
-$secondHalf=get_attendance_status_title($result['substatus']);
+                              $result=getAttendanceStatus($staffid, $shift_id, $cell['date'], $staff_type, $it['attendance_id']);
+                              $firstHalf=get_attendance_status_title($result['status']);
+                              $secondHalf=get_attendance_status_title($result['substatus']);
 
-$position=number_format($result['position'],2);	
-$remarks=$result['remarks'];				
+                              $position=number_format($result['position'],2);	
+                              $remarks=$result['remarks'];				
                               
                               echo '<td>'.$inTime.'</td>';
                               echo '<td>'.$outTime.'</td>';
@@ -275,27 +246,21 @@ $remarks=$result['remarks'];
                               $sumLateSecs += $parseHms($lates ?: '00:00:00');
                             } else {
 							
-			/*$fdata = [
-            'staffId'        	=> $staffid,
-            'shiftID'       	=> $shift_id,
-            'staffType'     	=> $staff_type,
-			'date'     		    => $cell['date'],
-            ];*/
-$result=getAttendanceStatus($staffid, $shift_id, $cell['date'], $staff_type);
-			
+                              $result=getAttendanceStatus($staffid, $shift_id, $cell['date'], $staff_type);
+							
 							 if(date('l', strtotime($cell['date']))=='Sunday'){
 					         $bgClass="tw-bg-danger-200";
 					         }elseif(date('l', strtotime($cell['date']))=='Saturday'){
 					         $bgClass="tw-bg-warning-200";
 					         }
 							 
-$firstHalf=$result['status'];
-$secondHalf=$result['substatus'];
+                              $firstHalf=$result['status'];
+                              $secondHalf=$result['substatus'];
 
-$position=number_format($result['position'],2);		
-$remarks=$result['remarks'];	
-				
-$inTime="00.00";$outTime="00.00";							 
+                              $position=number_format($result['position'],2);		
+                              $remarks=$result['remarks'];	
+					
+                              $inTime="00.00";$outTime="00.00";							 
                               echo '<td>'.$inTime.'</td><td>'.$outTime.'</td><td>'.get_attendance_status_title($firstHalf).'</td><td>'.get_attendance_status_title($secondHalf).'</td><td>'.$position.'</td><td>00:00:00</td><td>00:00:00</td><td><i class="fa-solid fa-circle-info" title="'.($remarks ?: '-').'" style=" color:khaki;"></i></td>';
                               // accumulate defaults
                               $sumPortion += (float)$position;
@@ -309,15 +274,16 @@ $inTime="00.00";$outTime="00.00";
                       $sumLateStr = $fmtHms($sumLateSecs);
                       ?>
 					  <tr>
-                        <td>&nbsp;</th>
+                        <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
 						<td>&nbsp;</td>
                         <td title="Portion"><?php echo number_format($sumPortion, 2); ?></td>
-							<td title="Tot. Hrs."><?php echo $sumTotStr; ?></td>
+						<td title="Tot. Hrs."><?php echo $sumTotStr; ?></td>
                         <td title="LateMark"><?php echo $sumLateStr; ?></td>
+                        <td>&nbsp;</td>
                       </tr>
                     </tbody>
 					
@@ -363,9 +329,7 @@ $inTime="00.00";$outTime="00.00";
       </div>
     </div>
   </div>
-  </div>
-
-
+</div>
 
 <?php init_tail(); ?>
 <script>
@@ -394,6 +358,7 @@ $(function(){
       if (resp && resp.success) {
         alert('Request submitted');
         $('#att_req_modal').modal('hide');
+        location.reload();
       } else {
         alert('Failed to submit');
       }

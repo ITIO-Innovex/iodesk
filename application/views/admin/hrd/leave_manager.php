@@ -10,6 +10,43 @@
             <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Leave Application'); ?>
           </a><?php */?>
         </div>
+        <?php $c = isset($leave_counters)?$leave_counters:[
+          'overall_pending'=>0,'current_month_pending'=>0,'past_month_pending'=>0,'total_completed'=>0
+        ]; ?>
+        <div class="row" style="margin-bottom: 10px;">
+          <div class="col-sm-3">
+            <div class="panel_s">
+              <div class="panel-body" style="text-align:center;">
+                <div class="tw-text-sm tw-text-neutral-500">Overall Pending</div>
+                <div class="tw-text-2xl tw-font-semibold"><?php echo (int)$c['overall_pending']; ?></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="panel_s">
+              <div class="panel-body" style="text-align:center;">
+                <div class="tw-text-sm tw-text-neutral-500">Current Month Pending</div>
+                <div class="tw-text-2xl tw-font-semibold"><?php echo (int)$c['current_month_pending']; ?></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="panel_s">
+              <div class="panel-body" style="text-align:center;">
+                <div class="tw-text-sm tw-text-neutral-500">Past Month Pending</div>
+                <div class="tw-text-2xl tw-font-semibold"><?php echo (int)$c['past_month_pending']; ?></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <div class="panel_s">
+              <div class="panel-body" style="text-align:center;">
+                <div class="tw-text-sm tw-text-neutral-500">Total Completed</div>
+                <div class="tw-text-2xl tw-font-semibold"><?php echo (int)$c['total_completed']; ?></div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
 		  <div class="row">

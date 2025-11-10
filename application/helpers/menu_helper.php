@@ -961,6 +961,16 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 		}
+		
+		if (staff_can('view_setting',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'self_service',
+            'name'     => _l('Self Service Management'),
+            'href'     => admin_url('hrd/setting/self_service'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
 	   
 	    if (staff_can('view_setting',  'hr_department')) {
 		$CI->app_menu->add_setup_children_item('hr_department', [

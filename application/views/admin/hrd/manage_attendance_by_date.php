@@ -54,7 +54,9 @@
                       <option value="<?php echo (int)$st['id']; ?>"><?php echo e($st['title']); ?></option>
                     <?php } } ?>
                   </select><?php */?>
-                  <button type="button" class="btn btn-primary" id="apply-bulk">Apply to Selected</button>
+                  <button type="button" class="btn btn-primary" id="apply-bulk">Apply to Selected & Locked In</button>
+                  <?php /*?><button type="button" class="btn btn-success" id="lock-in-btn">Locked In</button><?php */?>
+                  <button type="button" class="btn btn-warning" id="lock-out-btn">Locked Out</button>
                 </div>
               </div>
             </div>
@@ -73,31 +75,37 @@
                   <th>Portion</th>
 				  <th>Tot. Hrs.</th>
                   <th>LateMark</th>
-                  <th><?php echo _l('options'); ?></th>
+                  <?php /*?><th><?php echo _l('options'); ?></th><?php */?>
                 </tr>
               </thead>
               <tbody>
-                <?php if (!empty($staff)) { foreach ($staff as $s) { $sid=(int)$s['staffid']; $att = $attendance_map[$sid] ?? null; ?>
-                  <tr>
-                    <td><input type="checkbox" class="row-check" value="<?php echo (int)$sid; ?>"></td>
+                <?php if (!empty($staff)) { foreach ($staff as $s) { $sid=(int)$s['staffid']; $att = $attendance_map[$sid] ?? null; 
+                  $isLocked = isset($att['status']) && (int)$att['status'] === 1;
+                  $rowClass = $isLocked ? 'locked-row' : '';
+                  $attendanceId = isset($att['attendance_id']) ? (int)$att['attendance_id'] : 0;
+                ?>
+                  <tr class="<?php echo $rowClass; ?>" data-staffid="<?php echo (int)$sid; ?>" data-attendance-id="<?php echo $attendanceId; ?>" data-locked="<?php echo $isLocked ? '1' : '0'; ?>">
+                    <td>
+                      <input type="checkbox" class="row-check" value="<?php echo (int)$sid; ?>" <?php echo $isLocked ? 'disabled' : ''; ?>>
+                    </td>
                     <td><?php echo e(($s['firstname']??'') . ' ' . ($s['lastname']??'')); ?></td>
                     <td><?php echo e($date); ?></td>
 					<td><?php echo date('D', strtotime(e($date))); ?></td>
                     <td>
                       <div class="input-group input-group-sm" style="max-width:200px;">
-                        <input type="time" class="form-control in-time" data-staffid="<?php echo (int)$sid; ?>" value="<?php echo e(isset($att['in_time'])?date('H:i', strtotime($att['in_time'])):''); ?>">
+                        <input type="time" class="form-control in-time" data-staffid="<?php echo (int)$sid; ?>" value="<?php echo e(isset($att['in_time'])?date('H:i', strtotime($att['in_time'])):''); ?>" <?php echo $isLocked ? 'disabled' : ''; ?>>
                        
                       </div>
                     </td>
                     <td>
                       <div class="input-group input-group-sm" style="max-width:200px;">
-                        <input type="time" class="form-control out-time" data-staffid="<?php echo (int)$sid; ?>" value="<?php echo e(isset($att['out_time'])?date('H:i', strtotime($att['out_time'])):''); ?>">
+                        <input type="time" class="form-control out-time" data-staffid="<?php echo (int)$sid; ?>" value="<?php echo e(isset($att['out_time'])?date('H:i', strtotime($att['out_time'])):''); ?>" <?php echo $isLocked ? 'disabled' : ''; ?>>
                         
                       </div>
                     </td>
                     <td>
-                      <select class="form-control fh-select" data-staffid="<?php echo (int)$sid; ?>">
-                        <option value="">First Half</option>
+                      <select class="form-control fh-select" data-staffid="<?php echo (int)$sid; ?>" required title="First Half is required for checked data" <?php echo $isLocked ? 'disabled' : ''; ?>>
+                        <option value="">First Half *</option>
                         <?php if (!empty($attendance_statuses)) { 
 						foreach ($attendance_statuses as $st) { 
 						$sel = isset($att['first_half']) && (string)$att['first_half']===(string)$st['id'] ? 'selected' : ''; ?>
@@ -106,7 +114,7 @@
                       </select>
                     </td>
                     <td>
-                      <select class="form-control sh-select" data-staffid="<?php echo (int)$sid; ?>">
+                      <select class="form-control sh-select" data-staffid="<?php echo (int)$sid; ?>" <?php echo $isLocked ? 'disabled' : ''; ?>>
                         <option value="">Second Half</option>
                         <?php if (!empty($attendance_statuses)) { foreach ($attendance_statuses as $st) { $sel = isset($att['second_half']) && (string)$att['second_half']===(string)$st['id'] ? 'selected' : ''; ?>
                           <option style=" background:<?php echo $st['color']; ?>" value="<?php echo (int)$st['id']; ?>" <?php echo $sel; ?>><?php echo e($st['title']); ?></option>
@@ -117,14 +125,14 @@
 					<td><?php echo e($att['total_hours'] ?? ''); ?></td>
 					<td><?php echo e($att['late_mark'] ?? ''); ?></td>
                     <td>
-   <a class="btn btn-default btn-sm open-update" 
+   <?php /*?><a class="btn btn-default btn-sm open-update" 
    data-staffid="<?php echo (int)$sid; ?>"
    data-date="<?php echo e($date); ?>"
    data-in_time="<?php echo isset($att['in_time']) ? date('H:i', strtotime($att['in_time'])) : '';?>"
    data-out_time="<?php echo isset($att['out_time']) ? date('H:i', strtotime($att['out_time'])) : '';?>"
    data-first_half="<?php echo isset($att['first_half']) ? (string)$att['first_half'] : '';?>"
    data-second_half="<?php isset($att['second_half']) ? (string)$att['second_half'] : '';?>"
-   data-staff_name="<?php echo  e(($s['firstname']??'') . ' ' . ($s['lastname']??''));?>"><i class="fa-solid fa-pen-to-square" title="Edit"></i></a>
+   data-staff_name="<?php echo  e(($s['firstname']??'') . ' ' . ($s['lastname']??''));?>"><i class="fa-solid fa-pen-to-square" title="Edit"></i></a><?php */?>
                     </td>
                   </tr>
                 <?php } } ?>
@@ -178,8 +186,8 @@
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
-                <label>First Half</label>
-                <select id="modal-first-half" name="first_half" class="form-control">
+                <label>First Half <span class="text-danger">*</span></label>
+                <select id="modal-first-half" name="first_half" class="form-control" required>
                   <option value="">-- Select First Half --</option>
                   <?php if (!empty($attendance_statuses)) { foreach ($attendance_statuses as $st) { ?>
                     <option value="<?php echo (int)$st['id']; ?>"><?php echo e($st['title']); ?></option>
@@ -211,6 +219,20 @@
 
 
 <?php init_tail(); ?>
+<style>
+.locked-row {
+  background-color: #f0f0f0 !important;
+  opacity: 0.7;
+}
+.locked-row td {
+  color: #999;
+}
+.locked-row input,
+.locked-row select {
+  background-color: #e9ecef !important;
+  cursor: not-allowed;
+}
+</style>
 <script>
  $(document).on('click', '.open-update', function(){
   
@@ -221,12 +243,14 @@
 </script>
 <script>
 $(document).ready(function(){
-  // Select all checkbox
+  // Select all checkbox (skip locked rows)
   var selAll = document.getElementById('select-all');
   if(selAll){ 
     selAll.addEventListener('change', function(){
       var checked = this.checked;
-      document.querySelectorAll('.row-check').forEach(function(cb){ cb.checked = checked; });
+      document.querySelectorAll('.row-check:not(:disabled)').forEach(function(cb){ 
+        cb.checked = checked; 
+      });
     });
   }
 
@@ -239,6 +263,7 @@ $(document).ready(function(){
       
       var date = '<?php echo e($date); ?>';
       var staffData = [];
+      var missingFirstHalf = [];
       
       checkedRows.forEach(function(checkbox){
         var staffid = checkbox.value;
@@ -247,6 +272,12 @@ $(document).ready(function(){
         var outTime = $row.find('input.out-time[data-staffid="'+staffid+'"]').val();
         var fh = $row.find('select.fh-select[data-staffid="'+staffid+'"]').val();
         var sh = $row.find('select.sh-select[data-staffid="'+staffid+'"]').val();
+        var staffName = $row.find('td').eq(1).text().trim();
+        
+        // Validate First Half is required for checked data
+        if (!fh || fh === '') {
+          missingFirstHalf.push(staffName || 'Staff ID: ' + staffid);
+        }
         
         staffData.push({
           staffid: staffid,
@@ -257,12 +288,99 @@ $(document).ready(function(){
         });
       });
       
+      // Show error if any checked row is missing First Half
+      if (missingFirstHalf.length > 0) {
+        alert('First Half is required for the following staff:\n\n' + missingFirstHalf.join('\n'));
+        return;
+      }
+      
       $.post(admin_url + 'hrd/attendance_bulk_update_by_date', {date: date, staff_data: staffData}, function(resp){
         if(resp && resp.success){ 
           alert('Attendance updated successfully');
           window.location.reload(); 
         } else { 
           alert('Failed to update: ' + (resp.message || 'Unknown error')); 
+        }
+      }, 'json');
+    });
+  }
+
+  // Lock In button - Set status to 1 (locked)
+  var lockInBtn = document.getElementById('lock-in-btn');
+  if(lockInBtn){
+    lockInBtn.addEventListener('click', function(){
+      var checkedRows = document.querySelectorAll('.row-check:checked:not(:disabled)');
+      if(checkedRows.length === 0){ 
+        alert('Select at least one staff to lock'); 
+        return; 
+      }
+      
+      if(!confirm('Are you sure you want to lock ' + checkedRows.length + ' selected attendance record(s)?')) {
+        return;
+      }
+      
+      var date = '<?php echo e($date); ?>';
+      var attendanceIds = [];
+      
+      checkedRows.forEach(function(checkbox){
+        var staffid = checkbox.value;
+        var $row = $(checkbox).closest('tr');
+        var attendanceId = $row.data('attendance-id');
+        if(attendanceId > 0) {
+          attendanceIds.push(attendanceId);
+        } else {
+          // If no attendance record exists, we need to create one first
+          // For now, we'll skip these and show a message
+          var staffName = $row.find('td').eq(1).text().trim();
+          console.warn('No attendance record found for ' + staffName);
+        }
+      });
+      
+      if(attendanceIds.length === 0) {
+        alert('No attendance records found to lock. Please save attendance data first.');
+        return;
+      }
+      
+      $.post(admin_url + 'hrd/attendance_lock_by_date', {
+        date: date,
+        attendance_ids: attendanceIds,
+        status: 1
+      }, function(resp){
+        if(resp && resp.success){ 
+          alert('Attendance locked successfully');
+          window.location.reload(); 
+        } else { 
+          alert('Failed to lock: ' + (resp.message || 'Unknown error')); 
+        }
+      }, 'json');
+    });
+  }
+
+  // Lock Out button - Set status to 0 (unlocked) for current month
+  var lockOutBtn = document.getElementById('lock-out-btn');
+  if(lockOutBtn){
+    lockOutBtn.addEventListener('click', function(){
+      var date = '<?php echo e($date); ?>';
+      var currentDate = new Date(date);
+      var year = currentDate.getFullYear();
+      var month = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
+      var monthYear = year + '-' + (month < 10 ? '0' + month : month);
+      
+      if(!confirm('Are you sure you want to unlock all attendance records for the current month (' + monthYear + ')?')) {
+        return;
+      }
+      
+      $.post(admin_url + 'hrd/attendance_lock_by_date', {
+        date: date,
+        month_year: monthYear,
+        unlock_month: true,
+        status: 0
+      }, function(resp){
+        if(resp && resp.success){ 
+          alert('All attendance records for ' + monthYear + ' unlocked successfully');
+          window.location.reload(); 
+        } else { 
+          alert('Failed to unlock: ' + (resp.message || 'Unknown error')); 
         }
       }, 'json');
     });
@@ -310,6 +428,12 @@ $(document).ready(function(){
 
     if(!staffid || !date){
       alert('Missing required data');
+      return;
+    }
+
+    // Validate First Half is required
+    if (!firstHalf || firstHalf === '') {
+      alert('First Half is required');
       return;
     }
 
