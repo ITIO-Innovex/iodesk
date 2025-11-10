@@ -15,6 +15,8 @@
 		  </li>
 		  <li> <a href="<?php echo admin_url('hrd/manage_attendance_by_user');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Manage Attendance By User</a> 
 		  </li>
+		   <li> <a href="<?php echo admin_url('hrd/attendance_master');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Attendance Master</a> 
+		  </li>
         </ul>
 		
 		
