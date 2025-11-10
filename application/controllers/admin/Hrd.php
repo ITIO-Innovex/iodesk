@@ -1239,22 +1239,47 @@ class Hrd extends AdminController
             access_denied('Attendance Request');
         }
 
+        // Get staffid from query parameter - required for this page
+        $staffid = (int)$this->input->get('staffid');
+        if (!$staffid || $staffid <= 0) {
+            set_alert('danger', 'Staff ID is required');
+            redirect(admin_url('hrd/setting/employee_count_analysis'));
+        }
+
+        // Verify staff exists and get details
+        $this->db->where('staffid', $staffid);
+        $staff = $this->db->get(db_prefix() . 'staff')->row();
+        if (!$staff) {
+            set_alert('danger', 'Staff not found');
+            redirect(admin_url('hrd/setting/employee_count_analysis'));
+        }
+
         // Company scope
         $company_id = get_staff_company_id();
         if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
             $company_id = $_SESSION['super_view_company_id'];
         }
 
-        // Fetch attendance update requests with staff names
+        // Verify staff belongs to the same company
+        if ($staff->company_id != $company_id) {
+            set_alert('danger', 'Access denied');
+            redirect(admin_url('hrd/setting/employee_count_analysis'));
+        }
+
+        // Fetch attendance update requests for this staff only with status = 1
         $this->db->select('aur.*, s.firstname, s.lastname, s.employee_code');
         $this->db->from(db_prefix() . 'hrd_attendance_update_request aur');
         $this->db->join(db_prefix() . 'staff s', 's.staffid = aur.staffid', 'left');
-        $this->db->where('s.company_id', $company_id);
+        $this->db->where('aur.staffid', $staffid);
+        $this->db->where('aur.status', 1);
         $this->db->order_by('aur.addedon', 'desc');
         $data['requests'] = $this->db->get()->result_array();
 
-        $data['title'] = 'Attendance Request';
-        $this->load->view('admin/hrd/setting/attendance_request', $data);
+        // Pass staff information to view
+        $data['staff'] = $staff;
+        $data['staffid'] = $staffid;
+        $data['title'] = 'Attendance Request - ' . trim($staff->firstname . ' ' . $staff->lastname);
+        $this->load->view('admin/hrd/attendance_request', $data);
     }
 
     // Approve/Update Attendance Request
@@ -1290,7 +1315,7 @@ class Hrd extends AdminController
         }
 
         // Update attendance record if status is approved (2)
-        if ($status == 2) {
+        /*if ($status == 2) {
             // Compute total hours if both present
             $total_hours = null;
             if ($request['in_time'] && $request['out_time']) {
@@ -1342,7 +1367,7 @@ class Hrd extends AdminController
                 ];
                 $this->db->insert(db_prefix() . 'hrd_attendance', $ins);
             }
-        }
+        }*/
 
         // Update request record
         $upd_req = [
@@ -1406,6 +1431,61 @@ class Hrd extends AdminController
             'leave_type' => $ltype,
             'leave_status' => $lstatus,
         ];
+
+        // ===== Counters for summary boxes =====
+        // Determine company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Helper function for count with common join and where
+        $count_by = function($whereCb) use ($company_id) {
+            $CI = &get_instance();
+            $CI->db->from(db_prefix() . 'hrd_leave_master lm');
+            $CI->db->join(db_prefix() . 'staff s', 's.staffid = lm.staffid', 'left');
+            $CI->db->where('s.company_id', $company_id);
+            if (is_callable($whereCb)) {
+                $whereCb($CI->db);
+            }
+            return (int)$CI->db->count_all_results();
+        };
+
+        // Overall pending (leave_status = 0)
+        $overall_pending = $count_by(function($db){
+            $db->where('lm.leave_status', 0);
+        });
+
+        // Current month pending
+        $cm_start = date('Y-m-01');
+        $cm_end   = date('Y-m-t');
+        $current_month_pending = $count_by(function($db) use ($cm_start, $cm_end){
+            $db->where('lm.leave_status', 0);
+            $db->where('lm.from_date >=', $cm_start);
+            $db->where('lm.from_date <=', $cm_end);
+        });
+
+        // Past month pending (previous calendar month)
+        $pm_start = date('Y-m-01', strtotime('first day of previous month'));
+        $pm_end   = date('Y-m-t', strtotime('last day of previous month'));
+        $past_month_pending = $count_by(function($db) use ($pm_start, $pm_end){
+            $db->where('lm.leave_status', 0);
+            $db->where('lm.from_date >=', $pm_start);
+            $db->where('lm.from_date <=', $pm_end);
+        });
+
+        // Total completed (approved or rejected -> leave_status in (1,2))
+        $total_completed = $count_by(function($db){
+            $db->where_in('lm.leave_status', [1,2]);
+        });
+
+        $data['leave_counters'] = [
+            'overall_pending'       => $overall_pending,
+            'current_month_pending' => $current_month_pending,
+            'past_month_pending'    => $past_month_pending,
+            'total_completed'       => $total_completed,
+        ];
+        // ===== End counters =====
 
         // Load active leave types for dropdown
         if (!is_super()) {
@@ -1686,6 +1766,141 @@ class Hrd extends AdminController
 
         $data['title'] = 'Attendance';
         $this->load->view('admin/hrd/attendance', $data);
+    }
+
+    /* Employee Attendance - Calendar view for specific employee */
+    public function employee_attendance()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Employee Attendance');
+        }
+
+        // Get staffid from query parameter
+        $staffid = (int)$this->input->get('staffid');
+        if (!$staffid || $staffid <= 0) {
+            set_alert('danger', 'Invalid staff ID');
+            redirect(admin_url('hrd/setting/employee_count_analysis'));
+        }
+
+        // Verify staff exists and get details
+        $this->db->where('staffid', $staffid);
+        $staff = $this->db->get(db_prefix() . 'staff')->row();
+        if (!$staff) {
+            set_alert('danger', 'Staff not found');
+            redirect(admin_url('hrd/setting/employee_count_analysis'));
+        }
+
+        // Get month filter (format: YYYY-MM)
+        $month_year = trim((string)$this->input->get('month_year'));
+        if (!$month_year || !preg_match('/^\d{4}-\d{2}$/', $month_year)) {
+            $month_year = date('Y-m');
+        }
+
+        // Calculate date range from month
+        $parts = explode('-', $month_year);
+        $y = (int)$parts[0];
+        $m = (int)$parts[1];
+        $date_from = sprintf('%04d-%02d-01', $y, $m);
+        $date_to = date('Y-m-t', strtotime($date_from));
+
+        // Get attendance for this staff in the selected month
+        $this->db->where('staffid', $staffid);
+        $this->db->where('entry_date >=', $date_from);
+        $this->db->where('entry_date <=', $date_to);
+        $this->db->order_by('entry_date', 'asc');
+        $data['attendance_list'] = $this->hrd_model->get_attendance('', $staffid);
+
+        // Get shift details for this staff
+        $staff_branch = (int)($staff->branch ?? 0);
+        if ($staff_branch > 0) {
+            // Get shift_id from branch
+            $this->db->where('id', $staff_branch);
+            $branchRow = $this->db->get(db_prefix() . 'hrd_branch_manager')->row();
+            if ($branchRow && isset($branchRow->shift) && $branchRow->shift) {
+                $shift_id_from_branch = (int)$branchRow->shift;
+                $data['shift_details'] = $this->hrd_model->get_shift_details($shift_id_from_branch);
+            } else {
+                $data['shift_details'] = [];
+            }
+        } else {
+            $data['shift_details'] = [];
+        }
+        
+        // Fallback to default shift if no shift found
+        if (empty($data['shift_details'])) {
+            $this->db->where('company_id', $staff->company_id);
+            $this->db->where('status', 1);
+            $this->db->order_by('shift_id', 'asc');
+            $this->db->limit(1);
+            $shiftRow = $this->db->get(db_prefix() . 'hrd_shift_manager')->row_array();
+            if ($shiftRow) {
+                $data['shift_details'] = [$shiftRow];
+            } else {
+                $data['shift_details'] = [];
+            }
+        }
+
+        if (empty($data['shift_details'])) {
+            $data['shift_details'] = [[
+                'shift_id' => 0,
+                'shift_code' => 'N/A',
+                'shift_in' => '09:00:00',
+                'shift_out' => '18:00:00',
+                'first_half_start' => '09:00:00',
+                'first_half_end' => '13:30:00',
+                'second_half_start' => '14:00:00',
+                'second_half_end' => '18:00:00',
+                'saturday_rule' => 0,
+                'saturday_work_end' => '13:00:00'
+            ]];
+        }
+
+        // Get status counter for the month
+        $this->db->select('first_half, second_half, COUNT(*) AS total_count');
+        $this->db->where('staffid', $staffid);
+        $this->db->where('entry_date >=', $date_from);
+        $this->db->where('entry_date <=', $date_to);
+        $this->db->group_by(['first_half', 'second_half']);
+        $data['status_counter'] = $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+
+        // Build calendar
+        $calendarYear = $y;
+        $calendarMonth = $m;
+        $firstDay = sprintf('%04d-%02d-01', $calendarYear, $calendarMonth);
+        $daysInMonth = (int)date('t', strtotime($firstDay));
+        $startWeekday = (int)date('N', strtotime($firstDay)); // 1=Mon..7=Sun
+        $calendar = [
+            'year' => $calendarYear,
+            'month' => $calendarMonth,
+            'days' => [],
+            'start_weekday' => $startWeekday,
+            'days_in_month' => $daysInMonth,
+        ];
+        
+        // Group attendance by date
+        $byDate = [];
+        foreach ((array)$data['attendance_list'] as $row) {
+            $d = isset($row['entry_date']) ? $row['entry_date'] : (isset($row['attendance_date']) ? $row['attendance_date'] : null);
+            if ($d) { $byDate[$d][] = $row; }
+        }
+        
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $date = sprintf('%04d-%02d-%02d', $calendarYear, $calendarMonth, $d);
+            $calendar['days'][] = [
+                'date' => $date,
+                'items' => isset($byDate[$date]) ? $byDate[$date] : [],
+            ];
+        }
+        $data['calendar'] = $calendar;
+
+        // Get staff details
+        $data['staff'] = $staff;
+        $data['staffid'] = $staffid;
+        $data['filters'] = [
+            'month_year' => $month_year,
+        ];
+        $data['title'] = 'Employee Attendance - ' . trim($staff->firstname . ' ' . $staff->lastname);
+        $this->load->view('admin/hrd/setting/employee_attendance', $data);
     }
 	
 	/* View Attendance */
@@ -2776,6 +2991,305 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/manage_attendance_by_date', $data);
     }
 
+    // Lock/Unlock attendance records by date
+    public function attendance_lock_by_date()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $date = $this->input->post('date');
+        $attendance_ids = $this->input->post('attendance_ids');
+        $status = (int)$this->input->post('status'); // 1 = locked, 0 = unlocked
+        $unlock_month = $this->input->post('unlock_month') === 'true' || $this->input->post('unlock_month') === true;
+        $month_year = $this->input->post('month_year');
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // If unlock_month is true, unlock all records for the current month
+        if ($unlock_month && $month_year) {
+            // Validate month_year format (YYYY-MM)
+            if (!preg_match('/^\d{4}-\d{2}$/', $month_year)) {
+                echo json_encode(['success' => false, 'message' => 'Invalid month format']);
+                return;
+            }
+
+            // Calculate start and end dates for the month
+            $start_date = $month_year . '-01';
+            $end_date = date('Y-m-t', strtotime($start_date));
+
+            // Update all attendance records for the month
+            $this->db->where('company_id', $company_id);
+            $this->db->where('entry_date >=', $start_date);
+            $this->db->where('entry_date <=', $end_date);
+            $this->db->update(db_prefix() . 'hrd_attendance', ['status' => $status]);
+
+            $affected_rows = $this->db->affected_rows();
+            echo json_encode(['success' => true, 'message' => 'Status updated successfully', 'affected_rows' => $affected_rows]);
+            return;
+        }
+
+        // Original logic: Update specific attendance IDs for a single date
+        if (!$date || !is_array($attendance_ids) || empty($attendance_ids)) {
+            echo json_encode(['success' => false, 'message' => 'Missing data']);
+            return;
+        }
+
+        // Update status for all attendance IDs
+        $attendance_ids = array_map('intval', $attendance_ids);
+        $this->db->where_in('attendance_id', $attendance_ids);
+        $this->db->where('company_id', $company_id);
+        $this->db->where('entry_date', $date);
+        $this->db->update(db_prefix() . 'hrd_attendance', ['status' => $status]);
+
+        echo json_encode(['success' => true, 'message' => 'Status updated successfully']);
+    }
+
+    /* Attendance Master - Listing with filters */
+    public function attendance_master()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Attendance Master');
+        }
+
+        // Get filters
+        $month = $this->input->get('month');
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = date('Y-m');
+        }
+
+        $staff_filter = (int)$this->input->get('staff_id');
+        $branch_filter = (int)$this->input->get('branch_id');
+
+        // Calculate date range from month
+        $start_date = $month . '-01';
+        $end_date = date('Y-m-t', strtotime($start_date));
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Build attendance query with joins
+        $this->db->select('a.*, s.firstname, s.lastname, s.employee_code, s.branch, b.branch_name');
+        $this->db->from(db_prefix() . 'hrd_attendance a');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = a.staffid', 'inner');
+        $this->db->join(db_prefix() . 'hrd_branch_manager b', 'b.id = s.branch', 'left');
+        $this->db->where('a.company_id', $company_id);
+        $this->db->where('a.entry_date >=', $start_date);
+        $this->db->where('a.entry_date <=', $end_date);
+        $this->db->where('s.active', 1);
+
+        // Apply filters
+        if ($staff_filter > 0) {
+            $this->db->where('a.staffid', $staff_filter);
+        }
+        if ($branch_filter > 0) {
+            $this->db->where('s.branch', $branch_filter);
+        }
+
+        $this->db->order_by('a.entry_date', 'desc');
+        $this->db->order_by('s.firstname', 'asc');
+        $data['attendance_list'] = $this->db->get()->result_array();
+
+        // Load all active staff for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $data['all_staff'] = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        // Load all branches for dropdown
+        $this->db->select('id, branch_name');
+        $this->db->where('status', 1);
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->order_by('branch_name', 'asc');
+        $data['all_branches'] = $this->db->get(db_prefix() . 'hrd_branch_manager')->result_array();
+
+        // Load attendance statuses for display
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['attendance_statuses'] = $this->hrd_model->get_attendance_status();
+
+        // Create status map for quick lookup
+        $status_map = [];
+        if (!empty($data['attendance_statuses'])) {
+            foreach ($data['attendance_statuses'] as $st) {
+                $status_map[(int)$st['id']] = $st;
+            }
+        }
+        $data['status_map'] = $status_map;
+
+        $data['month'] = $month;
+        $data['staff_filter'] = $staff_filter;
+        $data['branch_filter'] = $branch_filter;
+        $data['title'] = 'Attendance Master';
+        $this->load->view('admin/hrd/setting/attendance_master', $data);
+    }
+
+    /* Manage Attendance (Master) by Month and Staff */
+    public function manage_attendance_master()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Manage Attendance Master');
+        }
+
+        // Month in format YYYY-MM
+        $month = $this->input->get('month');
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = date('Y-m');
+        }
+
+        $staff_filter = (int)$this->input->get('staff_id');
+
+        // Load all active staff for dropdown (for filter) - company scoped
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $all_staff = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        // Prepare days in month
+        $startDate = $month . '-01';
+        $daysInMonth = (int)date('t', strtotime($startDate));
+        $dates = [];
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $dates[] = date('Y-m-d', strtotime(sprintf('%s-%02d', $month, $d)));
+        }
+
+        // If a staff is selected, fetch attendance map for the month
+        $attendanceByDate = [];
+        if ($staff_filter > 0) {
+            $this->db->from(db_prefix() . 'hrd_attendance');
+            $this->db->where('staffid', $staff_filter);
+            $this->db->where('entry_date >=', $startDate);
+            $this->db->where('entry_date <=', $month . '-' . $daysInMonth);
+            $rows = $this->db->get()->result_array();
+            foreach ($rows as $r) {
+                $attendanceByDate[$r['entry_date']] = $r;
+            }
+        }
+
+        // Load attendance statuses for listboxes - company scoped, active only
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $attendanceStatuses = $this->hrd_model->get_attendance_status();
+
+        $data['month'] = $month;
+        $data['dates'] = $dates;
+        $data['all_staff'] = $all_staff;
+        $data['staff_filter'] = $staff_filter;
+        $data['attendance_map'] = $attendanceByDate;
+        $data['attendance_statuses'] = $attendanceStatuses;
+        $data['title'] = 'Manage Attendance Master';
+        $this->load->view('admin/hrd/manage_attendance_master', $data);
+    }
+
+    /* Manage Attendance by User */
+    public function manage_attendance_by_user()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Manage Attendance by User');
+        }
+
+        // Get selected staff IDs from GET parameter (array or comma-separated string)
+        $selected_staff_ids = $this->input->get('staff_ids');
+        $selected_staff_array = [];
+        if ($selected_staff_ids) {
+            if (is_array($selected_staff_ids)) {
+                $selected_staff_array = array_filter(array_map('intval', $selected_staff_ids));
+            } else {
+                $selected_staff_array = array_filter(array_map('intval', explode(',', $selected_staff_ids)));
+            }
+        }
+
+        // Company scope for staff
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, firstname, lastname, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $all_staff = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        // Get selected staff details
+        $selected_staff = [];
+        if (!empty($selected_staff_array)) {
+            if (is_super()) {
+                if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                } else {
+                    $this->db->where('company_id', get_staff_company_id());
+                }
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+            $this->db->where('active', 1);
+            $this->db->where_in('staffid', $selected_staff_array);
+            $this->db->select('staffid, firstname, lastname, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
+            $this->db->order_by('firstname', 'asc');
+            $selected_staff = $this->db->get(db_prefix() . 'staff')->result_array();
+        }
+
+        $data['all_staff'] = $all_staff;
+        $data['selected_staff'] = $selected_staff;
+        $data['selected_staff_ids'] = $selected_staff_array;
+        $data['title'] = 'Manage Attendance by User';
+        $this->load->view('admin/hrd/manage_attendance_by_user', $data);
+    }
+
     // Bulk add/update attendance for selected staff on a given date
     public function attendance_bulk_update_by_date()
     {
@@ -2813,6 +3327,17 @@ class Hrd extends AdminController
             $out_time = isset($item['out_time']) ? trim($item['out_time']) : '';
             $first_half = isset($item['first_half']) ? trim($item['first_half']) : '';
             $second_half = isset($item['second_half']) ? trim($item['second_half']) : '';
+            
+            // Validate First Half is required for checked data
+            if ($first_half === '' || $first_half === null) {
+                // Get staff name for error message
+                $this->db->select('firstname, lastname');
+                $this->db->where('staffid', $sid);
+                $staffRow = $this->db->get(db_prefix() . 'staff')->row();
+                $staffName = $staffRow ? trim($staffRow->firstname . ' ' . $staffRow->lastname) : 'Staff ID: ' . $sid;
+                echo json_encode(['success' => false, 'message' => 'First Half is required for ' . $staffName]);
+                return;
+            }
 
             // Calculate total hours if both in_time and out_time are provided
             $total_hours = null;
@@ -2850,7 +3375,7 @@ class Hrd extends AdminController
 				$upd['position'] = 0.50;
 				}
 				
-                
+                $upd['status'] = 1;
                 if (!empty($upd)) {
                     $this->db->where('attendance_id', (int)$row['attendance_id']);
                     $this->db->update(db_prefix() . 'hrd_attendance', $upd);
@@ -2868,6 +3393,7 @@ class Hrd extends AdminController
                     'first_half' => $first_half ?: '',
                     'second_half' => $second_half ?: '',
 					'ip' => $ip,
+					'status' => 1,
 					'remarks' => 'Added By HRD - '.get_staff_user_id(),
                 ];
                 if ($total_hours !== null) {
@@ -2969,6 +3495,322 @@ class Hrd extends AdminController
 
         $data['title'] = 'HRD Self Service';
         $this->load->view('admin/hrd/self_service', $data);
+    }
+
+    /* HRD Self Service - Setting */
+    public function setting_self_service()
+    {
+        if (!(is_admin() || staff_can('view_setting',  'hr_department'))) {
+            access_denied('HRD Self Service');
+        }
+
+        $data['title'] = 'HRD Self Service';
+        $this->load->view('admin/hrd/setting/self_service', $data);
+    }
+
+    /* Shift Wise Employee Count */
+    public function shift_wise_employee_count()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Shift Wise Employee Count');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Get today's date
+        $today = date('Y-m-d');
+
+        // Get all active staff with their branch and shift information
+        $this->db->select('s.staffid, s.firstname, s.lastname, s.branch, 
+                          br.branch_name, br.shift as branch_shift_id,
+                          sm.shift_code, sm.shift_name, sm.shift_in, sm.shift_out');
+        $this->db->from(db_prefix() . 'staff s');
+        $this->db->join(db_prefix() . 'hrd_branch_manager br', 'br.id = s.branch', 'left');
+        $this->db->join(db_prefix() . 'hrd_shift_manager sm', 'sm.shift_id = br.shift', 'left');
+        $this->db->where('s.company_id', $company_id);
+        $this->db->where('s.active', 1);
+        $this->db->order_by('br.branch_name', 'asc');
+        $this->db->order_by('s.firstname', 'asc');
+        $staff_list = $this->db->get()->result_array();
+
+        // Get today's attendance count for each staff
+        $attendance_counts = [];
+        if (!empty($staff_list)) {
+            $staff_ids = array_column($staff_list, 'staffid');
+            $this->db->select('staffid, COUNT(*) as attendance_count');
+            $this->db->from(db_prefix() . 'hrd_attendance');
+            $this->db->where('entry_date', $today);
+            $this->db->where_in('staffid', $staff_ids);
+            $this->db->group_by('staffid');
+            $attendance_results = $this->db->get()->result_array();
+            
+            foreach ($attendance_results as $att) {
+                $attendance_counts[(int)$att['staffid']] = (int)$att['attendance_count'];
+            }
+        }
+
+        // Add attendance count to staff list and group by branch
+        $staff_by_branch = [];
+        foreach ($staff_list as $staff) {
+            $branch_id = (int)($staff['branch'] ?? 0);
+            $branch_name = $staff['branch_name'] ?? 'No Branch';
+            $staff_id = (int)$staff['staffid'];
+            
+            if (!isset($staff_by_branch[$branch_id])) {
+                $staff_by_branch[$branch_id] = [
+                    'branch_name' => $branch_name,
+                    'staff' => []
+                ];
+            }
+            
+            $staff['attendance_count'] = $attendance_counts[$staff_id] ?? 0;
+            $staff['full_name'] = trim($staff['firstname'] . ' ' . $staff['lastname']);
+            $staff['shift_time'] = ($staff['shift_in'] && $staff['shift_out']) 
+                ? $staff['shift_in'] . ' - ' . $staff['shift_out'] 
+                : '-';
+            
+            $staff_by_branch[$branch_id]['staff'][] = $staff;
+        }
+
+        $data['staff_by_branch'] = $staff_by_branch;
+        $data['today'] = $today;
+        $data['title'] = 'Shift Wise Employee Count';
+        $this->load->view('admin/hrd/setting/shift_wise_employee_count', $data);
+    }
+
+    /* Top 10 Employee Having Late Mark */
+    public function top_10_employee_having_late_mark()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Top 10 Employee Having Late Mark');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Get month filter (format: YYYY-MM)
+        $month = $this->input->get('month');
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = date('Y-m');
+        }
+
+        // Calculate start and end dates for the month
+        $start_date = $month . '-01';
+        $end_date = date('Y-m-t', strtotime($start_date));
+
+        // Query to get top 10 employees with late marks (in_time > 09:30:00)
+        $this->db->select('s.staffid, s.firstname, s.lastname, s.employee_code, COUNT(a.attendance_id) as late_count');
+        $this->db->from(db_prefix() . 'hrd_attendance a');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = a.staffid', 'inner');
+        $this->db->where('a.company_id', $company_id);
+        $this->db->where('a.entry_date >=', $start_date);
+        $this->db->where('a.entry_date <=', $end_date);
+        $this->db->where('a.in_time >', '09:30:00');
+        $this->db->where('a.in_time IS NOT NULL');
+        $this->db->where('a.in_time !=', '');
+        $this->db->where('s.active', 1);
+        $this->db->group_by('a.staffid');
+        $this->db->order_by('late_count', 'DESC');
+        $this->db->limit(10);
+        $top_10_late = $this->db->get()->result_array();
+
+        // Format the data
+        foreach ($top_10_late as &$employee) {
+            $employee['full_name'] = trim($employee['firstname'] . ' ' . $employee['lastname']);
+            $employee['late_count'] = (int)$employee['late_count'];
+        }
+
+        $data['top_10_late'] = $top_10_late;
+        $data['month'] = $month;
+        $data['month_display'] = date('F Y', strtotime($start_date));
+        $data['title'] = 'Top 10 Employee Having Late Mark';
+        $this->load->view('admin/hrd/setting/top_10_employee_having_late_mark', $data);
+    }
+
+    /* List of Employee Early Going */
+    public function list_of_employee_early_going()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('List of Employee Early Going');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Get date filter
+        $search_date = $this->input->get('date');
+        if (!$search_date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $search_date)) {
+            $search_date = date('Y-m-d');
+        }
+
+        // Get month filter (format: YYYY-MM) - for backward compatibility
+        $month = $this->input->get('month');
+        if ($month && preg_match('/^\d{4}-\d{2}$/', $month)) {
+            // If month is provided, use month range
+            $start_date = $month . '-01';
+            $end_date = date('Y-m-t', strtotime($start_date));
+            $use_date_filter = false;
+        } else {
+            // Use specific date filter
+            $start_date = $search_date;
+            $end_date = $search_date;
+            $use_date_filter = true;
+        }
+
+        // Query to get employees with early going (out_time < 18:30:00)
+        $this->db->select('s.staffid, s.firstname, s.lastname, s.employee_code, 
+                          a.entry_date, a.out_time, a.attendance_id,
+                          COUNT(a.attendance_id) as early_count');
+        $this->db->from(db_prefix() . 'hrd_attendance a');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = a.staffid', 'inner');
+        $this->db->where('a.company_id', $company_id);
+        $this->db->where('a.entry_date >=', $start_date);
+        $this->db->where('a.entry_date <=', $end_date);
+        $this->db->where('a.out_time <', '18:30:00');
+        $this->db->where('a.out_time IS NOT NULL');
+        $this->db->where('a.out_time !=', '');
+        $this->db->where('s.active', 1);
+        
+        if ($use_date_filter) {
+            // For date search, show all records with details
+            $this->db->order_by('a.out_time', 'ASC');
+            $early_going_list = $this->db->get()->result_array();
+            
+            // Group by staff for summary
+            $staff_summary = [];
+            foreach ($early_going_list as $record) {
+                $staff_id = (int)$record['staffid'];
+                if (!isset($staff_summary[$staff_id])) {
+                    $staff_summary[$staff_id] = [
+                        'staffid' => $staff_id,
+                        'firstname' => $record['firstname'],
+                        'lastname' => $record['lastname'],
+                        'employee_code' => $record['employee_code'],
+                        'full_name' => trim($record['firstname'] . ' ' . $record['lastname']),
+                        'early_count' => 0,
+                        'records' => []
+                    ];
+                }
+                $staff_summary[$staff_id]['early_count']++;
+                $staff_summary[$staff_id]['records'][] = [
+                    'entry_date' => $record['entry_date'],
+                    'out_time' => $record['out_time'],
+                    'attendance_id' => $record['attendance_id']
+                ];
+            }
+            
+            // Sort by count descending, then get top 10
+            usort($staff_summary, function($a, $b) {
+                return $b['early_count'] - $a['early_count'];
+            });
+            $top_10_early = array_slice($staff_summary, 0, 10);
+        } else {
+            // For month search, show top 10 summary
+            $this->db->group_by('a.staffid');
+            $this->db->order_by('early_count', 'DESC');
+            $this->db->limit(10);
+            $top_10_early = $this->db->get()->result_array();
+            
+            // Format the data
+            foreach ($top_10_early as &$employee) {
+                $employee['full_name'] = trim($employee['firstname'] . ' ' . $employee['lastname']);
+                $employee['early_count'] = (int)$employee['early_count'];
+                $employee['records'] = []; // Empty for month view
+            }
+        }
+
+        $data['top_10_early'] = $top_10_early;
+        $data['month'] = $month;
+        $data['date'] = $search_date;
+        $data['use_date_filter'] = $use_date_filter;
+        $data['month_display'] = $use_date_filter ? date('d M Y', strtotime($search_date)) : date('F Y', strtotime($start_date));
+        $data['title'] = 'List of Employee Early Going';
+        $this->load->view('admin/hrd/setting/list_of_employee_early_going', $data);
+    }
+
+    /* Employee Count Analysis */
+    public function employee_count_analysis()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Employee Count Analysis');
+        }
+
+        // Get date filter (default to today)
+        $search_date = $this->input->get('date');
+        if (!$search_date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $search_date)) {
+            $search_date = date('Y-m-d');
+        }
+
+        // Get all active companies
+        $this->db->select('company_id, companyname, active');
+        $this->db->from(db_prefix() . 'company_master');
+        $this->db->where('active', 1);
+		$this->db->where('company_id', get_staff_company_id());
+        $this->db->order_by('companyname', 'asc');
+        $companies = $this->db->get()->result_array();
+
+        $company_stats = [];
+        foreach ($companies as $company) {
+            $company_id = (int)$company['company_id'];
+            
+            // Get total active employees for this company
+            $this->db->where('company_id', $company_id);
+            $this->db->where('active', 1);
+            $total_employees = $this->db->count_all_results(db_prefix() . 'staff');
+            
+            // Get present employees (those with attendance on the selected date)
+            $this->db->select('COUNT(DISTINCT a.staffid) as present_count');
+            $this->db->from(db_prefix() . 'hrd_attendance a');
+            $this->db->join(db_prefix() . 'staff s', 's.staffid = a.staffid', 'inner');
+            $this->db->where('a.company_id', $company_id);
+            $this->db->where('a.entry_date', $search_date);
+            $this->db->where('s.active', 1);
+            // Consider present if they have in_time or out_time
+            $this->db->group_start();
+            $this->db->where('a.in_time IS NOT NULL');
+            $this->db->or_where('a.out_time IS NOT NULL');
+            $this->db->group_end();
+            $present_result = $this->db->get()->row();
+            $total_present = (int)($present_result->present_count ?? 0);
+            
+            // Calculate absent
+            $total_absent = $total_employees - $total_present;
+            
+            // Calculate attendance percentage
+            $attendance_percentage = $total_employees > 0 
+                ? round(($total_present / $total_employees) * 100, 2) 
+                : 0;
+            
+            $company_stats[] = [
+                'company_id' => $company_id,
+                'company_name' => $company['companyname'],
+                'total_employees' => $total_employees,
+                'total_present' => $total_present,
+                'total_absent' => $total_absent,
+                'attendance_percentage' => $attendance_percentage
+            ];
+        }
+
+        // Sort by attendance percentage descending
+        usort($company_stats, function($a, $b) {
+            return $b['attendance_percentage'] <=> $a['attendance_percentage'];
+        });
+
+        $data['company_stats'] = $company_stats;
+        $data['date'] = $search_date;
+        $data['date_display'] = date('d M Y', strtotime($search_date));
+        $data['title'] = 'Employee Count Analysis';
+        $this->load->view('admin/hrd/setting/employee_count_analysis', $data);
     }
 
     /* Holidays List - simple listing page */

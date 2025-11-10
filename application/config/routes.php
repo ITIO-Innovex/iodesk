@@ -233,9 +233,19 @@ $route['admin/designation/delete/(:num)'] = 'admin/designations/delete/$1';
 
 // HRD - Manage Attendance by Date
 $route['admin/hrd/manage_attendance_by_date'] = 'admin/hrd/manage_attendance_by_date';
+$route['admin/hrd/manage_attendance_master'] = 'admin/hrd/manage_attendance_master';
+$route['admin/hrd/manage_attendance_by_user'] = 'admin/hrd/manage_attendance_by_user';
 $route['admin/hrd/attendance_bulk_update_by_date'] = 'admin/hrd/attendance_bulk_update_by_date';
 $route['admin/hrd/attendance_update_inout_by_date'] = 'admin/hrd/attendance_update_inout_by_date';
+$route['admin/hrd/attendance_lock_by_date'] = 'admin/hrd/attendance_lock_by_date';
 $route['admin/hrd/setting/dashboard'] = 'admin/hrd/setting_dashboard';
+$route['admin/hrd/setting/self_service'] = 'admin/hrd/setting_self_service';
+$route['admin/hrd/setting/shift_wise_employee_count'] = 'admin/hrd/shift_wise_employee_count';
+$route['admin/hrd/setting/top_10_employee_having_late_mark'] = 'admin/hrd/top_10_employee_having_late_mark';
+$route['admin/hrd/setting/list_of_employee_early_going'] = 'admin/hrd/list_of_employee_early_going';
+$route['admin/hrd/setting/employee_count_analysis'] = 'admin/hrd/employee_count_analysis';
+$route['admin/hrd/setting/employee_attendance'] = 'admin/hrd/employee_attendance';
+$route['admin/hrd/setting/attendance_master'] = 'admin/hrd/attendance_master';
 $route['admin/hrd/setting/staff_type'] = 'admin/hrd/staff_type';
 $route['admin/hrd/stafftype'] = 'admin/hrd/stafftype';
 $route['admin/hrd/delete_staff_type/(:num)'] = 'admin/hrd/delete_staff_type/$1';
@@ -245,6 +255,7 @@ $route['admin/hrd/saturdayrule'] = 'admin/hrd/saturdayrule';
 $route['admin/hrd/delete_saturday_rule/(:num)'] = 'admin/hrd/delete_saturday_rule/$1';
 $route['admin/hrd/toggle_saturday_rule/(:num)'] = 'admin/hrd/toggle_saturday_rule/$1';
 $route['admin/hrd/setting/attendance_request'] = 'admin/hrd/attendance_request';
+$route['admin/hrd/attendance_request'] = 'admin/hrd/attendance_request';
 $route['admin/hrd/attendance_request_update'] = 'admin/hrd/attendance_request_update';
 $route['admin/hrd/attendance_update_request_add'] = 'admin/hrd/attendance_update_request_add';
 $route['admin/hrd/self_service'] = 'admin/hrd/self_service';

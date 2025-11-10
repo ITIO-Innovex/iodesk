@@ -604,8 +604,17 @@ class Hrd_model extends App_Model
             $this->db->select('s.*, b.*');
 			$this->db->from(db_prefix() . 'hrd_shift_manager s');
 			$this->db->join(db_prefix() . 'hrd_branch_manager b', 's.shift_id = b.shift');
+			
+			if(isset($id)&&$id){
+			$this->db->where('b.shift', $id);
+			}else{
 			$this->db->where('b.shift', get_branch_id());
+			}
+			$this->db->limit(1);
+						
 			$query = $this->db->get();
+
+
 			return $query->result_array();
         
     }
@@ -793,6 +802,10 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		}else{
 		
 		$attendance = $this->hrd_model->get_todays_attendance();
+		
+		$shift_details = $this->hrd_model->get_shift_details();
+		
+		
 		$attendance_id  = $attendance[0]['attendance_id'];
 		$in_time  = $attendance[0]['in_time'];
 		
@@ -801,12 +814,101 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
         $interval = $time1->diff($time2);
 		// Format interval as H:i:s
         $totalHours = $interval->format('%H:%I:%S');
+		$shift_details = $this->hrd_model->get_shift_details();
+		log_message('error', print_r($shift_details, true));
+		$outTime=date("H:i:s");
+		$inTimeObj = (!empty($in_time) && $in_time != '-') ? new DateTime($in_time) : null;
+        $outTimeObj = (!empty($outTime) && $outTime != '-') ? new DateTime($outTime) : null;
+		if(isset($shift_details)&&$shift_details){
+		$officeIn 			= $shift_details[0]['shift_in'];
+		log_message('error', 'Display data'.$officeIn );
+        $officeOut 			= $shift_details[0]['shift_out'];
+        $firstHalfIn 		= $shift_details[0]['first_half_start'];
+        $firstHalfOut 		= $shift_details[0]['first_half_end'];
+        $secondHalfIn 		= $shift_details[0]['second_half_start'];
+        $secondHalfOut 		= $shift_details[0]['second_half_end'];
+		$saturday_rule 		= $shift_details[0]['saturday_rule'];
+		$saturday_work_end  = $shift_details[0]['saturday_work_end'];
+		
+		$dayName = date('l'); // Get current day name, e.g., "Saturday"
+		if ($dayName == 'Saturday') {
+		$officeOut 	 = $saturday_work_end ;
+		}
+		
+		}
+		
+		
+		// ==============================================================
+        //  5. Regular Attendance Logic
+        // ==============================================================
+
+        if ($inTimeObj && $outTimeObj) {
+            // Convert time strings to DateTime objects for comparison
+            $officeInObj = new DateTime($officeIn);
+            $officeOutObj = new DateTime($officeOut);
+            $firstHalfInObj = new DateTime($firstHalfIn);
+            $firstHalfOutObj = new DateTime($firstHalfOut);
+            $secondHalfInObj = new DateTime($secondHalfIn);
+            $secondHalfOutObj = new DateTime($secondHalfOut);
+
+            $lateMark = ($inTimeObj > $officeInObj) ? 'Late Mark' : '';
+
+            // Check first half
+            $firstHalf = ($inTimeObj <= $firstHalfInObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
+
+            // Check second half
+            $secondHalf = ($inTimeObj <= $secondHalfInObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+
+            // Full day present
+			//echo $inTimeObj->format('H:i:s');  // prints time only
+			//echo $officeInObj->format('H:i:s');  // prints time only
+			//echo $outTimeObj->format('H:i:s');  // prints time only
+			//echo $officeOutObj->format('H:i:s');  // prints time only
+			//echo "@@@";
+            if ($inTimeObj <= $officeInObj && $outTimeObj >= $officeOutObj) {
+                $status = 1;
+				$substatus = 0;
+                $position = 1.00;
+                $remarks = $lateMark ?: 'On Time';
+            }
+            // Half day
+            elseif ($firstHalf || $secondHalf) {
+			    $lateMark="";
+				if($firstHalf){ 
+				$lateMark="First Half";
+				$status = 1;
+				$substatus = 8;
+				}else{ 
+				$lateMark="Second Half";
+				$status = 8;
+				$substatus = 1;
+				}
+                
+                $position = 0.50;
+                $remarks = $lateMark ?: '';
+            } else {
+                $status = 4;
+				$substatus = 0;
+                $position = 0;
+                $remarks = 'Insufficient Hours';
+            }
+        } else {
+            // If inTime is missing but outTime exists, or vice versa
+            $status = 4;
+			$substatus = 0;
+            $position = 0;
+            $remarks = 'Incomplete Attendance';
+        }
+		
 
 //echo $interval->format('%H hours %I minutes %S seconds');
 		
 		$update = [
 			'out_time' 			=> date("H:i:s"),
-			'total_hours' 			=> $totalHours,
+			'total_hours' 		=> $totalHours,
+			'first_half' 		=> $status,
+			'second_half' 		=> $substatus,
+			'position' 		=> $position,
         ];
 		
 		

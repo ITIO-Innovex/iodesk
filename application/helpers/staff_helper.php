@@ -915,3 +915,293 @@ function get_attendance_status($statusId)
 
 	return $row ? $row : "";
 }
+
+function getAttendanceStatus($staffId, $shiftID, $date, $staffType = null, $attendance_id=null) {
+//echo $staffId;
+//echo $inTime;
+//echo $outTime;
+//echo $date;
+//echo $staffType;
+//echo $shiftID;
+//echo $attendance_status;
+//echo $attendance_id;
+    if (!class_exists('hrd_model', false)) {
+        get_instance()->load->model('hrd_model');
+    }
+       // Get shift details	
+		$data['shift_details'] = get_instance()->hrd_model->get_shift_details($shiftID);
+		if(isset($attendance_id)&&$attendance_id){
+		$data['attendance_list'] = get_instance()->hrd_model->get_attendance($attendance_id);
+		//print_r($data['attendance_list']);
+		$date=$data['attendance_list']->entry_date;
+		$inTime=$data['attendance_list']->in_time;
+		$outTime=$data['attendance_list']->out_time;
+		$attendance_status=$data['attendance_list']->first_half;
+		$attendance_substatus=$data['attendance_list']->second_half;
+		}else{
+		$attendance_status=0;
+		$attendance_substatus=0;
+		}
+		
+        
+        $status = 4;
+		$substatus = 0;
+        $position = 0;
+        $remarks = "";
+
+        // Validate required staffId
+        if (empty($staffId)) {
+            return [
+                'status' => 'Invalid',
+				'substatus' => 0,
+                'position' => 0.00,
+                'remarks' => 'Staff ID missing'
+            ];
+        }
+
+        // Validate shift details
+        if (empty($data['shift_details']) || !isset($data['shift_details'][0])) {
+            return [
+                'status' => 'Invalid',
+				'substatus' => 0,
+                'position' => 0.00,
+                'remarks' => 'Shift details not found'
+            ];
+        }
+
+        // Default date
+        if (empty($date)) $date = date('Y-m-d');
+        $dayName = date('l', strtotime($date));
+
+        // Convert times to DateTime
+       // $inTimeObj = !empty($inTime) ? new DateTime($inTime) : null;
+        //$outTimeObj = !empty($outTime) ? new DateTime($outTime) : null;
+		$inTimeObj = (!empty($inTime) && $inTime != '-') ? new DateTime($inTime) : null;
+        $outTimeObj = (!empty($outTime) && $outTime != '-') ? new DateTime($outTime) : null;
+
+
+
+        // Default working hours
+        $officeIn = $data['shift_details'][0]['shift_in'];
+        $officeOut = $data['shift_details'][0]['shift_out'];
+        $firstHalfIn = $data['shift_details'][0]['first_half_start'];
+        $firstHalfOut = $data['shift_details'][0]['first_half_end'];
+        $secondHalfIn = $data['shift_details'][0]['second_half_start'];
+        $secondHalfOut = $data['shift_details'][0]['second_half_end'];
+		$saturday_rule = $data['shift_details'][0]['saturday_rule'];
+		$saturday_work_end = $data['shift_details'][0]['saturday_work_end'];
+		
+		//echo $attendance_status;
+		//echo $attendance_substatus;
+		if (isset($attendance_status)&& $attendance_status==8 && $attendance_substatus==0 ) {
+            return [
+                'status' => $attendance_status,
+				'substatus' => 0,
+                'position' => 0,
+                'remarks' => 'Absent Without Pay'
+            ];
+        }
+		
+		if (isset($attendance_status)&& $attendance_status==1 && $attendance_substatus==8 ) {
+            return [
+                'status' => $attendance_status,
+				'substatus' => 8,
+                'position' => 0.5,
+                'remarks' => 'Absent Without Pay'
+            ];
+        }
+		
+		
+		if (isset($attendance_status)&& ($attendance_status==1 || $attendance_status==2 || $attendance_status==3|| $attendance_status==7)) {
+            return [
+                'status' => $attendance_status,
+				'substatus' => 0,
+                'position' => 1.00,
+                'remarks' => 'Present'
+            ];
+        }
+		
+		
+		
+
+        // ==============================================================
+        // 1. Check if date is in holidays
+        // ==============================================================
+
+        if (isHoliday($date)) {
+            return [
+                'status' => 7,
+				'substatus' => 0,
+                'position' => 1.00,
+                'remarks' => 'Holiday'
+            ];
+        }
+
+        // ==============================================================
+        //  2. Check if Sunday
+        // ==============================================================
+
+        if ($dayName == 'Sunday') {
+            return [
+                'status' => 2,
+				'substatus' => 0,
+                'position' => 1.00,
+                'remarks' => 'Sunday (Weekly Off)'
+            ];
+        }
+
+        // ==============================================================
+        //  3. Check if Saturday
+        // ==============================================================
+
+        if ($dayName == 'Saturday') {
+            $saturdayRule = $saturday_rule;
+            $weekOfMonth = ceil(date('j', strtotime($date)) / 7);
+			
+			
+			// Working Saturday
+            $saturdayOutTime = new DateTime($saturday_work_end);
+			//echo $inTimeObj->format('H:i:s');  // prints time only//
+            $officeInObj = new DateTime($officeIn);
+            if ($inTimeObj && $outTimeObj && $inTimeObj <= $officeInObj && $outTimeObj >= $saturdayOutTime) {
+                return ['status' => 1,'substatus' => 0, 'position' => 1.00, 'remarks' => 'Saturday Present'];
+            }
+			//echo $staffType;
+			if (in_array($staffType, [2, 3, 4]) && in_array($weekOfMonth, [1, 3])) { // HRD, INTERN, Notice Period EMP
+                return ['status' => 4, 'substatus' => 0, 'position' => 0.00, 'remarks' => 'Working for HRD'];
+            }
+
+            if ($saturdayRule == 1) { //All Saturday Off
+                return ['status' => 2, 'substatus' => 0, 'position' => 1.00, 'remarks' => 'Saturday Off (All Off)'];
+            }
+
+            if ($saturdayRule == 2 && $weekOfMonth != 5) { //Only 5th Saturday Working
+                return ['status' => 2, 'substatus' => 0, 'position' => 1.00, 'remarks' => 'Saturday Off (Only 5th Working)'];
+            }
+
+            if ($saturdayRule == 4 && in_array($weekOfMonth, [2, 4])) { //2nd And 4th Saturday off
+                return ['status' => 2, 'substatus' => 0, 'position' => 1.00, 'remarks' => 'Saturday Off (2nd/4th)'];
+            }
+
+            if ($saturdayRule == 5 && in_array($weekOfMonth, [1, 3])) { //1st And 3rd Saturday off
+                return ['status' => 2, 'substatus' => 0, 'position' => 1.00, 'remarks' => 'Saturday Off (1st/3rd)'];
+            }
+
+            
+
+            
+        }
+
+        // ==============================================================
+        //  4. If OutTime missing - Absent (only for working days)
+        // ==============================================================
+		
+		 if (empty($inTime) || $inTime == '-') {
+            return [
+                'status' => 4,
+				'substatus' => 0,
+                'position' => 0,
+                'remarks' => 'No In Time'
+            ];
+        }
+
+        if (empty($outTime) || $outTime == '-') {
+            return [
+                'status' => 4,
+				'substatus' => 0,
+                'position' => 0,
+                'remarks' => 'No Out Time'
+            ];
+        }
+
+        // ==============================================================
+        //  5. Regular Attendance Logic
+        // ==============================================================
+
+        if ($inTimeObj && $outTimeObj) {
+            // Convert time strings to DateTime objects for comparison
+            $officeInObj = new DateTime($officeIn);
+            $officeOutObj = new DateTime($officeOut);
+            $firstHalfInObj = new DateTime($firstHalfIn);
+            $firstHalfOutObj = new DateTime($firstHalfOut);
+            $secondHalfInObj = new DateTime($secondHalfIn);
+            $secondHalfOutObj = new DateTime($secondHalfOut);
+
+            $lateMark = ($inTimeObj > $officeInObj) ? 'Late Mark' : '';
+
+            // Check first half
+            $firstHalf = ($inTimeObj <= $firstHalfInObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
+
+            // Check second half
+            $secondHalf = ($inTimeObj <= $secondHalfInObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+
+            // Full day present
+			//echo $inTimeObj->format('H:i:s');  // prints time only
+			//echo $officeInObj->format('H:i:s');  // prints time only
+			//echo $outTimeObj->format('H:i:s');  // prints time only
+			//echo $officeOutObj->format('H:i:s');  // prints time only
+			//echo "@@@";
+            if ($inTimeObj <= $officeInObj && $outTimeObj >= $officeOutObj) {
+                $status = 1;
+				$substatus = 0;
+                $position = 1.00;
+                $remarks = $lateMark ?: 'On Time';
+            }
+            // Half day
+            elseif ($firstHalf || $secondHalf) {
+			    $lateMark="";
+				if($firstHalf){ 
+				$lateMark="First Half";
+				$status = 1;
+				$substatus = 8;
+				}else{ 
+				$lateMark="Second Half";
+				$status = 8;
+				$substatus = 1;
+				}
+                
+                $position = 0.50;
+                $remarks = $lateMark ?: '';
+            } else {
+                $status = 4;
+				$substatus = 0;
+                $position = 0;
+                $remarks = 'Insufficient Hours';
+            }
+        } else {
+            // If inTime is missing but outTime exists, or vice versa
+            $status = 4;
+			$substatus = 0;
+            $position = 0;
+            $remarks = 'Incomplete Attendance';
+        }
+
+        return [
+            'status' => $status,
+			'substatus' => $substatus,
+            'position' => $position,
+            'remarks' => $remarks
+        ];
+    }
+
+  
+
+    /**
+     *  Holiday Check Function
+     */
+    function isHoliday($date) {
+        // You can replace this with a DB query
+        // Example: SELECT * FROM holidays WHERE date = '$date'
+       $CI = & get_instance();
+	    // Fetch all active holidays (status = 1)
+       $query = $CI->db->select('holiday_date')
+                    ->from('it_crm_hrd_holiday_list')
+                    ->where('status', 1)
+                    ->get();
+
+        // Create an array of holiday dates
+        $holidays = array_column($query->result_array(), 'holiday_date');
+	
+
+        return in_array($date, $holidays);
+    }

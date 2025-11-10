@@ -2,7 +2,16 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
-    <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"><i class="fa-solid fa-calendar-days menu-icon tw-mr-2"></i> Attendance Request</h4>
+    <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
+      <i class="fa-solid fa-calendar-days menu-icon tw-mr-2"></i> 
+      Attendance Request
+      <span class="pull-right">
+        <?php echo e(trim($staff->firstname . ' ' . $staff->lastname)); ?>
+        <?php if (isset($staff->employee_code) && $staff->employee_code) { ?>
+          <small class="text-muted">[<?php echo e($staff->employee_code); ?>]</small>
+        <?php } ?>
+      </span>
+    </h4>
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">
@@ -10,13 +19,10 @@
             <?php if (count($requests) > 0) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
-                <th>Staff</th>
-                <th>Employee Code</th>
                 <th>Date</th>
                 <th>Requested In Time</th>
                 <th>Requested Out Time</th>
                 <th>Remarks</th>
-                <th>Status</th>
                 <th>Update Remark</th>
                 <th>Added On</th>
                 <th>Updated On</th>
@@ -25,29 +31,18 @@
               <tbody>
                 <?php foreach ($requests as $req) { ?>
                 <tr>
-                  <td><?php echo e(($req['firstname'] ?? '') . ' ' . ($req['lastname'] ?? '')); ?></td>
-                  <td><?php echo e($req['employee_code'] ?? ''); ?></td>
                   <td><?php echo e($req['entry_date'] ?? ''); ?></td>
                   <td><?php echo e($req['in_time'] ?? '-'); ?></td>
                   <td><?php echo e($req['out_time'] ?? '-'); ?></td>
                   <td><?php echo e($req['remarks'] ?? '-'); ?></td>
-                  <td>
-                    <?php 
-                      $status = (int)($req['status'] ?? 1);
-                      if ($status == 2) {
-                        echo '<span class="label label-success">Approved</span>';
-                      } elseif ($status == 0) {
-                        echo '<span class="label label-danger">Rejected</span>';
-                      } else {
-                        echo '<span class="label label-warning">Pending</span>';
-                      }
-                    ?>
-                  </td>
                   <td><?php echo e($req['update_remark'] ?? '-'); ?></td>
                   <td><?php echo e($req['addedon'] ?? ''); ?></td>
                   <td><?php echo e($req['updatedon'] ?? '-'); ?></td>
                   <td>
-                    <?php if ($status == 1) { // Only show action for pending requests ?>
+                    <?php 
+                      $status = (int)($req['status'] ?? 1);
+                      if ($status == 1) { // Only show action for pending requests
+                    ?>
                     <a href="#"
                        onclick="edit_attendance_request(this,<?php echo e($req['id']); ?>);return false;"
                        data-id="<?php echo e($req['id']); ?>"
@@ -57,6 +52,10 @@
                        data-out_time="<?php echo e($req['out_time'] ?? ''); ?>"
                        data-remarks="<?php echo e($req['remarks'] ?? ''); ?>"
                        class="btn btn-default btn-sm">Update</a>
+                    <?php } else { ?>
+                      <span class="label label-<?php echo $status == 2 ? 'success' : 'danger'; ?>">
+                        <?php echo $status == 2 ? 'Approved' : 'Rejected'; ?>
+                      </span>
                     <?php } ?>
                   </td>
                 </tr>
@@ -64,7 +63,10 @@
               </tbody>
             </table>
             <?php } else { ?>
-              <p class="no-margin">No attendance requests found.</p>
+              <div class="alert alert-info">
+                <i class="fa-solid fa-info-circle"></i> 
+                No pending attendance requests found for this staff.
+              </div>
             <?php } ?>
           </div>
         </div>
@@ -179,5 +181,4 @@ function manage_attendance_request(form) {
 }
 </script>
 </body></html>
-
 
