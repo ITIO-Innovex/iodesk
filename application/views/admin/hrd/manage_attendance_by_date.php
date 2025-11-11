@@ -1,5 +1,19 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+.locked-row {
+  background-color: #f0f0f0 !important;
+  opacity: 0.7;
+}
+.locked-row td {
+  color: #999;
+}
+.locked-row input,
+.locked-row select {
+  background-color: #e9ecef !important;
+  cursor: not-allowed;
+}
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -127,16 +141,18 @@
                     <td><?php echo e($att['position'] ?? ''); ?></td>
 					<td><?php echo e($att['total_hours'] ?? ''); ?></td>
 					<td><?php echo e($att['late_mark'] ?? ''); ?></td>
-                    <td>
-   <?php /*?><a class="btn btn-default btn-sm open-update" 
-   data-staffid="<?php echo (int)$sid; ?>"
-   data-date="<?php echo e($date); ?>"
-   data-in_time="<?php echo isset($att['in_time']) ? date('H:i', strtotime($att['in_time'])) : '';?>"
-   data-out_time="<?php echo isset($att['out_time']) ? date('H:i', strtotime($att['out_time'])) : '';?>"
-   data-first_half="<?php echo isset($att['first_half']) ? (string)$att['first_half'] : '';?>"
-   data-second_half="<?php isset($att['second_half']) ? (string)$att['second_half'] : '';?>"
-   data-staff_name="<?php echo  e(($s['firstname']??'') . ' ' . ($s['lastname']??''));?>"><i class="fa-solid fa-pen-to-square" title="Edit"></i></a><?php */?>
-                    </td>
+                    <?php /*?><td>
+                      <a class="btn btn-default btn-sm open-update" 
+                         data-staffid="<?php echo (int)$sid; ?>"
+                         data-date="<?php echo e($date); ?>"
+                         data-in_time="<?php echo isset($att['in_time']) ? date('H:i', strtotime($att['in_time'])) : '';?>"
+                         data-out_time="<?php echo isset($att['out_time']) ? date('H:i', strtotime($att['out_time'])) : '';?>"
+                         data-first_half="<?php echo isset($att['first_half']) ? (string)$att['first_half'] : '';?>"
+                         data-second_half="<?php echo isset($att['second_half']) ? (string)$att['second_half'] : '';?>"
+                         data-staff_name="<?php echo e(($s['firstname']??'') . ' ' . ($s['lastname']??''));?>">
+                        <i class="fa-solid fa-pen-to-square" title="Edit"></i>
+                      </a>
+                    </td><?php */?>
                   </tr>
                 <?php } } ?>
               </tbody>
@@ -222,40 +238,31 @@
 
 
 <?php init_tail(); ?>
-<style>
-.locked-row {
-  background-color: #f0f0f0 !important;
-  opacity: 0.7;
-}
-.locked-row td {
-  color: #999;
-}
-.locked-row input,
-.locked-row select {
-  background-color: #e9ecef !important;
-  cursor: not-allowed;
-}
-</style>
 <script>
- $(document).on('click', '.open-update', function(){
-  
-  let data = $(this).data();
-  openUpdateModal(data.staffid, data.date, data);
-  return false;
-  });
-</script>
-<script>
-$(document).ready(function(){
-  // Select all checkbox (skip locked rows)
-  var selAll = document.getElementById('select-all');
-  if(selAll){ 
-    selAll.addEventListener('change', function(){
-      var checked = this.checked;
-      document.querySelectorAll('.row-check:not(:disabled)').forEach(function(cb){ 
-        cb.checked = checked; 
-      });
+jQuery(document).ready(function($){
+  try {
+    // Open update modal
+    $(document).on('click', '.open-update', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var data = $(this).data();
+      if (typeof openUpdateModal === 'function') {
+        openUpdateModal(data.staffid, data.date, data);
+      }
+      return false;
     });
-  }
+    
+    // Select all checkbox (skip locked rows)
+    var selAll = document.getElementById('select-all');
+    if(selAll){ 
+      selAll.addEventListener('change', function(){
+        var checked = this.checked;
+        var checkboxes = document.querySelectorAll('.row-check:not(:disabled)');
+        for(var i = 0; i < checkboxes.length; i++) {
+          checkboxes[i].checked = checked;
+        }
+      });
+    }
 
   // Bulk apply button
   var applyBtn = document.getElementById('apply-bulk');
@@ -268,7 +275,8 @@ $(document).ready(function(){
       var staffData = [];
       var missingFirstHalf = [];
       
-      checkedRows.forEach(function(checkbox){
+      for(var i = 0; i < checkedRows.length; i++) {
+        var checkbox = checkedRows[i];
         var staffid = checkbox.value;
         var $row = $(checkbox).closest('tr');
         var inTime = $row.find('input.in-time[data-staffid="'+staffid+'"]').val();
@@ -289,7 +297,7 @@ $(document).ready(function(){
           first_half: fh || '',
           second_half: sh || ''
         });
-      });
+      }
       
       // Show error if any checked row is missing First Half
       if (missingFirstHalf.length > 0) {
@@ -325,7 +333,8 @@ $(document).ready(function(){
       var date = '<?php echo e($date); ?>';
       var attendanceIds = [];
       
-      checkedRows.forEach(function(checkbox){
+      for(var i = 0; i < checkedRows.length; i++) {
+        var checkbox = checkedRows[i];
         var staffid = checkbox.value;
         var $row = $(checkbox).closest('tr');
         var attendanceId = $row.data('attendance-id');
@@ -337,7 +346,7 @@ $(document).ready(function(){
           var staffName = $row.find('td').eq(1).text().trim();
           console.warn('No attendance record found for ' + staffName);
         }
-      });
+      }
       
       if(attendanceIds.length === 0) {
         alert('No attendance records found to lock. Please save attendance data first.');
@@ -462,8 +471,8 @@ $(document).ready(function(){
       }
     }, 'json');
   });
+  } catch(e) {
+    console.error('Error in attendance page scripts:', e);
+  }
 });
 </script>
-</body></html>
-
-
