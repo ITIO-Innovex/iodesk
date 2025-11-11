@@ -4126,6 +4126,90 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/uploaded_document_by_user', $data);
     }
 
+    /* Top 10 Leave Takers */
+    public function top_10_leave_takers()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Top 10 Leave Takers');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Get month filter (format: YYYY-MM)
+        $month = $this->input->get('month');
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = date('Y-m');
+        }
+
+        // Calculate start and end dates for the month
+        $start_date = $month . '-01';
+        $end_date = date('Y-m-t', strtotime($start_date));
+
+        // Get all leave applications for the month
+        // A leave is counted if its from_date or to_date falls within the month, or if it spans the month
+        $this->db->select('lm.*, s.firstname, s.lastname, s.employee_code');
+        $this->db->from(db_prefix() . 'hrd_leave_master lm');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = lm.staffid', 'left');
+        $this->db->where('s.company_id', $company_id);
+        $this->db->where('s.active', 1);
+        // Leave overlaps with the month if:
+        // - from_date <= end_date AND to_date >= start_date
+        $this->db->where('lm.from_date <=', $end_date);
+        $this->db->where('lm.to_date >=', $start_date);
+        $this->db->order_by('lm.from_date', 'desc');
+        $all_leaves = $this->db->get()->result_array();
+		
+		
+		//echo $this->db->last_query();exit;
+
+        // Group leaves by staff
+        $leaves_by_staff = [];
+        foreach ($all_leaves as $leave) {
+            $staffid = (int)$leave['staffid'];
+            if ($staffid > 0) {
+                if (!isset($leaves_by_staff[$staffid])) {
+                    $leaves_by_staff[$staffid] = [
+                        'staffid' => $staffid,
+                        'firstname' => $leave['firstname'] ?? '',
+                        'lastname' => $leave['lastname'] ?? '',
+                        'employee_code' => $leave['employee_code'] ?? '',
+                        'leaves' => []
+                    ];
+                }
+                $leaves_by_staff[$staffid]['leaves'][] = $leave;
+            }
+        }
+
+        // Calculate leave counts and prepare data
+        $top_leave_takers = [];
+        foreach ($leaves_by_staff as $staffid => $data) {
+            $top_leave_takers[] = [
+                'staffid' => $staffid,
+                'full_name' => trim($data['firstname'] . ' ' . $data['lastname']),
+                'employee_code' => $data['employee_code'],
+                'total_leaves' => count($data['leaves']),
+                'leaves' => $data['leaves']
+            ];
+        }
+
+        // Sort by total leaves descending
+        usort($top_leave_takers, function($a, $b) {
+            return $b['total_leaves'] <=> $a['total_leaves'];
+        });
+
+        // Get top 10
+        $top_10 = array_slice($top_leave_takers, 0, 10);
+
+        $data['top_10'] = $top_10;
+        $data['month'] = $month;
+        $data['title'] = 'Top 10 Leave Takers';
+        $this->load->view('admin/hrd/setting/top_10_leave_takers', $data);
+    }
+
     /* HRD Profile */
     public function profile()
     {
