@@ -129,6 +129,31 @@ class Staff extends AdminController
         $data['user_notes']    = $this->misc_model->get_notes($id, 'staff');
         $data['departments']   = $this->departments_model->get();
 		$data['designation']   = $this->staff_model->get_designation();
+        // Load branches and staff types for additional fields
+        $this->load->model('hrd_model');
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['branches'] = $this->hrd_model->get_branch_manager();
+
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+        $this->db->where('status', 1);
+        $data['staff_types'] = $this->hrd_model->get_staff_type();
         $data['title']         = $title;
 
         $this->load->view('admin/staff/member', $data);
