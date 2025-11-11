@@ -242,6 +242,7 @@ $route['admin/hrd/setting/dashboard'] = 'admin/hrd/setting_dashboard';
 $route['admin/hrd/setting/self_service'] = 'admin/hrd/setting_self_service';
 $route['admin/hrd/setting/shift_wise_employee_count'] = 'admin/hrd/shift_wise_employee_count';
 $route['admin/hrd/setting/top_10_employee_having_late_mark'] = 'admin/hrd/top_10_employee_having_late_mark';
+$route['admin/hrd/setting/top_10_leave_takers'] = 'admin/hrd/top_10_leave_takers';
 $route['admin/hrd/setting/list_of_employee_early_going'] = 'admin/hrd/list_of_employee_early_going';
 $route['admin/hrd/setting/employee_count_analysis'] = 'admin/hrd/employee_count_analysis';
 $route['admin/hrd/setting/employee_attendance'] = 'admin/hrd/employee_attendance';
