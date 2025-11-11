@@ -308,7 +308,7 @@ $inTime="00.00";$outTime="00.00";
                       $sumTotStr = $fmtHms($sumTotSecs);
                       $sumLateStr = $fmtHms($sumLateSecs);
                       ?>
-					  <tr>
+					  <?php /*?><tr>
                         <td>&nbsp;</th>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
@@ -318,7 +318,7 @@ $inTime="00.00";$outTime="00.00";
                         <td title="Portion"><?php echo number_format($sumPortion, 2); ?></td>
 							<td title="Tot. Hrs."><?php echo $sumTotStr; ?></td>
                         <td title="LateMark"><?php echo $sumLateStr; ?></td>
-                      </tr>
+                      </tr><?php */?>
                     </tbody>
 					
                   </table>

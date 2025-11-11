@@ -118,12 +118,19 @@
 				  
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/todays_thought');?>" class="btn btn-warning mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('todays_thought');?></a> 
 		  </div>
+<?php if(is_department_admin() || is_admin()){?>
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/events_announcements');?>" class="btn btn-warning mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('events_announcements');?></a> 
 		  </div>
+<?php } ?>		  
+<?php if(is_department_admin() || is_admin()){?>
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/company_policies');?>" class="btn btn-warning mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('company_policies');?></a> 
 		  </div>
+<?php } ?>		  
+<?php if(is_department_admin() || is_admin()){?>
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/corporate_guidelines');?>" class="btn btn-warning mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('corporate_guidelines');?></a> 
 		  </div>
+<?php } ?>		  
+		  
 <div class="col-sm-3 tw-my-2"> <a target="_blank" href="<?php echo admin_url('hrd/setting/holiday_list');?>" class="btn btn-warning mbot15 tw-w-full tw-inline-flex tw-items-center"><i class="fa-solid fa-circle-check tw-mx-2"></i><?php echo _l('holiday_list');?></a> 
 		  </div>	
                   </div>

@@ -33,9 +33,9 @@
                 <thead>
                   <tr>
                     <th>Month Year</th>
-                    <th>PL</th>
-                    <th>WL</th>
-                    <th>AD</th>
+                    <th title="Paid Leave">PL</th>
+                    <th title="Balance Leave">BL</th>
+                    <th title="Adjustment Leave">AD</th>
                     <th>Total Balance PL</th>
                     <th>Total Balance WL</th>
                     <th>Total (PL + WL)</th>

@@ -391,7 +391,7 @@ function app_init_admin_sidebar_menu_items()
 	  if (staff_can('view_own',  'hr_department')){
         $CI->app_menu->add_sidebar_children_item('hr_department', [
             'slug'     => 'leave_application',
-            'name'     => _l('Leave Application'),
+            'name'     => _l('leave_application'),
             'href'     => admin_url('hrd/leave_application'),
             'position' => 10,
             'badge'    => [],
