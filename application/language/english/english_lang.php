@@ -1,5 +1,29 @@
 <?php
 
+// Custom additions for missing language lines
+$lang['Add New Project']        = 'Add New Project';
+$lang['Owner']                  = 'Owner';
+$lang['Project Group']          = 'Project Group';
+$lang['Start Date']             = 'Start Date';
+$lang['End Date']               = 'End Date';
+$lang['Enter a tag name']       = 'Enter a tag name';
+$lang['New Task']               = 'New Task';
+$lang['Add New Task']           = 'Add New Task';
+$lang['Task Name']              = 'Task Name';
+$lang['Priority']               = 'Priority';
+$lang['Attachments']            = 'Attachments';
+$lang['New Project Group']      = 'New Project Group';
+$lang['Add New Project Group']  = 'Add New Project Group';
+$lang['Group Color']            = 'Group Color';
+$lang['New Leave Application']  = 'New Leave Application';
+$lang['Leave Rule']             = 'Leave Rule';
+$lang['New Interview']          = 'New Interview';
+$lang['Add Interview']          = 'Add Interview';
+$lang['ID']                     = 'ID';
+$lang['Image']                  = 'Image';
+$lang['Title']                  = 'Title';
+$lang['Description']            = 'Description';
+$lang['Rate']                   = 'Rate';
 # Version 1.0.0
 #
 # General
