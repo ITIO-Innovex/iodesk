@@ -57,9 +57,9 @@
                   <button type="button" class="btn btn-primary" id="apply-bulk">Apply to Selected & Locked In</button>
                   <?php /*?><button type="button" class="btn btn-success" id="lock-in-btn">Locked In</button><?php */?>
 				  
-				  <?php if(is_department_admin() || is_admin()){?>
+				  <?php //if(is_department_admin() || is_admin()){?>
                   <button type="button" class="btn btn-warning" id="lock-out-btn">Locked Out</button>
-				  <?php } ?>
+				  <?php //} ?>
                 </div>
               </div>
             </div>
