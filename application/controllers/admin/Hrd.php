@@ -4064,6 +4064,68 @@ class Hrd extends AdminController
         echo json_encode(['success' => true]);
     }
 
+    /* Uploaded Document by User */
+    public function uploaded_document_by_user()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Uploaded Document by User');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Get all documents with staff information
+        $this->db->select('d.*, s.staffid, s.firstname, s.lastname, s.employee_code');
+        $this->db->from(db_prefix() . 'hrd_documents d');
+        $this->db->join(db_prefix() . 'staff s', 's.staffid = d.staff', 'left');
+        $this->db->where('s.company_id', $company_id);
+        $this->db->where('s.active', 1);
+        $this->db->order_by('d.addedon', 'desc');
+        $all_docs = $this->db->get()->result_array();
+
+        // Group documents by staff
+        $docs_by_staff = [];
+        foreach ($all_docs as $doc) {
+            $staffid = (int)$doc['staff'];
+            if ($staffid > 0) {
+                if (!isset($docs_by_staff[$staffid])) {
+                    $docs_by_staff[$staffid] = [
+                        'staffid' => $staffid,
+                        'firstname' => $doc['firstname'] ?? '',
+                        'lastname' => $doc['lastname'] ?? '',
+                        'employee_code' => $doc['employee_code'] ?? '',
+                        'documents' => []
+                    ];
+                }
+                $docs_by_staff[$staffid]['documents'][] = $doc;
+            }
+        }
+
+        // Calculate file counts and prepare data
+        $user_list = [];
+        foreach ($docs_by_staff as $staffid => $data) {
+            $user_list[] = [
+                'staffid' => $staffid,
+                'full_name' => trim($data['firstname'] . ' ' . $data['lastname']),
+                'employee_code' => $data['employee_code'],
+                'file_count' => count($data['documents']),
+                'documents' => $data['documents']
+            ];
+        }
+
+        // Sort by file count descending
+        usort($user_list, function($a, $b) {
+            return $b['file_count'] <=> $a['file_count'];
+        });
+
+        $data['user_list'] = $user_list;
+        $data['title'] = 'Uploaded Document by User';
+        $this->load->view('admin/hrd/uploaded_document_by_user', $data);
+    }
+
     /* HRD Profile */
     public function profile()
     {
