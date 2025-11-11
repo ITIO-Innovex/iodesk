@@ -266,6 +266,7 @@ $route['admin/hrd/leave_balance'] = 'admin/hrd/leave_balance';
 $route['admin/hrd/setting/leave_balance'] = 'admin/hrd/setting_leave_balance';
 $route['admin/hrd/setting/leave_balance_add'] = 'admin/hrd/setting_leave_balance_add';
 $route['admin/hrd/uploaded_document'] = 'admin/hrd/uploaded_document';
+$route['admin/hrd/uploaded_document_by_user'] = 'admin/hrd/uploaded_document_by_user';
 $route['admin/hrd/document_update_status'] = 'admin/hrd/document_update_status';
 $route['admin/hrd/profile'] = 'admin/hrd/profile';
 $route['admin/hrd/profile_update_personal'] = 'admin/hrd/profile_update_personal';
