@@ -113,10 +113,10 @@
                           <span class="text-muted">-</span>
                         <?php } ?>
                       </td>
-                      <td><?php echo date('d M Y', strtotime($record['entry_date'])); ?></td>
+                      <td><?php echo !empty($record['entry_date']) ? date('d M Y', strtotime($record['entry_date'])) : '-'; ?></td>
                       <td>
                         <span class="label label-danger" style="font-size: 13px;">
-                          <?php echo date('H:i:s', strtotime($record['out_time'])); ?>
+                          <?php echo !empty($record['out_time']) ? date('H:i:s', strtotime($record['out_time'])) : '-'; ?>
                         </span>
                       </td>
                       <td>
