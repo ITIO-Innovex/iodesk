@@ -4198,4 +4198,5 @@ $lang['New Leave Rule'] = 'New Leave Rule';
 $lang['Add New Leave Rule'] = 'Add New Leave Rule';
 $lang['Add New Leave Type'] = 'Add New Leave Type';
 $lang['Add New Interview Source'] = 'Add New Interview Source';
+$lang['Download Email From Cron'] = 'Download Email From Cron';
 ?>

@@ -1,9 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 use Webklex\PHPIMAP\ClientManager;
+//use Webklex\PHPIMAP\ClientManager;
+use Webklex\PHPIMAP\Exceptions\ImapServerErrorException;
+use Webklex\PHPIMAP\Exceptions\ResponseException;
+use Webklex\PHPIMAP\Exceptions\GetMessagesFailedException;
 use Webklex\PHPIMAP\Client;
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
+
+
 
 require_once APPPATH.'/vendor/vendor/autoload.php';
 
@@ -529,7 +537,7 @@ $client->disconnect();
        //echo "ERROR 103";exit;
         //return $this->db->get(db_prefix().'webmail_setup')->result_array();
       }
-public function downloadmail($id)
+public function downloadmailbbbbb($id)
 {
     if (!isset($id) || !$id) {
         return "Invalid Mailbox ID!";
@@ -547,7 +555,7 @@ public function downloadmail($id)
     $encryption       = trim($mailers[0]['encryption']);
     $data['email']    = $mailer_username;
 
-    try {
+    /*try {
         $cm = new ClientManager();
         $client = $cm->make([
             'host'          => $mailer_imap_host,
@@ -659,6 +667,262 @@ public function downloadmail($id)
         }
     } catch (Exception $e) {
         return "Error: " . $e->getMessage();
+    }*/
+	try {
+    $cm = new ClientManager();
+    $client = $cm->make([
+        'host'          => $mailer_imap_host,
+        'port'          => $mailer_imap_port,
+        'encryption'    => $encryption,
+        'validate_cert' => true,
+        'username'      => $mailer_username,
+        'password'      => $mailer_password,
+        'protocol'      => 'imap',
+        'timeout'       => 300
+    ]);
+
+    if (!$client->connect()) {
+        throw new Exception("IMAP Connection failed");
+    }
+
+    $cnt = 0;
+    $folders = $client->getFolders();
+
+    foreach ($folders as $folder) {
+        try {
+            // Skip system folders
+            if (in_array(strtolower($folder->name), ['spam', 'junk', 'trash'])) {
+                continue;
+            }
+
+            $data['folder'] = $folder->name;
+            $last_email_id  = $this->webmail_model->lastemailid($mailer_username, $folder->name);
+            $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
+
+            // Get only 10 recent messages after last UID
+            $messages = $folder->messages()
+                ->since(now()->subDays(7)) // fetch recent only
+                ->limit(10)
+                ->get();
+
+            if ($messages->count() == 0) continue;
+
+            // Filter only new
+            $messages = $messages->filter(function ($m) use ($last_email_id) {
+                return $m->getUid() > $last_email_id;
+            });
+
+            foreach ($messages as $message) {
+                $data = [
+                    'folder'       => $folder->name,
+                    'subject'      => $message->getSubject(),
+                    'date'         => $message->getDate(),
+                    'body'         => $message->getHtmlBody() ?? $message->getTextBody() ?? '',
+                    'uniqid'       => $message->uid,
+                    'messageid'    => $message->getMessageId(),
+                    'from_email'   => $message->getFrom()[0]->mail ?? '',
+                    'from_name'    => $message->getFrom()[0]->personal ?? '',
+                    'to_emails'    => $message->getTo()[0]->mail ?? '',
+                    'cc_emails'    => $message->getCc()[0]->mail ?? '',
+                    'bcc_emails'   => $message->getBcc()[0]->mail ?? '',
+                    'isattachments'=> 0,
+                    'attachments'  => ''
+                ];
+
+                // Save attachments
+                $attachments_paths = [];
+                foreach ($message->getAttachments() as $attachment) {
+                    $uid = uniqid();
+                    $dir = FCPATH . 'uploads/email_attachments/' . $uid;
+                    if (!is_dir($dir)) mkdir($dir, 0777, true);
+                    $attachment->save($dir);
+                    $attachments_paths[] = $dir . '/' . $attachment->name;
+                    $data['isattachments'] = 1;
+                }
+
+                $data['attachments'] = implode(',', $attachments_paths);
+
+                // Insert safely
+                $this->db->insert(db_prefix() . 'emails', $data);
+                $cnt++;
+
+                unset($message); // free memory
+            }
+        } catch (\Webklex\PHPIMAP\Exceptions\ResponseException $e) {
+            log_message('error', "IMAP Folder Error [{$folder->name}]: " . $e->getMessage());
+            continue;
+        } catch (Exception $e) {
+            log_message('error', "Folder skipped [{$folder->name}]: " . $e->getMessage());
+            continue;
+        }
+    }
+
+    $client->disconnect();
+    return "Total emails downloaded: $cnt";
+
+} catch (\Webklex\PHPIMAP\Exceptions\ResponseException $e) {
+    log_message('error', 'IMAP Connection Error: ' . $e->getMessage());
+    return "Error: IMAP connection failed";
+} catch (Exception $e) {
+    log_message('error', 'General Exception: ' . $e->getMessage());
+    return "Error: " . $e->getMessage();
+}
+
+	
+}
+
+public function downloadmail($id)
+{
+    // ===============================
+    // Validate Mailbox
+    // ===============================
+    if (!isset($id) || !$id) {
+        return "Invalid Mailbox ID!";
+    }
+
+    $mailers = $this->webmail_model->get_imap_details($id);
+    if (empty($mailers)) {
+        return "Email IMAP details not found!";
+    }
+
+    $mailer_imap_host = trim($mailers[0]['mailer_imap_host']);
+    $mailer_imap_port = trim($mailers[0]['mailer_imap_port']);
+    $mailer_username  = trim($mailers[0]['mailer_username']);
+    $mailer_password  = trim($mailers[0]['mailer_password']);
+    $encryption       = trim($mailers[0]['encryption']);
+    $data['email']    = $mailer_username;
+
+    // ===============================
+    // Connect to IMAP
+    // ===============================
+    try {
+        $cm = new ClientManager();
+        $client = $cm->make([
+            'host'          => $mailer_imap_host,
+            'port'          => $mailer_imap_port,
+            'encryption'    => $encryption,   // 'ssl' or 'tls'
+            'validate_cert' => true,
+            'username'      => $mailer_username,
+            'password'      => $mailer_password,
+            'protocol'      => 'imap',
+            'timeout'       => 300
+        ]);
+
+        try {
+            if (!$client->connect()) {
+                return "Unable to connect to IMAP server ($mailer_imap_host). Check host/port.";
+            }
+        } catch (ImapServerErrorException $e) {
+            log_message('error', 'IMAP Login Failed: ' . $e->getMessage());
+            return "Authentication failed - please check username/password.";
+        } catch (ResponseException $e) {
+            log_message('error', 'IMAP Response Error: ' . $e->getMessage());
+            return "IMAP server error - please verify IMAP configuration.";
+        }
+
+        // ===============================
+        // 3 Fetch Folders
+        // ===============================
+        $folders = $client->getFolders();
+        $cnt = 0;
+
+        foreach ($folders as $folder) {
+            try {
+                // Skip system folders
+                if (in_array(strtolower($folder->name), ['spam', 'junk', 'trash', '[gmail]/spam'])) {
+                    continue;
+                }
+
+                $data['folder'] = $folder->name;
+                $last_email_id  = $this->webmail_model->lastemailid($mailer_username, $folder->name);
+                $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
+
+                // ===============================
+                // Fetch Recent Messages
+                // ===============================
+                try {
+                    $messages = $folder->messages()->all()->limit(10)->get();
+                } catch (GetMessagesFailedException $e) {
+                    log_message('error', "IMAP message fetch error in {$folder->name}: " . $e->getMessage());
+                    continue;
+                }
+
+                if ($messages->count() == 0) continue;
+
+                // Filter only new messages
+                $messages = $messages->filter(function ($m) use ($last_email_id) {
+                    return $m->getUid() > $last_email_id;
+                });
+
+                foreach ($messages as $message) {
+                    $data = [
+                        'email'         => $mailer_username,
+                        'folder'        => $folder->name,
+                        'subject'       => $message->getSubject(),
+                        'date'          => $message->getDate(),
+                        'body'          => $message->getHtmlBody() ?? $message->getTextBody() ?? '',
+                        'uniqid'        => $message->uid,
+                        'messageid'     => $message->getMessageId(),
+                        'from_email'    => $message->getFrom()[0]->mail ?? '',
+                        'from_name'     => $message->getFrom()[0]->personal ?? '',
+                        'to_emails'     => $message->getTo()[0]->mail ?? '',
+                        'cc_emails'     => $message->getCc()[0]->mail ?? '',
+                        'bcc_emails'    => $message->getBcc()[0]->mail ?? '',
+                        'isattachments' => 0,
+                        'attachments'   => ''
+                    ];
+
+                    // ===============================
+                    // Handle Attachments
+                    // ===============================
+                    $attachments_paths = [];
+                    foreach ($message->getAttachments() as $attachment) {
+                        $uid = uniqid();
+                        $dir = FCPATH . 'uploads/email_attachments/' . $uid;
+                        if (!is_dir($dir)) mkdir($dir, 0777, true);
+                        $attachment->save($dir);
+                        $attachments_paths[] = $dir . '/' . $attachment->name;
+                        $data['isattachments'] = 1;
+                    }
+                    $data['attachments'] = implode(',', $attachments_paths);
+
+                    // ===============================
+                    //Insert into Database
+                    // ===============================
+                    try {
+                        $this->db->insert(db_prefix() . 'emails', $data);
+                        $cnt++;
+                    } catch (Exception $e) {
+                        log_message('error', 'DB Insert Failed: ' . $e->getMessage());
+                        continue;
+                    }
+
+                    unset($message); // free memory
+                }
+            } catch (ResponseException $e) {
+                log_message('error', "IMAP Folder Error [{$folder->name}]: " . $e->getMessage());
+                continue;
+            } catch (Exception $e) {
+                log_message('error', "Folder skipped [{$folder->name}]: " . $e->getMessage());
+                continue;
+            }
+        }
+
+        // ===============================
+        //Clean Disconnect
+        // ===============================
+        $client->disconnect();
+        return " Total emails downloaded: {$cnt}";
+
+    } catch (ImapServerErrorException $e) {
+        log_message('error', 'IMAP Server Error: ' . $e->getMessage());
+        return " IMAP Authentication failed - check credentials.";
+    } catch (ResponseException $e) {
+        log_message('error', 'IMAP Response Exception: ' . $e->getMessage());
+        return " IMAP server response invalid.";
+    } catch (Exception $e) {
+        log_message('error', 'General Exception: ' . $e->getMessage());
+        return " Error: " . $e->getMessage();
     }
 }
 
