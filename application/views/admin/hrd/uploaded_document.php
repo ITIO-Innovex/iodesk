@@ -37,6 +37,7 @@
                     <td>
                       <?php if ($path) { ?>
                         <a href="<?php echo base_url($path); ?>" target="_blank" class="btn btn-default btn-sm">View</a>
+                        <a href="<?php echo base_url($path); ?>" class="btn btn-primary btn-sm" download>Download</a>
                       <?php } ?>
                     </td>
                     <td><?php echo e($added); ?></td>

@@ -112,16 +112,7 @@
                         </span>
                       </td>
                       <td>
-                        <div class="progress" style="margin-bottom: 5px; height: 25px;">
-                          <div class="progress-bar <?php echo $progress_class; ?>" 
-                               role="progressbar" 
-                               aria-valuenow="<?php echo $percentage; ?>" 
-                               aria-valuemin="0" 
-                               aria-valuemax="100" 
-                               style="width: <?php echo $percentage; ?>%; line-height: 25px;">
-                            <?php echo number_format($percentage, 2); ?>%
-                          </div>
-                        </div>
+                        
                         <span class="label label-<?php echo $badge_class; ?>">
                           <?php echo number_format($percentage, 2); ?>%
                         </span>
@@ -209,33 +200,7 @@
               </div>
 
               <!-- Overall Attendance Percentage -->
-              <div class="row" style="margin-top: 20px;">
-                <div class="col-md-12">
-                  <div class="panel panel-default">
-                    <div class="panel-heading">
-                      <h4 class="panel-title" style="margin: 0;">
-                        <i class="fa-solid fa-chart-pie tw-mr-2"></i>
-                        <strong>Overall Attendance Percentage</strong>
-                      </h4>
-                    </div>
-                    <div class="panel-body">
-                      <div class="progress" style="height: 40px; margin-bottom: 10px;">
-                        <div class="progress-bar progress-bar-<?php echo $grand_badge_class; ?>" 
-                             role="progressbar" 
-                             aria-valuenow="<?php echo $grand_percentage; ?>" 
-                             aria-valuemin="0" 
-                             aria-valuemax="100" 
-                             style="width: <?php echo $grand_percentage; ?>%; line-height: 40px; font-size: 18px; font-weight: bold;">
-                          <?php echo number_format($grand_percentage, 2); ?>%
-                        </div>
-                      </div>
-                      <p class="text-center" style="margin: 0;">
-                        <strong><?php echo $grand_total_present; ?></strong> out of <strong><?php echo $grand_total_employees; ?></strong> employees present on <?php echo e($date_display); ?>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              
 
             <?php } else { ?>
               <div class="alert alert-warning">

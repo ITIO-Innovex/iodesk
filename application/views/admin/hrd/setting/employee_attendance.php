@@ -273,7 +273,7 @@ function printDiv(divId) {
                       $sumTotStr = $fmtHms($sumTotSecs);
                       $sumLateStr = $fmtHms($sumLateSecs);
                       ?>
-					  <tr>
+					  <?php /*?><tr>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
                         <td>&nbsp;</td>
@@ -284,7 +284,7 @@ function printDiv(divId) {
 						<td title="Tot. Hrs."><?php echo $sumTotStr; ?></td>
                         <td title="LateMark"><?php echo $sumLateStr; ?></td>
                         <td>&nbsp;</td>
-                      </tr>
+                      </tr><?php */?>
                     </tbody>
 					
                   </table>

@@ -18,7 +18,7 @@
             <?php if (!empty($leave_list)) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
-                <th>#</th>
+                <th title="Serial Number">S. No</th>
                 <th>Employee</th>
                 <th>From</th>
                 <th>To</th>

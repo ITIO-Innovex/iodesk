@@ -11,8 +11,8 @@
 		<ul class="reports tw-space-y-1">
           <li> <a target="_blank" href="<?php echo admin_url('hrd/manage_attendance_by_date');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Manage Attendance By Date</a> 
 		  </li>
-		  <li> <a target="_blank" href="<?php echo admin_url('hrd/manage_attendance_master');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Manage Attendance By Month</a> 
-		  </li>
+		  <?php /*?><li> <a target="_blank" href="<?php echo admin_url('hrd/manage_attendance_master');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Manage Attendance By Month</a> 
+		  </li><?php */?>
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/manage_attendance_by_user');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Manage Attendance By User</a> 
 		  </li>
 		   <li> <a target="_blank" href="<?php echo admin_url('hrd/attendance_master');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Attendance Master</a> 
@@ -25,7 +25,7 @@
 	  <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-file-text tw-mx-2"></i>  Requests</h4>
         <ul class="reports tw-space-y-1">
-          <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/attendance_request');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i> Attendance Reques</a> 
+          <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/attendance_request');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i> Attendance Request</a> 
 		  </li>
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/leave_manager');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Leave Manager</a> 
 		  </li>
@@ -64,7 +64,7 @@
       
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/interview_process');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Interview Process</a> 
 		  </li>
-		   <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/interview_source');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Iinterview Source</a> 
+		   <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/interview_source');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Interview Source</a> 
 		  </li>
 		  
         </ul>
@@ -74,12 +74,19 @@
         <ul class="reports tw-space-y-1">
           <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/todays_thought');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Today`s Thought</a> 
 		  </li>
+		  
+		  <?php if(is_department_admin() || is_admin()){?>
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/events_announcements');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Events and Announcements</a> 
 		  </li>
+		  <?php } ?>
+		  <?php if(is_department_admin() || is_admin()){?>
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/company_policies');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Company Policies</a> 
 		  </li>
+		  <?php } ?>
+		  <?php if(is_department_admin() || is_admin()){?>
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/corporate_guidelines');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Corporate Guidelines</a> 
 		  </li>
+		  <?php } ?>
 		  <li> <a target="_blank" href="<?php echo admin_url('hrd/setting/holiday_list');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Holiday List</a> 
 		  </li>
         </ul>

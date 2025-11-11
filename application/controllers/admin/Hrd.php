@@ -1102,9 +1102,11 @@ class Hrd extends AdminController
     /* View Corporate Guidelines */
     public function corporate_guidelines()
     {
-        if (!staff_can('view_setting',  'hr_department')) {
+        
+		if(!is_department_admin() && !is_admin()){
             access_denied('Corporate Guidelines');
         }
+
 
         if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
@@ -1136,7 +1138,8 @@ class Hrd extends AdminController
     /* View Company Policies */
     public function company_policies()
     {
-        if (!staff_can('view_setting',  'hr_department')) {
+        
+		 if(!is_department_admin() && !is_admin()){
             access_denied('Company Policies');
         }
 
@@ -1177,7 +1180,7 @@ class Hrd extends AdminController
     /* View Events & Announcements */
     public function events_announcements()
     {
-        if (!staff_can('view_setting',  'hr_department')) {
+        if(!is_department_admin() && !is_admin()){
             access_denied('Events & Announcements');
         }
 
@@ -3881,34 +3884,54 @@ class Hrd extends AdminController
 
         $staffid = get_staff_user_id();
         $title = trim((string)$this->input->post('document_title'));
-        $relPath = '';
+        $savedAny = false;
 
-        if (!empty($_FILES['document']['name'])) {
+        // Support multiple files via document[]
+        if (isset($_FILES['document'])) {
+            $files = $_FILES['document'];
+            // Normalize to array structure
+            $isMultiple = is_array($files['name']);
+            $total = $isMultiple ? count($files['name']) : ($files['name'] ? 1 : 0);
+
             $uploadDir = FCPATH . 'uploads/hrd_documents/';
             if (!is_dir($uploadDir)) {
                 @mkdir($uploadDir, 0755, true);
             }
-            $ext = pathinfo($_FILES['document']['name'], PATHINFO_EXTENSION);
-            $safeName = 'doc_' . $staffid . '_' . time() . '_' . mt_rand(1000,9999) . ($ext ? ('.' . $ext) : '');
-            $dest = $uploadDir . $safeName;
-            if (move_uploaded_file($_FILES['document']['tmp_name'], $dest)) {
-                $relPath = 'uploads/hrd_documents/' . $safeName;
+
+            for ($i = 0; $i < $total; $i++) {
+                $name     = $isMultiple ? $files['name'][$i] : $files['name'];
+                $tmp_name = $isMultiple ? $files['tmp_name'][$i] : $files['tmp_name'];
+                if (empty($name) || !is_uploaded_file($tmp_name)) {
+                    continue;
+                }
+                $ext = pathinfo($name, PATHINFO_EXTENSION);
+                $safeName = 'doc_' . $staffid . '_' . time() . '_' . mt_rand(1000,9999) . ($ext ? ('.' . $ext) : '');
+                $dest = $uploadDir . $safeName;
+                if (@move_uploaded_file($tmp_name, $dest)) {
+                    $relPath = 'uploads/hrd_documents/' . $safeName;
+                    // Use provided title or fallback to filename (without extension)
+                    $titleForThis = $title !== '' ? $title : pathinfo($name, PATHINFO_FILENAME);
+                    $ins = [
+                        'staff' => $staffid,
+                        'document_title' => $titleForThis !== '' ? $titleForThis : null,
+                        'document_path' => $relPath,
+                        'status' => 2,
+                    ];
+                    $this->db->insert(db_prefix() . 'hrd_documents', $ins);
+                    $savedAny = true;
+                }
             }
         }
 
-        $ins = [
-            'staff' => $staffid,
-            'document_title' => $title !== '' ? $title : null,
-            'document_path' => $relPath !== '' ? $relPath : null,
-            'status' => 2,
-        ];
-        $this->db->insert(db_prefix() . 'hrd_documents', $ins);
-
         if ($this->input->is_ajax_request()) {
-            echo json_encode(['success' => true]);
+            echo json_encode(['success' => $savedAny]);
             return;
         }
-        set_alert('success', 'Document added');
+        if ($savedAny) {
+            set_alert('success', 'Document(s) added');
+        } else {
+            set_alert('warning', 'No document uploaded');
+        }
         redirect(admin_url('hrd/my_document'));
     }
 
