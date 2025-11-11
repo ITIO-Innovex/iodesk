@@ -2,9 +2,8 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
-    <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
-      <i class="fa-solid fa-file-upload menu-icon tw-mr-2"></i> Uploaded Document by User
-    </h4>
+  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  Uploaded Document by User </span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
+    
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">

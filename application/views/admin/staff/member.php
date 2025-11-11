@@ -113,7 +113,7 @@
                                 <?php $value = (isset($member) ? $member->lastname : ''); ?>
                                 <?php echo render_input('lastname', 'staff_add_edit_lastname', $value); ?>
                                 <?php $value = (isset($member) ? $member->email : ''); ?>
-                                <?php echo render_input('email', 'staff_add_edit_email', $value, 'email', ['autocomplete' => 'off']); ?>
+                                <?php echo render_input('email', 'staff_add_edit_email', $value, 'email', ['autocomplete' => 'off','required' => 'true']); ?>
                                 <?php /*?><div class="form-group">
                                     <label for="hourly_rate"><?php echo _l('staff_hourly_rate'); ?></label>
                                     <div class="input-group">
@@ -213,7 +213,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
 								}
 								
 								?>
-								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '<label for="email" class="control-label"> <small class="req text-danger">* </small>Department</label>', $departmentid, ['required' => 'true']); ?>
+								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '<label for="departments" class="control-label"> <small class="req text-danger">* </small>Department</label>', $departmentid, ['required' => 'true']); ?>
 								
 								<?php 
 								$designation_id="";
@@ -221,7 +221,42 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
 								$designation_id=$member->designation_id;
 								} 
 								?>
-								<?php echo render_select('designation_id', $designation, ['id', 'title'], '<label for="email" class="control-label"> <small class="req text-danger">* </small>Designation</label>', $designation_id, ['required' => 'true']); ?>
+								<?php echo render_select('designation_id', $designation, ['id', 'title'], '<label for="designation_id" class="control-label"> <small class="req text-danger">* </small>Designation</label>', $designation_id, ['required' => 'true']); ?>
+
+                                <?php
+                                // Prefill custom staff fields if editing
+                                $staff_branch = isset($member) && isset($member->branch) ? (int)$member->branch : '';
+                                $employee_code = isset($member) && isset($member->employee_code) ? $member->employee_code : '';
+                                $staff_type = isset($member) && isset($member->staff_type) ? (int)$member->staff_type : '';
+                                ?>
+                                <div class="form-group">
+                                    <label class="control-label"><small class="req text-danger">* </small>Branch</label>
+                                    <select name="branch" class="form-control" required>
+                                        <option value="">-- Select Branch --</option>
+                                        <?php if (isset($branches) && is_array($branches)) { foreach ($branches as $b) { ?>
+                                            <option value="<?php echo (int)$b['id']; ?>" <?php echo ($staff_branch !== '' && (int)$staff_branch === (int)$b['id']) ? 'selected' : ''; ?>>
+                                                <?php echo e($b['branch_name']); ?>
+                                            </option>
+                                        <?php } } ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label"><small class="req text-danger">* </small>Employee Code</label>
+                                    <input type="text" name="employee_code" class="form-control" value="<?php echo e($employee_code); ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="control-label"><small class="req text-danger">* </small>Staff Type</label>
+                                    <select name="staff_type" class="form-control" required>
+                                        <option value="">-- Select Staff Type --</option>
+                                        <?php if (isset($staff_types) && is_array($staff_types)) { foreach ($staff_types as $st) { ?>
+                                            <option value="<?php echo (int)$st['id']; ?>" <?php echo ($staff_type !== '' && (int)$staff_type === (int)$st['id']) ? 'selected' : ''; ?>>
+                                                <?php echo e($st['title']); ?>
+                                            </option>
+                                        <?php } } ?>
+                                    </select>
+                                </div>
                                 
                                 <?php $rel_id = (isset($member) ? $member->staffid : false); ?>
                                 <?php echo render_custom_fields('staff', $rel_id); ?>
@@ -232,7 +267,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
 										 <?php if (is_admin()) { ?>
 										<div class="form-group">
     <label for="rtl_support_admin" class="control-label clearfix">
-        Staff Type    </label>
+        Staff Permission    </label>
     <div class="radio radio-primary radio-inline">
         <input type="radio"  id="administrator0" name="administrator" value="0" checked="">
         <label for="administrator">
@@ -690,6 +725,9 @@ radioButton.checked = true;  // Check the radio button
             firstname: 'required',
             lastname: 'required',
             username: 'required',
+            employee_code: 'required',
+            branch: 'required',
+            staff_type: 'required',
             password: {
                 required: {
                     depends: function(element) {
