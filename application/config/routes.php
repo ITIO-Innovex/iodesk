@@ -234,6 +234,9 @@ $route['admin/designation/delete/(:num)'] = 'admin/designations/delete/$1';
 // HRD - Manage Attendance by Date
 $route['admin/hrd/manage_attendance_by_date'] = 'admin/hrd/manage_attendance_by_date';
 $route['admin/hrd/manage_attendance_master'] = 'admin/hrd/manage_attendance_master';
+$route['admin/hrd/manage_attendance_maestro'] = 'admin/hrd/manage_attendance_maestro';
+$route['admin/hrd/save_attendance_maestro'] = 'admin/hrd/save_attendance_maestro';
+$route['admin/hrd/leave_register'] = 'admin/hrd/leave_register';
 $route['admin/hrd/manage_attendance_by_user'] = 'admin/hrd/manage_attendance_by_user';
 $route['admin/hrd/attendance_bulk_update_by_date'] = 'admin/hrd/attendance_bulk_update_by_date';
 $route['admin/hrd/attendance_update_inout_by_date'] = 'admin/hrd/attendance_update_inout_by_date';

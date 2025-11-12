@@ -10,7 +10,7 @@
             
             <div class="row">
               <div class="col-md-12">
-                <table class="table dt-table" data-order-col="1" data-order-type="asc">
+                <table class="table  dt-table" data-order-col="1" data-order-type="asc">
                   <thead>
                     <tr>
                       <th>#</th>
@@ -23,6 +23,7 @@
                       <th>Staff Type</th>
                       <th>Phone</th>
                       <th>Joining Date</th>
+					  <th>Status</th>
                       <th><?php echo _l('options'); ?></th>
                     </tr>
                   </thead>
@@ -39,8 +40,20 @@
                         <td><?php echo e($row['staff_type_name'] ?? ''); ?></td>
                         <td><?php echo e($row['phonenumber'] ?? ''); ?></td>
                         <td><?php echo isset($row['joining_date']) ? $row['joining_date'] : ''; ?></td>
+						<td>
+<?php 
+$employee_status=isset($row['employee_status']) ? $row['employee_status'] : '';
+$class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_status.'" class="fa-solid fa-circle-check text-success"></i>';}else{echo '<i title="'.$employee_status.'" class="fa-solid fa-circle-xmark text-danger"></i>';} ?>
                         <td>
-                          <a href="#" class="btn btn-default btn-sm" onclick='openStaffModal(<?php echo json_encode([
+                          <a href="#" class="" onclick='openStaffModal(<?php 
+                            $approver_data = [];
+                            if (!empty($row['approver'])) {
+                              $approver_data = json_decode($row['approver'], true);
+                              if (!is_array($approver_data)) {
+                                $approver_data = [];
+                              }
+                            }
+                            echo json_encode([
                             'staffid' => (int)($row['staffid']??0),
                             'title' => (string)($row['title'] ?? ''),
                             'firstname' => (string)($row['firstname'] ?? ''),
@@ -54,7 +67,12 @@
                             'joining_date' => (string)($row['joining_date'] ?? ''),
                             'dob' => (string)($row['dob'] ?? ''),
                             'gender' => (string)($row['gender'] ?? ''),
-                          ]); ?>); return false;'>Edit</a>
+                            'hr_approver' => isset($approver_data['hr_approver']) ? (string)$approver_data['hr_approver'] : '',
+                            'admin_approver' => isset($approver_data['admin_approver']) ? (string)$approver_data['admin_approver'] : '',
+                            'hr_manager_approver' => isset($approver_data['hr_manager_approver']) ? (string)$approver_data['hr_manager_approver'] : '',
+                            'reporting_approver' => isset($approver_data['reporting_approver']) ? (string)$approver_data['reporting_approver'] : '',
+                            'employee_status' => (string)($row['employee_status'] ?? ''),
+                          ]); ?>); return false;'><i class="fa-solid fa-pen-to-square text-warning"></i></a>
                         </td>
                       </tr>
                     <?php } } ?>
@@ -143,6 +161,65 @@
 		  <div class="col-md-4"><div class="form-group"><label>Joining Date</label><input type="date" name="joining_date" class="form-control"></div></div>
         </div>
         <div class="row">
+          <div class="col-md-12">
+            <hr>
+            <h5><strong>Approvers</strong></h5>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><div class="form-group"><label>HR Approver</label>
+            <select name="hr_approver" class="form-control">
+              <option value="">-- Select HR Approver --</option>
+              <?php if (!empty($dept9_employees)) { foreach ($dept9_employees as $emp) { ?>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+              <?php } } ?>
+            </select>
+          </div></div>
+          <div class="col-md-6"><div class="form-group"><label>Admin Approver</label>
+            <select name="admin_approver" class="form-control">
+              <option value="">-- Select Admin Approver --</option>
+              <?php if (!empty($dept9_employees)) { foreach ($dept9_employees as $emp) { ?>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+              <?php } } ?>
+            </select>
+          </div></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><div class="form-group"><label>HR Manager Approver</label>
+            <select name="hr_manager_approver" class="form-control">
+              <option value="">-- Select HR Manager Approver --</option>
+              <?php if (!empty($dept9_employees)) { foreach ($dept9_employees as $emp) { ?>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+              <?php } } ?>
+            </select>
+          </div></div>
+          <div class="col-md-6"><div class="form-group"><label>Reporting Approver</label>
+            <select name="reporting_approver" class="form-control">
+              <option value="">-- Select Reporting Approver --</option>
+              <?php if (!empty($all_employees)) { foreach ($all_employees as $emp) { ?>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+              <?php } } ?>
+            </select>
+          </div></div>
+        </div>
+		
+		<div class="row">
+          <div class="col-md-12">
+            <hr>
+            <h5><strong>Status</strong></h5>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6"><div class="form-group"><label>Employee Status</label>
+            <select name="employee_status" class="form-control">
+              <option value="">-- Employee Status --</option>
+                <option value="Active">Active</option>
+				<option value="Absconding">Absconding</option>
+				<option value="Termination">Termination</option>
+				<option value="Resignation">Resignation</option>
+				<option value="Retired">Retired</option>
+            </select>
+          </div></div>
           
         </div>
       </div>
@@ -197,6 +274,11 @@ function openStaffModal(data){
   $f.find('input[name=joining_date]').val((data.joining_date||'').substring(0,10));
   $f.find('input[name=dob]').val((data.dob||'').substring(0,10));
   $f.find('select[name=gender]').val(data.gender||'');
+  $f.find('select[name=hr_approver]').val(data.hr_approver||'');
+  $f.find('select[name=admin_approver]').val(data.admin_approver||'');
+  $f.find('select[name=hr_manager_approver]').val(data.hr_manager_approver||'');
+  $f.find('select[name=reporting_approver]').val(data.reporting_approver||'');
+  $f.find('select[name=employee_status]').val(data.employee_status||'');
   $m.modal('show');
 }
 

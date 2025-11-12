@@ -88,7 +88,12 @@
 				  <th>Day</th>
                   <th>InTime</th>
                   <th>OutTime</th>
-                  <th>First Half</th>
+                  <th><select id="bulk-first-half" class="form-control" style="width:auto; display:inline-block;">
+                    <option value="">First Half</option>
+                    <?php if (!empty($attendance_statuses)) { foreach ($attendance_statuses as $st) { ?>
+                      <option value="<?php echo (int)$st['id']; ?>"><?php echo e($st['title']); ?></option>
+                    <?php } } ?>
+                  </select></th>
                   <th>Second Half</th>
                   <th>Portion</th>
 				  <th>Tot. Hrs.</th>
@@ -396,6 +401,25 @@ jQuery(document).ready(function($){
           alert('Failed to unlock: ' + (resp.message || 'Unknown error')); 
         }
       }, 'json');
+    });
+  }
+
+  // Bulk First Half selection - apply to all fh-select dropdowns
+  var bulkFirstHalf = document.getElementById('bulk-first-half');
+  if(bulkFirstHalf){
+    bulkFirstHalf.addEventListener('change', function(){
+      var selectedValue = this.value;
+      if(selectedValue === '') return; // Don't do anything if empty
+      
+      // Find all fh-select dropdowns that are not disabled
+      var fhSelects = document.querySelectorAll('.fh-select:not(:disabled)');
+      for(var i = 0; i < fhSelects.length; i++) {
+        fhSelects[i].value = selectedValue;
+        // Trigger change event in case there are other listeners
+        if(typeof jQuery !== 'undefined') {
+          $(fhSelects[i]).trigger('change');
+        }
+      }
     });
   }
 

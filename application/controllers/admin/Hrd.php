@@ -2020,7 +2020,7 @@ class Hrd extends AdminController
         }
 
         // Build listing query
-        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.staff_type, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, d.name AS department, des.title AS designation, br.branch_name AS branch_name, st.title AS staff_type_name');
+        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.staff_type, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, s.approver, s.employee_status, d.name AS department, des.title AS designation, br.branch_name AS branch_name, st.title AS staff_type_name');
         $this->db->from(db_prefix() . 'staff s');
         $this->db->join(db_prefix() . 'departments d', 'd.departmentid = s.department_id', 'left');
         $this->db->join(db_prefix() . 'designations des', 'des.id = s.designation_id', 'left');
@@ -2069,6 +2069,40 @@ class Hrd extends AdminController
         $this->db->where('status', 1);
         $data['staff_types'] = $this->hrd_model->get_staff_type();
 
+        // Load employees for approver dropdowns
+        // Employees with department_id=9 (for hr_approver, admin_approver, hr_manager_approver)
+        $this->db->reset_query();
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->where('department_id', 9);
+        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $data['dept9_employees'] = $this->db->get(db_prefix() . 'staff')->result_array();
+        
+        // Get all employees (for reporting_approver)
+        $this->db->reset_query();
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $data['all_employees'] = $this->db->get(db_prefix() . 'staff')->result_array();
+
         $data['title'] = 'Staff Management';
         $this->load->view('admin/hrd/staff_manager', $data);
     }
@@ -2089,6 +2123,23 @@ class Hrd extends AdminController
         $firstname = trim((string)$this->input->post('firstname'));
         $lastname  = trim((string)$this->input->post('lastname'));
 
+        // Get approver fields
+        $hr_approver = $this->input->post('hr_approver') !== '' ? (int)$this->input->post('hr_approver') : null;
+        $admin_approver = $this->input->post('admin_approver') !== '' ? (int)$this->input->post('admin_approver') : null;
+        $hr_manager_approver = $this->input->post('hr_manager_approver') !== '' ? (int)$this->input->post('hr_manager_approver') : null;
+        $reporting_approver = $this->input->post('reporting_approver') !== '' ? (int)$this->input->post('reporting_approver') : null;
+        
+        // Build approver JSON
+        $approver_data = [
+            'hr_approver' => $hr_approver,
+            'admin_approver' => $admin_approver,
+            'hr_manager_approver' => $hr_manager_approver,
+            'reporting_approver' => $reporting_approver,
+        ];
+        $approver_json = json_encode($approver_data);
+		
+		
+
         $data = [
             'title'          => $this->input->post('title'),
             'firstname'      => $firstname,
@@ -2102,7 +2153,19 @@ class Hrd extends AdminController
             'joining_date'   => $this->input->post('joining_date'),
             'date_of_birth'  => $this->input->post('dob'),
             'gender'         => $this->input->post('gender'),
+            'approver'       => $approver_json,
+            'employee_status' => $this->input->post('employee_status') !== '' ? trim($this->input->post('employee_status')) : null,
         ];
+		
+		if(!empty($this->input->post('employee_status'))){
+		
+			if($this->input->post('employee_status')=="Active"){
+			$data['active']=1;$data['is_not_staff']=0;
+			}else{
+			$data['active']=0;$data['is_not_staff']=1;
+			}
+		
+		}
 
         $this->db->where('staffid', $staffid);
         $this->db->update(db_prefix() . 'staff', $data);
@@ -2115,6 +2178,144 @@ class Hrd extends AdminController
         }
         set_alert('success', 'Staff updated successfully');
         redirect(admin_url('hrd/staff_manager'));
+    }
+
+    /* Leave Register */
+    public function leave_register()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Leave Register');
+        }
+
+        // Get staff ID - default to current user if not admin
+        $staffid = (int)$this->input->get('staffid');
+        if ($staffid <= 0) {
+            if (is_admin() || is_department_admin()) {
+                // Admin can view all, but need to select a staff
+                $staffid = 0;
+            } else {
+                $staffid = get_staff_user_id();
+            }
+        }
+
+        // Get year filter (format: YYYY)
+        $year = $this->input->get('year');
+        if (!$year || !preg_match('/^\d{4}$/', $year)) {
+            $year = date('Y');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Load all active staff for dropdown (if admin)
+        if (is_admin() || is_department_admin()) {
+            if (is_super()) {
+                if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                } else {
+                    $this->db->where('company_id', get_staff_company_id());
+                }
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+            $this->db->where('active', 1);
+            $this->db->select('staffid, firstname, lastname, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
+            $this->db->order_by('firstname', 'asc');
+            $data['all_staff'] = $this->db->get(db_prefix() . 'staff')->result_array();
+        } else {
+            $data['all_staff'] = [];
+        }
+
+        $leave_register_data = [];
+
+        if ($staffid > 0) {
+            // Get staff details
+            $this->db->where('staffid', $staffid);
+            $staff_info = $this->db->get(db_prefix() . 'staff')->row_array();
+            
+            if ($staff_info) {
+                // Get attendance records for the entire year
+                $startDate = $year . '-01-01';
+                $endDate = $year . '-12-31';
+
+                $this->db->where('staffid', $staffid);
+                $this->db->where('entry_date >=', $startDate);
+                $this->db->where('entry_date <=', $endDate);
+                $this->db->order_by('entry_date', 'asc');
+                $attendance_records = $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+
+                // Group attendance by month
+                $attendance_by_month = [];
+                foreach ($attendance_records as $rec) {
+                    $entry_date = $rec['entry_date'];
+                    $month_key = date('Y-m', strtotime($entry_date));
+                    if (!isset($attendance_by_month[$month_key])) {
+                        $attendance_by_month[$month_key] = [];
+                    }
+                    $attendance_by_month[$month_key][] = $rec;
+                }
+
+                // Calculate for each month
+                for ($m = 1; $m <= 12; $m++) {
+                    $month_key = sprintf('%04d-%02d', $year, $m);
+                    $startDateMonth = $month_key . '-01';
+                    $daysInMonth = (int)date('t', strtotime($startDateMonth));
+                    
+                    $month_records = isset($attendance_by_month[$month_key]) ? $attendance_by_month[$month_key] : [];
+                    
+                    // Calculate statistics for this month
+                    $total_days = $daysInMonth; // A
+                    $total_present = 0; // B - count position > 0
+                    $pl_count = 0; // C - count first_half = 3
+                    
+                    foreach ($month_records as $rec) {
+                        // Count present (position > 0)
+                        $position = isset($rec['position']) ? (float)$rec['position'] : 0;
+                        if ($position > 0) {
+                            $total_present++;
+                        }
+                        
+                        // Count PL (first_half = 3)
+                        $first_half = isset($rec['first_half']) ? (int)$rec['first_half'] : 0;
+                        if ($first_half == 3) {
+                            $pl_count++;
+                        }
+                    }
+//echo $total_present."666";
+                    if($total_present===0){
+                    $leave_earned = 0; // D - default 1
+                    $leave_balance = 0; // A - B + D - C
+					}else{
+					$leave_earned = 1; // D - default 1
+                    $leave_balance =(($total_present + $leave_earned - $pl_count) - $total_days); // A - B + D - C
+					$leave_balance = ($leave_balance < 0) ? 0 : $leave_balance;
+					}
+                    $total_adsent=$total_days - $total_present;
+                    $leave_register_data[] = [
+                        'month_year' => $month_key,
+                        'month_display' => date('F Y', strtotime($startDateMonth)),
+                        'total_days' => $total_days,
+                        'total_present' => $total_present,
+						'total_adsent' => $total_adsent,
+                        'pl_count' => $pl_count,
+                        'leave_earned' => $leave_earned,
+                        'leave_balance' => $leave_balance,
+                        'staffid' => $staffid,
+                        'staff_name' => trim(($staff_info['firstname'] ?? '') . ' ' . ($staff_info['lastname'] ?? '')),
+                        'employee_code' => $staff_info['employee_code'] ?? '',
+                    ];
+                }
+            }
+        }
+
+        $data['staffid'] = $staffid;
+        $data['year'] = $year;
+        $data['leave_register'] = $leave_register_data;
+        $data['title'] = 'Leave Register';
+        $this->load->view('admin/hrd/leave_register', $data);
     }
 
     // Ajax: get designations filtered by department (if column exists)
@@ -3232,6 +3433,220 @@ class Hrd extends AdminController
         $data['attendance_statuses'] = $attendanceStatuses;
         $data['title'] = 'Manage Attendance Master';
         $this->load->view('admin/hrd/manage_attendance_master', $data);
+    }
+
+    /* Manage Attendance Maestro */
+    public function manage_attendance_maestro()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Manage Attendance Maestro');
+        }
+
+        // Month in format YYYY-MM
+        $month = $this->input->get('month');
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $month = date('Y-m');
+        }
+
+        $staff_filter = (int)$this->input->get('staff_id');
+
+        // Load all active staff for dropdown (for filter) - company scoped
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('active', 1);
+        $this->db->select('staffid, firstname, lastname, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->order_by('firstname', 'asc');
+        $all_staff = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        // Prepare days in month
+        $startDate = $month . '-01';
+        $daysInMonth = (int)date('t', strtotime($startDate));
+        $dates = [];
+        for ($d = 1; $d <= $daysInMonth; $d++) {
+            $dates[] = date('Y-m-d', strtotime(sprintf('%s-%02d', $month, $d)));
+        }
+
+        // Get staff list (all or filtered)
+        $staff_list = [];
+        if ($staff_filter > 0) {
+            // Filter by selected staff
+            foreach ($all_staff as $st) {
+                if ((int)$st['staffid'] === $staff_filter) {
+                    $staff_list[] = $st;
+                    break;
+                }
+            }
+        } else {
+            // Show all staff
+            $staff_list = $all_staff;
+        }
+
+        // Fetch attendance data for all staff and dates
+        $attendance_map = [];
+        if (!empty($staff_list)) {
+            $staff_ids = array_column($staff_list, 'staffid');
+            $this->db->from(db_prefix() . 'hrd_attendance');
+            $this->db->where_in('staffid', $staff_ids);
+            $this->db->where('entry_date >=', $startDate);
+            $this->db->where('entry_date <=', $month . '-' . $daysInMonth);
+            $rows = $this->db->get()->result_array();
+            foreach ($rows as $r) {
+                $key = (int)$r['staffid'] . '_' . $r['entry_date'];
+                $attendance_map[$key] = $r;
+            }
+        }
+
+        // Load attendance statuses for listboxes - company scoped, active only
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $attendanceStatuses = $this->hrd_model->get_attendance_status();
+
+        $data['month'] = $month;
+        $data['dates'] = $dates;
+        $data['all_staff'] = $all_staff;
+        $data['staff_filter'] = $staff_filter;
+        $data['staff_list'] = $staff_list;
+        $data['attendance_map'] = $attendance_map;
+        $data['attendance_statuses'] = $attendanceStatuses;
+        $data['title'] = 'Manage Attendance Maestro';
+        $this->load->view('admin/hrd/manage_attendance_maestro', $data);
+    }
+
+    /* Save Attendance Maestro */
+    public function save_attendance_maestro()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $month = $this->input->post('month');
+        $staff_data = $this->input->post('staff_data'); // Array of {staffid, date, first_half, portion, second_half}
+        $lock_data = (int)$this->input->post('lock_data'); // 1 if checked, 0 if not
+
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid month']);
+            return;
+        }
+
+        if (!is_array($staff_data) || empty($staff_data)) {
+            echo json_encode(['success' => false, 'message' => 'No data to save']);
+            return;
+        }
+
+        // Get company_id
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Get default shift_id
+        $this->db->where('company_id', $company_id);
+        $this->db->where('status', 1);
+        $this->db->order_by('shift_id', 'asc');
+        $this->db->limit(1);
+        $shiftRow = $this->db->get(db_prefix() . 'hrd_shift_manager')->row_array();
+        $default_shift_id = $shiftRow && isset($shiftRow['shift_id']) ? (int)$shiftRow['shift_id'] : 1;
+
+        $saved = 0;
+        $errors = [];
+
+        foreach ($staff_data as $item) {
+            $staffid = isset($item['staffid']) ? (int)$item['staffid'] : 0;
+            $date = isset($item['date']) ? trim($item['date']) : '';
+            $first_half = isset($item['first_half']) ? trim($item['first_half']) : '';
+            $portion = isset($item['portion']) ? trim($item['portion']) : '';
+            $second_half = isset($item['second_half']) ? trim($item['second_half']) : '';
+			
+			log_message('error', 'portion - '.$portion );
+
+            if ($staffid <= 0 || !$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                continue;
+            }
+
+            // Validate First Half is required
+            if ($first_half === '' || $first_half === null) {
+                // Get staff name for error message
+                $this->db->select('firstname, lastname');
+                $this->db->where('staffid', $staffid);
+                $staffRow = $this->db->get(db_prefix() . 'staff')->row();
+                $staffName = $staffRow ? trim($staffRow->firstname . ' ' . $staffRow->lastname) : 'Staff ID: ' . $staffid;
+                echo json_encode(['success' => false, 'message' => 'First Half is required for ' . $staffName . ' on ' . $date]);
+                return;
+            }
+
+            // Default portion to 1.00 if blank
+            if ($portion === '') {
+                $portion = '1.00';
+            }
+
+            // Check if attendance record exists
+            $this->db->where('staffid', $staffid);
+            $this->db->where('entry_date', $date);
+            $existing = $this->db->get(db_prefix() . 'hrd_attendance')->row_array();
+            log_message('error', 'portionXX - '.$portion );
+            $data = [
+                'first_half' => $first_half !== '' ? (int)$first_half : null,
+                'position' => $portion,
+                'second_half' => $second_half !== '' ? (int)$second_half : null,
+				'ip' => ($_SERVER['SERVER_ADDR'] ?? '127.0.0.1') === '::1' ? '127.0.0.1' : $_SERVER['SERVER_ADDR'],
+				'remarks' => 'Added By HRD - '.get_staff_user_id(),
+            ];
+             
+            // Set status to 1 (locked) if lock checkbox is checked
+            if ($lock_data === 1) {
+                $data['status'] = 1;
+            }
+
+            if ($existing) {
+                // Check if record is locked (status = 1)
+                if (isset($existing['status']) && (int)$existing['status'] === 1) {
+                    // Skip locked records - don't update them
+                    continue;
+                }
+                // Update existing (only if not locked)
+                $this->db->where('staffid', $staffid);
+                $this->db->where('entry_date', $date);
+                $this->db->where('status !=', 1); // Extra safety check
+                $this->db->update(db_prefix() . 'hrd_attendance', $data);
+				log_message('error', 'Qry - '.$this->db->last_query() );
+				
+                if ($this->db->affected_rows() >= 0) {
+                    $saved++;
+                }
+            } else {
+                // Insert new (with required fields including shift_id and company_id)
+                $data['staffid'] = $staffid;
+                $data['company_id'] = $company_id;
+                $data['shift_id'] = $default_shift_id;
+                $data['entry_date'] = $date;
+                // Set status: 1 if lock is checked, otherwise 0 (unlocked)
+                if (!isset($data['status'])) {
+                    $data['status'] = 0;
+                }
+                $this->db->insert(db_prefix() . 'hrd_attendance', $data);
+                if ($this->db->insert_id()) {
+                    $saved++;
+                }
+            }
+        }
+
+        echo json_encode(['success' => true, 'message' => 'Saved ' . $saved . ' record(s)']);
     }
 
     /* Manage Attendance by User */
