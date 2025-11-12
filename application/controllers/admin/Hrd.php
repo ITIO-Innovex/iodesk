@@ -2318,6 +2318,117 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/leave_register', $data);
     }
 
+    /* Leave Balance Register */
+    public function leave_balance_register()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Leave Balance Register');
+        }
+
+        // Always use current staff ID (no employee selection)
+        $staffid = get_staff_user_id();
+
+        // Get year filter (format: YYYY)
+        $year = $this->input->get('year');
+        if (!$year || !preg_match('/^\d{4}$/', $year)) {
+            $year = date('Y');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        $leave_register_data = [];
+
+        if ($staffid > 0) {
+            // Get staff details
+            $this->db->where('staffid', $staffid);
+            $staff_info = $this->db->get(db_prefix() . 'staff')->row_array();
+            
+            if ($staff_info) {
+                // Get attendance records for the entire year
+                $startDate = $year . '-01-01';
+                $endDate = $year . '-12-31';
+
+                $this->db->where('staffid', $staffid);
+                $this->db->where('entry_date >=', $startDate);
+                $this->db->where('entry_date <=', $endDate);
+                $this->db->order_by('entry_date', 'asc');
+                $attendance_records = $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+
+                // Group attendance by month
+                $attendance_by_month = [];
+                foreach ($attendance_records as $rec) {
+                    $entry_date = $rec['entry_date'];
+                    $month_key = date('Y-m', strtotime($entry_date));
+                    if (!isset($attendance_by_month[$month_key])) {
+                        $attendance_by_month[$month_key] = [];
+                    }
+                    $attendance_by_month[$month_key][] = $rec;
+                }
+
+                // Calculate for each month
+                for ($m = 1; $m <= 12; $m++) {
+                    $month_key = sprintf('%04d-%02d', $year, $m);
+                    $startDateMonth = $month_key . '-01';
+                    $daysInMonth = (int)date('t', strtotime($startDateMonth));
+                    
+                    $month_records = isset($attendance_by_month[$month_key]) ? $attendance_by_month[$month_key] : [];
+                    
+                    // Calculate statistics for this month
+                    $total_days = $daysInMonth; // A
+                    $total_present = 0; // B - count position > 0
+                    $pl_count = 0; // C - count first_half = 3
+                    
+                    foreach ($month_records as $rec) {
+                        // Count present (position > 0)
+                        $position = isset($rec['position']) ? (float)$rec['position'] : 0;
+                        if ($position > 0) {
+                            $total_present++;
+                        }
+                        
+                        // Count PL (first_half = 3)
+                        $first_half = isset($rec['first_half']) ? (int)$rec['first_half'] : 0;
+                        if ($first_half == 3) {
+                            $pl_count++;
+                        }
+                    }
+
+                    if($total_present===0){
+                        $leave_earned = 0; // D - default 1
+                        $leave_balance = 0; // A - B + D - C
+                    }else{
+                        $leave_earned = 1; // D - default 1
+                        $leave_balance = (($total_present + $leave_earned - $pl_count) - $total_days); // A - B + D - C
+                        $leave_balance = ($leave_balance < 0) ? 0 : $leave_balance;
+                    }
+                    $total_adsent=$total_days - $total_present;
+                    $leave_register_data[] = [
+                        'month_year' => $month_key,
+                        'month_display' => date('F Y', strtotime($startDateMonth)),
+                        'total_days' => $total_days,
+                        'total_present' => $total_present,
+                        'total_adsent' => $total_adsent,
+                        'pl_count' => $pl_count,
+                        'leave_earned' => $leave_earned,
+                        'leave_balance' => $leave_balance,
+                        'staffid' => $staffid,
+                        'staff_name' => trim(($staff_info['firstname'] ?? '') . ' ' . ($staff_info['lastname'] ?? '')),
+                        'employee_code' => $staff_info['employee_code'] ?? '',
+                    ];
+                }
+            }
+        }
+
+        $data['staffid'] = $staffid;
+        $data['year'] = $year;
+        $data['leave_register'] = $leave_register_data;
+        $data['title'] = 'Leave Balance Register';
+        $this->load->view('admin/hrd/leave_balance_register', $data);
+    }
+
     // Ajax: get designations filtered by department (if column exists)
     public function designations_by_department()
     {
