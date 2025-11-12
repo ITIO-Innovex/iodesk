@@ -24,7 +24,7 @@
                       <th style="width: 20%;">Approver Title</th>
                       <th style="width: 20%;">Email</th>
                       <th style="width: 15%;">Phone Number</th>
-                      <th style="width: 15%;">Employee Code</th>
+                      <?php /*?><th style="width: 15%;">Employee Code</th><?php */?>
                     </tr>
                   </thead>
                   <tbody>
@@ -70,19 +70,19 @@
                             <span class="text-muted">-</span>
                           <?php } ?>
                         </td>
-                        <td>
-                          <?php if (!empty($approver['phonenumber'])) { ?>
+                        <td><span class="text-muted">-</span>
+                          <?php /*?><?php if (!empty($approver['phonenumber'])) { ?>
                             <a href="tel:<?php echo e($approver['phonenumber']); ?>" title="Call">
                               <i class="fa-solid fa-phone tw-mr-1"></i>
                               <?php echo e($approver['phonenumber']); ?>
                             </a>
                           <?php } else { ?>
                             <span class="text-muted">-</span>
-                          <?php } ?>
+                          <?php } ?><?php */?>
                         </td>
-                        <td>
+                        <?php /*?><td>
                           <?php echo !empty($approver['employee_code']) ? e($approver['employee_code']) : '<span class="text-muted">-</span>'; ?>
-                        </td>
+                        </td><?php */?>
                       </tr>
                     <?php } ?>
                   </tbody>
