@@ -2429,6 +2429,116 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/leave_balance_register', $data);
     }
 
+    /* Approver List */
+    public function approver()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('Approver List');
+        }
+
+        // Company scope
+        $company_id = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $company_id = $_SESSION['super_view_company_id'];
+        }
+
+        // Fetch all staff with approver field (not null/empty)
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('approver IS NOT NULL');
+        $this->db->where('approver !=', '');
+        $this->db->where('approver !=', 'null');
+        $this->db->select('staffid, approver');
+        $staff_with_approvers = $this->db->get(db_prefix() . 'staff')->result_array();
+
+        // Collect all unique employee IDs from approver JSON with their titles
+        $approver_ids = [];
+        $approver_titles_map = []; // Map staffid => array of approver titles
+        
+        foreach ($staff_with_approvers as $staff) {
+            if (!empty($staff['approver'])) {
+                $approver_data = json_decode($staff['approver'], true);
+                if (is_array($approver_data)) {
+                    // Extract all approver IDs and track their titles
+                    if (!empty($approver_data['hr_approver']) && (int)$approver_data['hr_approver'] > 0) {
+                        $staffid = (int)$approver_data['hr_approver'];
+                        $approver_ids[$staffid] = true;
+                        if (!isset($approver_titles_map[$staffid])) {
+                            $approver_titles_map[$staffid] = [];
+                        }
+                        $approver_titles_map[$staffid][] = 'HR Approver';
+                    }
+                    if (!empty($approver_data['admin_approver']) && (int)$approver_data['admin_approver'] > 0) {
+                        $staffid = (int)$approver_data['admin_approver'];
+                        $approver_ids[$staffid] = true;
+                        if (!isset($approver_titles_map[$staffid])) {
+                            $approver_titles_map[$staffid] = [];
+                        }
+                        $approver_titles_map[$staffid][] = 'Admin Approver';
+                    }
+                    if (!empty($approver_data['hr_manager_approver']) && (int)$approver_data['hr_manager_approver'] > 0) {
+                        $staffid = (int)$approver_data['hr_manager_approver'];
+                        $approver_ids[$staffid] = true;
+                        if (!isset($approver_titles_map[$staffid])) {
+                            $approver_titles_map[$staffid] = [];
+                        }
+                        $approver_titles_map[$staffid][] = 'HR Manager Approver';
+                    }
+                    if (!empty($approver_data['reporting_approver']) && (int)$approver_data['reporting_approver'] > 0) {
+                        $staffid = (int)$approver_data['reporting_approver'];
+                        $approver_ids[$staffid] = true;
+                        if (!isset($approver_titles_map[$staffid])) {
+                            $approver_titles_map[$staffid] = [];
+                        }
+                        $approver_titles_map[$staffid][] = 'Reporting Approver';
+                    }
+                }
+            }
+        }
+
+        // Get employee details for all approver IDs
+        $approver_list = [];
+        if (!empty($approver_ids)) {
+            $approver_id_array = array_keys($approver_ids);
+            
+            if (is_super()) {
+                if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
+                } else {
+                    $this->db->where('company_id', get_staff_company_id());
+                }
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+            $this->db->where_in('staffid', $approver_id_array);
+            $this->db->select('staffid, firstname, lastname, email, phonenumber, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
+            $this->db->order_by('firstname', 'asc');
+            $approver_list = $this->db->get(db_prefix() . 'staff')->result_array();
+            
+            // Add approver titles to each employee
+            foreach ($approver_list as &$approver) {
+                $staffid = (int)$approver['staffid'];
+                if (isset($approver_titles_map[$staffid])) {
+                    $approver['approver_titles'] = array_unique($approver_titles_map[$staffid]);
+                } else {
+                    $approver['approver_titles'] = [];
+                }
+            }
+            unset($approver); // Break reference
+        }
+
+        $data['approver_list'] = $approver_list;
+        $data['title'] = 'Approver List';
+        $this->load->view('admin/hrd/approver', $data);
+    }
+
     // Ajax: get designations filtered by department (if column exists)
     public function designations_by_department()
     {
