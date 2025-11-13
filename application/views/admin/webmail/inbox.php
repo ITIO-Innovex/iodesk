@@ -133,7 +133,7 @@ if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 </div>
 </td>
 
-	<td class="hrefmodal tw-cursor-pointer <?php echo $mailcss;?> isread<?=$message['id'];?>" data-mid="<?=$message['id'];?>" data-fid="0" data-tid="<?=$message['subject'];?>" data-id="msg<?=$cnt;?>" title="<?=$message['subject'];?>" mailto="<?=htmlspecialchars($message['from_email']);?>" mailtox="<?=htmlspecialchars($message['to_emails']);?>" mailcc="<?=htmlspecialchars($message['cc_emails']);?>" mailbcc="<?=htmlspecialchars($message['bcc_emails']);?>" messageid="<?=$message['messageid'];?>" data-date="<?=$message['date'];?>" data-folder="<?=$message['folder'];?>"><div class="w-36 h-36 bg-red-600 rounded-full"></div> <span> <b><?=$message['subject'];?></b><br>From : <?=htmlspecialchars($message['from_email']);?> To : <?=htmlspecialchars($message['to_emails']);?></span></td>
+	<td class="hrefmodal tw-cursor-pointer <?php echo $mailcss;?> isread<?=$message['id'];?>" data-mid="<?=$message['id'];?>" data-fid="0" data-tid="<?=$message['subject'];?>" data-id="msg<?=$cnt;?>" title="<?=$message['subject'];?>" mailto="<?=htmlspecialchars($message['from_email']);?>" mailtox="<?=htmlspecialchars($message['to_emails']);?>" mailcc="<?=htmlspecialchars($message['cc_emails']);?>" mailbcc="<?=htmlspecialchars($message['bcc_emails']);?>" messageid="<?=$message['messageid'];?>" data-date="<?=$message['date'];?>" data-folder="<?=$message['folder'];?>" data-body="<?=htmlspecialchars($message['body'], ENT_QUOTES, 'UTF-8');?>" data-attachments="<?=htmlspecialchars(isset($message['attachments']) ? $message['attachments'] : '', ENT_QUOTES, 'UTF-8');?>"><div class="w-36 h-36 bg-red-600 rounded-full"></div> <span> <b><?=$message['subject'];?></b><br>From : <?=htmlspecialchars($message['from_email']);?> To : <?=htmlspecialchars($message['to_emails']);?></span></td>
 	<td class="w-25 text-end" style="min-width: 130px;"><span><?=$message['date'];?></span><?php if(!empty($_SESSION['webmail']['folder'])&&$_SESSION['webmail']['folder']=="Search"){ echo "<br><span  class='text-info'> ".$message['folder']."</span>"; } ?></td>
 </tr>
 <tr><td colspan="2" style="display:none;" id="msg<?=$cnt;?>">
@@ -255,6 +255,7 @@ if ($nextPage) {
   <p class="d-inline-flex gap-1 text-end">
  
   <a class="btn btn-warning mtop10" id="reply-button"><i class="fa-solid fa-reply"></i> Reply</a>
+  <a class="btn btn-info mtop10" id="forward-button" style="margin-left: 10px;"><i class="fa-solid fa-share"></i> Forward</a>
 </p>
 <div class="collapse" id="reply-box">
   <div class="card card-body">
@@ -267,7 +268,7 @@ if ($nextPage) {
                value="<?= $this->security->get_csrf_hash(); ?>">
 	<input type="hidden" name="redirect" value="inbox.php">
 	<input type="hidden" name="messageid" id="messageidIT" value="">
-	<input type="hidden" name="messagetype" value="Reply">
+	<input type="hidden" name="messagetype" id="messagetypeIT" value="Reply">
       <div class="mb-3">
         <label for="recipientEmail" class="form-label">Recipient Email</label>
         <input type="text" class="form-control" id="recipientEmailIT" name="recipientEmail" value="" placeholder="Enter recipient email" required>
@@ -309,6 +310,59 @@ if ($nextPage) {
     <div id="resultMessage" class="mt-4"></div>
   </div>
 </div>
+<div class="collapse" id="forward-box">
+  <div class="card card-body">
+  
+  
+  
+    <form action="<?=  admin_url('webmail/Reply') ?>" method="post" enctype="multipart/form-data">
+	<!-- CSRF Token -->
+        <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
+               value="<?= $this->security->get_csrf_hash(); ?>">
+	<input type="hidden" name="redirect" value="inbox.php">
+	<input type="hidden" name="messageid" id="messageidFW" value="">
+	<input type="hidden" name="messagetype" id="messagetypeFW" value="Forward">
+      <div class="mb-3">
+        <label for="recipientEmailFW" class="form-label">Recipient Email</label>
+        <input type="text" class="form-control" id="recipientEmailFW" name="recipientEmail" value="" placeholder="Enter recipient email" required>
+      </div>
+	  <div class="mb-3">
+        <label for="recipientCCFW" class="form-label mtop10">CC</label>
+        <input type="text" class="form-control" id="recipientCCFW" name="recipientCC" value="" placeholder="Enter CC email" >
+      </div>
+	  <div class="mb-3">
+        <label for="recipientBCCFW" class="form-label mtop10">BCC</label>
+        <input type="text" class="form-control" id="recipientBCCFW" name="recipientBCC" value="" placeholder="Enter BCC email" >
+      </div>
+      <div class="mb-3">
+        <label for="emailSubjectFW" class="form-label mtop10">Subject</label>
+        <input type="text" class="form-control" id="emailSubjectFW" name="emailSubject" value="" placeholder="Enter email subject" required>
+      </div>
+      <div class="mb-3">
+    
+	   <textarea  name="emailBody" id="emailBodyFW" class="form-control editor" required></textarea>
+        <div class="checkbox checkbox-primary">
+<input type="checkbox" id="toggleSignatureFW" name="toggleSignature" value="1">
+<label for="SignatureXFW">Add Signature</label>
+</div>                       
+      </div>
+	  <div class="mb-3">
+	  <div class="tw-text-right">
+	  <a name="send" class="ailoader" onclick="get_content_forward();return false;"><img src="<?php echo base_url('assets/images/artificial-intelligence.png')?>" title="Draft with AI"  style="width:30px;" /></a>
+	 
+	  </div>
+
+	  </div>
+	  
+	  <div class="mb-3">
+        <label for="recipientEmail" class="form-label">Attach Files:</label>
+        <input type="file" name="attachments[]"  class="form-control" multiple>
+      </div>
+      <button type="submit" name="send" class="btn btn-primary mtop20 submitemailforward">Send Email</button>
+    </form>
+    <div id="resultMessage" class="mt-4"></div>
+  </div>
+</div>
   </div>
       </div>
       <!-- Modal footer -->
@@ -328,6 +382,7 @@ if ($nextPage) {
 <script>
 
 	$('.editor').jqte();
+	$('#emailBodyFW').jqte();
 
 </script>
 <script>
@@ -369,11 +424,89 @@ $('.submitemailxxx').click(function(){
 
 });
 
+$('.submitemailforward').click(function(e){ 
+	var recipientEmailFW=$.trim($('#recipientEmailFW').val());
+	var emailSubjectFW=$.trim($('#emailSubjectFW').val());
+	var emailBodyFW='';
+	var isEmpty = true;
+	
+	// Get email body from jqte editor - try multiple methods
+	if($('#emailBodyFW').length) {
+		// First, try to sync content from editor to textarea
+		var $jqteEditor = $('#emailBodyFW').siblings('.jqte_editor');
+		if($jqteEditor.length) {
+			var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+			if($contentEditable.length) {
+				// Sync content from contenteditable to textarea
+				var editorContent = $contentEditable.html() || $contentEditable.text() || '';
+				$('#emailBodyFW').val(editorContent);
+			}
+		}
+		
+		// Method 1: Try jqteVal() function
+		if(typeof $('#emailBodyFW').jqteVal === 'function') {
+			emailBodyFW = $('#emailBodyFW').jqteVal() || '';
+		}
+		
+		// Method 2: Try getting from contenteditable div directly
+		if((!emailBodyFW || emailBodyFW.trim() === '') && $jqteEditor.length) {
+			var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+			if($contentEditable.length) {
+				emailBodyFW = $contentEditable.html() || $contentEditable.text() || '';
+			}
+		}
+		
+		// Method 3: Fallback to textarea value
+		if(!emailBodyFW || emailBodyFW.trim() === '') {
+			emailBodyFW = $('#emailBodyFW').val() || '';
+		}
+		
+		// Strip HTML tags and check actual content
+		if(emailBodyFW) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = emailBodyFW;
+			var textContent = (tempDiv.textContent || tempDiv.innerText || '').trim();
+			textContent = textContent.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+			isEmpty = !textContent || textContent === '' || textContent.length < 6;
+		}
+	}
+        
+		
+		 if(recipientEmailFW==''){
+			alert('Please enter to email');
+			$('#recipientEmailFW').focus();
+			return false;
+		}else if(emailSubjectFW==''){
+		    alert('Please enter email subject');
+			$('#emailSubjectFW').focus();
+			return false;
+		}else if(isEmpty){
+		    alert('Please check Email body before submit / Min content length 5 character');
+			// Focus on the editor
+			var $jqteEditor = $('#emailBodyFW').siblings('.jqte_editor');
+			if($jqteEditor.length) {
+				var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+				if($contentEditable.length) {
+					$contentEditable[0].focus();
+				} else {
+					$('#emailBodyFW').focus();
+				}
+			} else {
+				$('#emailBodyFW').focus();
+			}
+			return false;
+		}else{
+		$(".submitemailforward").html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+		}
+
+
+});
+
 
 function get_content() { 
 
 //let str = $('input[name="aicontent"]').val();
-let str = $('.editor').val();
+let str = $('#emailBody').val();
 let aicontent = $.trim(str);
 
 
@@ -392,8 +525,8 @@ $(".ailoader").html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
             var formattedStr = str.replace(/\\n/g, "<br>");
             var formattedStr = formattedStr.replace(/\\/g, "");
             //alert(formattedStr);
-			$('.editor').jqteVal(formattedStr);
-			$('.editor').val(formattedStr);
+			$('#emailBody').jqteVal(formattedStr);
+			$('#emailBody').val(formattedStr);
 			$(".ailoader").html('<img src="<?php echo base_url('assets/images/artificial-intelligence.png')?>" title="Draft with AI"  style="width:30px;" />');
 			// Usage example: Set cursor after 1 second
             setTimeout(setCursorToEnd, 2000);
@@ -413,6 +546,51 @@ alert("Enter Correct Email Body with min length 5");
 
    
 }
+
+function get_content_forward() { 
+
+//let str = $('input[name="aicontent"]').val();
+let str = $('#emailBodyFW').val();
+let aicontent = $.trim(str);
+
+
+if((aicontent !="") && (aicontent.length >= 5)){
+//alert(emailSubject);
+$(".ailoader").html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+     $.post(admin_url + 'ai_content_generator/generate_email_ai', {
+            content_title: aicontent,
+        })
+        .done(function(response) { 
+            response = JSON.parse(response);
+			//alert(response);
+			
+			if(response.alert_type=="success"){
+			var str = response.message.toString();
+            var formattedStr = str.replace(/\\n/g, "<br>");
+            var formattedStr = formattedStr.replace(/\\/g, "");
+            //alert(formattedStr);
+			$('#emailBodyFW').jqteVal(formattedStr);
+			$('#emailBodyFW').val(formattedStr);
+			$(".ailoader").html('<img src="<?php echo base_url('assets/images/artificial-intelligence.png')?>" title="Draft with AI"  style="width:30px;" />');
+			// Usage example: Set cursor after 1 second
+            setTimeout(setCursorToEndForward, 2000);
+			//alert("Please edit the content before send");
+			
+			}else{
+			alert("Not Generated");
+			$(".ailoader").html('<img src="<?php echo base_url('assets/images/artificial-intelligence.png')?>" title="Draft with AI"  style="width:30px;" />');
+			
+			}
+			
+            
+        });
+}else{
+alert("Enter Correct Email Body with min length 5");
+}
+
+   
+}
+
 function setCursorToEnd() {
   var iframe = $('.jqte_editor')[0]; // Get the editable div (jqte_editor)
   var range = document.createRange();
@@ -422,6 +600,19 @@ function setCursorToEnd() {
   range.collapse(false); // false = to end of the content
   selection.removeAllRanges();
   selection.addRange(range);
+}
+
+function setCursorToEndForward() {
+  var iframe = $('#emailBodyFW').siblings('.jqte_editor').find('[contenteditable="true"]')[0]; // Get the editable div for forward editor
+  if(iframe) {
+    var range = document.createRange();
+    var selection = window.getSelection();
+
+    range.selectNodeContents(iframe);
+    range.collapse(false); // false = to end of the content
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
 }
   </script>
 <script>
@@ -462,15 +653,25 @@ $('.isread').click(function(){
 		 var messageid=$(this).attr('messageid');
 		 var did=$(this).attr('data-id');
 		 var ddate=$(this).attr('data-date');
+		 // Get email body from data attribute (browser automatically decodes HTML entities)
+		 var emailBody=$(this).attr('data-body') || '';
+		 var attachments=$(this).attr('data-attachments') || '';
 		 const formattedDate = moment(ddate).format('ddd, DD MMM YYYY h:mm:ss A Z');
 		 //alert(tid);alert(mailto);alert(formattedDate);
+		 
+		 // Hide both forms initially
+		 $('#reply-box').hide();
+		 $('#forward-box').hide();
 		 
 		 $('#myModal12').modal('show');
 		  $('#myModal12 .modal-dialog').css({"max-width":"80%", "margin-top": "20px"});
 		 //$('#myModal12').modal('show').find('.modal-body').load(urls);
 	     $('#myModal12 .modal-title').html('<span class="h4"><b>' + tid + '</b></span><br>' + '<span class="h6 text-primary"> From : ' + escapeHtml(mailto) +'<br> To : ' + escapeHtml(mailtox) +'<br> CC :' + escapeHtml(mailcc) +' BCC :' + escapeHtml(mailbcc) +'<br>' + formattedDate +'</span>');
 		// $('#emailSubject').val(tid);
+		 
+		 // Set values for Reply form
 		 $('#emailSubjectIT').val(tid);
+		 $('#messagetypeIT').val('Reply');
 		 
 		 if($(this).attr('data-folder')=="Sent"){
 		 $('#recipientEmailIT').val(mailtox);
@@ -481,8 +682,49 @@ $('.isread').click(function(){
 		 $('#recipientBCCIT').val(mailbcc);
 		 $('#messageidIT').val(messageid);
 		 
+		 // Set values for Forward form
+		 var forwardSubject = 'Fwd: ' + tid;
+		 $('#emailSubjectFW').val(forwardSubject);
+		 $('#messagetypeFW').val('Forward');
+		 $('#recipientEmailFW').val('');
+		 $('#recipientCCFW').val('');
+		 $('#recipientBCCFW').val('');
+		 $('#messageidFW').val(messageid);
+		 
 		 var contents=$('#'+did).html();
 		 $('#messageDisplay').html(contents);
+		 
+		 // Build attachment links if attachments exist
+		 var attachmentHtml = '';
+		 if(attachments && attachments.trim() !== '') {
+			 var attachmentArray = attachments.split(',');
+			 attachmentArray.forEach(function(attach) {
+				 if(attach && attach.trim() !== '') {
+					 var filePath = '<?php echo site_url(); ?>/' + attach.trim();
+					 attachmentHtml += '<i class="fa-solid fa-paperclip"></i> <a href="' + filePath + '" target="_blank" title="Click to view">' + filePath + '</a><br>';
+				 }
+			 });
+		 }
+		 
+		 // Store original message content for forward
+		 window.originalMessageContent = contents;
+		 
+		 // Set forward body with full original message content (not just iframe HTML)
+		 var forwardBody = '<br><br>---------- Forwarded message ----------<br>From: ' + escapeHtml(mailto) + '<br>Date: ' + formattedDate + '<br>Subject: ' + escapeHtml(tid) + '<br>To: ' + escapeHtml(mailtox);
+		 if(mailcc && mailcc.trim() !== '') {
+			 forwardBody += '<br>CC: ' + escapeHtml(mailcc);
+		 }
+		 if(mailbcc && mailbcc.trim() !== '') {
+			 forwardBody += '<br>BCC: ' + escapeHtml(mailbcc);
+		 }
+		 forwardBody += '<br><br>' + emailBody;
+		 if(attachmentHtml !== '') {
+			 forwardBody += '<br><br>Attachments:<br>' + attachmentHtml;
+		 }
+		 
+		 // Initialize forward editor body after a short delay to ensure editor is ready
+		 // This will be set when forward button is clicked
+		 window.forwardBodyContent = forwardBody;
 
 $('#emailBody_ifr').contents().find('#tinymce').html(content);
 		 
@@ -490,7 +732,34 @@ $('#emailBody_ifr').contents().find('#tinymce').html(content);
 	});
 	
 	$( "#reply-button" ).click(function() {
+    $( "#forward-box" ).hide();
     $( "#reply-box" ).toggle();
+});
+
+	$( "#forward-button" ).click(function() {
+    $( "#reply-box" ).hide();
+    $( "#forward-box" ).show();
+    
+    // Initialize editor when forward box is shown
+    setTimeout(function() {
+        // Check if editor is already initialized
+        if(!$('#emailBodyFW').siblings('.jqte_editor').length) {
+            $('#emailBodyFW').jqte();
+        }
+        
+        // Set forward body content if available
+        if(window.forwardBodyContent) {
+            setTimeout(function() {
+                if($('#emailBodyFW').length) {
+                    if(typeof $('#emailBodyFW').jqteVal === 'function') {
+                        $('#emailBodyFW').jqteVal(window.forwardBodyContent);
+                    } else {
+                        $('#emailBodyFW').val(window.forwardBodyContent);
+                    }
+                }
+            }, 200);
+        }
+    }, 50);
 });
   </script>
   
