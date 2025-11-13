@@ -776,16 +776,40 @@ body, html {
   width: 250px;
   background-color: unset !important;
   color: #fff;
-  overflow-y: scroll; /* allow scrolling */
+  overflow-y: auto; /* allow scrolling */
+  overflow-x: hidden;
   padding: 20px;
-  /* Hide scrollbar */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  max-height: 100vh;
+  height: 100vh;
   backdrop-filter: saturate(125%) blur(15px);
-  
 }
-.sidebar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+
+/* Show scrollbar for sidebar menu when needed */
+.sidebar #side-menu {
+  max-height: calc(100vh - 20px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1e293b;
+}
+
+.sidebar #side-menu::-webkit-scrollbar {
+  width: 6px;
+  display: block;
+}
+
+.sidebar #side-menu::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.sidebar #side-menu::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.sidebar #side-menu::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 .sidebar.animated {
 padding: 0px !important;

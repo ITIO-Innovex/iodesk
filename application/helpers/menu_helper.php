@@ -252,6 +252,16 @@ function app_init_admin_sidebar_menu_items()
 			'badge'    => [],
 		]);
     }
+	if (is_staff_member() && staff_can('view',  'ai_support')) {
+		$CI->app_menu->add_sidebar_menu_item('ai-content-generator', [
+			'name'     => _l('AI Support'),
+			'href'     => admin_url('ai_content_generator'),
+			'icon'     => 'fa-regular fa-newspaper',
+			'position' => 45,
+			'badge'    => [],
+		]);
+    }
+	
 	
 	//////////////////////////////////////////
 	
