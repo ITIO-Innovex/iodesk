@@ -10,6 +10,9 @@
         </li>
         <?php
         $totalSetupMenuItems = 0;
+        if (!isset($setup_menu) || !is_array($setup_menu)) {
+            $setup_menu = [];
+        }
         foreach ($setup_menu as $key => $item) {
             if (isset($item['collapse']) && count($item['children']) === 0) {
                 continue;
