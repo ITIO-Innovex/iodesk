@@ -274,10 +274,9 @@ class Project extends AdminController
     /* Get project Dashboard Data */
     public function dashboard()
     {
-        if(is_admin() || (is_staff_member() && staff_can('view_own',  'hr_department'))) { 
-        }else{
-		access_denied('HRD Dashboard');
-		}
+         if (!is_admin() && !staff_can('project_project', 'project')) {
+            access_denied('Project');
+        }
         
         $this->load->model('project_model');
         $this->load->model('staff_model');

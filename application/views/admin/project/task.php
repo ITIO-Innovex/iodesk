@@ -25,6 +25,33 @@
     left: 100px; /* Width of first column */
   }
 .table-responsive{ min-height:500px; }
+
+/* Red border for task description validation error */
+.jqte_editor.error-border {
+    border: 2px solid #dc3545 !important;
+    border-radius: 4px;
+    padding: 2px;
+    transition: border-color 0.3s ease;
+}
+
+.jqte_editor.error-border [contenteditable="true"] {
+    border: 1px solid #dc3545 !important;
+    outline: none;
+}
+
+/* Focus effect for task description */
+#task_description:focus + .jqte_editor,
+.jqte_editor:has([contenteditable="true"]:focus) {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    padding: 2px;
+    transition: border-color 0.3s ease;
+}
+
+.jqte_editor [contenteditable="true"]:focus {
+    border: 1px solid #007bff;
+    outline: none;
+}
 </style>
 
 
@@ -49,9 +76,8 @@
 					<th class="sticky-col first-col" style="position: sticky;"><?php echo 'ID'; ?></th>
                     <th class="sticky-col second-col" style="left: 100px;position: sticky;min-width: 200px;"><?php echo 'Task Name'; ?></th>
                      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-                    <th ><?php echo 'Owner'; ?></th>
+                    <th ><?php echo 'Assign To'; ?></th>
                     <th><?php echo 'Status'; ?></th>
-					
 					<th><?php echo 'Start Date'; ?></th>
                     <th><?php echo 'End Date'; ?></th>
                     <th><?php echo 'Duration'; ?></th>
@@ -174,7 +200,7 @@
               <div class="col-md-6">
                                        <!-- Owners (Multi-select with avatars) -->
               <div class="form-group">
-                <label for="task_owner" class="control-label"><small class="req text-danger">* </small><?php echo _l('Owner'); ?></label>
+                <label for="task_owner" class="control-label"><small class="req text-danger">* </small>Assign To</label>
                 <select class="form-control selectpicker" id="task_owner" name="task_owner[]" required multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" title="Owner">
                   <?php if (isset($staff_members) && is_array($staff_members)) { ?>
                     <?php foreach ($staff_members as $staff) { ?>
@@ -217,8 +243,10 @@
              
             
                          <!-- Description -->
-             <?php echo render_textarea('task_description', '', '', ['required' => 'true'], [], '', 'editor'); ?>
-             
+			<div class="form-group">
+                  <label for="task_start_date" class="control-label"><small class="req text-danger">* </small>Project Description</label>
+             <?php echo render_textarea('task_description', '', '', [], [], '', 'editor'); ?>
+             </div>
                            <!-- Tags -->
               <div class="form-group">
                 <label for="tags" class="control-label"><?php echo _l('Tags'); ?> <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Add tags to better manage and search records. Add text and press enter for add tag"></i></label>
@@ -387,6 +415,115 @@ function manage_project_form(form) {
     if (startDate && endDate && endDate < startDate) {
         alert('End Date cannot be earlier than Start Date.');
         $('#task_end_date').focus();
+        return false;
+    }
+
+    // Validate task_description
+    var taskDescription = '';
+    var $descriptionEditor = $('#task_description');
+    var isEmpty = true;
+    
+    if ($descriptionEditor.length) {
+        // Method 1: Try jqteVal() function (if available)
+        if (typeof $.fn.jqteVal === 'function') {
+            try {
+                taskDescription = $descriptionEditor.jqteVal() || '';
+            } catch(e) {
+                // Continue to other methods
+            }
+        }
+        
+        // Method 2: Get from textarea value (jqte syncs to textarea)
+        if (!taskDescription) {
+            taskDescription = $descriptionEditor.val() || '';
+        }
+        
+        // Method 3: Get directly from jqte editor's contenteditable div
+        // jqte creates a structure like: .jqte > .jqte_editor > [contenteditable div]
+        var $jqteEditor = $descriptionEditor.siblings('.jqte_editor').length ? 
+            $descriptionEditor.siblings('.jqte_editor') : 
+            $descriptionEditor.parent().find('.jqte_editor').first();
+            
+        if ($jqteEditor.length && !taskDescription) {
+            var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+            if ($contentEditable.length) {
+                taskDescription = $contentEditable.html() || '';
+            }
+        }
+        
+        // Extract text content from HTML
+        if (taskDescription) {
+            var tempDiv = document.createElement('div');
+            tempDiv.innerHTML = taskDescription;
+            var textContent = (tempDiv.textContent || tempDiv.innerText || '').trim();
+            // Remove HTML entities and extra whitespace
+            textContent = textContent.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+            isEmpty = !textContent || textContent === '';
+        }
+    }
+    
+    if (isEmpty) {
+        alert('Task Description is required. Please enter a description.');
+        // Focus the jqte editor and add red border
+        var $jqteEditor = $descriptionEditor.siblings('.jqte_editor').length ? 
+            $descriptionEditor.siblings('.jqte_editor') : 
+            $descriptionEditor.parent().find('.jqte_editor').first();
+        if ($jqteEditor.length) { 
+            var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+            if ($contentEditable.length) {
+                // Add error class for red border styling
+                $jqteEditor.addClass('error-border');
+                
+                // Multiple methods to ensure focus works
+                setTimeout(function() {
+                    // Method 1: Direct focus
+                    $contentEditable[0].focus();
+                    
+                    // Method 2: Click to focus
+                    $contentEditable[0].click();
+                    
+                    // Method 3: Set cursor position
+                    if (window.getSelection && document.createRange) {
+                        var range = document.createRange();
+                        range.selectNodeContents($contentEditable[0]);
+                        range.collapse(false);
+                        var sel = window.getSelection();
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                    
+                    // Scroll into view
+                    $contentEditable[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+                
+                // Remove red border when user starts typing
+                var removeErrorBorder = function() {
+                    $jqteEditor.removeClass('error-border');
+                    $contentEditable.off('input keydown paste', removeErrorBorder);
+                };
+                $contentEditable.on('input keydown paste', removeErrorBorder);
+            } else {
+                $descriptionEditor.css('border', '2px solid #dc3545');
+                setTimeout(function() {
+                    $descriptionEditor.focus();
+                    $descriptionEditor[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 100);
+                // Remove border on input
+                $descriptionEditor.on('input', function() {
+                    $(this).css('border', '');
+                });
+            }
+        } else {
+            $descriptionEditor.css('border', '2px solid #dc3545');
+            setTimeout(function() {
+                $descriptionEditor.focus();
+                $descriptionEditor[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            // Remove border on input
+            $descriptionEditor.on('input', function() {
+                $(this).css('border', '');
+            });
+        }
         return false;
     }
 
