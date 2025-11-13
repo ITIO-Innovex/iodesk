@@ -513,10 +513,63 @@ body.page-small #header {
   bottom: 0;
   left: 0;
   top: 0;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  max-height: 100vh !important;
+  height: 100vh !important;
 }
 
 .sidebar > ul > li:nth-child(2) a {
   margin-top: 8px;
+}
+
+/* Sidebar menu scrollable when content exceeds screen height */
+.sidebar #side-menu {
+  display: block;
+  max-height: 100vh !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-bottom: 20px;
+  /* Firefox scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #475569 #1e293b;
+}
+
+/* Override JavaScript min-height when menu exceeds viewport */
+#menu.sidebar {
+  max-height: 100vh !important;
+  height: 100vh !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+}
+
+/* Ensure menu list can scroll independently */
+#menu.sidebar #side-menu {
+  position: relative;
+  max-height: 100vh !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Custom scrollbar styling for sidebar menu (Webkit browsers - Chrome, Safari, Edge) */
+.sidebar #side-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar #side-menu::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.sidebar #side-menu::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.sidebar #side-menu::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 .sidebar li a {

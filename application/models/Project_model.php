@@ -182,6 +182,8 @@ if (is_super()) {
 } else {
 // Instead of where_in, use FIND_IN_SET
     $this->db->where("FIND_IN_SET(".get_staff_user_id().", pt.task_owner) !=", 0);
+	$this->db->or_where('pm.owner', get_staff_user_id());
+	$this->db->or_where('pt.task_addedby', get_staff_user_id());
 }
 
 $this->db->where('pt.task_is_deleted', 0);

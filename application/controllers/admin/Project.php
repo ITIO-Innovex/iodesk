@@ -48,6 +48,7 @@ class Project extends AdminController
         
         // Get data for the view
         $data['listdata'] = $this->project_model->get_task_list($id);
+		//print_r($data['listdata']);
 		$data['project_id'] = $id;
 		
 		//print_r($data['listdata']);exit;
