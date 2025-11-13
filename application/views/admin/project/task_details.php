@@ -222,7 +222,7 @@ border-radius: 20px;
 					<?php echo form_open(admin_url('project/addcomments'), ['id' => 'add-comment-form', 'onsubmit' => 'return submitCommentForm(this);']); ?>
 					<input type="hidden" name="project_id" value="<?php echo (int)$task['project_id']; ?>">
 					<input type="hidden" name="task_id" value="<?php echo (int)$task['id']; ?>">
-					<?php echo render_textarea('comments', '', '', [], [], '', 'tinymce'); ?>
+					<?php //echo render_textarea('comments', '', '', [], [], '', 'tinymce'); ?>
 <textarea name="comments" id="comments" class="form-control editor"  placeholder="Comments..." required></textarea>
 					<button type="submit" class="btn btn-primary submit-loader">Submit</button>
 					<span id="submit-loader-message" class="text-info tw-px-2"></span>

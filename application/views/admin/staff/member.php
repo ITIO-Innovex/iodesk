@@ -129,7 +129,7 @@
                                 </div><?php */?>
                                 <?php $value = (isset($member) ? $member->phonenumber : ''); ?>
                                 <?php //echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value); ?>
-								 <?php echo render_input('phonenumber', 'staff_add_edit_phonenumber', $value,'number',['maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
+								 <?php echo render_input('phonenumber', '<small class="req text-danger">* </small>Phone Number</label>', $value,'number',['maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57','required' => 'true']); ?>
                                 <?php /*?><div class="form-group">
                                     <label for="facebook" class="control-label"><i class="fa-brands fa-facebook-f"></i>
                                         <?php echo _l('staff_add_edit_facebook'); ?></label>
