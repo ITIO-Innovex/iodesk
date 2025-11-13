@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">
-          <div class="panel-body panel-table-full">
+          <div class="panel-body panel-table-fullxx">
             <?php if (!empty($approver_list)) { ?>
               <div class="alert alert-info">
                 <i class="fa-solid fa-info-circle"></i> 

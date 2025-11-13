@@ -780,7 +780,11 @@ public function downloadmail($id)
         return "Invalid Mailbox ID!";
     }
 
-    $mailers = $this->webmail_model->get_imap_details($id);
+    // Increase execution time for email processing
+    set_time_limit(300); // 5 minutes
+    ini_set('max_execution_time', 300);
+
+    $mailers = $this->get_imap_details($id);
     if (empty($mailers)) {
         return "Email IMAP details not found!";
     }
@@ -797,15 +801,30 @@ public function downloadmail($id)
     // ===============================
     try {
         $cm = new ClientManager();
+		
+		$client_config = [
+    'host'          => $mailer_imap_host,
+    'port'          => $mailer_imap_port,
+    'encryption'    => $encryption,   // 'ssl' or 'tls'
+    'validate_cert' => true,
+    'username'      => $mailer_username,
+    'password'      => $mailer_password,    // mask password for logs
+    'protocol'      => 'imap',
+    'timeout'       => 300
+];
+
+// Log the IMAP connection details
+log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_PRINT));
+
         $client = $cm->make([
             'host'          => $mailer_imap_host,
             'port'          => $mailer_imap_port,
             'encryption'    => $encryption,   // 'ssl' or 'tls'
-            'validate_cert' => true,
+            //'validate_cert' => true,
             'username'      => $mailer_username,
             'password'      => $mailer_password,
             'protocol'      => 'imap',
-            'timeout'       => 300
+            'timeout'       => 600
         ]);
 
         try {
@@ -834,67 +853,131 @@ public function downloadmail($id)
                 }
 
                 $data['folder'] = $folder->name;
-                $last_email_id  = $this->webmail_model->lastemailid($mailer_username, $folder->name);
+                $last_email_id  = $this->lastemailid($mailer_username, $folder->name);
                 $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
 
                 // ===============================
                 // Fetch Recent Messages
                 // ===============================
                 try {
-                    $messages = $folder->messages()->all()->limit(10)->get();
+                    // Use a reasonable limit to avoid timeout (50 messages per folder)
+                    // Process in smaller batches to prevent timeout errors
+                    $limit = 10;
+                    
+                    // Fetch messages in batches
+                    $messages = $folder->messages()->all()->limit($limit)->get();
                 } catch (GetMessagesFailedException $e) {
                     log_message('error', "IMAP message fetch error in {$folder->name}: " . $e->getMessage());
                     continue;
+                } catch (\Exception $e) {
+                    log_message('error', "Error fetching messages from {$folder->name}: " . $e->getMessage());
+                    continue;
                 }
 
-                if ($messages->count() == 0) continue;
+                if ($messages->count() == 0) {
+                    log_message('info', "No messages found in folder: {$folder->name}");
+                    continue;
+                }
 
-                // Filter only new messages
+                // Store original count before filtering
+                $original_count = $messages->count();
+                
+                // Log for debugging
+                log_message('info', "Folder: {$folder->name}, Total messages fetched: {$original_count}, Last email UID: {$last_email_id}");
+
+                // Filter only new messages (UIDs greater than last downloaded)
                 $messages = $messages->filter(function ($m) use ($last_email_id) {
-                    return $m->getUid() > $last_email_id;
+                    $uid = $m->getUid();
+                    return $uid > $last_email_id;
                 });
 
+                // Log filtered count
+                $filtered_count = $messages->count();
+                log_message('info', "Folder: {$folder->name}, New messages after filtering: {$filtered_count}");
+                
+                // If no new messages after filtering but we fetched messages, log a warning
+                if ($filtered_count == 0 && $original_count > 0) {
+                    log_message('error', "Folder: {$folder->name}, All {$original_count} fetched messages have UID <= {$last_email_id}. May need to fetch more messages or check UID values.");
+                }
+
+                $message_index = 0;
                 foreach ($messages as $message) {
-                    $data = [
-                        'email'         => $mailer_username,
-                        'folder'        => $folder->name,
-                        'subject'       => $message->getSubject(),
-                        'date'          => $message->getDate(),
-                        'body'          => $message->getHtmlBody() ?? $message->getTextBody() ?? '',
-                        'uniqid'        => $message->uid,
-                        'messageid'     => $message->getMessageId(),
-                        'from_email'    => $message->getFrom()[0]->mail ?? '',
-                        'from_name'     => $message->getFrom()[0]->personal ?? '',
-                        'to_emails'     => $message->getTo()[0]->mail ?? '',
-                        'cc_emails'     => $message->getCc()[0]->mail ?? '',
-                        'bcc_emails'    => $message->getBcc()[0]->mail ?? '',
-                        'isattachments' => 0,
-                        'attachments'   => ''
-                    ];
-
-                    // ===============================
-                    // Handle Attachments
-                    // ===============================
-                    $attachments_paths = [];
-                    foreach ($message->getAttachments() as $attachment) {
-                        $uid = uniqid();
-                        $dir = FCPATH . 'uploads/email_attachments/' . $uid;
-                        if (!is_dir($dir)) mkdir($dir, 0777, true);
-                        $attachment->save($dir);
-                        $attachments_paths[] = $dir . '/' . $attachment->name;
-                        $data['isattachments'] = 1;
+                    $message_index++;
+                    
+                    // Check execution time periodically to avoid timeout
+                    if ($message_index % 10 == 0) {
+                        $elapsed = time() - (isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time());
+                        if ($elapsed > 100) { // If more than 100 seconds elapsed, stop processing
+                            log_message('error', "Stopping email processing in {$folder->name} to avoid timeout. Processed {$message_index} messages.");
+                            break;
+                        }
                     }
-                    $data['attachments'] = implode(',', $attachments_paths);
-
-                    // ===============================
-                    //Insert into Database
-                    // ===============================
+                    
                     try {
-                        $this->db->insert(db_prefix() . 'emails', $data);
-                        $cnt++;
-                    } catch (Exception $e) {
-                        log_message('error', 'DB Insert Failed: ' . $e->getMessage());
-                        continue;
+                        $data = [
+                            'email'         => $mailer_username,
+                            'folder'        => $folder->name,
+                            'subject'       => $message->getSubject(),
+                            'date'          => $message->getDate(),
+                            'body'          => $message->getHtmlBody() ?? $message->getTextBody() ?? '',
+                            'uniqid'        => $message->uid,
+                            'messageid'     => $message->getMessageId(),
+                            'from_email'    => $message->getFrom()[0]->mail ?? '',
+                            'from_name'     => $message->getFrom()[0]->personal ?? '',
+                            'to_emails'     => $message->getTo()[0]->mail ?? '',
+                            'cc_emails'     => $message->getCc()[0]->mail ?? '',
+                            'bcc_emails'    => $message->getBcc()[0]->mail ?? '',
+                            'isattachments' => 0,
+                            'attachments'   => ''
+                        ];
+
+                        // ===============================
+                        // Handle Attachments
+                        // ===============================
+                        $attachments_paths = [];
+                        try {
+                            foreach ($message->getAttachments() as $attachment) {
+                                $uid = uniqid();
+                                $dir = FCPATH . 'uploads/email_attachments/' . $uid;
+                                if (!is_dir($dir)) mkdir($dir, 0777, true);
+                                $attachment->save($dir);
+                                $attachments_paths[] = $dir . '/' . $attachment->name;
+                                $data['isattachments'] = 1;
+                            }
+                        } catch (\Exception $e) {
+                            log_message('error', "Error saving attachment for message UID {$data['uniqid']}: " . $e->getMessage());
+                            // Continue without attachment
+                        }
+                        $data['attachments'] = implode(',', $attachments_paths);
+
+                        // ===============================
+                        //Insert into Database
+                        // ===============================
+                        try {
+                            // Check if email already exists (by uniqid, email, and folder to avoid duplicates)
+                            $this->db->where('uniqid', $data['uniqid']);
+                            $this->db->where('email', $data['email']);
+                            $this->db->where('folder', $data['folder']);
+                            $existing = $this->db->get(db_prefix() . 'emails')->row();
+                            
+                            if (!$existing) {
+                                $this->db->insert(db_prefix() . 'emails', $data);
+                                if ($this->db->insert_id()) {
+                                    $cnt++;
+                                    log_message('info', "Inserted email: {$data['subject']} (UID: {$data['uniqid']})");
+                                } else {
+                                    log_message('error', "Failed to insert email: {$data['subject']} (UID: {$data['uniqid']})");
+                                }
+                            } else {
+                                log_message('info', "Email already exists, skipped: {$data['subject']} (UID: {$data['uniqid']})");
+                            }
+                        } catch (Exception $e) {
+                            log_message('error', 'DB Insert Failed for UID ' . ($data['uniqid'] ?? 'unknown') . ': ' . $e->getMessage());
+                            continue;
+                        }
+                    } catch (\Exception $e) {
+                        log_message('error', "Error processing message in {$folder->name}: " . $e->getMessage());
+                        continue; // Skip this message and continue with next
                     }
 
                     unset($message); // free memory
@@ -912,7 +995,15 @@ public function downloadmail($id)
         //Clean Disconnect
         // ===============================
         $client->disconnect();
-        return " Total emails downloaded: {$cnt}";
+        
+        // Log final result
+        log_message('info', "Email download completed. Total emails downloaded: {$cnt}");
+        
+        if ($cnt == 0) {
+            return "Total emails downloaded: 0. (No new emails found. All emails may have already been downloaded, or check logs for details.)";
+        }
+        
+        return "Total emails downloaded: {$cnt}";
 
     } catch (ImapServerErrorException $e) {
         log_message('error', 'IMAP Server Error: ' . $e->getMessage());
