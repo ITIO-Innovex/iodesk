@@ -9,7 +9,11 @@
         <?php
          hooks()->do_action('before_render_aside_menu');
          ?>
-        <?php foreach ($sidebar_menu as $key => $item) {
+        <?php 
+        if (!isset($sidebar_menu) || !is_array($sidebar_menu)) {
+            $sidebar_menu = [];
+        }
+        foreach ($sidebar_menu as $key => $item) {
              if ((isset($item['collapse']) && $item['collapse']) && count($item['children']) === 0) {
                  continue;
              } ?>
