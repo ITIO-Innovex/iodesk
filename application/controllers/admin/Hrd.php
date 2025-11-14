@@ -1582,7 +1582,7 @@ class Hrd extends AdminController
             'company_id'   => get_staff_company_id(),
             'from_date'    => $this->input->post('from_date'),
             'to_date'      => $this->input->post('to_date'),
-            'leave_type'   => $this->input->post('leave_type') ? $this->input->post('leave_type') : 'General',
+            'leave_type'   => $this->input->post('leave_type') ? $this->input->post('leave_type') : '',
             'leave_for'    => $this->input->post('leave_for') !== null ? (int)$this->input->post('leave_for') : 1,
             'leave_reson'  => $this->input->post('leave_reson'),
         ];
