@@ -2038,14 +2038,14 @@ echo "&nbsp;&nbsp;Invoice form"; ?>
 
 <div class="modal fade" id="CustomizedDealModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
-<?php echo form_open((isset($lead) ? admin_url('leads/customizeddeal/' . $lead->id) : admin_url('leads/customizeddeal')), ['id' => 'customizeddeal_form', 'enctype' => 'multipart/form-data']); ?> 
-<?php
-
+<?php 
+if (isset($lead) && !empty($lead) && isset($lead->id) && isset($_SESSION['deal_form_order'])) {
+    echo form_open(admin_url('leads/customizeddeal/' . $lead->id), ['id' => 'customizeddeal_form', 'enctype' => 'multipart/form-data']); 
 $deal_list=$_SESSION['deal_form_order'];
 //print_r($deal_list);
 $lastdealid = $_SESSION['lastdealid']= end($deal_list);
 $deal_list_total=count($deal_list);
-$deal_stage=$deal_list[$lead->deal_stage];
+$deal_stage = isset($lead->deal_stage) && isset($deal_list[$lead->deal_stage]) ? $deal_list[$lead->deal_stage] : '';
 $deal_stage;
 
 
@@ -2056,12 +2056,12 @@ $deal_stage;
             <div class="modal-header" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">#<?php echo $lead->id;?> [<?php echo get_deals_stage_title($deal_stage);?>]</h4>
+                <h4 class="modal-title">#<?php echo isset($lead->id) ? $lead->id : '';?> [<?php echo get_deals_stage_title($deal_stage);?>]</h4>
             </div>
             <div class="modal-body">
                 <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
                 
-                <input type="hidden" name="deal_id" id="deal_id" value="<?php echo $lead->id;?>"  />
+                <input type="hidden" name="deal_id" id="deal_id" value="<?php echo isset($lead->id) ? $lead->id : '';?>"  />
 				<input type="hidden" name="deal_stage" id="deal_stage" value="<?php echo $deal_stage;?>"  />
 				
 <div>
@@ -2255,16 +2255,35 @@ if(isset($deal_stage)&&$deal_stage==$lastdealid){
 			<!--===================================================================-->
 
 			
-<div class="modal-footer" style="background-color: rgb(186 230 253 / 1) !important;">
+            <div class="modal-footer" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button class="btn btn-primary">Submit</button>
             </div>
 		<?php echo form_close(); ?>
         </div>
         <!-- /.modal-content -->
-        
     </div>
     <!-- /.modal-dialog -->
 </div>
+<?php } else { ?>
+    <!-- Modal content when lead is not set -->
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">No Lead Selected</h4>
+            </div>
+            <div class="modal-body">
+                <p>Please select a lead first.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php } ?>
 <?php if (isset($lead) && $lead_locked == true) { ?>
 <script>
 $(function() {

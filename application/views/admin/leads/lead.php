@@ -201,7 +201,7 @@ $(document).ready(function() {
 			type: 'POST', // Request method
 			data: {
 				telegram_message: message, // Sending the message to the specified URL
-				lead_id: <?php echo e($lead->id);?>, // Sending the message to the specified URL
+				lead_id: <?php echo (isset($lead) && isset($lead->id)) ? e($lead->id) : '0';?>, // Sending the message to the specified URL
 				staff_user_id: <?php echo e($_SESSION['staff_user_id']);?>,
 			},
 			success: function(response) {
