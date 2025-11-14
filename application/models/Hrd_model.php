@@ -821,7 +821,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
         $outTimeObj = (!empty($outTime) && $outTime != '-') ? new DateTime($outTime) : null;
 		if(isset($shift_details)&&$shift_details){
 		$officeIn 			= $shift_details[0]['shift_in'];
-		log_message('error', 'Display data'.$officeIn );
+		//log_message('error', 'Display data'.$officeIn );
         $officeOut 			= $shift_details[0]['shift_out'];
         $firstHalfIn 		= $shift_details[0]['first_half_start'];
         $firstHalfOut 		= $shift_details[0]['first_half_end'];
