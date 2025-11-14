@@ -62,13 +62,26 @@
             <!-- Search Form -->
             <form method="get" action="" class="mbot15" style="margin-bottom:15px;">
               <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-group">
                     <label>Month</label>
                     <input type="month" name="month" class="form-control" value="<?php echo e($month); ?>" />
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label>Branch</label>
+                    <select name="branch_id" class="form-control">
+                      <option value="">-- All Branches --</option>
+                      <?php if (!empty($branches)) { foreach ($branches as $branch) { 
+                        $selected = (isset($branch_filter) && (int)$branch_filter === (int)$branch['id']) ? 'selected' : '';
+                      ?>
+                        <option value="<?php echo (int)$branch['id']; ?>" <?php echo $selected; ?>><?php echo e($branch['branch_name']); ?></option>
+                      <?php } } ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-3">
                   <div class="form-group">
                     <label>Employee</label>
                     <select name="staff_id" class="form-control">
@@ -81,7 +94,7 @@
                     </select>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-group">
                     <label>&nbsp;</label>
                     <div>
