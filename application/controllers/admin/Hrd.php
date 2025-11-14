@@ -1572,10 +1572,13 @@ class Hrd extends AdminController
         if (!staff_can('view_own',  'hr_department')) {
             access_denied('Leave Application');
         }
+		
+		$data = print_r($this->input->post(), true);
+        log_message('error', 'Display data - ' . $data);
 
         $leave_id = $this->input->post('leave_id');
         $data = [
-            'staffid'      => ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id(),
+            //'staffid'      => ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id(),
             'company_id'   => get_staff_company_id(),
             'from_date'    => $this->input->post('from_date'),
             'to_date'      => $this->input->post('to_date'),
@@ -3342,6 +3345,7 @@ class Hrd extends AdminController
         if (!$date) { $date = date('Y-m-d'); }
         
         $staff_filter = (int)$this->input->get('staff_id');
+        $branch_filter = (int)$this->input->get('branch_id');
 
         // Company scope for staff
         if (is_super()) {
@@ -3354,6 +3358,11 @@ class Hrd extends AdminController
             $this->db->where('company_id', get_staff_company_id());
         }
         $this->db->where('active', 1);
+        
+        // Filter by branch if provided
+        if ($branch_filter > 0) {
+            $this->db->where('branch', $branch_filter);
+        }
         
         // Filter by staff if provided
         if ($staff_filter > 0) {
@@ -3406,10 +3415,24 @@ class Hrd extends AdminController
         $this->db->where('status', 1);
         $attendanceStatuses = $this->hrd_model->get_attendance_status();
 
+        // Load branches for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['branches'] = $this->hrd_model->get_branch_manager();
+
         $data['date'] = $date;
         $data['staff'] = $staff;
         $data['all_staff'] = $all_staff;
         $data['staff_filter'] = $staff_filter;
+        $data['branch_filter'] = $branch_filter;
         $data['attendance_map'] = $attendanceByStaff;
         $data['attendance_statuses'] = $attendanceStatuses;
         $data['title'] = 'Manage Attendance by Date';
@@ -3670,6 +3693,7 @@ class Hrd extends AdminController
         }
 
         $staff_filter = (int)$this->input->get('staff_id');
+        $branch_filter = (int)$this->input->get('branch_id');
 
         // Load all active staff for dropdown (for filter) - company scoped
         if (is_super()) {
@@ -3682,6 +3706,12 @@ class Hrd extends AdminController
             $this->db->where('company_id', get_staff_company_id());
         }
         $this->db->where('active', 1);
+        
+        // Filter by branch if provided
+        if ($branch_filter > 0) {
+            $this->db->where('branch', $branch_filter);
+        }
+        
         $this->db->select('staffid, firstname, lastname, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
         $this->db->order_by('firstname', 'asc');
         $all_staff = $this->db->get(db_prefix() . 'staff')->result_array();
@@ -3705,7 +3735,7 @@ class Hrd extends AdminController
                 }
             }
         } else {
-            // Show all staff
+            // Show all staff (already filtered by branch if branch_filter is set)
             $staff_list = $all_staff;
         }
 
@@ -3737,10 +3767,24 @@ class Hrd extends AdminController
         $this->db->where('status', 1);
         $attendanceStatuses = $this->hrd_model->get_attendance_status();
 
+        // Load branches for dropdown
+        if (is_super()) {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        } else {
+            $this->db->where('company_id', get_staff_company_id());
+        }
+        $this->db->where('status', 1);
+        $data['branches'] = $this->hrd_model->get_branch_manager();
+
         $data['month'] = $month;
         $data['dates'] = $dates;
         $data['all_staff'] = $all_staff;
         $data['staff_filter'] = $staff_filter;
+        $data['branch_filter'] = $branch_filter;
         $data['staff_list'] = $staff_list;
         $data['attendance_map'] = $attendance_map;
         $data['attendance_statuses'] = $attendanceStatuses;

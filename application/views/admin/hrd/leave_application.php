@@ -22,7 +22,6 @@
                 <th>Employee</th>
                 <th>From</th>
                 <th>To</th>
-                <th>Type</th>
                 <th>For</th>
                 <th>Status</th>
                 <th><?php echo _l('options'); ?></th>
@@ -34,7 +33,6 @@
                   <td><?php echo function_exists('get_staff_full_name') ? e(get_staff_full_name($l['staffid'])) : (int)$l['staffid']; ?></td>
                   <td><?php echo e($l['from_date']); ?></td>
                   <td><?php echo e($l['to_date']); ?></td>
-                  <td><?php echo e($l['leave_type']); ?></td>
                   <td><?php echo ((int)$l['leave_for']===2)?'Half Day':'Full Day'; ?></td>
                   <td><?php $label='Pending';$class='warning'; if($st===1){$label='Approved';$class='success';}elseif($st===2){$label='Rejected';$class='danger';} ?><span class="label label-<?php echo $class; ?>"><?php echo $label; ?></span></td>
                   <td>
@@ -66,21 +64,10 @@
       <div class="modal-body">
         <div id="additional"></div>
         <div class="row">
-          <div class="col-md-6"><div class="form-group"><label>From Date</label><input type="date" name="from_date" class="form-control" required></div></div>
-          <div class="col-md-6"><div class="form-group"><label>To Date</label><input type="date" name="to_date" class="form-control" required></div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-group"><label>Leave Type</label>
-              <select name="leave_type" class="form-control" required>
-                <option value="">-- Select Leave Type --</option>
-                <?php  if (!empty($leave_types)) { foreach ($leave_types as $t) { ?>
-                  <option value="<?php echo e($t['title']); ?>"><?php echo e($t['title']); ?> - <?php echo e($t['remark']); ?></option>
-                <?php } } ?>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6">
+          <div class="col-md-4"><div class="form-group"><label>From Date</label><input type="date" name="from_date" class="form-control" required></div></div>
+          <div class="col-md-4"><div class="form-group"><label>To Date</label><input type="date" name="to_date" class="form-control" required></div></div>
+       
+          <div class="col-md-4">
             <div class="form-group"><label>Leave For</label>
               <select name="leave_for" class="form-control" required>
                 <option value="1">Full Day</option>
@@ -116,9 +103,8 @@
           <div class="col-md-3"><strong>To:</strong> <span id="d-to"></span></div>
         </div>
         <div class="row mtop10">
-          <div class="col-md-4"><strong>Type:</strong> <span id="d-type"></span></div>
-          <div class="col-md-4"><strong>For:</strong> <span id="d-for"></span></div>
-          <div class="col-md-4"><strong>Status:</strong> <span id="d-status" class="label"></span></div>
+          <div class="col-md-6"><strong>For:</strong> <span id="d-for"></span></div>
+          <div class="col-md-6"><strong>Status:</strong> <span id="d-status" class="label"></span></div>
         </div>
         <div class="row mtop10">
           <div class="col-md-12"><strong>Reason:</strong>
@@ -158,13 +144,13 @@
 function leave_rule(){ $('#leave_rule').modal('show');}
 
   window.addEventListener('load', function () {
-    appValidateForm($("body").find('#leave-application-form'), {from_date:'required',to_date:'required',leave_type:'required',leave_for:'required',leave_reson:'required'}, manage_leave);
+    appValidateForm($("body").find('#leave-application-form'), {from_date:'required',to_date:'required',leave_for:'required',leave_reson:'required'}, manage_leave);
     $('#leave_application').on("hidden.bs.modal", function () { $('#additional').html(''); $('#leave_application input, #leave_application textarea').val(''); $('#leave_application select').val(''); $('.add-title').removeClass('hide'); $('.edit-title').removeClass('hide'); });
   });
   
   function new_leave(){ $('#leave_application').modal('show'); $('.edit-title').addClass('hide'); }
-  function edit_leave(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('leave_id', it.leave_id)); $('#leave_application input[name=from_date]').val(it.from_date); $('#leave_application input[name=to_date]').val(it.to_date); $('#leave_application select[name=leave_type]').val(it.leave_type); $('#leave_application select[name=leave_for]').val(it.leave_for); $('#leave_application textarea[name=leave_reson]').val(it.leave_reson); $('#leave_application textarea[name=leave_reply]').val(it.leave_reply||''); $('#leave_application select[name=leave_status]').val(it.leave_status||0); $('#leave_application').modal('show'); $('.add-title').addClass('hide'); }
-  function view_leave(invoker){ var it=$(invoker).data('all'); $('#d-employee').text(it.staffid); $('#d-from').text(it.from_date); $('#d-to').text(it.to_date); $('#d-type').text(it.leave_type); $('#d-for').text((parseInt(it.leave_for,10)===2)?'Half Day':'Full Day'); var st=parseInt(it.leave_status||0,10); var label='Pending', cls='label-warning'; if(st===1){label='Approved';cls='label-success';} else if(st===2){label='Rejected';cls='label-danger';} $('#d-status').removeClass('label-warning label-success label-danger').addClass(cls).text(label); $('#d-reason').text(it.leave_reson||''); $('#d-reply').text(it.leave_reply||''); $('#leave_details').modal('show'); }
+  function edit_leave(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('leave_id', it.leave_id)); $('#leave_application input[name=from_date]').val(it.from_date); $('#leave_application input[name=to_date]').val(it.to_date); $('#leave_application select[name=leave_for]').val(it.leave_for); $('#leave_application textarea[name=leave_reson]').val(it.leave_reson); $('#leave_application textarea[name=leave_reply]').val(it.leave_reply||''); $('#leave_application select[name=leave_status]').val(it.leave_status||0); $('#leave_application').modal('show'); $('.add-title').addClass('hide'); }
+  function view_leave(invoker){ var it=$(invoker).data('all'); $('#d-employee').text(it.staffid); $('#d-from').text(it.from_date); $('#d-to').text(it.to_date); $('#d-for').text((parseInt(it.leave_for,10)===2)?'Half Day':'Full Day'); var st=parseInt(it.leave_status||0,10); var label='Pending', cls='label-warning'; if(st===1){label='Approved';cls='label-success';} else if(st===2){label='Rejected';cls='label-danger';} $('#d-status').removeClass('label-warning label-success label-danger').addClass(cls).text(label); $('#d-reason').text(it.leave_reson||''); $('#d-reply').text(it.leave_reply||''); $('#leave_details').modal('show'); }
   function manage_leave(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
 </script>
 <?php init_tail(); ?>

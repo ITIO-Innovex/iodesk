@@ -773,6 +773,8 @@ public function downloadmailbbbbb($id)
 
 public function downloadmail($id)
 {
+
+
     // ===============================
     // Validate Mailbox
     // ===============================
@@ -854,18 +856,22 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
 
                 $data['folder'] = $folder->name;
                 $last_email_id  = $this->lastemailid($mailer_username, $folder->name);
+				//print_r($last_email_id);
                 $last_email_id  = $last_email_id[0]['uniqid'] ?? 0;
+				
 
                 // ===============================
                 // Fetch Recent Messages
                 // ===============================
                 try {
-                    // Use a reasonable limit to avoid timeout (50 messages per folder)
-                    // Process in smaller batches to prevent timeout errors
-                    $limit = 10;
+                    // Fetch a larger batch to ensure we get new messages beyond the first 10
+                    // We'll fetch up to 100 messages and filter to get the next 10 new ones
+                    $fetch_limit = 100; // Fetch more messages to find new ones
+                    $target_new_messages = 10; // We want to process 10 new messages
                     
-                    // Fetch messages in batches
-                    $messages = $folder->messages()->all()->limit($limit)->get();
+                    // Fetch messages in larger batches to find new ones
+                    $messages = $folder->messages()->all()->limit($fetch_limit)->get();
+					
                 } catch (GetMessagesFailedException $e) {
                     log_message('error', "IMAP message fetch error in {$folder->name}: " . $e->getMessage());
                     continue;
@@ -881,6 +887,7 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
 
                 // Store original count before filtering
                 $original_count = $messages->count();
+				
                 
                 // Log for debugging
                 log_message('info', "Folder: {$folder->name}, Total messages fetched: {$original_count}, Last email UID: {$last_email_id}");
@@ -894,16 +901,27 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
                 // Log filtered count
                 $filtered_count = $messages->count();
                 log_message('info', "Folder: {$folder->name}, New messages after filtering: {$filtered_count}");
-                
-                // If no new messages after filtering but we fetched messages, log a warning
-                if ($filtered_count == 0 && $original_count > 0) {
-                    log_message('error', "Folder: {$folder->name}, All {$original_count} fetched messages have UID <= {$last_email_id}. May need to fetch more messages or check UID values.");
+               
+                // If no new messages after filtering, skip this folder
+                if ($filtered_count == 0) {
+                    if ($original_count > 0) {
+                        log_message('info', "Folder: {$folder->name}, All {$original_count} fetched messages have UID <= {$last_email_id}. No new messages to download.");
+                    }
+                    continue; // Skip to next folder if no new messages
                 }
-
+                
+                // Limit processing to target number of new messages per batch
+                $processed_count = 0;
                 $message_index = 0;
                 foreach ($messages as $message) {
-                    $message_index++;
+                    // Stop if we've processed the target number of new messages
+                    if ($processed_count >= $target_new_messages) {
+                        log_message('info', "Folder: {$folder->name}, Processed {$target_new_messages} new messages. Remaining will be processed in next batch.");
+                        break;
+                    }
                     
+                    $message_index++;
+                     
                     // Check execution time periodically to avoid timeout
                     if ($message_index % 10 == 0) {
                         $elapsed = time() - (isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time());
@@ -913,7 +931,7 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
                         }
                     }
                     
-                    try {
+                    try { 
                         $data = [
                             'email'         => $mailer_username,
                             'folder'        => $folder->name,
@@ -930,6 +948,8 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
                             'isattachments' => 0,
                             'attachments'   => ''
                         ];
+						
+						
 
                         // ===============================
                         // Handle Attachments
@@ -954,13 +974,16 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
                         //Insert into Database
                         // ===============================
                         try {
+						
+						
                             // Check if email already exists (by uniqid, email, and folder to avoid duplicates)
                             $this->db->where('uniqid', $data['uniqid']);
                             $this->db->where('email', $data['email']);
                             $this->db->where('folder', $data['folder']);
                             $existing = $this->db->get(db_prefix() . 'emails')->row();
+							//echo $this->db->last_query();exit;
                             
-                            if (!$existing) {
+                            if (!$existing) { //echo "SSSSSSSSSSSS";exit;
                                 $this->db->insert(db_prefix() . 'emails', $data);
                                 if ($this->db->insert_id()) {
                                     $cnt++;
@@ -971,12 +994,19 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
                             } else {
                                 log_message('info', "Email already exists, skipped: {$data['subject']} (UID: {$data['uniqid']})");
                             }
+                            
+                            // Increment processed count after processing this message
+                            $processed_count++;
                         } catch (Exception $e) {
                             log_message('error', 'DB Insert Failed for UID ' . ($data['uniqid'] ?? 'unknown') . ': ' . $e->getMessage());
+                            // Still increment processed count even if insert failed
+                            $processed_count++;
                             continue;
                         }
                     } catch (\Exception $e) {
                         log_message('error', "Error processing message in {$folder->name}: " . $e->getMessage());
+                        // Still increment processed count even if processing failed
+                        $processed_count++;
                         continue; // Skip this message and continue with next
                     }
 
@@ -1209,8 +1239,9 @@ $client->disconnect();
         $this->db->where('folder', $folder);
         $this->db->limit(1);
 		$this->db->order_by('uniqid', 'DESC');
-        return $this->db->get(db_prefix() . 'emails')->result_array(); //return 
-		
+        $result=$this->db->get(db_prefix() . 'emails')->result_array(); //return 
+		log_message('error', 'Last Email ID - ' . print_r($result, true));
+		return $result;
 		
     }
 	
