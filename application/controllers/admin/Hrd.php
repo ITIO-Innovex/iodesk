@@ -1578,7 +1578,6 @@ class Hrd extends AdminController
 
         $leave_id = $this->input->post('leave_id');
         $data = [
-            //'staffid'      => ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id(),
             'company_id'   => get_staff_company_id(),
             'from_date'    => $this->input->post('from_date'),
             'to_date'      => $this->input->post('to_date'),
@@ -1606,6 +1605,7 @@ class Hrd extends AdminController
             if (!isset($data['leave_status'])) {
                 $data['leave_status'] = 0;
             }
+			 $data['staffid'] = ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id();
             $this->db->insert('it_crm_hrd_leave_master', $data);
             set_alert('success', 'Leave application submitted successfully');
             exit;
