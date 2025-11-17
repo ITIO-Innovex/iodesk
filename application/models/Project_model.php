@@ -1024,6 +1024,7 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('pm.owner', get_staff_user_id());
 		}
+		$this->db->where('pt.task_is_deleted', 0);
         $this->db->order_by('pt.task_created', 'DESC');
         $this->db->limit($limit);
         return $this->db->get()->result_array();

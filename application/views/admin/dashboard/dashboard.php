@@ -29,35 +29,35 @@ $out_time = $attendance[0]['out_time'] ?? '';
 <div id="wrapper">
     <div class="screen-options-area">
 	             
-	<div class="top_stats_wrapper"> 
+	<div class="top_stats_wrapper modal-content"> 
 				 			                				
-	<div class="row">     
+	<div class="row ">     
 	                
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
-	<i class="fa-regular fa-circle-check menu-icon fa-2x fa-1x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Name : <?php echo e(get_staff_full_name()); ?></span>                     
+	<i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i>                         
+	<span class="tw-truncate tw-text-sm">Name : <?php echo e(get_staff_full_name()); ?></span>                     
 	</div>    
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
-	<i class="fa-regular fa-circle-check menu-icon fa-2x fa-1x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Email : <?php echo $GLOBALS['current_user']->email; ?></span>                     
+	<i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i>                         
+	<span class="tw-truncate tw-text-sm">Email : <?php echo $GLOBALS['current_user']->email; ?></span>                     
 	</div>
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
-	<i class="fa-regular fa-circle-check menu-icon fa-2x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Role : <?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?> [<?=get_user_type();?>]
+	<i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i>                         
+	<span class="tw-truncate tw-text-sm">Role : <?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?> [<?=get_user_type();?>]
 	</span>                     
 	</div> 
 	
-	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
-	<i class="fa-regular fa-circle-check menu-icon fa-2x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Company Name : <?php echo get_staff_company_name(); ?></span>                     
+	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6 ">                         
+	<i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i>                         
+	<span class="tw-truncate tw-text-sm">Company Name : <?php echo get_staff_company_name(); ?></span>                     
 	</div>
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
-	<i class="fa-regular fa-circle-check menu-icon fa-2x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Created At : <?php echo $GLOBALS['current_user']->datecreated; ?></span>                     
+	<i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i>                         
+	<span class="tw-truncate tw-text-sm">Created At : <?php echo $GLOBALS['current_user']->datecreated; ?></span>                     
 	</div>  
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
-	<i class="fa-regular fa-circle-check menu-icon fa-2x tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-xl">Last Login : <?php echo $GLOBALS['current_user']->last_login; ?></span>                     
+	<i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i>                         
+	<span class="tw-truncate tw-text-sm">Last Login : <?php echo $GLOBALS['current_user']->last_login; ?></span>                     
 	</div>              
 	</span>                 
 	</div> 				 				                                                
