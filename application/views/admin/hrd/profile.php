@@ -11,7 +11,7 @@
               <div class="col-md-3">
                 <div class="text-center">
                   <?php 
-                    $img = isset($me['profile_image']) && $me['profile_image'] ? base_url($me['profile_image']) : base_url('assets/images/not-user.jpg');
+                    $img = isset($me['profile_image']) && $me['profile_image'] ? base_url($me['profile_image']) : base_url('assets/images/user-placeholder.jpg');
                   ?>
                   <img src="<?php echo $img; ?>" class="img img-responsive img-thumbnail" alt="Profile" />
                   <div class="mtop10">
