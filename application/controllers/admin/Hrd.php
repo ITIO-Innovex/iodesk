@@ -1753,8 +1753,41 @@ class Hrd extends AdminController
 		// Get shift details	
 		$data['shift_details'] = $this->hrd_model->get_shift_details();
 		//print_r($data['shift_details']);exit;
-		$data['status_counter'] = $this->hrd_model->get_status_counter($month_year);
-		
+        $data['status_counter'] = $this->hrd_model->get_status_counter($month_year);
+
+        // When ?download=pdf is passed, generate and output the attendance PDF instead of HTML
+        if ($this->input->get('download') === 'pdf') {
+            $this->load->helper('pdf');
+
+            try {
+                $pdf = attendance_pdf($data);
+            } catch (Exception $e) {
+                $message = $e->getMessage();
+                echo $message;
+                if (strpos($message, 'Unable to get the size of the image') !== false) {
+                    show_pdf_unable_to_get_image_size_error();
+                }
+                die;
+            }
+
+            $filenameMonth = $month_year !== '' ? $month_year : date('Y-m');
+            $filename      = 'attendance-' . $filenameMonth;
+
+            $type = 'D';
+            if ($this->input->get('output_type')) {
+                $type = $this->input->get('output_type');
+            }
+            if ($this->input->get('print')) {
+                $type = 'I';
+            }
+
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+
+            $pdf->Output(mb_strtoupper(slug_it($filename)) . '.pdf', $type);
+            return;
+        }
 
         $data['title'] = 'Attendance';
         $this->load->view('admin/hrd/attendance', $data);

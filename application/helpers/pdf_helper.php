@@ -161,6 +161,17 @@ function invoice_pdf($invoice, $tag = '')
 {
     return app_pdf('invoice', LIBSPATH . 'pdf/Invoice_pdf', $invoice, $tag);
 }
+
+/**
+ * Prepare attendance PDF
+ * @param  array  $data Attendance data array (calendar, filters, etc.)
+ * @param  string $tag  Optional tag for bulk exporter (not used currently)
+ * @return mixed object
+ */
+function attendance_pdf($data = [], $tag = '')
+{
+    return app_pdf('attendance', LIBSPATH . 'pdf/Attendance_pdf', $data, $tag);
+}
 /**
  * Prepare general credit note pdf
  * @param  object $credit_note Credit note as object with all necessary fields
