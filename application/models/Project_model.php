@@ -883,7 +883,7 @@ return $result = $this->db->get()->result_array();
 	        $task_owner=get_task_owner($task_id);
 			$emails=get_cc_mail_list($task_owner);
 			$emailString = implode(',', $emails);	
-			$mail_subject="Add New Comment # :".$insert_id;
+			$mail_subject="Added New Comment # :".$insert_id;
             $data_desc=$mail_subject."<br><br>".$data['comments'];
 			$staffid=get_staff_user_id();
 			$staffemail=get_staff_email($staffid);
@@ -891,7 +891,7 @@ return $result = $this->db->get()->result_array();
             /////////////////////////////////////////
 	
 			$this->log_project_activity($project_id, $project_type, $data_desc,'',$task_id);
-            log_activity('Add New Comment with [ID: ' . $insert_id . ']');
+            log_activity('Added New Comment with [ID: ' . $insert_id . ']');
 		}	
 			
         return $this->db->insert_id();
