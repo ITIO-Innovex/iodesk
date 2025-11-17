@@ -135,6 +135,7 @@ class Hrd extends AdminController
 		// Get stats counter
 		$data['status_counter'] = $this->hrd_model->get_status_counter();
 		
+		
         $this->load->view('admin/hrd/dashboard', $data);
     }
 
@@ -1242,20 +1243,8 @@ class Hrd extends AdminController
             access_denied('Attendance Request');
         }
 
-        // Get staffid from query parameter - required for this page
-        $staffid = (int)$this->input->get('staffid');
-        if (!$staffid || $staffid <= 0) {
-            set_alert('danger', 'Staff ID is required');
-            redirect(admin_url('hrd/setting/employee_count_analysis'));
-        }
-
-        // Verify staff exists and get details
-        $this->db->where('staffid', $staffid);
-        $staff = $this->db->get(db_prefix() . 'staff')->row();
-        if (!$staff) {
-            set_alert('danger', 'Staff not found');
-            redirect(admin_url('hrd/setting/employee_count_analysis'));
-        }
+       
+        
 
         // Company scope
         $company_id = get_staff_company_id();
@@ -1263,25 +1252,22 @@ class Hrd extends AdminController
             $company_id = $_SESSION['super_view_company_id'];
         }
 
-        // Verify staff belongs to the same company
-        if ($staff->company_id != $company_id) {
-            set_alert('danger', 'Access denied');
-            redirect(admin_url('hrd/setting/employee_count_analysis'));
-        }
+       
 
         // Fetch attendance update requests for this staff only with status = 1
         $this->db->select('aur.*, s.firstname, s.lastname, s.employee_code');
         $this->db->from(db_prefix() . 'hrd_attendance_update_request aur');
         $this->db->join(db_prefix() . 'staff s', 's.staffid = aur.staffid', 'left');
-        $this->db->where('aur.staffid', $staffid);
-        $this->db->where('aur.status', 1);
+        $this->db->where('aur.company_id', get_staff_company_id());
+        //$this->db->where('aur.status', 1);
         $this->db->order_by('aur.addedon', 'desc');
         $data['requests'] = $this->db->get()->result_array();
-
+		//print_r($data['requests']);exit;
+//echo $this->db->last_query();exit;
         // Pass staff information to view
-        $data['staff'] = $staff;
-        $data['staffid'] = $staffid;
-        $data['title'] = 'Attendance Request - ' . trim($staff->firstname . ' ' . $staff->lastname);
+        $data['staff'] = $data['requests'][0]['firstname']." ".$data['requests'][0]['lastname'];
+        $data['staffid'] = $data['requests'][0]['staffid'];
+        $data['title'] = 'Attendance Request - ' . trim($data['staff']);
         $this->load->view('admin/hrd/attendance_request', $data);
     }
 
@@ -2681,6 +2667,7 @@ class Hrd extends AdminController
         }
 
         $staffid      = get_staff_user_id();
+		$company_id = get_staff_company_id();
         $attendanceId = (int)$this->input->post('attendance_id');
         $entry_date   = $this->input->post('entry_date');
         $in_time      = $this->input->post('in_time');
@@ -2704,6 +2691,7 @@ class Hrd extends AdminController
         $ins = [
             'attendance_id' => $attendanceId > 0 ? $attendanceId : null,
             'staffid'       => $staffid,
+			'company_id'    => $company_id,
             'entry_date'    => $entry_date,
             'in_time'       => $in_time ?: null,
             'out_time'      => $out_time ?: null,
@@ -4165,7 +4153,9 @@ class Hrd extends AdminController
             'on_leave' => $onLeaveToday,
         ];
         $data['present_rows'] = $presentRows;
-
+        $data['leave_counter'] = $this->hrd_model->get_leave_counter();
+		$data['attendance_counter'] = $this->hrd_model->get_attendance_counter();
+		
         $this->load->view('admin/hrd/setting_dashboard', $data);
     }
 

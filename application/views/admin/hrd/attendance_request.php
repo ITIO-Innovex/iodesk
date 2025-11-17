@@ -5,12 +5,7 @@
     <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
       <i class="fa-solid fa-calendar-days menu-icon tw-mr-2"></i> 
       Attendance Request
-      <span class="pull-right">
-        <?php echo e(trim($staff->firstname . ' ' . $staff->lastname)); ?>
-        <?php if (isset($staff->employee_code) && $staff->employee_code) { ?>
-          <small class="text-muted">[<?php echo e($staff->employee_code); ?>]</small>
-        <?php } ?>
-      </span>
+     
     </h4>
     <div class="row">
       <div class="col-md-12">
@@ -24,6 +19,8 @@
                 <th>Requested Out Time</th>
                 <th>Remarks</th>
                 <th>Update Remark</th>
+				<th>Name</th>
+				<th>Employee Code</th>
                 <th>Added On</th>
                 <th>Updated On</th>
                 <th><?php echo _l('options'); ?></th>
@@ -36,7 +33,9 @@
                   <td><?php echo e($req['out_time'] ?? '-'); ?></td>
                   <td><?php echo e($req['remarks'] ?? '-'); ?></td>
                   <td><?php echo e($req['update_remark'] ?? '-'); ?></td>
-                  <td><?php echo e($req['addedon'] ?? ''); ?></td>
+                  <td><?php echo e($req['firstname'] ?? ''); ?></td>
+				  <td><?php echo e($req['employee_code'] ?? ''); ?></td>
+				  <td><?php echo e($req['addedon'] ?? ''); ?></td>
                   <td><?php echo e($req['updatedon'] ?? '-'); ?></td>
                   <td>
                     <?php 
