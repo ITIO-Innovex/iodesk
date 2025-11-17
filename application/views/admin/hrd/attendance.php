@@ -71,7 +71,10 @@ html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                       <button type="submit" class="btn btn-default">Search</button>
                       <a href="<?php echo admin_url('hrd/attendance'); ?>" class="btn btn-default">Reset</a>
                       <button type="button" class="btn btn-success" onclick="printDiv('calendar-section')"><i class="fa-solid fa-print"></i> Print</button>
-                      <?php /*?><button type="button" class="btn btn-danger" onclick="window.print()"><i class="fa-regular fa-file-pdf"></i> Download PDF</button><?php */?>
+                      <?php $pdf_my = isset($filters['month_year']) ? $filters['month_year'] : ''; ?>
+                      <a href="<?php echo admin_url('hrd/attendance?month_year=' . urlencode($pdf_my) . '&download=pdf'); ?>" class="btn btn-danger">
+                        <i class="fa-regular fa-file-pdf"></i> Download PDF
+                      </a>
                     </div>
                   </div>
                 </div>
