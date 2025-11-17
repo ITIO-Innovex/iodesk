@@ -866,7 +866,8 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 
             log_message('error', 'firstHalf - '.$firstHalf );
             // Check second half
-            $secondHalf = ($inTimeObj <= $secondHalfInObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+            //$secondHalf = ($inTimeObj <= $secondHalfInObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+			$secondHalf = ($inTimeObj <= $secondHalfOutObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
 			
 
             // Full day present
