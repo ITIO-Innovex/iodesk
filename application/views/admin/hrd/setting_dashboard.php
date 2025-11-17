@@ -1,5 +1,13 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); 
+
+$leave_active_count=$leave_counter[0]['active_count'];
+$leave_pending_count=$leave_counter[0]['pending_count'];
+
+$attendance_active_count=$attendance_counter[0]['active_count'];
+$attendance_pending_count=$attendance_counter[0]['pending_count'];
+$attendance_rejected_count=$attendance_counter[0]['rejected_count'];
+?>
 <style>
 .fa-2xs{font-size: 50px;}
 </style>
@@ -71,9 +79,9 @@
 			<div class="col-md-4">
                 <div class="panel_s">
                     <div class="panel-body">
-                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Attendance Stats</h4>
+                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Attendance Request</h4>
                         <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
-                            <canvas id="taskStatusChart"></canvas>
+                            <canvas id="attendanceRequestChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -81,9 +89,9 @@
 			<div class="col-md-4">
                 <div class="panel_s">
                     <div class="panel-body">
-                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Attendance Stats</h4>
+                        <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-warning"></i> Leave Request</h4>
                         <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
-                            <canvas id="taskStatusChart"></canvas>
+                            <canvas id="leaveRequestChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -293,6 +301,67 @@ $(document).ready(function() {
             datasets: [{
                 data: taskStatusData.map(item => item.count),
                 backgroundColor: taskStatusData.map(item => item.color || '#28a745'),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+	// Attendance Request Chart
+    const attendanceRequestCtx = document.getElementById('attendanceRequestChart').getContext('2d');
+	const attendanceRequestData = [
+	{"name":"Pending ","color":"#ca8a04","count":"<?php echo (int)$attendance_pending_count; ?>"},
+	{"name":"Completed","color":"#22c55e","count":"<?php echo (int)$attendance_active_count; ?>"},
+	{"name":"Rejected","color":"#ff4401","count":"<?php echo (int)$attendance_rejected_count; ?>"},
+	];
+    
+    new Chart(attendanceRequestCtx, {
+        type: 'doughnut',
+        data: {
+            labels: attendanceRequestData.map(item => item.name),
+            datasets: [{
+                data: attendanceRequestData.map(item => item.count),
+                backgroundColor: attendanceRequestData.map(item => item.color || '#28a745'),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+	
+	// Leave Request Chart 
+    const leaveRequestCtx = document.getElementById('leaveRequestChart').getContext('2d');
+	const leaveRequestData = [
+	
+	{"name":"Pending ","color":"#ca8a04","count":"<?php echo (int)$leave_pending_count; ?>"},
+	{"name":"Completed","color":"#22c55e","count":"<?php echo (int)$leave_active_count; ?>"},
+	
+	];
+    
+    new Chart(leaveRequestCtx, {
+        type: 'doughnut',
+        data: {
+            labels: leaveRequestData.map(item => item.name),
+            datasets: [{
+                data: leaveRequestData.map(item => item.count),
+                backgroundColor: leaveRequestData.map(item => item.color || '#28a745'),
                 borderWidth: 2,
                 borderColor: '#fff'
             }]

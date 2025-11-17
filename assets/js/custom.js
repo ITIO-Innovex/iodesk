@@ -181,6 +181,8 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
 $(document).on('click', '.attendance-submit', function(e) {
   e.preventDefault();
   //alert(11);
+   $(".attendance-submit").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+   
   var mode = $(this).attr('data-mode');
   
   //alert(mode);
@@ -205,11 +207,13 @@ $(document).on('click', '.attendance-submit', function(e) {
         window.location.href = window.admin_url + 'hrd/dashboard';
       }, 2000); // 1 second delay
       } else {
+		  $(".attendance-submit").html('<i class="fa-solid fa-right-from-bracket"></i>  Mark out ');
         //if(window.toastr) toastr.error('Failed to load project data');
 		showFlashMessage('Attendance Failed , Try Again', 'failed');
       }
     },
     error: function() {
+		$(".attendance-submit").html('<i class="fa-solid fa-right-from-bracket"></i>  Mark out ');
       //if(window.toastr) toastr.error('Failed to load project data');
 	  showFlashMessage('Attendance Failed , Try Again', 'failed');
     }

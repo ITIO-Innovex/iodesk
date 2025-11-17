@@ -815,7 +815,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		// Format interval as H:i:s
         $totalHours = $interval->format('%H:%I:%S');
 		$shift_details = $this->hrd_model->get_shift_details();
-		log_message('error', print_r($shift_details, true));
+		//log_message('error', print_r($shift_details, true));
 		$outTime=date("H:i:s");
 		$inTimeObj = (!empty($in_time) && $in_time != '-') ? new DateTime($in_time) : null;
         $outTimeObj = (!empty($outTime) && $outTime != '-') ? new DateTime($outTime) : null;
@@ -852,12 +852,22 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
             $secondHalfOutObj = new DateTime($secondHalfOut);
 
             $lateMark = ($inTimeObj > $officeInObj) ? 'Late Mark' : '';
+			
+			//$outTimeObj = new DateTime("14:30:00");
+			//$outTimeObj = new DateTime(date("H:i:s"));
+			//log_message('error', 'inTimeObj - '.$inTimeObj->format('H:i:s') );
+			//log_message('error', 'firstHalfInObj - '.$firstHalfInObj->format('H:i:s') );
+			//log_message('error', 'outTimeObj - '.$outTimeObj->format('H:i:s') );
+			//log_message('error', 'firstHalfOutObj - '.$firstHalfOutObj->format('H:i:s') );
 
             // Check first half
-            $firstHalf = ($inTimeObj <= $firstHalfInObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
+            //$firstHalf = ($inTimeObj <= $firstHalfInObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
+			$firstHalf = ($inTimeObj <= $firstHalfOutObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
 
+            log_message('error', 'firstHalf - '.$firstHalf );
             // Check second half
             $secondHalf = ($inTimeObj <= $secondHalfInObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+			
 
             // Full day present
 			//echo $inTimeObj->format('H:i:s');  // prints time only
@@ -908,12 +918,12 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 			'total_hours' 		=> $totalHours,
 			'first_half' 		=> $status,
 			'second_half' 		=> $substatus,
-			'position' 		=> $position,
+			'position' 		    => $position,
         ];
 		
 		
 		
-		
+		log_message('error', 'Display data - ' . print_r($update, true));
 		$this->db->where('attendance_id', $attendance_id);
 		$this->db->update(db_prefix() . 'hrd_attendance', $update);
 		
@@ -985,6 +995,33 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		$this->db->like('entry_date', $month_year, 'after'); // matches e.g. 2025-11-01, 2025-11-15
 		$this->db->group_by(['first_half', 'second_half']);
         return $this->db->get(db_prefix() . 'hrd_attendance')->result_array();
+    }  
+	
+	public function get_leave_counter()
+    { 
+	
+	   
+		$company_id = get_staff_company_id();
+		 $this->db->select('
+        COUNT(CASE WHEN leave_status = 1 THEN 1 END) AS active_count,
+        COUNT(CASE WHEN leave_status = 0 THEN 1 END) AS pending_count
+    ');
+		$this->db->where('company_id', $company_id);
+        return $this->db->get(db_prefix() . 'hrd_leave_master')->result_array();
+    }
+	
+	public function get_attendance_counter()
+    { 
+	
+	   
+		$company_id = get_staff_company_id();
+		 $this->db->select('
+        COUNT(CASE WHEN status = 2 THEN 1 END) AS active_count,
+        COUNT(CASE WHEN status = 1 THEN 1 END) AS pending_count,
+		COUNT(CASE WHEN status = 0 THEN 1 END) AS rejected_count
+    ');
+		$this->db->where('company_id', $company_id);
+        return $this->db->get(db_prefix() . 'hrd_attendance_update_request')->result_array();
     }
 	
 }
