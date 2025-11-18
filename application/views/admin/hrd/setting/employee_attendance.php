@@ -136,7 +136,7 @@ function printDiv(divId) {
 					$fhTitle = get_attendance_status_title((int)$first);
 					}elseif(($first==1 && $second==8) || ($first==8 && $second==1)){
 					$fhTitle = get_attendance_status_title(8);
-					}elseif(($first==8 && $second==0)) || $first==4){
+					}elseif(($first==8 && $second==0) || $first==4)){
 					$fhTitle = get_attendance_status_title(4);
 					}elseif($first==3){
 					$fhTitle = get_attendance_status_title(3);
