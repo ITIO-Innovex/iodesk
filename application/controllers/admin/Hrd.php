@@ -2654,8 +2654,48 @@ class Hrd extends AdminController
             set_alert('success', 'Attendance updated successfully');
             exit;
         } else {
-            $this->db->insert('it_crm_hrd_attendance', $data);
-            set_alert('success', 'Attendance added successfully');
+            // Check if attendance record already exists for this staff and date
+            $staffid = isset($data['staffid']) ? (int)$data['staffid'] : get_staff_user_id();
+            $entry_date = isset($data['entry_date']) ? $data['entry_date'] : null;
+            
+            if ($staffid && $entry_date) {
+                $this->db->where('staffid', $staffid);
+                $this->db->where('entry_date', $entry_date);
+                $existing = $this->db->get('it_crm_hrd_attendance')->row();
+                
+                if ($existing) {
+                    // Update existing record instead of inserting
+                    $this->db->where('attendance_id', $existing->attendance_id);
+                    $this->db->update('it_crm_hrd_attendance', $data);
+                    set_alert('success', 'Attendance updated successfully');
+                } else {
+                    // Insert new record
+                    $this->db->insert('it_crm_hrd_attendance', $data);
+                    set_alert('success', 'Attendance added successfully');
+                }
+            } else {
+                // Fallback: try insert and handle duplicate error
+                $this->db->insert('it_crm_hrd_attendance', $data);
+                $error = $this->db->error();
+                
+                if ($error['code'] == 1062) { // MySQL duplicate entry error code
+                    // Duplicate entry - update existing record instead
+                    if ($staffid && $entry_date) {
+                        $this->db->where('staffid', $staffid);
+                        $this->db->where('entry_date', $entry_date);
+                        $this->db->update('it_crm_hrd_attendance', $data);
+                        set_alert('success', 'Attendance updated successfully');
+                    } else {
+                        set_alert('warning', 'Attendance record already exists for this date');
+                    }
+                } elseif ($error['code'] == 0) {
+                    // No error - insert successful
+                    set_alert('success', 'Attendance added successfully');
+                } else {
+                    // Other database error
+                    set_alert('danger', 'Error saving attendance: ' . $error['message']);
+                }
+            }
             exit;
         }
         redirect(admin_url('hrd/attendance'));
@@ -2797,16 +2837,33 @@ class Hrd extends AdminController
             $shiftRow = $this->db->get(db_prefix() . 'hrd_shift_manager')->row_array();
             $default_shift_id = $shiftRow && isset($shiftRow['shift_id']) ? (int)$shiftRow['shift_id'] : 1;
 
-            $ins = [
-                'staffid'     => $staffid,
-                'company_id'  => $company_id,
-                'shift_id'    => $default_shift_id,
-                'entry_date'  => $date,
-                'in_time'     => $in_time ?: null,
-                'out_time'    => $out_time ?: null,
-                'total_hours' => $total_hours ?: null,
-            ];
-            $this->db->insert(db_prefix() . 'hrd_attendance', $ins);
+            // Check if record already exists
+            $this->db->where('staffid', $staffid);
+            $this->db->where('entry_date', $date);
+            $existing = $this->db->get(db_prefix() . 'hrd_attendance')->row();
+            
+            if ($existing) {
+                // Update existing record
+                $ins = [
+                    'in_time'     => $in_time ?: null,
+                    'out_time'    => $out_time ?: null,
+                    'total_hours' => $total_hours ?: null,
+                ];
+                $this->db->where('attendance_id', $existing->attendance_id);
+                $this->db->update(db_prefix() . 'hrd_attendance', $ins);
+            } else {
+                // Insert new record
+                $ins = [
+                    'staffid'     => $staffid,
+                    'company_id'  => $company_id,
+                    'shift_id'    => $default_shift_id,
+                    'entry_date'  => $date,
+                    'in_time'     => $in_time ?: null,
+                    'out_time'    => $out_time ?: null,
+                    'total_hours' => $total_hours ?: null,
+                ];
+                $this->db->insert(db_prefix() . 'hrd_attendance', $ins);
+            }
         }
 
         echo json_encode(['success' => true]);
