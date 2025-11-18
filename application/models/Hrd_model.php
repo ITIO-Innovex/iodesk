@@ -922,8 +922,9 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 				$status = 8;
 				$substatus = 1;
 				}
+				$position = 0.50;
                 log_message('error', 'Status - Full '.$status.''.$substatus.''.$position.''.$staffid );
-                $position = 0.50;
+                
                 $remarks = $lateMark ?: '';
             } else {
                 $status = 4;
