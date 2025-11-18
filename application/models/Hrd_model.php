@@ -784,21 +784,41 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		
 		if(isset($mode)&&$mode=='In'){
 		
-        $insert = [
-            'staffid'        	=> $staffid,
-            'company_id'       	=> $company_id,
-            'shift_id'     		=> isset($data['status']) ? (int)$data['status'] : 1,
-			'mode'     			=> $mode,
-			'ip'     			=> $ip,
-			'first_half'     	=> 4,
-			'position'     		=> 1,
-            'in_time' 			=> date("H:i:s"),
-			'entry_date' 		=> date("Y-m-d"),
-			'late_mark' 		=> $difference,
-        ];
+        // Check if attendance record already exists for today
+        $entry_date = date("Y-m-d");
+        $this->db->where('staffid', $staffid);
+        $this->db->where('entry_date', $entry_date);
+        $existing = $this->db->get(db_prefix() . 'hrd_attendance')->row();
+        
+        if ($existing) {
+            // Update existing record with in_time
+            $update = [
+                'in_time' => date("H:i:s"),
+                'late_mark' => $difference,
+                'mode' => $mode,
+                'ip' => $ip,
+            ];
+            $this->db->where('attendance_id', $existing->attendance_id);
+            $this->db->update(db_prefix() . 'hrd_attendance', $update);
+            $insert_id = $existing->attendance_id;
+        } else {
+            // Insert new record
+            $insert = [
+                'staffid'        	=> $staffid,
+                'company_id'       	=> $company_id,
+                'shift_id'     		=> isset($data['status']) ? (int)$data['status'] : 1,
+                'mode'     			=> $mode,
+                'ip'     			=> $ip,
+                'first_half'     	=> 4,
+                'position'     		=> 1,
+                'in_time' 			=> date("H:i:s"),
+                'entry_date' 		=> $entry_date,
+                'late_mark' 		=> $difference,
+            ];
 
-        $this->db->insert(db_prefix() . 'hrd_attendance', $insert);
-        $insert_id = $this->db->insert_id();
+            $this->db->insert(db_prefix() . 'hrd_attendance', $insert);
+            $insert_id = $this->db->insert_id();
+        }
 		}else{
 		
 		$attendance = $this->hrd_model->get_todays_attendance();
