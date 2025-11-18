@@ -4255,4 +4255,7 @@ $lang['Add New Deal Stage'] = 'Add New Deal Stage';
 $lang['Stage Color'] = 'Stage Color';
 $lang['Assigned To'] = 'Assigned To';
 $lang['New Project'] = 'New Project';
+$lang['Back'] = 'Back';
+$lang['Assign To'] = 'Assign To';
+$lang['Save'] = 'Save';
 ?>

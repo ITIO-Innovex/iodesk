@@ -763,15 +763,29 @@ class Hrd_model extends App_Model
 		$company_id = get_staff_company_id();
 		$mode = $data;
 		
-		/*$late_time = "09:30:00"; // Allowed time
-		$in = new DateTime(date("H:i:s"));
-		$limit = new DateTime($late_time);
-		$late_mark=0;
-		if ($in > $limit) { $late_mark=1;}*/
+		
+		$shift_details = $this->hrd_model->get_shift_details();
+        if(isset($shift_details)&&$shift_details){
+		$officeIn 			= $shift_details[0]['shift_in'];
+		//log_message('error', 'Display data'.$officeIn );
+        $officeOut 			= $shift_details[0]['shift_out'];
+        $firstHalfIn 		= $shift_details[0]['first_half_start'];
+        $firstHalfOut 		= $shift_details[0]['first_half_end'];
+        $secondHalfIn 		= $shift_details[0]['second_half_start'];
+        $secondHalfOut 		= $shift_details[0]['second_half_end'];
+		$saturday_rule 		= $shift_details[0]['saturday_rule'];
+		$saturday_work_end  = $shift_details[0]['saturday_work_end'];
+		
+		$dayName = date('l'); // Get current day name, e.g., "Saturday"
+		if ($dayName == 'Saturday') {
+		$officeOut 	 = $saturday_work_end ;
+		}
+		
+		}
 		
 $in_time = new DateTime(date("H:i:s")); // or from DB
-$start_time = new DateTime('09:30:00');
-$end_time   = new DateTime('13:00:00');
+$start_time = new DateTime($firstHalfIn);
+$end_time   = new DateTime($firstHalfOut);
 
 if ($in_time >= $start_time && $in_time <= $end_time) {
     $diff = $start_time->diff($in_time);
@@ -823,7 +837,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		
 		$attendance = $this->hrd_model->get_todays_attendance();
 		
-		$shift_details = $this->hrd_model->get_shift_details();
+		
 		
 		
 		$attendance_id  = $attendance[0]['attendance_id'];
@@ -834,28 +848,11 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
         $interval = $time1->diff($time2);
 		// Format interval as H:i:s
         $totalHours = $interval->format('%H:%I:%S');
-		$shift_details = $this->hrd_model->get_shift_details();
 		//log_message('error', print_r($shift_details, true));
 		$outTime=date("H:i:s");
 		$inTimeObj = (!empty($in_time) && $in_time != '-') ? new DateTime($in_time) : null;
         $outTimeObj = (!empty($outTime) && $outTime != '-') ? new DateTime($outTime) : null;
-		if(isset($shift_details)&&$shift_details){
-		$officeIn 			= $shift_details[0]['shift_in'];
-		//log_message('error', 'Display data'.$officeIn );
-        $officeOut 			= $shift_details[0]['shift_out'];
-        $firstHalfIn 		= $shift_details[0]['first_half_start'];
-        $firstHalfOut 		= $shift_details[0]['first_half_end'];
-        $secondHalfIn 		= $shift_details[0]['second_half_start'];
-        $secondHalfOut 		= $shift_details[0]['second_half_end'];
-		$saturday_rule 		= $shift_details[0]['saturday_rule'];
-		$saturday_work_end  = $shift_details[0]['saturday_work_end'];
 		
-		$dayName = date('l'); // Get current day name, e.g., "Saturday"
-		if ($dayName == 'Saturday') {
-		$officeOut 	 = $saturday_work_end ;
-		}
-		
-		}
 		
 		
 		// ==============================================================
@@ -873,22 +870,32 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 
             $lateMark = ($inTimeObj > $officeInObj) ? 'Late Mark' : '';
 			
-			//$outTimeObj = new DateTime("14:30:00");
-			//$outTimeObj = new DateTime(date("H:i:s"));
+			//$outTimeObj = new DateTime("18:30:29");
+			$outTimeObj = new DateTime(date("H:i:s"));
 			//log_message('error', 'inTimeObj - '.$inTimeObj->format('H:i:s') );
-			//log_message('error', 'firstHalfInObj - '.$firstHalfInObj->format('H:i:s') );
 			//log_message('error', 'outTimeObj - '.$outTimeObj->format('H:i:s') );
+			//log_message('error', 'firstHalfInObj - '.$firstHalfInObj->format('H:i:s') );
 			//log_message('error', 'firstHalfOutObj - '.$firstHalfOutObj->format('H:i:s') );
 
             // Check first half
             //$firstHalf = ($inTimeObj <= $firstHalfInObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
-			$firstHalf = ($inTimeObj <= $firstHalfOutObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
+			//$firstHalf = ($inTimeObj <= $firstHalfOutObj && $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
+			$firstHalf = ($inTimeObj <= $firstHalfInObj && 
+               $outTimeObj >= $firstHalfOutObj) ? 1 : 0;
 
-            log_message('error', 'firstHalf - '.$firstHalf );
+            //log_message('error', 'firstHalf - '.$firstHalf );
+			//log_message('error', 'inTimeObj - '.$inTimeObj->format('H:i:s') );
+			//log_message('error', 'outTimeObj - '.$outTimeObj->format('H:i:s') );
+			//log_message('error', 'secondHalfInObj - '.$secondHalfInObj->format('H:i:s') );
+			//log_message('error', 'secondHalfOutObj - '.$secondHalfOutObj->format('H:i:s') );
+			
+			
             // Check second half
             //$secondHalf = ($inTimeObj <= $secondHalfInObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
-			$secondHalf = ($inTimeObj <= $secondHalfOutObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
-			
+			//$secondHalf = ($inTimeObj <= $secondHalfOutObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+			$secondHalf = ($inTimeObj <= $secondHalfInObj && 
+            $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
+			log_message('error', 'secondHalf - '.$secondHalf );
 
             // Full day present
 			//echo $inTimeObj->format('H:i:s');  // prints time only
@@ -901,6 +908,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 				$substatus = 0;
                 $position = 1.00;
                 $remarks = $lateMark ?: 'On Time';
+				log_message('error', 'Status - Full '.$status.''.$position.''.$staffid );
             }
             // Half day
             elseif ($firstHalf || $secondHalf) {
@@ -914,7 +922,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 				$status = 8;
 				$substatus = 1;
 				}
-                
+                log_message('error', 'Status - Full '.$status.''.$substatus.''.$position.''.$staffid );
                 $position = 0.50;
                 $remarks = $lateMark ?: '';
             } else {
@@ -922,6 +930,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 				$substatus = 0;
                 $position = 0;
                 $remarks = 'Insufficient Hours';
+				log_message('error', 'Status - Full '.$status.''.$substatus.''.$position.''.$remarks.''.$staffid );
             }
         } else {
             // If inTime is missing but outTime exists, or vice versa
@@ -929,6 +938,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 			$substatus = 0;
             $position = 0;
             $remarks = 'Incomplete Attendance';
+			log_message('error', 'Status - Full '.$status.''.$substatus.''.$position.''.$remarks.''.$staffid );
         }
 		
 
@@ -944,7 +954,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		
 		
 		
-		log_message('error', 'Display data - ' . print_r($update, true));
+		//log_message('error', 'Display data - ' . print_r($update, true));//exit;
 		$this->db->where('attendance_id', $attendance_id);
 		$this->db->update(db_prefix() . 'hrd_attendance', $update);
 		
