@@ -115,7 +115,31 @@ function printDiv(divId) {
                     </thead>
 				  </table>
 					<?php
+					
+					//print_r($status_counter);
 					foreach ($status_counter as $sc) {
+					
+					$fhTitle = '';
+					$first  = $sc['first_half']?(int)$sc['first_half']:0;
+                    $second = $sc['second_half']?(int)$sc['second_half']:0;
+                    $count  = $sc['total_count']?(int)$sc['total_count']:0;
+					
+					if($first==1 && $second==0){
+					$fhTitle = get_attendance_status_title((int)$sc['first_half']);
+					}elseif($first==2 && $second==0){
+					$fhTitle = get_attendance_status_title((int)$first);
+					}elseif(($first==1 && $second==8) || ($first==8 && $second==0)){
+					$fhTitle = get_attendance_status_title(8);
+					}elseif($first==3){
+					$fhTitle = get_attendance_status_title(3);
+					}elseif($first==7){
+					$fhTitle = get_attendance_status_title(7);
+					}else{
+					$fhTitle = get_attendance_status_title(4);
+					}
+					
+					
+					
 						$fhTitle = '';
 						if (isset($sc['first_half']) && is_numeric($sc['first_half'])) {
 							$fhTitle = get_attendance_status_title((int)$sc['first_half']);

@@ -895,7 +895,7 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 			//$secondHalf = ($inTimeObj <= $secondHalfOutObj && $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
 			$secondHalf = ($inTimeObj <= $secondHalfInObj && 
             $outTimeObj >= $secondHalfOutObj) ? 1 : 0;
-			log_message('error', 'secondHalf - '.$secondHalf );
+			//log_message('error', 'secondHalf - '.$secondHalf );
 
             // Full day present
 			//echo $inTimeObj->format('H:i:s');  // prints time only
