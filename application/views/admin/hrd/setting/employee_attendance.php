@@ -126,9 +126,9 @@ function printDiv(divId) {
 					foreach ($status_counter as $sc) {
 					
 					$fhTitle = '';
-					$first  = $sc['first_half']?(int)$sc['first_half']:0;
-                    $second = $sc['second_half']?(int)$sc['second_half']:0;
-                    $count  = $sc['total_count']?(int)$sc['total_count']:0;
+					echo $first  = $sc['first_half']?(int)$sc['first_half']:0;
+                    echo $second = $sc['second_half']?(int)$sc['second_half']:0;
+                    echo $count  = $sc['total_count']?(int)$sc['total_count']:0;
 					
 					if($first==1 && $second==0){
 					$fhTitle = get_attendance_status_title((int)$sc['first_half']);
