@@ -56,6 +56,12 @@ $route['404_override']         = '';
 $route['translate_uri_dashes'] = false;
 
 /**
+ * Handle /index requests - redirect to default controller
+ */
+$route['index'] = 'clients';
+$route['index/(:any)'] = 'clients/$1';
+
+/**
  * Dashboard clean route
  */
 $route['admin'] = 'admin/dashboard';
