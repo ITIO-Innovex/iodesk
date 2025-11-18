@@ -140,14 +140,14 @@ function printDiv(divId) {
 					
 					
 					
-						$fhTitle = '';
+						/*$fhTitle = '';
 						if (isset($sc['first_half']) && is_numeric($sc['first_half'])) {
 							$fhTitle = get_attendance_status_title((int)$sc['first_half']);
 						}
 						if (isset($sc['second_half']) && is_numeric($sc['second_half']) && ($sc['second_half']==8 or $sc['second_half']==4)) {  $fhTitle = get_attendance_status_title((int)$sc['second_half']);
 						 
 						 
-						}
+						}*/
 						
 						$label = $fhTitle !== '' ? $fhTitle : (isset($sc['first_half']) ? e($sc['first_half']) : '-');
 						echo "<a class='btn btn-default mx-2'>".$label." (".$sc['total_count'].")&nbsp;</a>&nbsp;";
