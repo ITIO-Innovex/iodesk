@@ -866,7 +866,7 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
                 try {
                     // Fetch a larger batch to ensure we get new messages beyond the first 10
                     // We'll fetch up to 100 messages and filter to get the next 10 new ones
-                    $fetch_limit = 100; // Fetch more messages to find new ones
+                    $fetch_limit = 10; // Fetch more messages to find new ones
                     $target_new_messages = 10; // We want to process 10 new messages
                     
                     // Fetch messages in larger batches to find new ones

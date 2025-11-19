@@ -1,5 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+.customer-profile-group-heading{ color:#FFFFFF !important;}
+</style>
 <div id="wrapper" class="customer_profile">
     <div class="content">
         <?php if (isset($client) && $client->registration_confirmed == 0 && is_admin()) { ?>
@@ -34,7 +37,7 @@
                             #<?php echo $client->userid . ' ' . $title; ?>
                         </span>
                         <?php if (staff_can('delete',  'customers') || is_admin()) { ?>
-                        <div class="btn-group">
+                        <?php /*?><div class="btn-group">
                             <a href="#" class="dropdown-toggle btn-link" data-toggle="dropdown" aria-haspopup="true"
                                 aria-expanded="false">
                                 <span class="caret"></span>
@@ -58,13 +61,13 @@
                                 </li>
                                 <?php } ?>
                             </ul>
-                        </div>
+                        </div><?php */?>
                         <?php } ?>
                     </div>
                     <?php if (isset($client) && $client->leadid != null) { ?>
                     <small class="tw-block">
-                        <b><?php echo e(_l('customer_from_lead', _l('lead'))); ?></b>
-                        <a href="<?php echo admin_url('leads/index/' . $client->leadid); ?>"
+                        <b class="tw-text-white"><?php echo e(_l('customer_from_lead', _l('lead'))); ?></b>
+                        <a class="tw-text-white" href="<?php echo admin_url('leads/index/' . $client->leadid); ?>"
                             onclick="init_lead(<?php echo e($client->leadid); ?>); return false;">
                             - <?php echo _l('view'); ?>
                         </a>
