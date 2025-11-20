@@ -14,7 +14,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 require_once APPPATH.'/vendor/vendor/autoload.php';
-
+echo "Webklex version: " . \Webklex\PHPIMAP\ClientManager::VERSION;
 class Webmail_model extends App_Model
 {
     
