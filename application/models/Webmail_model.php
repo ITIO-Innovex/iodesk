@@ -1141,8 +1141,11 @@ $connection=false;
         return $message->getUid() > $last_email_id;
     });*/
 	$from_uid = $last_email_id + 1;
-	try {
-    $messages = $mailbox->getMessages("UID {$from_uid}:*");
+
+try {
+    $messages = $mailbox->query()
+        ->raw("UID {$from_uid}:*")   // SAFE for all versions
+        ->get();
 } catch (\Exception $e) {
     log_message('error', 'IMAP ERROR: ' . $e->getMessage());
     $messages = [];
