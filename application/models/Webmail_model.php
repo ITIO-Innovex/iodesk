@@ -1132,12 +1132,18 @@ $connection=false;
 	 log_message('error', 'LastID - ' . $last_email_id);
 	 
       $pg=floor($last_email_id / 10) +1;
-	  $messages = $mailbox->query()
+	  
+	  
+	  /*$messages = $mailbox->query()
     ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
-    });
+    });*/
+	
+	$messages = $mailbox->query()
+        ->uidGreater($last_email_id)
+        ->get();
 
    
 
