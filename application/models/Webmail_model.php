@@ -1240,7 +1240,7 @@ $client->disconnect();
         $this->db->limit(1);
 		$this->db->order_by('uniqid', 'DESC');
         $result=$this->db->get(db_prefix() . 'emails')->result_array(); //return 
-		log_message('error', 'Last Email ID - ' . print_r($result, true));
+		//log_message('error', 'Last Email ID - ' . print_r($result, true));
 		return $result;
 		
     }

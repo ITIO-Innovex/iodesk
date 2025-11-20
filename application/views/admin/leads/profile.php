@@ -1469,6 +1469,8 @@ $dstatus="Send Quotation";
 $selected_deals=4;
 }
 
+$lead_id = (isset($lead) && isset($lead->id)) ? (int)$lead->id : 0;
+
 
 $this->db->order_by('statusorder', 'asc');
 $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_array(); 
@@ -1478,12 +1480,12 @@ $data['dealsstatus']   = $this->db->get(db_prefix() . 'deals_status')->result_ar
             <div class="modal-header" style="background-color: rgb(186 230 253 / 1) !important;">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">#<?php echo $lead->id;?> - <?php echo $dstatus; ?> <?php /*?>[<?php echo $lead->deal_status;?>]<?php */?></h4>
+                <h4 class="modal-title">#<?php echo $lead_id;?> - <?php echo $dstatus; ?> <?php /*?>[<?php echo isset($lead) ? $lead->deal_status : ''; ?>]<?php */?></h4>
             </div>
             <div class="modal-body">
                 <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
                 
-                <input type="hidden" name="deal_id" id="deal_id" value="<?php echo $lead->id;?>"  />
+                <input type="hidden" name="deal_id" id="deal_id" value="<?php echo $lead_id;?>"  />
 				
 <div>
 
