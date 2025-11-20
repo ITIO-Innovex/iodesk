@@ -1140,10 +1140,13 @@ $connection=false;
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
     });*/
-	
-	$messages = $mailbox->query()
-        ->uidGreater($last_email_id)
-        ->get();
+	$from_uid = $last_email_id + 1;
+	try {
+    $messages = $mailbox->getMessages("UID {$from_uid}:*");
+} catch (\Exception $e) {
+    log_message('error', 'IMAP ERROR: ' . $e->getMessage());
+    $messages = [];
+}
 
    
 
