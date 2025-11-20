@@ -14,7 +14,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 require_once APPPATH.'/vendor/vendor/autoload.php';
-echo "Webklex version: " . \Webklex\PHPIMAP\ClientManager::VERSION;
+
 class Webmail_model extends App_Model
 {
     
@@ -1134,27 +1134,14 @@ $connection=false;
       $pg=floor($last_email_id / 10) +1;
 	  
 	  
-	  /*$messages = $mailbox->query()
+	  $messages = $mailbox->query()
     ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
-    });*/
+    });
 	
-	$ves=" \Webklex\PHPIMAP\ClientManager::VERSION";
-	log_message('error', 'Version - ' . $ves);
-$from_uid = $last_email_id + 1;
-
-try {
-    // Gmail-safe UID search
-    $messages = $mailbox->search([
-        "UID {$from_uid}:*"
-    ])->get();
-
-} catch (\Exception $e) {
-    log_message('error', 'IMAP ERROR: ' . $e->getMessage());
-    $messages = [];
-}
+	
 
    
 
