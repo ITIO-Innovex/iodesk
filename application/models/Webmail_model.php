@@ -1142,7 +1142,7 @@ $connection=false;
    
 
 
-print_r($messages);exit;
+
 foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
@@ -1152,7 +1152,7 @@ foreach ($messages as $message) {
 	$data['uniqid'] = $message->uid;
 	$data['messageid'] = $message->getMessageId();
 	
-	
+log_message('error', 'LastID - ' . $data['subject']);	
 	 // From
     $from = $message->getFrom(); // Returns array of Address objects
     $data['from_email'] = $from[0]->mail ?? '';
