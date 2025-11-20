@@ -4258,4 +4258,16 @@ $lang['New Project'] = 'New Project';
 $lang['Back'] = 'Back';
 $lang['Assign To'] = 'Assign To';
 $lang['Save'] = 'Save';
+$lang['New Holiday'] = 'New Holiday';
+$lang['New Event/Announcement'] = 'New Event/Announcement';
+$lang['Add New Event/Announcement'] = 'Add New Event/Announcement';
+$lang['New Shift Type'] = 'New Shift Type';
+$lang['Add New Shift Type'] = 'Add New Shift Type';
+$lang['New Shift'] = 'New Shift';
+$lang['Add New Shift'] = 'Add New Shift';
+$lang['New Employee Type'] = 'New Employee Type';
+$lang['Add New Employee Type'] = 'Add New Employee Type';
+$lang['New Branch Manager'] = 'New Branch Manager';
+$lang['Add New Branch Manager'] = 'Add New Branch Manager';
+$lang['Add New Attendance Status'] = 'Add New Attendance Status';
 ?>
