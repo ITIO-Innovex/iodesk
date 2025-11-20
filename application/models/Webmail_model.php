@@ -1140,12 +1140,17 @@ $connection=false;
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
     });*/
-	$from_uid = $last_email_id + 1;
+	
+	$ves=" \Webklex\PHPIMAP\ClientManager::VERSION";
+	log_message('error', 'Version - ' . $ves);
+$from_uid = $last_email_id + 1;
 
 try {
-    $messages = $mailbox->query()
-        ->raw("UID {$from_uid}:*")   // SAFE for all versions
-        ->get();
+    // Gmail-safe UID search
+    $messages = $mailbox->search([
+        "UID {$from_uid}:*"
+    ])->get();
+
 } catch (\Exception $e) {
     log_message('error', 'IMAP ERROR: ' . $e->getMessage());
     $messages = [];
