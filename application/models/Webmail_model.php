@@ -1127,6 +1127,10 @@ $connection=false;
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
+	 
+	 log_message('error', 'Folder - ' . $folder);
+	 log_message('error', 'LastID - ' . $last_email_id);
+	 
       $pg=floor($last_email_id / 10) +1;
 	  $messages = $mailbox->query()
     ->all()->limit($limit = 10, $page = $pg)
@@ -1138,7 +1142,7 @@ $connection=false;
    
 
 
-//print_r($messages);exit;
+print_r($messages);exit;
 foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
