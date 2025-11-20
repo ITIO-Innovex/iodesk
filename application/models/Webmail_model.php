@@ -1127,26 +1127,18 @@ $connection=false;
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
 	 
-	 
-	 log_message('error', 'Folder - ' . $folder);
-	 log_message('error', 'LastID - ' . $last_email_id);
-	 
       $pg=floor($last_email_id / 10) +1;
-	  
-	  
 	  $messages = $mailbox->query()
     ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
     });
-	
-	
 
    
 
 
-
+//print_r($messages);exit;
 foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
@@ -1156,7 +1148,7 @@ foreach ($messages as $message) {
 	$data['uniqid'] = $message->uid;
 	$data['messageid'] = $message->getMessageId();
 	
-log_message('error', 'LastID - ' . $data['subject']);	
+	
 	 // From
     $from = $message->getFrom(); // Returns array of Address objects
     $data['from_email'] = $from[0]->mail ?? '';
