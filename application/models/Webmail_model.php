@@ -822,7 +822,7 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
             'host'          => $mailer_imap_host,
             'port'          => $mailer_imap_port,
             'encryption'    => $encryption,   // 'ssl' or 'tls'
-            //'validate_cert' => true,
+            'validate_cert' => true,
             'username'      => $mailer_username,
             'password'      => $mailer_password,
             'protocol'      => 'imap',
