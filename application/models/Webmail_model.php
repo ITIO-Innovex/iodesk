@@ -428,7 +428,7 @@ try {
     ->all()->limit($limit = 5, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
-        return $message->getUid() > $last_email_id;
+        return $message->uid() > $last_email_id;
     });
 	
 	
@@ -1084,7 +1084,7 @@ log_message('error', 'IMAP Details: ' . json_encode($client_config, JSON_PRETTY_
         'username'      => $mailer_username,
         'password'      => $mailer_password,
         'protocol'      => 'imap', 
-		'timeout'       => 60
+		'timeout'       => 300
 		//'authentication' => "oauth"            // Protocol (imap/pop3)
     ]);
 	
@@ -1125,15 +1125,17 @@ $connection=false;
      
 	  //$total_Email=$mailbox->query()->all()->count();
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
-	  $last_email_id=$last_email_id[0]['uniqid']?? 0;//exit;
+	  $last_uid=$last_email_id[0]['uniqid']?? 0;//exit;
+	  
+	  $messages = $mailbox->query()->limit(10)->getByUidGreater($last_uid);
 	 
-      $pg=floor($last_email_id / 10) +1;
+      /*$pg=floor($last_email_id / 10) +1;
 	  $messages = $mailbox->query()
     ->all()->limit($limit = 10, $page = $pg)
     ->get() // fetch messages
     ->filter(function($message) use ($last_email_id) {
         return $message->getUid() > $last_email_id;
-    });
+    });*/
 
    
 
