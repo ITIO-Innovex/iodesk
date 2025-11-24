@@ -49,45 +49,7 @@ function app_init_admin_sidebar_menu_items()
     //     ]);
     // }
 
-     $CI->app_menu->add_sidebar_menu_item('salesD', [
-        'collapse' => true,
-        'name'     => _l('als_sales'),
-        'position' => 10,
-        'icon'     => 'fa-solid fa-receipt',
-        'badge'    => [],
-    ]);
-    if ((staff_can('view',  'invoices') || staff_can('view_own',  'invoices'))
-        || (staff_has_assigned_invoices() && get_option('allow_staff_view_invoices_assigned') == 1)
-    ) {
-        $CI->app_menu->add_sidebar_children_item('salesD', [
-            'slug'     => 'invoices',
-            'name'     => _l('invoices'),
-            'href'     => admin_url('invoices'),
-            'position' => 15,
-            'badge'    => [],
-        ]);
-    }
-    if (staff_can('view',  'items')) {
-        $CI->app_menu->add_sidebar_children_item('salesD', [
-            'slug'     => 'items',
-            'name'     => _l('items'),
-            'href'     => admin_url('invoice_items'),
-            'position' => 30,
-            'badge'    => [],
-        ]);
-    }
-    if (
-        staff_can('view',  'payments') || staff_can('view_own',  'invoices')
-        || (get_option('allow_staff_view_invoices_assigned') == 1 && staff_has_assigned_invoices())
-    ) {
-        $CI->app_menu->add_sidebar_children_item('salesD', [
-            'slug'     => 'payments',
-            'name'     => _l('payments'),
-            'href'     => admin_url('payments'),
-            'position' => 20,
-            'badge'    => [],
-        ]);
-    }
+     
 
     // if (staff_can('view',  'credit_notes') || staff_can('view_own',  'credit_notes')) {
     //     $CI->app_menu->add_sidebar_children_item('sales', [
@@ -157,7 +119,7 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 
-        $CI->load->model('tickets_model');
+        /*$CI->load->model('tickets_model');
         $statuses = $CI->tickets_model->get_ticket_status();
 
         if ($enable_badge) {
@@ -173,7 +135,7 @@ function app_init_admin_sidebar_menu_items()
                     ],
                 ]);
             }
-        }
+        }*/
     }
 
 
@@ -196,6 +158,47 @@ function app_init_admin_sidebar_menu_items()
 			'badge'    => [],
 		]);
     }
+	
+	 $CI->app_menu->add_sidebar_menu_item('salesD', [
+        'collapse' => true,
+        'name'     => _l('als_sales'),
+        'position' => 20,
+        'icon'     => 'fa-solid fa-receipt',
+        'badge'    => [],
+    ]);
+    if ((staff_can('view',  'invoices') || staff_can('view_own',  'invoices'))
+        || (staff_has_assigned_invoices() && get_option('allow_staff_view_invoices_assigned') == 1)
+    ) {
+        $CI->app_menu->add_sidebar_children_item('salesD', [
+            'slug'     => 'invoices',
+            'name'     => _l('invoices'),
+            'href'     => admin_url('invoices'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+    }
+    if (staff_can('view',  'items')) {
+        $CI->app_menu->add_sidebar_children_item('salesD', [
+            'slug'     => 'items',
+            'name'     => _l('items'),
+            'href'     => admin_url('invoice_items'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+    }
+    if (
+        staff_can('view',  'payments') || staff_can('view_own',  'invoices')
+        || (get_option('allow_staff_view_invoices_assigned') == 1 && staff_has_assigned_invoices())
+    ) {
+        $CI->app_menu->add_sidebar_children_item('salesD', [
+            'slug'     => 'payments',
+            'name'     => _l('payments'),
+            'href'     => admin_url('payments'),
+            'position' => 20,
+            'badge'    => [],
+        ]);
+    }
+	
 	    if(isset($_SESSION['company_form_type'])&& $_SESSION['company_form_type']<>1){
 	
 		if (is_staff_member() && get_staff_rolex()<>3) {
@@ -556,7 +559,7 @@ function app_init_admin_sidebar_menu_items()
             'name'     => _l('als_reports'),
             'href'     => admin_url('reports'),
             'icon'     => 'fa-regular fa-chart-bar',
-            'position' => 60,
+            'position' => 40,
             'badge'    => [],
         ]);
     }
