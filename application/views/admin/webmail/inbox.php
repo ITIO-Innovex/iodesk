@@ -9,6 +9,9 @@
 	table.number-index-2 tbody>tr>td:nth-child(2), table.number-index-2 thead>tr>th:nth-child(2) {
         text-align: left !important;
     }
+	
+	input.form-control, input[type=text] { border-radius: 0px !important; }
+	.input-sm { border-radius : 0px !important; }
 }
 </style>
 
@@ -66,7 +69,7 @@
 			  <div class="col-md-5 mbot10">
 			  <div class="dt-buttons btn-group55 tw-text-right">
 			  <div class="w-full tw-inline-flex sm:max-w-xs">
-<select name="stype" class="form-control input-sm input-group-addon" id="search_code" style="width:auto;border-top-left-radius: .375rem;border-bottom-left-radius: .375rem;" required>
+<select name="stype" class="form-control input-group-addon" id="search_code" style="width:auto;border-top-left-radius: .375rem;border-bottom-left-radius: .375rem;" required>
 <option value="">Select type</option>
 <option value="from_email" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="from_email"){ ?> selected="selected"<?php }?>>From Email</option>
 <option value="from_name" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="from_name"){ ?> selected="selected"<?php }?>>From Name</option>
@@ -77,7 +80,7 @@
 <option value="body" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="body"){ ?> selected="selected"<?php }?>>Mail Body</option>
 </select>
 
-              <input type="text" class="form-control input-sm" name="skey" placeholder="Enter Search Keywords" value="<?php if(isset($_SESSION['skey'])&&$_SESSION['skey']){echo trim($_SESSION['skey']); } ?>" required>
+              <input type="text" class="form-control" name="skey" placeholder="Enter Search Keywords" value="<?php if(isset($_SESSION['skey'])&&$_SESSION['skey']){echo trim($_SESSION['skey']); } ?>" required>
               <button type="submit" class="input-group-addon" style="padding-right: 25px;"><span class="fa fa-search"></span></button>
                 </div>
 				</div>

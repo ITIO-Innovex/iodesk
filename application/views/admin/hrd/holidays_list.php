@@ -13,7 +13,8 @@
               <table class="table dt-table" data-order-col="0" data-order-type="asc">
                 <thead>
                   <tr>
-                    <th>Date</th>
+                    <th style="display:none;">Date</th>
+					<th >Date</th>
                     <th>Day</th>
                     <th>Remarks</th>
                   </tr>
@@ -27,7 +28,9 @@
                     $isPast = ($holidayDates < $today); // check if holiday is before today
                   ?>
                   <tr <?php if($isPast){ echo 'style="background-color: khaki;"'; }?>>
-                    <td ><?php echo $holiday_date; ?></td>
+                    <td style="display:none;" ><?php echo $holiday_date; ?></td>
+					<td ><?php echo date("d F Y", strtotime($holiday_date)); ?></td>
+					
                     <td><?php if (!empty($holiday_date)){ echo date("l", strtotime($holiday_date)); }?></td>
                     <td><?php echo $holiday_remark; ?></td>
                   </tr>

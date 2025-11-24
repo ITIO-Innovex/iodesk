@@ -789,11 +789,13 @@ class Hrd extends AdminController
         if ($id) {
             $this->db->where('shift_id', $id);
             $this->db->update('it_crm_hrd_shift_manager', $data);
+			log_activity('Update Attendance Shift : ' . json_encode($data, JSON_PRETTY_PRINT));
             set_alert('success', 'Shift updated successfully');exit;
         } else {
             // Default new shifts to Active (status=1)
             $data['status'] = 1;
             $this->db->insert('it_crm_hrd_shift_manager', $data);
+			log_activity('Update Attendance Shift : ' . json_encode($data, JSON_PRETTY_PRINT));
             set_alert('success', 'Shift added successfully');exit;
         }
         redirect(admin_url('hrd/setting/shift_manager'));
@@ -3023,11 +3025,13 @@ class Hrd extends AdminController
         if ($id) {
             $this->db->where('id', $id);
             $this->db->update('it_crm_hrd_holiday_list', $data);
+			log_activity('Updated Holiday : ' . json_encode($data, JSON_PRETTY_PRINT));
             set_alert('success', 'Holiday updated successfully');exit;
         } else {
             // Default new holidays to Active (status=1)
             $data['status'] = 1;
             $this->db->insert('it_crm_hrd_holiday_list', $data);
+			log_activity('Added New Holiday : ' . json_encode($data, JSON_PRETTY_PRINT));
             set_alert('success', 'Holiday added successfully');exit;
         }
         redirect(admin_url('hrd/setting/holiday_list'));
@@ -3382,6 +3386,7 @@ class Hrd extends AdminController
         // Soft delete: set status to 0 (Deactive) instead of removing the record
         $this->db->where('id', $id);
         $this->db->update('it_crm_hrd_holiday_list', ['status' => 0]);
+		log_activity('Holiday deactivated ID: ' . $id);
         set_alert('success', 'Holiday deactivated successfully');
         redirect(admin_url('hrd/setting/holiday_list'));
     }
