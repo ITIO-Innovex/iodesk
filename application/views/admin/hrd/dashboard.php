@@ -21,6 +21,24 @@ $totaldays=($fullday +($half / 2)) ?? 0;
 .box-gradient-bg12{background-image: radial-gradient(circle, #a6dcce 0%, #edbbc663 100%);}
 .box-gradient-bg13{background-image: radial-gradient(circle, #f5f2b7 0%, #ba9e9c 100%);}
 .box-gradient-bg14{background-image: radial-gradient(circle, #eaedb4 0%, #daeaed 100%);}
+::selection {
+  background: #ff4401;
+  color: #fff;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ccc;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+
+
 </style>
 <div id="wrapper">
     <div class="content">
