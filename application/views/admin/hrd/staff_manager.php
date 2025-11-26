@@ -171,7 +171,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
             <select name="hr_approver" class="form-control">
               <option value="">-- Select HR Approver --</option>
               <?php if (!empty($dept9_employees)) { foreach ($dept9_employees as $emp) { ?>
-                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?>  (<?php echo e($emp['email']); ?>)</option>
               <?php } } ?>
             </select>
           </div></div>
@@ -179,7 +179,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
             <select name="admin_approver" class="form-control">
               <option value="">-- Select Admin Approver --</option>
               <?php if (!empty($dept9_employees)) { foreach ($dept9_employees as $emp) { ?>
-                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?> (<?php echo e($emp['email']); ?>)</option>
               <?php } } ?>
             </select>
           </div></div>
@@ -189,7 +189,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
             <select name="hr_manager_approver" class="form-control">
               <option value="">-- Select HR Manager Approver --</option>
               <?php if (!empty($dept9_employees)) { foreach ($dept9_employees as $emp) { ?>
-                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?> (<?php echo e($emp['email']); ?>)</option>
               <?php } } ?>
             </select>
           </div></div>
@@ -197,7 +197,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
             <select name="reporting_approver" class="form-control">
               <option value="">-- Select Reporting Approver --</option>
               <?php if (!empty($all_employees)) { foreach ($all_employees as $emp) { ?>
-                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?></option>
+                <option value="<?php echo (int)$emp['staffid']; ?>"><?php echo e($emp['full_name']); ?> (<?php echo e($emp['email']); ?>)</option>
               <?php } } ?>
             </select>
           </div></div>
