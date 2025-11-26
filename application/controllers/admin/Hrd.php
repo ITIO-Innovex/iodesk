@@ -1561,8 +1561,8 @@ class Hrd extends AdminController
             access_denied('Leave Application');
         }
 		
-		$data = print_r($this->input->post(), true);
-        log_message('error', 'Display data - ' . $data);
+		//$data = print_r($this->input->post(), true);
+        //log_message('error', 'Display data - ' . $data);
 
         $leave_id = $this->input->post('leave_id');
         $data = [
@@ -1594,7 +1594,24 @@ class Hrd extends AdminController
                 $data['leave_status'] = 0;
             }
 			 $data['staffid'] = ($this->input->post('staffid')) ? (int)$this->input->post('staffid') : get_staff_user_id();
-            $this->db->insert('it_crm_hrd_leave_master', $data);
+           // print_r($data);exit;
+			
+			$this->db->insert('it_crm_hrd_leave_master', $data);
+			$insert_id = $this->db->insert_id();
+            if ($insert_id) {
+			// Get HRD EMAIL From staff->approver
+			$hrdid=get_approver_id("hr_approver");
+			$hrdid=$hrdid ?? $data['staffid'];
+			$leave_for = ($data['leave_for'] == 2) ? 'Half Day' : 'Full Day';
+			//log_message('error', 'Emaill - ' . $hrdid);exit;
+			$staffemail=get_staff_email($hrdid);
+			$mail_subject=$leave_for . " Leave Application by ".get_staff_full_name($data['staffid'])." for :".$data['from_date']." to ".$data['to_date'];
+			$mail_details=$mail_subject."<br><br>".$data['leave_reson'];
+            send_mail_template('project_mail', $staffemail, $hrdid, $insert_id, $mail_details, $mail_subject            );
+			set_alert('success', 'Leave application submitted successfully');
+            exit;
+			}
+			
             set_alert('success', 'Leave application submitted successfully');
             exit;
         }
@@ -2107,7 +2124,7 @@ class Hrd extends AdminController
         }
         $this->db->where('active', 1);
         $this->db->where('department_id', 9);
-        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->select('staffid, email, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
         $this->db->order_by('firstname', 'asc');
         $data['dept9_employees'] = $this->db->get(db_prefix() . 'staff')->result_array();
         
@@ -2123,7 +2140,7 @@ class Hrd extends AdminController
             $this->db->where('company_id', get_staff_company_id());
         }
         $this->db->where('active', 1);
-        $this->db->select('staffid, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
+        $this->db->select('staffid, email, firstname, lastname, CONCAT(firstname, " ", lastname) AS full_name');
         $this->db->order_by('firstname', 'asc');
         $data['all_employees'] = $this->db->get(db_prefix() . 'staff')->result_array();
 

@@ -1,5 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?> 
-<?php //$CI =& get_instance(); // Get CodeIgniter super object
+<?php 
+
+//echo get_approver_id("reporting_approver");
+//$CI =& get_instance(); // Get CodeIgniter super object
 //print_r($GLOBALS['current_user']); // Call session method properly 
 //$CI =& get_instance();
 //print_r($CI->session);

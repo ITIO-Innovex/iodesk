@@ -530,6 +530,45 @@ function get_company_status($company_id)
 		
 		return 0;
 }
+//Get Approver ID by Spprover Type hr_approver,admin_approver,hr_manager_approver,reporting_approver
+function get_approver_id($approver_type = 'hr_approver')
+{ 
+                $tmpStaffUserId = get_staff_user_id();
+				if(isset($GLOBALS['current_user'])) {
+				$approver=$GLOBALS['current_user']->approver;
+				}
+				// Decode JSON into an array
+                $approverArr = json_decode($approver, true);
+
+                // Return only HR Approver value
+               return $approverArr[$approver_type] ?? get_staff_user_id();
+
+}
+
+function get_hrd_email()
+{   
+				if(isset($GLOBALS['current_user'])) {
+				$approver=$GLOBALS['current_user']->approver;
+				}
+				// Decode JSON into an array
+                $approverArr = json_decode($approver, true);
+
+                // Return only HR Approver value
+               return $approverArr['hr_approver'] ?? get_staff_user_id();
+}
+
+function get_admin_email()
+{   
+
+				if(isset($GLOBALS['current_user'])) {
+				$approver=$GLOBALS['current_user']->approver;
+				}
+				 // Decode JSON into an array
+                $approverArr = json_decode($approver, true);
+
+                // Return only HR Approver value
+               return $approverArr['admin_approver'] ?? get_staff_user_id();
+}
 
 function get_deal_form_type($company_id)
 {   
