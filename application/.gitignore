@@ -9,7 +9,14 @@ attachments/
 
 # Ignore environment files
 .env
+# Ignore SQL dump files
+*.sql
 
+# Ignore zipped SQL backups
+*.sql.zip
+
+# Ignore all zip archives
+*.zip
 # Ignore all files in temp/ folder
 temp/
 

@@ -60,7 +60,7 @@
     <div class="row">
       <div class="col-md-12">
 	  <div id="loader-project"><i class="fa-solid fa-spinner fa-spin fa-5x text-warning"></i></div>
-        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" id="addTaskBtn"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Task'); ?> </a> 
+        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" id="addTaskBtn"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Task'); ?> </a> <span class="btn btn-warning"> Total : <?php echo count($listdata)??0?>  </span> 
 		<?php if(isset($project_id)&&$project_id){ ?>
 		<h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"># Project ID : <?php echo get_project_title($project_id);?></h4> 
 		<?php } ?>

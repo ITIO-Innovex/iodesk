@@ -916,6 +916,7 @@ return $result = $this->db->get()->result_array();
         // Total projects
         $this->db->select('COUNT(*) as total');
 		
+		
         if(is_super()){
 			if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 		    $this->db->where('company_id', $_SESSION['super_view_company_id']);	// Use condition
@@ -926,6 +927,7 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('owner', get_staff_user_id());
 		}
+		$this->db->where('is_deleted', 0);
         $stats['total_projects'] = $this->db->get(db_prefix() . 'project_master')->row()->total;
        
         // Active projects
@@ -943,6 +945,7 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('owner', get_staff_user_id());
 		}
+		$this->db->where('is_deleted', 0);
         $stats['active_projects'] = $this->db->get(db_prefix() . 'project_master')->row()->total;
          
         // Total tasks
@@ -961,7 +964,7 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('pm.owner', get_staff_user_id());
 		}
-		
+		$this->db->where('pt.task_is_deleted', 0);
         $stats['total_tasks'] = $this->db->get()->row()->total;
         //echo $this->db->last_query();exit;
         // Completed tasks
@@ -979,6 +982,7 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('pm.owner', get_staff_user_id());
 		}
+		$this->db->where('pt.task_is_deleted', 0);
         $stats['completed_tasks'] = $this->db->get()->row()->total;
         
         // Calculate completion percentage
@@ -1003,9 +1007,11 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('pm.owner', get_staff_user_id());
 		}
+		$this->db->where('pm.is_deleted', 0);
         $this->db->order_by('pm.project_created', 'DESC');
         $this->db->limit($limit);
         return $this->db->get()->result_array();
+		//echo $this->db->last_query();exit;
     }
 
     public function get_latest_tasks($limit = 5)
