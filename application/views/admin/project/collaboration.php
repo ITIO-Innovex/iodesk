@@ -240,6 +240,22 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.minxx.js"></script>
+<style>
+.fc-more-popover {
+     max-width: 1000px !important;   /* set max width */
+    width: fit-content;            /* auto width */
+    margin: 0 auto !important;     /* center align */
+    left: 50% !important;          /* center */
+	margin-bottom: 10% !important;
+    transform: translateX(-50%);   /* adjust center */
+	 
+}
+.fc-more-popover,
+.fc-more-popover * {
+    white-space: normal !important;
+    word-break: break-word !important;
+}
+</style>
 
 <script>
 $(document).ready(function() {

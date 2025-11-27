@@ -13,6 +13,14 @@ node_modules/
 
 # Ignore environment files
 .env
+# Ignore SQL dump files
+*.sql
+
+# Ignore zipped SQL backups
+*.sql.zip
+
+# Ignore all zip archives
+*.zip
 
 # Ignore all files in temp/ folder
 temp/
@@ -21,7 +29,7 @@ temp/
 *.class
 *.pyc
 *.mno
-*.sql
+#*.sql
 
 # Ignore OS or editor-specific files
 .DS_Store

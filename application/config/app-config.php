@@ -9,7 +9,7 @@ if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
     define('APP_DB_HOSTNAME', 'localhost');
     define('APP_DB_USERNAME', 'root');
     define('APP_DB_PASSWORD', '');
-    define('APP_DB_NAME', 'xeyso_iodesk_crm');
+    define('APP_DB_NAME', 'itio_crm');
     define('Whatsapp_Api_Url', 'https://api.whatsapp.xeyso.com');
     define('Whatsapp_Socket_Url', 'wss://api.whatsapp.xeyso.com');
 } else {

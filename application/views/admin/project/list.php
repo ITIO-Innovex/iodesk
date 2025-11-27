@@ -57,6 +57,7 @@
 
 <div id="wrapper">
   <div class="content">
+  
     <div class="row">
 	<!-- Loader -->
 
@@ -65,7 +66,7 @@
 	  <div id="loader-project"><i class="fa-solid fa-spinner fa-spin fa-5x text-warning"></i></div>
   
 
-        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" id="addProjectBtn"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Project'); ?> </a> </div>
+        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" id="addProjectBtn"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Project'); ?> </a> <span class="btn btn-warning"> Total : <?php echo count($listdata)??0?>  </span> </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (isset($listdata) && count($listdata) > 0) { ?>
