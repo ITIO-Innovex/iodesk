@@ -678,7 +678,8 @@ $('#start_date').on('change', function() {
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
 
 <script>
-	$('.editor').jqte();
+	// Initialize jqte editors, but exclude edit modal editors for now
+	$('.editor').not('#edit_project_description').jqte();
 	
 	 $("#edit-project-form").on("submit", function(e){
     let startDate = new Date($("#edit_start_date").val());

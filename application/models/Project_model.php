@@ -320,7 +320,9 @@ return $result = $this->db->get()->result_array();
 			$emails=get_cc_mail_list($task_owner);
 			$emailString = implode(',', $emails);	
 			$mail_subject="Create New Task # :".$insert_id." - ".$data['task_name'];
-            $data_desc=$mail_subject."<br><br>".implode(', ', $changes);
+            //$data_desc=$mail_subject."<br><br>".implode(', ', $changes);
+			$data_desc=$mail_subject."<br><br>".nl2br(implode("\n\n", $changes))."";
+			
 			$staffid=get_staff_user_id();
 			$staffemail=get_staff_email($staffid);
 			send_mail_template('project_mail', $staffemail, $staffid, $insert_id, $data_desc, $mail_subject,$emailString);
@@ -352,7 +354,7 @@ return $result = $this->db->get()->result_array();
 			$project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
 			//===========================
 			$mail_subject="Updated Project # :".$id;
-            $data_desc=$mail_subject."<br><br>".implode(', ', $changes);
+            $data_desc=$mail_subject."<br><br>".nl2br(implode("\n\n", $changes))."";
 			$staffid=get_staff_user_id();
 			$staffemail=get_staff_email($staffid);
 			send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject);
@@ -828,7 +830,8 @@ return $result = $this->db->get()->result_array();
 			$emails=get_cc_mail_list($task_owner);
 			$emailString = implode(',', $emails);	
 			$mail_subject="Updated Task # :".$id;
-            $data_desc=$mail_subject."<br><br>".implode(', ', $changes);
+           // $data_desc=$mail_subject."<br><br>".implode(', ', $changes);
+			$data_desc=$mail_subject."<br><br>".nl2br(implode("\n\n", $changes))."";
 			$staffid=get_staff_user_id();
 			$staffemail=get_staff_email($staffid);
 			send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject,$emailString);

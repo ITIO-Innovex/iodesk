@@ -1086,7 +1086,9 @@ class Staff_model extends App_Model
 		$this->db->from(db_prefix() . 'staff as s');
 		$this->db->join('it_crm_staff_departments as d', 'd.staffid = s.staffid', 'inner');
 		$this->db->where('s.company_id', $companyid);
+		if (!is_admin()){ 
 		$this->db->where('d.departmentid', $departmentid);
+		}
 		$this->db->order_by('s.firstname', 'desc');
 		$res = $this->db->get()->result_array();
 		//echo $this->db->get_compiled_select();exit;

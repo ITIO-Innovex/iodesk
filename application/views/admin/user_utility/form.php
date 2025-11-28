@@ -30,7 +30,7 @@
 
 <div class="form-group">
                 <label for="task_owner" class="control-label"><?php echo _l('Assign To'); ?></label>
-                <select class="form-control selectpicker" id="share_with" name="share_with[]" multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" title="Assign To">
+                <select class="form-control chosen-select" id="share_with" name="share_with[]" multiple data-placeholder="Select User(s)" title="Assign To">
                   <?php if (isset($staff_members) && is_array($staff_members)) { ?>
                     <?php foreach ($staff_members as $staff) { ?>
                       <?php 
@@ -136,9 +136,19 @@
 
 
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/plugins/chosen/css/chosen.css'); ?>"/>
+<script src="<?php echo base_url('assets/plugins/chosen/js/chosen.jquery.js'); ?>"></script>
 <script>
 $(document).ready(function() {
     var fieldIndex = <?php echo isset($form) && !empty($form->form_fields) ? count($form->form_fields) : 0; ?>;
+
+    // Initialize Chosen for share_with selection
+    $('#share_with').chosen({
+      width: '100%',
+      placeholder_text_multiple: 'Select User(s)',
+      search_contains: true,
+      allow_single_deselect: true
+    });
     
     // Add new field
     $('#add-field').click(function() {
