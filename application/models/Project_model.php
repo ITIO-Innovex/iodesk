@@ -128,7 +128,7 @@ class Project_model extends App_Model
 	
 	public function get_project_list()
     {
-        $this->db->select('pm.*, pg.name as project_group_name, COUNT(pt.id) as total_tasks, COUNT(ps.id) as total_milestones, COUNT(pi.id) as total_issues');
+        $this->db->select('pm.*, pg.name as project_group_name, COUNT(CASE WHEN pt.task_is_deleted = 0 THEN pt.id END) as total_tasks, COUNT(ps.id) as total_milestones, COUNT(pi.id) as total_issues');
         $this->db->from(db_prefix() . 'project_master pm');
         $this->db->join(db_prefix() . 'project_group pg', 'pg.id = pm.project_group', 'left');
 		$this->db->join(db_prefix() . 'project_task pt', 'pt.project_id = pm.id', 'left');
@@ -922,42 +922,64 @@ return $result = $this->db->get()->result_array();
     {
         $stats = [];
         
-        // Total projects
-        $this->db->select('COUNT(*) as total');
+		// ###############Total projects###########################
+		$this->db->select('COUNT(DISTINCT pm.id) AS total_project');
+		$this->db->from('it_crm_project_master pm');
+		$this->db->join('it_crm_project_group pg', 'pg.id = pm.project_group', 'left');
+		$this->db->join('it_crm_project_task pt', 'pt.project_id = pm.id', 'left');
 		
 		
-        if(is_super()){
-			if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-		    $this->db->where('company_id', $_SESSION['super_view_company_id']);	// Use condition
+            if(is_super()){
+				if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+				$this->db->where('pm.company_id', $_SESSION['super_view_company_id']);	// Use condition
 		    }
 		
 		}elseif(is_admin()){
-		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('owner', get_staff_user_id());
+		
+		
+		//$this->db->where('owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();   // )
+		
+		
 		}
-		$this->db->where('is_deleted', 0);
-        $stats['total_projects'] = $this->db->get(db_prefix() . 'project_master')->row()->total;
+		$this->db->where('pm.is_deleted', 0);
+        $stats['total_projects'] = $this->db->get()->row()->total_project;
+		//echo $this->db->last_query();exit;
        
-        // Active projects
+        // ###################################Active projects############################
         $this->db->select('COUNT(*) as total');
-        $this->db->where('project_status !=', 10); // Assuming 10 is completed
+        //$this->db->where('project_status !=', 10); // Assuming 10 is completed
+		
+		$this->db->select('COUNT(DISTINCT pm.id) AS total_active_project');
+		$this->db->from('it_crm_project_master pm');
+		$this->db->join('it_crm_project_group pg', 'pg.id = pm.project_group', 'left');
+		$this->db->join('it_crm_project_task pt', 'pt.project_id = pm.id', 'left');
+		
         if(is_super()){
             //$this->db->where('company_id', get_staff_company_id());
 			
 			if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-		    $this->db->where('company_id', $_SESSION['super_view_company_id']);	// Use condition
+		    $this->db->where('pm.company_id', $_SESSION['super_view_company_id']);	// Use condition
 		    }
 		
 		}elseif(is_admin()){
-		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();   // )
 		}
-		$this->db->where('is_deleted', 0);
-        $stats['active_projects'] = $this->db->get(db_prefix() . 'project_master')->row()->total;
+		$this->db->where('pm.is_deleted', 0);
+		$this->db->where('project_status !=', 10);
+        $stats['active_projects'] = $this->db->get()->row()->total_active_project;
          
-        // Total tasks
+        // ###################Total tasks########################
         $this->db->select('COUNT(*) as total');
         $this->db->from(db_prefix() . 'project_task pt');
         $this->db->join(db_prefix() . 'project_master pm', 'pt.project_id = pm.id');
@@ -971,12 +993,15 @@ return $result = $this->db->get()->result_array();
 		}elseif(is_admin()){
 		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();   // )
 		}
 		$this->db->where('pt.task_is_deleted', 0);
         $stats['total_tasks'] = $this->db->get()->row()->total;
         //echo $this->db->last_query();exit;
-        // Completed tasks
+        // ##########################Completed tasks#######################
         $this->db->select('COUNT(*) as total');
         $this->db->from(db_prefix() . 'project_task pt');
         $this->db->join(db_prefix() . 'project_master pm', 'pt.project_id = pm.id');
@@ -989,7 +1014,10 @@ return $result = $this->db->get()->result_array();
 		}elseif(is_admin()){
 		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();
 		}
 		$this->db->where('pt.task_is_deleted', 0);
         $stats['completed_tasks'] = $this->db->get()->row()->total;
@@ -1006,6 +1034,7 @@ return $result = $this->db->get()->result_array();
         $this->db->from(db_prefix() . 'project_master pm');
         $this->db->join(db_prefix() . 'project_group pg', 'pg.id = pm.project_group', 'left');
         $this->db->join(db_prefix() . 'project_status ps', 'ps.id = pm.project_status', 'left');
+		$this->db->join('it_crm_project_task pt', 'pt.project_id = pm.id', 'left');
         if(is_super()){
 			if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 		    $this->db->where('pm.company_id', $_SESSION['super_view_company_id']);	// Use condition
@@ -1014,9 +1043,13 @@ return $result = $this->db->get()->result_array();
 		}elseif(is_admin()){
 		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();
 		}
 		$this->db->where('pm.is_deleted', 0);
+		$this->db->group_by('pm.id');
         $this->db->order_by('pm.project_created', 'DESC');
         $this->db->limit($limit);
         return $this->db->get()->result_array();
@@ -1037,7 +1070,10 @@ return $result = $this->db->get()->result_array();
 		}elseif(is_admin()){
 		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();
 		}
 		$this->db->where('pt.task_is_deleted', 0);
         $this->db->order_by('pt.task_created', 'DESC');
@@ -1060,9 +1096,12 @@ return $result = $this->db->get()->result_array();
 		}else{
 		$this->db->where('pm.owner', get_staff_user_id());
 		}
+		$this->db->where('pm.is_deleted', 0);
         $this->db->group_by('ps.id');
         $this->db->order_by('ps.statusorder');
+		//echo $this->db->get_compiled_select();exit;
         return $this->db->get()->result_array();
+		//echo $this->db->last_query();exit;
     }
 
     public function get_task_status_chart_data()
@@ -1079,8 +1118,12 @@ return $result = $this->db->get()->result_array();
 		}elseif(is_admin()){
 		$this->db->where('pm.company_id', get_staff_company_id());
 		}else{
-		$this->db->where('pm.owner', get_staff_user_id());
+		$this->db->group_start(); // (
+        $this->db->where('pm.owner', get_staff_user_id());
+        $this->db->or_where("FIND_IN_SET(" . get_staff_user_id() . ", pt.task_owner) !=", 0);
+        $this->db->group_end();
 		}
+		$this->db->where('pt.task_is_deleted', 0);
         $this->db->group_by('ps.id');
         $this->db->order_by('ps.statusorder');
         return $this->db->get()->result_array();
