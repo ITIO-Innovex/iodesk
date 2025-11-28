@@ -107,7 +107,7 @@ border-radius: 20px;
 <input type="hidden" name="task_priority" value="<?php echo $task['task_priority']; ?>">
 <div class="form-group">
                 <label for="task_owner" class="control-label"><small class="req text-danger">* </small><?php echo _l('Owner'); ?></label>
-                <select class="form-control selectpicker" id="task_owner" name="task_owner[]" required multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" title="Owner">
+                <select class="form-control chosen-select" id="task_owner" name="task_owner[]" required multiple data-placeholder="Select Owner(s)" title="Owner">
                   <?php if (isset($staff_members) && is_array($staff_members)) { ?>
                     <?php foreach ($staff_members as $staff) { ?>
                       <?php 
@@ -401,10 +401,13 @@ waitForJQuery(function() {
 
    
 
-    // Initialize selectpicker for owner selection
-    if (typeof init_selectpicker === 'function') {
-      init_selectpicker();
-    }
+    // Initialize Chosen for owner selection
+    $('#task_owner').chosen({
+      width: '100%',
+      placeholder_text_multiple: 'Select Owner(s)',
+      search_contains: true,
+      allow_single_deselect: true
+    });
 
     // Handle reminder field visibility
     function toggleReminderFields() {
@@ -594,7 +597,7 @@ waitForJQuery(function() {
             // Get staff name from the select option
             var $option = $('#task_owner option[value="' + oid + '"]');
             var staffName = $option.text().trim();
-            
+
             html += '<a href="' + '<?php echo admin_url('profile/'); ?>' + oid + '" data-toggle="tooltip" data-title="' + staffName + '">' +
                     '<img src="' + '<?php echo base_url('uploads/staff_profile_images/'); ?>' + oid + '.jpg" ' +
                     'class="tw-h-7 tw-w-7 tw-inline-block tw-rounded-full tw-ring-2 tw-ring-white" ' +
@@ -608,6 +611,9 @@ waitForJQuery(function() {
       } else {
         $ownerContainer.html('-');
       }
+
+      // Trigger Chosen update to reflect any changes
+      $('#task_owner').trigger('chosen:updated');
     }
   });
 });
@@ -628,6 +634,8 @@ function togglediv(divdata){
 
 </script>
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/plugins/chosen/css/chosen.css'); ?>"/>
+<script src="<?php echo base_url('assets/plugins/chosen/js/chosen.jquery.js'); ?>"></script>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>

@@ -201,7 +201,7 @@
                                        <!-- Owners (Multi-select with avatars) -->
               <div class="form-group">
                 <label for="task_owner" class="control-label"><small class="req text-danger">* </small>Assign To</label>
-                <select class="form-control selectpicker" id="task_owner" name="task_owner[]" required multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" title="Owner">
+                <select class="form-control chosen-select" id="task_owner" name="task_owner[]" required multiple data-placeholder="Select Owner(s)" title="Owner">
                   <?php if (isset($staff_members) && is_array($staff_members)) { ?>
                     <?php foreach ($staff_members as $staff) { ?>
                       <option data-content='<span class="tw-inline-flex tw-items-center"><?php echo str_replace("'", "&apos;", staff_profile_image($staff['staffid'], ["tw-h-6 tw-w-6 tw-rounded-full tw-inline-block tw-mr-2 tw-ring-2 tw-ring-white"], "small")); ?><span><?php echo e($staff['firstname'] . ' ' . $staff['lastname']); ?></span></span>' value="<?php echo $staff['staffid']; ?>">
@@ -350,14 +350,21 @@ function initializeTasktModal() {
             // Initialize custom tags input
            // console.log('Initializing tags input...');
             //initializeTagsInput();
-            if (typeof init_selectpicker === 'function') { init_selectpicker(); }
+            // Initialize Chosen for owner selection
+            $('#task_owner').chosen({
+              width: '100%',
+              placeholder_text_multiple: 'Select Owner(s)',
+              search_contains: true,
+              allow_single_deselect: true
+            });
         });
         
         // Modal hidden event
         $('#addTaskModal').on("hidden.bs.modal", function (event) {
             $('#additional').html('');
             $('#addTaskModal input[name="task_name"]').val('');
-            $('#addTaskModal select[name="task_owner[]"]').val('');
+            // Reset Chosen dropdown
+            $('#task_owner').val('').trigger('chosen:updated');
             $('#addTaskModal input[name="task_start_date"]').val('');
             $('#addTaskModal input[name="task_end_date"]').val('');
             $('#addTaskModal select[name="task_priority"]').val('');
@@ -657,6 +664,8 @@ $('body').on('click', '.remove_attachment', function() {
 </style>
 
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/plugins/chosen/css/chosen.css'); ?>"/>
+<script src="<?php echo base_url('assets/plugins/chosen/js/chosen.jquery.js'); ?>"></script>
 <script>
 
     // Handle reminder field visibility

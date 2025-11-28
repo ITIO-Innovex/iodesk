@@ -140,7 +140,10 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
     success: function(res) {
       if(res.success && res.data) {
        // var p = res.data;
-		var p = res.data[0]; 
+		var p = res.data[0];
+        console.log('Project data loaded:', p); // Debug log
+        console.log('Project description:', p.project_description); // Debug log
+
         $('#edit_project_id').val(p.id);
         $('#edit_project_title').val(p.project_title);
         $('#edit_owner').val(p.owner);
@@ -148,7 +151,6 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
         $('#edit_start_date').val(p.start_date);
         $('#edit_deadline').val(p.deadline);
 		$('#edit_tags').val(p.tags);
-		$('#edit_project_description').jqteVal(p.project_description);
         //if(window.tinymce && tinymce.get('edit_project_description')) {
           //tinymce.get('edit_project_description').setContent(p.project_description || '');
         //} else {
@@ -164,6 +166,53 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
         }
         // Tags
       
+        // Set the textarea value first
+        var description = p.project_description || '';
+        console.log('Setting description to textarea:', description); // Debug log
+        $('#edit_project_description').val(description);
+
+        // Initialize jqte editor with content
+        setTimeout(function() {
+          var $editor = $('#edit_project_description');
+          console.log('Initializing jqte editor, current value:', $editor.val()); // Debug log
+
+          // Check if jqte is already initialized
+          if ($editor.siblings('.jqte').length === 0) {
+            // Initialize jqte if not already done
+            console.log('Initializing jqte...'); // Debug log
+            $editor.jqte();
+          } else {
+            console.log('jqte already initialized'); // Debug log
+          }
+
+          // After initialization, ensure content is properly set
+          setTimeout(function() {
+            console.log('Setting content after init, description:', description); // Debug log
+
+            // Set content using textarea value and trigger update
+            $editor.val(description).trigger('change');
+
+            // Also try jqteVal if available
+            if (typeof $editor.jqteVal === 'function') {
+              console.log('Using jqteVal method'); // Debug log
+              $editor.jqteVal(description);
+            } else {
+              console.log('jqteVal method not available'); // Debug log
+            }
+
+            // Force refresh of jqte display
+            var $jqteEditor = $editor.siblings('.jqte_editor').find('[contenteditable="true"]');
+            if ($jqteEditor.length && description) {
+              console.log('Setting contenteditable div content'); // Debug log
+              $jqteEditor.html(description);
+            } else {
+              console.log('No contenteditable div found or no description'); // Debug log
+            }
+
+            console.log('Final editor state - textarea:', $editor.val(), 'jqte html:', $jqteEditor.html()); // Debug log
+          }, 150);
+        }, 300);
+
         $('#editProjectModal').modal('show');
       } else {
         //if(window.toastr) toastr.error('Failed to load project data');
@@ -225,10 +274,49 @@ $(document).on('submit', '#edit-project-form', function(e) {
   e.preventDefault();
   var form = this;
   var formData = new FormData(form);
-  // Get TinyMCE content if present
-  if(window.tinymce && tinymce.get('edit_project_description')) {
-    formData.set('project_description', tinymce.get('edit_project_description').getContent());
+  
+ 
+  // Get jqte content if present
+  var $editDescriptionEditor = $('#edit_project_description');
+  if ($editDescriptionEditor.length) {
+    var projectDescription = '';
+    // Method 1: Try jqteVal() function (if available)
+    if (typeof $.fn.jqteVal === 'function') {
+      try {
+        projectDescription = $editDescriptionEditor.jqteVal() || '';
+      } catch(e) {
+        // Continue to other methods
+      }
+    }
+
+    // Method 2: Get from textarea value (jqte syncs to textarea)
+    if (!projectDescription) {
+      projectDescription = $editDescriptionEditor.val() || '';
+    }
+
+    // Method 3: Get directly from jqte editor's contenteditable div
+    if (!projectDescription) {
+      var $jqteEditor = $editDescriptionEditor.siblings('.jqte_editor').length ?
+        $editDescriptionEditor.siblings('.jqte_editor') :
+        $editDescriptionEditor.parent().find('.jqte_editor').first();
+
+      if ($jqteEditor.length) {
+        var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+        if ($contentEditable.length) {
+          projectDescription = $contentEditable.html() || '';
+        }
+      }
+    }
+
+    formData.set('project_description', projectDescription);
   }
+  
+   let output = "";
+    for (let pair of formData.entries()) {
+        output += pair[0] + " = " + pair[1] + "\n";
+    }
+
+    // alert(output);
   // Get tags from tag items
   var tags = [];
   $('#edit-tags-container .tag-item').each(function() {
@@ -261,7 +349,7 @@ $(document).on('submit', '#edit-project-form', function(e) {
     },
     error: function() {
      //if(window.toastr) toastr.error('Failed to update project');
-	  showFlashMessage('Failed to update project!', 'failed');
+	  showFlashMessage('Failed to update project!!', 'failed');
     },
     complete: function() {
       $btn.prop('disabled', false).text(origText);

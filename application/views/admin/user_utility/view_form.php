@@ -216,7 +216,7 @@
                                     </div>
                                     <div class="panel-body">
                                         <?php foreach ($form->form_data as $key => $value) { ?>
-                                        <div class="form-group">
+                                        <div class="form-group" style="word-break: break-word !important;">
                                             <strong><?php echo ucfirst(str_replace('_', ' ', $key)); ?>:</strong><br>
                                             <?php 
                                             if (is_array($value)) {

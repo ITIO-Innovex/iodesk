@@ -632,7 +632,7 @@ class Project extends AdminController
 		$tags=""; // insert old tags
 		}
 		
-        log_message('error', 'Update Project - Received tags: ' . $tags); // Debug log
+       //log_message('error', 'Update Project - Received tags: ' . $tags); // Debug log
 		
 		
         $data = [
@@ -646,6 +646,8 @@ class Project extends AdminController
             'make_this_a_strict_project' => $this->input->post('make_this_a_strict_project') ? 1 : 0,
             'project_access' => $this->input->post('project_access') ? $this->input->post('project_access') : 1,
         ];
+		
+		//log_message('error', 'Update Project - Received tags: ' . print_r($data, true)); // Debug log
         $this->load->model('project_model');
         $success = $this->project_model->update($data, $project_id);
 		if($path==9){
