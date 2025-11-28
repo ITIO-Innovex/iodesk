@@ -122,6 +122,20 @@ function get_project_priority($sid)
 		
 		return null;
 }
+function get_project_priority_button($sid)
+{   
+        // Fetch company Name from company id
+		if(isset($sid)&&$sid){
+		$CI = & get_instance();
+		$CI->db->where('priorityid ', $sid);
+		$com = $CI->db->select('name, color')->from(db_prefix() . 'project_priority')->get()->row();
+		if(isset($com)&&$com->name && isset($com)&&$com->color){
+		return "<span class='btn btn-sm  tw-rounded-full top-left-btn' style='color:#FFFFFF;background: ".$com->color.";'>".$com->name."<span>";
+		}
+		}
+		
+		return null;
+}
 
 function get_proj_priority_color($sid)
 {   
