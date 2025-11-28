@@ -82,8 +82,8 @@
                     <th ><?php echo 'Owner'; ?></th>
                     <th><?php echo 'Status'; ?></th>
                     <th><?php echo 'Task'; ?></th>
-                    <th><?php echo 'Milestone'; ?></th>
-                    <th><?php echo 'Issues'; ?></th>
+                    <?php /*?><th><?php echo 'Milestone'; ?></th>
+                    <th><?php echo 'Issues'; ?></th><?php */?>
                     <th><?php echo 'Start Date'; ?></th>
                     <th><?php echo 'End Date'; ?></th>
                     <th><?php echo 'Tags'; ?></th>
@@ -137,8 +137,8 @@
     <?php endforeach; ?>
   </select></td>
                     <td><?php echo isset($status['total_tasks']) ? _d($status['total_tasks']) : '0'; ?></td>
-                    <td><?php echo isset($status['total_milestones']) ? _d($status['total_milestones']) : '0'; ?></td>
-                    <td><?php echo isset($status['total_issues']) ? _d($status['total_issues']) : '0'; ?></td>
+                    <?php /*?><td><?php echo isset($status['total_milestones']) ? _d($status['total_milestones']) : '0'; ?></td>
+                    <td><?php echo isset($status['total_issues']) ? _d($status['total_issues']) : '0'; ?></td><?php */?>
                     <td><?php echo isset($status['start_date']) ? _d($status['start_date']) : '-'; ?></td>
                     <td><?php echo isset($status['deadline']) ? _d($status['deadline']) : '-'; ?>
 					<?php 

@@ -91,16 +91,19 @@
                 <tbody>
                   <?php foreach ($listdata as $status) { 
                     $prod_status=proj_status_translate($status['task_status']);
+					//print_r($status);exit;
                   ?>
                   <tr>
 					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo $status['id']; ?></td>
                     <td  class="sticky-col second-col" style="width: 300px;
     max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 50) . '...' : '-'; ?>
 	<?php //echo get_project_title($project_id);?>
-	<?php if(!isset($project_id)||empty($project_id)){ ?><br />
+	<?php if(!isset($project_id)||empty($project_id) || isset($status['project_id'])){ ?><br />
 <span class="text-warning text-bold" title="Project Title">
 	<?php echo isset($status['project_id']) ? get_project_title($status['project_id'], 0, 50) . '' : '-'; ?>
 	</span>
+	<?php }else{?>
+	
 	<?php }?>
 	
 	<a href="<?php echo admin_url('project/tasks_details/'.$status["id"]); ?>" class="action-task action-task-btn tw-m-1 tw-p-1" style=""> <i class="fa-solid fa-file-contract"></i> View</a>
@@ -142,8 +145,8 @@
 					
 					<td><?php echo isset($status['task_start_date']) ? _d($status['task_start_date']) : '-'; ?></td>
                     <td><?php echo isset($status['task_end_date']) ? _d($status['task_end_date']) : '-'; ?></td>
-                    <td><?php echo getDaysBetweenDates($status['task_start_date'],$status['task_end_date']);  ?></td>
-                    <td><?php echo isset($status['task_priority']) ? get_project_priority($status['task_priority']) : '-'; ?></td>
+                    <td><?php echo getDaysBetweenDates($status['task_start_date'],$status['task_end_date']);  ?> Day</td>
+                    <td><?php echo isset($status['task_priority']) ? get_project_priority_button($status['task_priority']) : '-'; ?></td>
                     <td><?php echo isset($status['task_addedby']) ? get_staff_full_name($status['task_addedby']) : '-'; ?></td>
 					<td><?php echo get_task_percentage($status['id']); ?> %</td>
 					<td><?php echo isset($status['task_tags']) ? _d($status['task_tags']) : '-'; ?></td>
