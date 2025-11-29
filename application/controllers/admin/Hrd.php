@@ -2750,6 +2750,29 @@ class Hrd extends AdminController
         echo json_encode(['success' => true]);
     }
 
+    // Get attendance logs by attendance_id
+    public function get_attendance_logs()
+    {
+        if (!staff_can('view_own', 'hr_department')) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $attendance_id = (int)$this->input->get('attendance_id');
+        
+        if (!$attendance_id) {
+            echo json_encode(['success' => false, 'message' => 'Attendance ID required']);
+            return;
+        }
+
+        // Get logs from it_crm_hrd_attendance_logs table
+        $this->db->where('attendance_id', $attendance_id);
+        $this->db->order_by('punch_time', 'asc');
+        $logs = $this->db->get(db_prefix() . 'hrd_attendance_logs')->result_array();
+
+        echo json_encode(['success' => true, 'logs' => $logs]);
+    }
+
     // Submit request to update attendance in/out times (user-initiated)
     public function attendance_update_request_add()
     {
