@@ -19,18 +19,32 @@ if(empty($shift_details)){ echo "Shift Not Mapped. contact web admin"; exit;} ?>
 /* Show only the calendar when printing */
 body * { visibility: hidden !important; }
 #calendar-section, #calendar-section * { visibility: visible !important; }
-/* Let it flow normally for full multi-page print */
+
+/* Layout fixes */
 #calendar-section { width: 100%; }
-/* Ensure full table prints, not clipped by responsive wrapper */
 #calendar-section .table-responsive { overflow: visible !important; }
-/* Improve pagination */
+
+/* Page break rules */
 #calendar-section table { page-break-inside: auto; }
-#calendar-section tr    { page-break-inside: avoid; page-break-after: auto; }
+#calendar-section tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+    border: 1px solid #000; /* Added border */
+}
 #calendar-section thead { display: table-header-group; }
 #calendar-section tfoot { display: table-footer-group; }
-/* Better spacing/colors in print */
+
+/* Print settings */
 @page { size: auto; margin: 12mm; }
 html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+table td, 
+table th {
+    border: 1px solid #000;
+}
+table {
+    border-collapse: collapse;
+}
+</style>
 <style>
 @media print {
   body * {
@@ -46,7 +60,7 @@ html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 }
 </style>
-</style>
+
 <div id="wrapper">
   <div class="content">
   <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  My Attendance</span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
@@ -98,7 +112,7 @@ function printDiv(divId) {
               <div class="col-md-12">
                 <h4 style="margin-top:0;"><?php echo e(get_staff_full_name()); ?> : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></h4>
                 <div class="table-responsive">
-				<table class="table table-bordered" style="background:#fff;">
+				<table class="table table-bordered" border="1" >
 				   <thead>
                       <tr class="tw-bg-neutral-200 tw-text-xs">
                         <th>Month for : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></th>
@@ -148,7 +162,7 @@ function printDiv(divId) {
 						echo "<a class='btn btn-default mx-2'>".$label." (".$sc['total_count'].")&nbsp;</a>&nbsp;";
 					}
 					?>
-                  <table class="table table-bordered" style="background:#fff;">
+                  <table class="table table-bordered" border="1" style="background:#fff;">
 				   
                     <thead>
                       <tr>
@@ -212,8 +226,8 @@ function printDiv(divId) {
 					  //print_r($cell['items']);
 					  ?>
                         <tr class="<?php echo $bgClass;?>">
-                          <td><strong><a href="#" class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
-                          <td ><?php echo date('l', strtotime($cell['date'])); ?> </td>
+                          <td><strong><a href="#" title="Click for view attendace logs" class="open-att-logs" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
+                          <td ><a href="#"  class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>" title="Click for send attendance update request" ><?php echo date('l', strtotime($cell['date'])); ?></a> </td>
                           <?php
                             if (!empty($cell['items'])) {
                               // Take only the first record to avoid duplicates
@@ -358,6 +372,43 @@ $inTime="00.00";$outTime="00.00";
   </div>
 </div>
 
+<!-- Attendance Logs Modal -->
+<div class="modal fade" id="att_logs_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Attendance Logs - <span id="logs-date"></span></h4>
+      </div>
+      <div class="modal-body">
+        <div id="logs-loading" class="text-center" style="padding: 20px;">
+          <i class="fa fa-spinner fa-spin fa-2x"></i> Loading logs...
+        </div>
+        <div id="logs-content" style="display: none;">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Punch Type</th>
+                <th>Punch Time</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+            </tbody>
+          </table>
+          <div id="logs-empty" style="display: none; padding: 20px; text-align: center;">
+            <p class="text-muted">No logs found for this attendance record.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Update Request Modal -->
 <div class="modal fade" id="att_req_modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -392,6 +443,57 @@ $inTime="00.00";$outTime="00.00";
 <?php init_tail(); ?>
 <script>
 $(function(){
+  // Handle click on date to show logs
+  $(document).on('click', 'a.open-att-logs', function(){
+    var entry = $(this).data('entry_date');
+    var attId = $(this).data('att_id') || 0;
+    
+    if (attId === 0) {
+      alert('No attendance record found for this date.');
+      return false;
+    }
+    
+    // Show modal and set date
+    $('#logs-date').text(entry);
+    $('#att_logs_modal').modal('show');
+    
+    // Show loading, hide content
+    $('#logs-loading').show();
+    $('#logs-content').hide();
+    $('#logs-empty').hide();
+    $('#logs-tbody').empty();
+    
+    // Fetch logs via AJAX
+    $.get(admin_url + 'hrd/get_attendance_logs', { attendance_id: attId }, function(resp){
+      $('#logs-loading').hide();
+      
+      if (resp && resp.success && resp.logs && resp.logs.length > 0) {
+        var tbody = $('#logs-tbody');
+        tbody.empty();
+        
+        $.each(resp.logs, function(index, log){
+          var row = '<tr>' +
+            '<td>' + (index + 1) + '</td>' +
+            '<td>' + (log.punch_type ? log.punch_type : '-') + '</td>' +
+            '<td>' + (log.punch_time ? log.punch_time : '-') + '</td>' +
+            '<td>' + (log.ip ? log.ip : '-') + '</td>' +
+            '</tr>';
+          tbody.append(row);
+        });
+        
+        $('#logs-content').show();
+      } else {
+        $('#logs-empty').show();
+      }
+    }, 'json').fail(function(){
+      $('#logs-loading').hide();
+      alert('Failed to load logs. Please try again.');
+    });
+    
+    return false;
+  });
+
+  // Keep the old attendance request modal handler (if needed)
   $(document).on('click', 'a.open-att-req', function(){
     var entry = $(this).data('entry_date');
     var attId = $(this).data('att_id') || 0;

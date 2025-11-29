@@ -211,8 +211,8 @@ function printDiv(divId) {
                       if (strtotime($cell['date']) > time()) { continue; }
 					  ?>
                         <tr class="<?php echo $bgClass;?>">
-                          <td><strong><a href="#" class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
-                          <td><?php echo date('l', strtotime($cell['date'])); ?><?php //echo $sat_count; ?></td>
+                          <td><strong><a href="#" title="Click to view attendance logs" class="open-att-logs" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>"><?php echo date('D, d M Y', strtotime($cell['date'])); ?></a></strong></td>
+                          <td><a href="#" class="open-att-req" data-entry_date="<?php echo e($cell['date']); ?>" data-att_id="<?php echo (!empty($cell['items']) && isset($cell['items'][0]['attendance_id'])) ? (int)$cell['items'][0]['attendance_id'] : 0; ?>" title="Click to send attendance update request"><?php echo date('l', strtotime($cell['date'])); ?></a><?php //echo $sat_count; ?></td>
                           <?php
                             if (!empty($cell['items'])) {
                               // Take only the first record to avoid duplicates
@@ -329,6 +329,43 @@ function printDiv(divId) {
   </div>
 </div>
 
+<!-- Attendance Logs Modal -->
+<div class="modal fade" id="att_logs_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Attendance Logs - <span id="logs-date"></span></h4>
+      </div>
+      <div class="modal-body">
+        <div id="logs-loading" class="text-center" style="padding: 20px;">
+          <i class="fa fa-spinner fa-spin fa-2x"></i> Loading logs...
+        </div>
+        <div id="logs-content" style="display: none;">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Punch Type</th>
+                <th>Punch Time</th>
+                <th>IP Address</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+            </tbody>
+          </table>
+          <div id="logs-empty" style="display: none; padding: 20px; text-align: center;">
+            <p class="text-muted">No logs found for this attendance record.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Update Request Modal -->
 <div class="modal fade" id="att_req_modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -361,6 +398,57 @@ function printDiv(divId) {
 <?php init_tail(); ?>
 <script>
 $(function(){
+  // Handle click on date to show logs
+  $(document).on('click', 'a.open-att-logs', function(){
+    var entry = $(this).data('entry_date');
+    var attId = $(this).data('att_id') || 0;
+    
+    if (attId === 0) {
+      alert('No attendance record found for this date.');
+      return false;
+    }
+    
+    // Show modal and set date
+    $('#logs-date').text(entry);
+    $('#att_logs_modal').modal('show');
+    
+    // Show loading, hide content
+    $('#logs-loading').show();
+    $('#logs-content').hide();
+    $('#logs-empty').hide();
+    $('#logs-tbody').empty();
+    
+    // Fetch logs via AJAX
+    $.get(admin_url + 'hrd/get_attendance_logs', { attendance_id: attId }, function(resp){
+      $('#logs-loading').hide();
+      
+      if (resp && resp.success && resp.logs && resp.logs.length > 0) {
+        var tbody = $('#logs-tbody');
+        tbody.empty();
+        
+        $.each(resp.logs, function(index, log){
+          var row = '<tr>' +
+            '<td>' + (index + 1) + '</td>' +
+            '<td>' + (log.punch_type ? log.punch_type : '-') + '</td>' +
+            '<td>' + (log.punch_time ? log.punch_time : '-') + '</td>' +
+            '<td>' + (log.ip ? log.ip : '-') + '</td>' +
+            '</tr>';
+          tbody.append(row);
+        });
+        
+        $('#logs-content').show();
+      } else {
+        $('#logs-empty').show();
+      }
+    }, 'json').fail(function(){
+      $('#logs-loading').hide();
+      alert('Failed to load logs. Please try again.');
+    });
+    
+    return false;
+  });
+
+  // Keep the old attendance request modal handler
   $(document).on('click', 'a.open-att-req', function(){
     var entry = $(this).data('entry_date');
     var attId = $(this).data('att_id') || 0;
