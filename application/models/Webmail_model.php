@@ -1052,6 +1052,7 @@ $client->disconnect();
         $handlerSet = false;
         $prevDisplayErrors = ini_get('display_errors');
         ini_set('display_errors', '0');
+		ini_set('memory_limit', '1024M');
 
         try {
             $cm = new ClientManager();
@@ -1097,8 +1098,8 @@ $client->disconnect();
             $last_email_id = $this->webmail_model->lastemailid($mailer_username, $folder);
             $last_uid      = $last_email_id[0]['uniqid'] ?? 0;
 
-            log_message('error', 'Total Email: ' . $total_Email);
-            log_message('error', 'Last Email: ' . $last_uid);
+            //log_message('error', 'Total Email: ' . $total_Email);
+            //log_message('error', 'Last Email: ' . $last_uid);
 
             try {
                 $messages = $mailbox->query()
