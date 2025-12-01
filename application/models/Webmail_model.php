@@ -1101,15 +1101,16 @@ $connection=false;
 	  		log_message('error', 'Total Email: ' . $total_Email);
 			log_message('error', 'Last Email: ' . $last_uid);
 
-	  $messages = $mailbox->query()->limit(25)->getByUidGreater($last_uid);
+	  //$messages = $mailbox->query()->limit(25)->getByUidGreater($last_uid);
 	 
-      /*$pg=floor($last_email_id / 10) +1;
-	  $messages = $mailbox->query()
-    ->all()->limit($limit = 10, $page = $pg)
-    ->get() // fetch messages
-    ->filter(function($message) use ($last_email_id) {
-        return $message->getUid() > $last_email_id;
-    });*/
+      try {
+    $messages = $mailbox->query()
+                        ->limit(25)
+                        ->getByUidGreater($last_uid);
+} catch (\Exception $e) {
+    log_message('error', 'IMAP Error: '.$e->getMessage());
+    $messages = [];
+}
 
    
 
