@@ -59,8 +59,8 @@
                   <div class="form-group">
                     <label>&nbsp;</label>
                     <div>
-                      <button type="submit" class="btn btn-default" title="Search"><i class="fa fa-search"></i></button>
-                      <a href="<?php echo admin_url('hrd/manage_attendance_by_date'); ?>" class="btn btn-default" title="Reset"><i class="fa-solid fa-xmark" ></i></a>
+                      <button type="submit" class="btn btn-primary" title="Search"><i class="fa fa-search"></i> Search</button>
+                      <a href="<?php echo admin_url('hrd/manage_attendance_by_date'); ?>" class="btn btn-default" title="Reset"><i class="fa-solid fa-xmark" ></i> Reset</a>
                     </div>
                   </div>
                 </div>
