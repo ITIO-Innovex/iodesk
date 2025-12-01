@@ -27,7 +27,7 @@ if (empty($shiftDetails)) {
     table {
         border-collapse: collapse;
         width: 100%;
-        font-size: 10px;
+        font-size: 8px;
     }
     table, th, td {
         border: 1px solid #ddd;
@@ -48,23 +48,29 @@ if (empty($shiftDetails)) {
     }
 </style>
 
-<h3><?php echo e(get_staff_full_name()); ?> - Attendance</h3>
-<?php if ($cal) { ?>
-    <p>
-        Month: <strong><?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int) $cal['year'], (int) $cal['month']))); ?></strong>
-    </p>
-<?php } ?>
+<h3><?php echo e(get_staff_full_name()); ?> - Attendance <?php if ($cal) { ?>- Month: <strong><?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int) $cal['year'], (int) $cal['month']))); ?><?php } ?></h3>
 
-<table class="header-table">
+
+
+
+<table class="header-table" style="font-size:12px">
     <tr>
-        <th>Month for : <?php echo $cal ? date('F Y', strtotime(sprintf('%04d-%02d-01', (int) $cal['year'], (int) $cal['month']))) : '-'; ?></th>
+       <?php /*?> <th>Month for : <?php echo $cal ? date('F Y', strtotime(sprintf('%04d-%02d-01', (int) $cal['year'], (int) $cal['month']))) : '-'; ?></th><?php */?>
         <th><?php echo e(get_staff_full_name()); ?></th>
-        <th>Employee Code : <?php echo get_staff_fields('', 'employee_code'); ?></th>
-        <th>Shift Code : <?php echo e($get_shift_code); ?></th>
-        <th>Shift InTime : <?php echo e($get_shift_in); ?></th>
+        <th>Emp Code : <?php echo get_staff_fields('', 'employee_code'); ?></th>
+        <?php /*?><th>Shift Code : <?php echo e($get_shift_code); ?></th><?php */?>
+        <th>Shift InTime : <?php 
+							// Convert to DateTime object
+							$time = new DateTime($get_shift_in);
+							// Subtract 15 minutes
+							$time->modify('-15 minutes');
+							// Convert back to string if needed
+							$get_shift_in = $time->format('H:i:s');
+							echo $get_shift_in; // Output: 09:30:00
+						 ?></th>
         <th>Shift OutTime : <?php echo e($get_shift_out); ?></th>
         <th>Staff Type : <?php if ($staff_type) { echo '[ ' . get_staff_staff_type($staff_type) . ' ]'; } ?></th>
-        <th>Saturday Rule : <?php echo get_saturday_rule($get_saturday_rule); ?></th>
+        <?php /*?><th>Saturday Rule : <?php echo get_saturday_rule($get_saturday_rule); ?></th><?php */?>
     </tr>
 </table>
 
@@ -113,7 +119,7 @@ $fmtHms = function ($secs) {
 };
 ?>
 
-<table>
+<table style="font-size:9px">
     <thead>
     <tr>
         <th style="width:90px;">Date</th>

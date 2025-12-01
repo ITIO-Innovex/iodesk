@@ -1094,10 +1094,13 @@ $connection=false;
 
 
      
-	  //$total_Email=$mailbox->query()->all()->count();
+	  $total_Email=$mailbox->query()->all()->count();
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_uid=$last_email_id[0]['uniqid']?? 0;//exit;
 	  
+	  		log_message('error', 'Total Email: ' . $total_Email);
+			log_message('error', 'Last Email: ' . $last_uid);
+
 	  $messages = $mailbox->query()->limit(25)->getByUidGreater($last_uid);
 	 
       /*$pg=floor($last_email_id / 10) +1;

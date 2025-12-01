@@ -81,8 +81,8 @@ html, body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                   <div class="form-group">
                     <label>&nbsp;</label>
                     <div>
-                      <button type="submit" class="btn btn-default">Search</button>
-                      <a href="<?php echo admin_url('hrd/setting/employee_attendance?staffid=' . (int)$staffid); ?>" class="btn btn-default">Reset</a>
+                      <button type="submit" class="btn btn-primary"><i class="fa-solid fa-xmark"></i> Search</button>
+                      <a href="<?php echo admin_url('hrd/setting/employee_attendance?staffid=' . (int)$staffid); ?>" class="btn btn-default"><i class="fa-solid fa-xmark"></i> Reset</a>
                       <button type="button" class="btn btn-success" onclick="printDiv('calendar-section')"><i class="fa-solid fa-print"></i> Print</button>
                     </div>
                   </div>
@@ -107,14 +107,23 @@ function printDiv(divId) {
               <div class="col-md-12">
                 <h4 style="margin-top:0;"><?php echo e($staff_full_name); ?> : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></h4>
                 <div class="table-responsive">
-				<table class="table table-bordered" style="background:#fff;">
+				<table class="table table-bordered" border="1" style="background:#fff;">
 				   <thead>
                       <tr class="tw-bg-neutral-200 tw-text-xs">
-                        <th>Month for : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></th>
+                        <?php /*?><th>Month for : <?php echo date('F Y', strtotime(sprintf('%04d-%02d-01', (int)$cal['year'], (int)$cal['month']))); ?></th><?php */?>
                         <th><?php echo e($staff_full_name); ?></th>
-						<th>Employee Code : <?php echo e($staff->employee_code ?? '-'); ?></th>
-						<th>Shift Code    : <?php echo $get_shift_code; ?></th>
-                        <th>Shift InTime  : <?php echo $get_shift_in; ?></th>
+						<th>Emp. Code : <?php echo e($staff->employee_code ?? '-'); ?></th>
+						<?php /*?><th>Shift Code    : <?php echo $get_shift_code; ?></th><?php */?>
+                        <th>Shift InTime  : 
+						    <?php 
+							// Convert to DateTime object
+							$time = new DateTime($get_shift_in);
+							// Subtract 15 minutes
+							$time->modify('-15 minutes');
+							// Convert back to string if needed
+							$get_shift_in = $time->format('H:i:s');
+							echo $get_shift_in; // Output: 09:30:00
+						 ?></th>
 						<th>Shift OutTime : <?php echo $get_shift_out; ?></th>
 					    <th>Staff Type : <?php if ($staff_type_title) { echo "[ " . e($staff_type_title) . " ]"; } ?></th>
 						<th>Saturday Rule : <?php echo get_saturday_rule($get_saturday_rule); ?></th>
@@ -163,7 +172,7 @@ function printDiv(divId) {
 						echo "<a class='btn btn-default mx-2'>".$label." (".$sc['total_count'].")&nbsp;</a>&nbsp;";*/
 					}
 					?>
-                  <table class="table table-bordered" style="background:#fff;">
+                  <table class="table table-bordered" border="1" style="background:#fff;">
 				   
                     <thead>
                       <tr>
@@ -246,7 +255,8 @@ function printDiv(divId) {
                                 $outTime = '-';
                               }
                               
-                              $position = number_format($it['position'],2)??'';
+                              //$position = number_format($it['position'],2)??'';
+							  $position = $it['position'] !== null ? number_format($it['position'], 2) : '';
                               $totals = e($it['total_hours']??'');
                               $lates = e($it['late_mark']??'');
 							  
