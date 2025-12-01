@@ -1050,6 +1050,8 @@ $client->disconnect();
         $bufferLevel = ob_get_level();
         ob_start();
         $handlerSet = false;
+        $prevDisplayErrors = ini_get('display_errors');
+        ini_set('display_errors', '0');
 
         try {
             $cm = new ClientManager();
@@ -1166,6 +1168,9 @@ $client->disconnect();
             }
             while (ob_get_level() > $bufferLevel) {
                 @ob_end_clean();
+            }
+            if ($prevDisplayErrors !== false) {
+                ini_set('display_errors', $prevDisplayErrors);
             }
         }
 
