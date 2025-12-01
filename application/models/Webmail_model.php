@@ -1031,180 +1031,145 @@ $client->disconnect();
 
 	  
 	  // function for get inbox mail list
-        public function downloadmailbyfolder()
+       public function downloadmailbyfolder()
         {
-		
-		$mailer_imap_host=trim($_SESSION['webmail']['mailer_imap_host']);
-        $mailer_imap_port=trim($_SESSION['webmail']['mailer_imap_port']);
-        $mailer_username=trim($_SESSION['webmail']['mailer_username']);
-		$data['email']=trim($_SESSION['webmail']['mailer_username']);
-        $mailer_password=trim($_SESSION['webmail']['mailer_password']);
-		$encryption=trim($_SESSION['webmail']['encryption']);
-		$folder=trim($_SESSION['webmail']['folder']);
-		
-		try {
-		 
-		 $cm = new ClientManager();
+        $result = ['msg' => 'Unable to download emails.', 'cnt' => 0];
+        $mailer_imap_host = trim($_SESSION['webmail']['mailer_imap_host'] ?? '');
+        $mailer_imap_port = trim($_SESSION['webmail']['mailer_imap_port'] ?? '');
+        $mailer_username  = trim($_SESSION['webmail']['mailer_username'] ?? '');
+        $mailer_password  = trim($_SESSION['webmail']['mailer_password'] ?? '');
+        $encryption       = trim($_SESSION['webmail']['encryption'] ?? '');
+        $folder           = trim($_SESSION['webmail']['folder'] ?? '');
+        $data['email']    = $mailer_username;
 
-    // Define the IMAP connection settings
-    $client = $cm->make([
-        'host'          => $mailer_imap_host,
-        'port'          => $mailer_imap_port,
-        'encryption'    => $encryption,
-        'validate_cert' => true,
-        'username'      => $mailer_username,
-        'password'      => $mailer_password,
-        'protocol'      => 'imap', 
-		'timeout'       => 300
-		//'authentication' => "oauth"            // Protocol (imap/pop3)
-    ]);
-	
-// convert warnings to exceptions
-set_error_handler(function($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) return;
-    throw new ErrorException($message, 0, $severity, $file, $line);
-});
+        if ($mailer_username === '' || $mailer_password === '' || $folder === '') {
+            $result['msg'] = 'Missing webmail session details.';
+            return $result;
+        }
 
-$cnt=0;	
-$connection=false;
-             // Check IMAP connection
-			try {
-			if ($client->connect()) {
-			$connection=true;
-			} else {
-			$data['msg']="IMAP Error :-".$e->getMessage();
-			$data['cnt']=0;
-			return $data;
-			
-			}
-			} catch (\Exception $e) {
-			$data['msg']="IMAP Error :-".$e->getMessage();
-			$data['cnt']=0;
-			return $data;
-			}
+        $bufferLevel = ob_get_level();
+        ob_start();
+        $handlerSet = false;
 
-	
-	if ($connection) {
- 
-	$mailbox = $client->getFolder($folder);
-	 if ($mailbox === null) {
-      die("The ".$folder." folder could not be found.");exit;
-      }
-	  $data['folder']=$folder;
+        try {
+            $cm = new ClientManager();
+            $client = $cm->make([
+                'host'          => $mailer_imap_host,
+                'port'          => $mailer_imap_port,
+                'encryption'    => $encryption,
+                'validate_cert' => true,
+                'username'      => $mailer_username,
+                'password'      => $mailer_password,
+                'protocol'      => 'imap',
+                'timeout'       => 300,
+            ]);
 
+            set_error_handler(function ($severity, $message, $file, $line) {
+                if (!(error_reporting() & $severity)) {
+                    return;
+                }
+                throw new ErrorException($message, 0, $severity, $file, $line);
+            });
+            $handlerSet = true;
 
-     
-	  $total_Email=$mailbox->query()->all()->count();
-	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
-	  $last_uid=$last_email_id[0]['uniqid']?? 0;//exit;
-	  
-	  		log_message('error', 'Total Email: ' . $total_Email);
-			log_message('error', 'Last Email: ' . $last_uid);
+            $cnt = 0;
+            try {
+                if (!$client->connect()) {
+                    $result['msg'] = 'IMAP connection failed.';
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                $result['msg'] = 'IMAP Error :-' . $e->getMessage();
+                return $result;
+            }
 
-	  //$messages = $mailbox->query()->limit(25)->getByUidGreater($last_uid);
-	 
-      try {
-    $messages = $mailbox->query()
-                        ->limit(25)
-                        ->getByUidGreater($last_uid);
-} catch (\Exception $e) {
-    log_message('error', 'IMAP Error: '.$e->getMessage());
-    $messages = [];
-}
+            $mailbox = $client->getFolder($folder);
+            if ($mailbox === null) {
+                $result['msg'] = 'Folder "' . $folder . '" not found on server.';
+                $client->disconnect();
+                return $result;
+            }
+            $data['folder'] = $folder;
 
-   
+            $total_Email   = $mailbox->query()->all()->count();
+            $last_email_id = $this->webmail_model->lastemailid($mailer_username, $folder);
+            $last_uid      = $last_email_id[0]['uniqid'] ?? 0;
 
+            log_message('error', 'Total Email: ' . $total_Email);
+            log_message('error', 'Last Email: ' . $last_uid);
 
-//print_r($messages);exit;
-foreach ($messages as $message) {
+            try {
+                $messages = $mailbox->query()
+                    ->limit(25)
+                    ->getByUidGreater($last_uid);
+            } catch (\Exception $e) {
+                log_message('error', 'IMAP Error: ' . $e->getMessage());
+                $messages = [];
+            }
 
-    $data['subject'] = $message->getSubject();
-    $data['date'] = $message->getDate(); //->format('Y-m-d H:i:s')
-    $data['body'] = $message->getHtmlBody() ?? '';
-	if($data['body']==""){$data['body'] = $message->getTextBody() ?? ''; }
-	$data['uniqid'] = $message->uid;
-	$data['messageid'] = $message->getMessageId();
-	
-	
-	 // From
-    $from = $message->getFrom(); // Returns array of Address objects
-    $data['from_email'] = $from[0]->mail ?? '';
-    $data['from_name']  = $from[0]->personal ?? '';
-	//print_r($from);
-	//echo "<br><br>";
-	// To
-  
-	
-    $to_list = $message->getTo(); // Returns array of Address objects
-    $data['to_emails'] = $to_list[0]->mail ?? '';
-   
-	
-	
-   
-    $cc_list = $message->getCc(); // Returns array of Address objects
-    $data['cc_emails'] = $cc_list[0]->mail ?? '';
-	
-	
-  
-    // BCC
-	$bcc_list = $message->getBcc(); // Returns array of Address objects
-    $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+            foreach ($messages as $message) {
+                $data['subject']   = $message->getSubject();
+                $data['date']      = $message->getDate();
+                $data['body']      = $message->getHtmlBody() ?? '';
+                if ($data['body'] === '') {
+                    $data['body'] = $message->getTextBody() ?? '';
+                }
+                $data['uniqid']     = $message->uid;
+                $data['messageid']  = $message->getMessageId();
+                $from               = $message->getFrom();
+                $data['from_email'] = $from[0]->mail ?? '';
+                $data['from_name']  = $from[0]->personal ?? '';
+                $to_list            = $message->getTo();
+                $data['to_emails']  = $to_list[0]->mail ?? '';
+                $cc_list            = $message->getCc();
+                $data['cc_emails']  = $cc_list[0]->mail ?? '';
+                $bcc_list           = $message->getBcc();
+                $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
 
+                $attachments_paths   = [];
+                $data['isattachments'] = 0;
+                $uid                = uniqid();
+                $attachmentDir      = 'attachments';
+                $filePath           = $attachmentDir . '/' . $uid;
 
-    // Handle attachments
-    $attachments_paths = [];
-    $data['isattachments']=0;
-	$uid=uniqid();
-	$attachmentDir = 'attachments';
-	$filePath = $attachmentDir . '/' . $uid;
-    foreach ($message->getAttachments() as $attachment) {
-    $attachments = $message->getAttachments();
-		
-		// Create directory if it doesn't exist
-					
-		foreach ($attachments as $attachment) {
-		
-		if (!file_exists($filePath)) {
-		mkdir($filePath, 0777, true);
-		}	
-				
-		$fileName = $attachment->name;
-		// Save the attachment
-		$attachment->save($filePath);
-		$data['isattachments']=1;
-		$attachments_paths[] = $filePath."/".$fileName;
-		}
-		$data['attachments'] = implode(',', $attachments_paths);//exit;
- }
- $cnt++;
-		$this->db->insert(db_prefix() . 'emails', $data);
-		//echo $this->db->last_query();exit;
- 
-}
+                $attachments = $message->getAttachments();
+                foreach ($attachments as $attachment) {
+                    if (!file_exists($filePath)) {
+                        mkdir($filePath, 0777, true);
+                    }
+                    $fileName = $attachment->name;
+                    $attachment->save($filePath);
+                    $data['isattachments'] = 1;
+                    $attachments_paths[]   = $filePath . "/" . $fileName;
+                }
+                $data['attachments'] = implode(',', $attachments_paths);
 
-    
-$client->disconnect();	   
-	    // Get the inbox folder
-      
+                $cnt++;
+                $this->db->insert(db_prefix() . 'emails', $data);
+            }
 
-	        
-			$data['msg']="Total Added :-".$cnt;
-			$data['cnt']=1;
-			return $data;exit;
-	  
-	  }
-	
-   
-	
-		} catch (Exception $e) {
-		    $data['msg']="Error: " . $e->getMessage();
-			$data['cnt']=0;
-			return $data;exit;
-			}
-		return $data;exit;
-	
-       //echo "ERROR 103";exit;
-        //return $this->db->get(db_prefix().'webmail_setup')->result_array();
+            $client->disconnect();
+            $result['msg'] = 'Total Added :-' . $cnt;
+            $result['cnt'] = 1;
+        } catch (ImapServerErrorException $e) {
+            log_message('error', 'IMAP Server Error: ' . $e->getMessage());
+            $result['msg'] = ' IMAP Authentication failed - check credentials.';
+        } catch (ResponseException $e) {
+            log_message('error', 'IMAP Response Exception: ' . $e->getMessage());
+            $result['msg'] = ' IMAP server response invalid.';
+        } catch (Exception $e) {
+            log_message('error', 'General Exception: ' . $e->getMessage());
+            $result['msg'] = ' Error: ' . $e->getMessage();
+        } finally {
+            if ($handlerSet) {
+                restore_error_handler();
+            }
+            while (ob_get_level() > $bufferLevel) {
+                @ob_end_clean();
+            }
+        }
+
+        return $result;
       }
 	  
 
