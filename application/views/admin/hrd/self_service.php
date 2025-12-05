@@ -22,6 +22,8 @@
 		  </li>
 		  <li> <a href="<?php echo admin_url('hrd/my_document');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>My Document</a> 
 		  </li>
+		  <li> <a href="<?php echo admin_url('hrd/awards');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Awards</a> 
+		  </li>
 		  <li> <a href="<?php echo admin_url('hrd/holidays_list');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Holidays list</a> 
 		  </li>
         </ul>
@@ -29,9 +31,9 @@
 	  <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-hand-holding-dollar tw-mx-2"></i> Salary</h4>
         <ul class="reports tw-space-y-1">
-          <li> <a href="<?php echo admin_url('hrd/ctc');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>CTC</a> 
+          <li> <a href="#" onclick="alert('Coming Soon'); return false;" <?php /*?>href="<?php echo admin_url('hrd/ctc');?>" <?php */?> class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>CTC</a> 
 		  </li>
-		  <li> <a href="<?php echo admin_url('hrd/pay_slip');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Pay Slip</a> 
+		  <li> <a href="#" onclick="alert('Coming Soon'); return false;" <?php /*?>href="<?php echo admin_url('hrd/pay_slip');?>"<?php */?> class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Pay Slip</a> 
 		  </li>
 		 
         </ul>

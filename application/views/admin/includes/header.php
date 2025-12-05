@@ -186,6 +186,9 @@
                         <li class="header-edit-profile"><a
                                 href="<?php echo admin_url('staff/edit_profile'); ?>"><?php echo _l('nav_edit_profile'); ?></a>
                         </li>
+						<li class="header-my-timesheets"><a
+                                href="<?php echo admin_url('utilities/activity_log'); ?>"><?php echo 'Activity Logs'; ?></a>
+                                </li>
                         <?php if (!is_language_disabled()) { ?>
                         <li class="dropdown-submenu pull-left header-languages">
                             <a href="#" tabindex="-1"><?php echo _l('language'); ?></a>
