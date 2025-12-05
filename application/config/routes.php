@@ -274,6 +274,8 @@ $route['admin/hrd/self_service'] = 'admin/hrd/self_service';
 $route['admin/hrd/holidays_list'] = 'admin/hrd/holidays_list';
 $route['admin/hrd/my_document'] = 'admin/hrd/my_document';
 $route['admin/hrd/my_document_add'] = 'admin/hrd/my_document_add';
+$route['admin/hrd/setting/awards'] = 'admin/hrd/setting/awards';
+$route['admin/hrd/setting/awards_add'] = 'admin/hrd/awards_add';
 $route['admin/hrd/leave_balance'] = 'admin/hrd/leave_balance';
 $route['admin/hrd/setting/leave_balance'] = 'admin/hrd/setting_leave_balance';
 $route['admin/hrd/setting/leave_balance_add'] = 'admin/hrd/setting_leave_balance_add';
@@ -284,9 +286,15 @@ $route['admin/hrd/profile'] = 'admin/hrd/profile';
 $route['admin/hrd/profile_update_personal'] = 'admin/hrd/profile_update_personal';
 $route['admin/hrd/profile_update_social'] = 'admin/hrd/profile_update_social';
 $route['admin/hrd/profile_image_update'] = 'admin/hrd/profile_image_update';
+$route['admin/hrd/setting/awards_update/(:num)'] = 'admin/hrd/awards_update/$1';
+$route['admin/hrd/setting/awards_delete/(:num)'] = 'admin/hrd/awards_delete/$1';
+$route['admin/hrd/setting/delete_award_image/(:num)'] = 'admin/hrd/delete_award_image/$1';
+$route['admin/hrd/awards'] = 'admin/hrd/awards_gallery';
 
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';
 $route['admin/database_backups/export_backup'] = 'admin/database_backups/export_backup';
 $route['admin/database_backups/download/(.+)'] = 'admin/database_backups/download/$1';
 $route['admin/database_backups/delete'] = 'admin/database_backups/delete';
+
+$route['admin/hrd/gallery'] = 'admin/hrd/gallery_latest';

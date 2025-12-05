@@ -155,6 +155,10 @@
 		  <li> <a href="<?php echo admin_url('designation');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Designation</a> 
 		  </li>
 		  <?php } ?>
+		  <?php if(is_department_admin() || is_admin()){?>
+		  <li> <a href="<?php echo admin_url('hrd/setting/awards');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>Awards</a> 
+		  </li>
+		  <?php } ?>
 		  
         </ul>
       </div>

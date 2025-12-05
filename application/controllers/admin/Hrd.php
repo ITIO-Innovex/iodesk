@@ -52,6 +52,8 @@ class Hrd extends AdminController
             $this->attendance_request();
         } elseif ($type == 'shift_manager') {
             $this->shift_manager();
+        } elseif ($type == 'awards') {
+            $this->awards();
         } else {
             // Default HRD settings page should look like /admin/reports
             $data['title'] = 'Settings';
@@ -2061,7 +2063,7 @@ class Hrd extends AdminController
         }
 
         // Build listing query
-        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.staff_type, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, s.approver, s.employee_status, d.name AS department, des.title AS designation, br.branch_name AS branch_name, st.title AS staff_type_name');
+        $this->db->select('s.staffid, s.employee_code, s.title, s.firstname, s.lastname, s.branch as branch, s.department_id, s.designation_id, s.staff_type, s.gender, s.date_of_birth as dob, s.email, s.phonenumber, s.joining_date AS joining_date, s.approver, s.employee_status, s.reporting_manager, d.name AS department, des.title AS designation, br.branch_name AS branch_name, st.title AS staff_type_name');
         $this->db->from(db_prefix() . 'staff s');
         $this->db->join(db_prefix() . 'departments d', 'd.departmentid = s.department_id', 'left');
         $this->db->join(db_prefix() . 'designations des', 'des.id = s.designation_id', 'left');
@@ -2190,6 +2192,7 @@ class Hrd extends AdminController
             'department_id'  => ($this->input->post('department')!=='') ? (int)$this->input->post('department') : null,
             'designation_id' => ($this->input->post('designation')!=='') ? (int)$this->input->post('designation') : null,
             'staff_type'     => ($this->input->post('staff_type')!=='') ? (int)$this->input->post('staff_type') : null,
+			'reporting_manager'     => ($this->input->post('reporting_manager')!=='') ? (int)$this->input->post('reporting_manager') : null,
             'phonenumber'    => $this->input->post('phonenumber'),
             'joining_date'   => $this->input->post('joining_date'),
             'date_of_birth'  => $this->input->post('dob'),
@@ -4740,6 +4743,90 @@ class Hrd extends AdminController
         redirect(admin_url('hrd/my_document'));
     }
 
+    /* Awards - list & upload images */
+    public function awards()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Awards');
+        }
+        // get all awards
+        $this->db->order_by('addedon', 'desc');
+        $awards = $this->db->get('it_crm_hrd_awards')->result_array();
+        // get images per award
+        foreach ($awards as &$a) {
+            $a['images'] = $this->db->get_where('it_crm_hrd_awards_images', ['awards_id' => $a['id'], 'status'=>1])->result_array();
+        }
+        unset($a);
+        $data = [];
+        $data['title'] = 'Awards';
+        $data['awards'] = $awards;
+        $this->load->view('admin/hrd/setting/awards', $data);
+    }
+
+    public function awards_add()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $staffid = get_staff_user_id();
+        $title = trim((string)$this->input->post('award_title'));
+        $savedAny = false;
+        // main awards insert
+        $award_data = [
+            'staff' => $staffid,
+            'award_title' => $title,
+            'addedon' => date('Y-m-d H:i:s'),
+            'status' => 1,
+        ];
+        $this->db->insert('it_crm_hrd_awards', $award_data);
+        $award_id = $this->db->insert_id();
+        // Allowed image extensions
+        $allowedImageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        // Support multiple files via image[]
+        if (isset($_FILES['image'])) {
+            $files = $_FILES['image'];
+            $isMultiple = is_array($files['name']);
+            $total = $isMultiple ? count($files['name']) : ($files['name'] ? 1 : 0);
+            $uploadDir = FCPATH . 'uploads/hrd_awards/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+            for ($i = 0; $i < $total; $i++) {
+                $name     = $isMultiple ? $files['name'][$i] : $files['name'];
+                $tmp_name = $isMultiple ? $files['tmp_name'][$i] : $files['tmp_name'];
+                if (empty($name) || !is_uploaded_file($tmp_name)) { continue; }
+                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                if (!in_array($ext, $allowedImageExts)) { continue; }
+                $imageInfo = @getimagesize($tmp_name);
+                if ($imageInfo === false) { continue; }
+                $safeName = 'award_' . $staffid . '_' . time() . '_' . mt_rand(1000,9999) . '.' . $ext;
+                $dest = $uploadDir . $safeName;
+                if (@move_uploaded_file($tmp_name, $dest)) {
+                    $relPath = 'uploads/hrd_awards/' . $safeName;
+                    $imgdata = [
+                        'awards_id' => $award_id,
+                        'image_path' => $relPath,
+                        'status' => 1,
+                    ];
+                    $this->db->insert('it_crm_hrd_awards_images', $imgdata);
+                    $savedAny = true;
+                }
+            }
+        }
+        if ($this->input->is_ajax_request()) {
+            echo json_encode(['success' => $savedAny]);
+            return;
+        }
+        if ($savedAny) {
+            set_alert('success', 'Award and images added');
+        } else {
+            set_alert('warning', 'No images uploaded or invalid image format');
+        }
+        redirect(admin_url('hrd/setting/awards'));
+    }
+
     /* Leave Balance listing for current staff with month filter */
     public function leave_balance()
     {
@@ -5132,5 +5219,121 @@ class Hrd extends AdminController
             }
         }
         echo json_encode(['success' => false]);
+    }
+
+    public function awards_update($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Awards');
+        }
+        $award = $this->db->get_where('it_crm_hrd_awards', ['id'=>$id])->row_array();
+        if (!$award) {
+            set_alert('warning', 'Award not found');
+            redirect(admin_url('hrd/setting/awards'));
+            return;
+        }
+        if ($this->input->method() === 'post') {
+            $title = trim((string)$this->input->post('award_title'));
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_hrd_awards', ['award_title'=>$title]);
+            $savedAny = false;
+            $allowedImageExts = ['jpg','jpeg','png','gif','webp'];
+            if (isset($_FILES['image'])) {
+                $files = $_FILES['image'];
+                $isMultiple = is_array($files['name']);
+                $total = $isMultiple ? count($files['name']) : ($files['name'] ? 1 : 0);
+                $uploadDir = FCPATH . 'uploads/hrd_awards/';
+                if (!is_dir($uploadDir)) {@mkdir($uploadDir, 0755, true);}
+                for ($i=0;$i<$total;$i++) {
+                    $name=$isMultiple?$files['name'][$i]:$files['name'];
+                    $tmp_name=$isMultiple?$files['tmp_name'][$i]:$files['tmp_name'];
+                    if (empty($name)||!is_uploaded_file($tmp_name)) continue;
+                    $ext=strtolower(pathinfo($name,PATHINFO_EXTENSION));
+                    if(!in_array($ext,$allowedImageExts))continue;
+                    $imageInfo=@getimagesize($tmp_name);
+                    if($imageInfo===false)continue;
+                    $safeName='award_'.$id.'_'.time().'_'.mt_rand(1000,9999).'.'.$ext;
+                    $dest=$uploadDir.$safeName;
+                    if (@move_uploaded_file($tmp_name,$dest)) {
+                        $relPath='uploads/hrd_awards/'.$safeName;
+                        $imgdata=[
+                            'awards_id'=>$id,
+                            'image_path'=>$relPath,
+                            'status'=>1,
+                        ];
+                        $this->db->insert('it_crm_hrd_awards_images',$imgdata);
+                        $savedAny=true;
+                    }
+                }
+            }
+            set_alert('success','Award updated'.($savedAny?', images added too':''));
+            redirect(admin_url('hrd/setting/awards'));
+            return;
+        }
+        // preload images
+        $award['images']=$this->db->get_where('it_crm_hrd_awards_images',['awards_id'=>$id,'status'=>1])->result_array();
+        $data=['title'=>'Update Award','award'=>$award];
+        $this->load->view('admin/hrd/setting/awards_edit',$data);
+    }
+
+    public function awards_delete($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Awards');
+        }
+        $award=$this->db->get_where('it_crm_hrd_awards',['id'=>$id])->row_array();
+        if(!$award){ set_alert('warning','Award not found'); redirect(admin_url('hrd/setting/awards')); return; }
+        // Delete images
+        $images=$this->db->get_where('it_crm_hrd_awards_images',['awards_id'=>$id])->result_array();
+        foreach($images as $img) {
+            $file=FCPATH.$img['image_path'];
+            if(file_exists($file)) @unlink($file);
+        }
+        $this->db->where('awards_id',$id)->delete('it_crm_hrd_awards_images');
+        $this->db->where('id',$id)->delete('it_crm_hrd_awards');
+        set_alert('success','Award and images deleted');
+        redirect(admin_url('hrd/setting/awards'));
+    }
+
+    public function delete_award_image($image_id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success'=>false]);return;
+        }
+        $img = $this->db->get_where('it_crm_hrd_awards_images',['id'=>$image_id])->row_array();
+        if ($img) {
+            $file=FCPATH.$img['image_path'];
+            if(file_exists($file)) @unlink($file);
+            $this->db->where('id',$image_id)->delete('it_crm_hrd_awards_images');
+            echo json_encode(['success'=>true]);return;
+        }
+        echo json_encode(['success'=>false]);
+    }
+
+    public function awards_gallery()
+    {
+        // Get all awards
+        $this->db->order_by('addedon', 'desc');
+        $awards = $this->db->get('it_crm_hrd_awards')->result_array();
+        foreach ($awards as &$a) {
+            $a['images'] = $this->db->get_where('it_crm_hrd_awards_images', ['awards_id'=>$a['id'], 'status'=>1])->result_array();
+        }
+        unset($a);
+        $data = ['title' => 'Awards Gallery', 'awards' => $awards];
+        $this->load->view('admin/hrd/awards_gallery', $data);
+    }
+
+    public function gallery_latest()
+    {
+        // Get latest 100 images (you can change this limit)
+        $this->db->select('img.*, award.award_title');
+        $this->db->from('it_crm_hrd_awards_images img');
+        $this->db->join('it_crm_hrd_awards award', 'award.id = img.awards_id', 'left');
+        $this->db->where('img.status', 1);
+        $this->db->order_by('img.id', 'desc');
+        $this->db->limit(100);
+        $images = $this->db->get()->result_array();
+        $data = ['title' => 'Latest Awards Gallery', 'images' => $images];
+        $this->load->view('admin/hrd/awards_gallery_latest', $data);
     }
 }

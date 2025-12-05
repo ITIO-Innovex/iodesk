@@ -23,29 +23,16 @@
                       <th>Staff Type</th>
                       <th>Phone</th>
                       <th>Joining Date</th>
-					  <th>Status</th>
-                      <th><?php echo _l('options'); ?></th>
+					  
                     </tr>
                   </thead>
                   <tbody>
+				 
                     <?php if (!empty($staff_rows)) { $i=1; foreach ($staff_rows as $row) { ?>
                       <tr>
-                        <td><?php echo (int)$i++; ?></td>
-                        <td><?php echo e($row['firstname'] ?? ''); ?> <?php echo e($row['lastname'] ?? ''); ?></td>
-                        <td><?php echo e($row['employee_code'] ?? ''); ?></td>
-                        <td><?php echo e($row['email'] ?? ''); ?></td>
-                        <td><?php echo e($row['branch_name'] ?? ''); ?></td>
-                        <td><?php echo e($row['department'] ?? ''); ?></td>
-                        <td><?php echo e($row['designation'] ?? ''); ?></td>
-                        <td><?php echo e($row['staff_type_name'] ?? ''); ?></td>
-                        <td><?php echo e($row['phonenumber'] ?? ''); ?></td>
-                        <td><?php echo isset($row['joining_date']) ? $row['joining_date'] : ''; ?></td>
-						<td>
-<?php 
+                        <td style="width:50px;"><?php 
 $employee_status=isset($row['employee_status']) ? $row['employee_status'] : '';
-$class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_status.'" class="fa-solid fa-circle-check text-success"></i>';}else{echo '<i title="'.$employee_status.'" class="fa-solid fa-circle-xmark text-danger"></i>';} ?>
-                        <td>
-                          <a href="#" class="" onclick='openStaffModal(<?php 
+$class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_status.'" class="fa-solid fa-circle-check text-success"></i>';}else{echo '<i title="'.$employee_status.'" class="fa-solid fa-circle-xmark text-danger"></i>';} ?>&nbsp;<a href="#" class="" onclick='openStaffModal(<?php 
                             $approver_data = [];
                             if (!empty($row['approver'])) {
                               $approver_data = json_decode($row['approver'], true);
@@ -72,8 +59,19 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
                             'hr_manager_approver' => isset($approver_data['hr_manager_approver']) ? (string)$approver_data['hr_manager_approver'] : '',
                             'reporting_approver' => isset($approver_data['reporting_approver']) ? (string)$approver_data['reporting_approver'] : '',
                             'employee_status' => (string)($row['employee_status'] ?? ''),
+							'reporting_manager' => (string)($row['reporting_manager'] ?? ''),
                           ]); ?>); return false;'><i class="fa-solid fa-pen-to-square text-warning"></i></a>
-                        </td>
+</td>
+                        <td><?php echo e($row['firstname'] ?? ''); ?> <?php echo e($row['lastname'] ?? ''); ?></td>
+                        <td><?php echo e($row['employee_code'] ?? ''); ?></td>
+                        <td><?php echo e($row['email'] ?? ''); ?></td>
+                        <td><?php echo e($row['branch_name'] ?? ''); ?></td>
+                        <td><?php echo e($row['department'] ?? ''); ?></td>
+                        <td><?php echo e($row['designation'] ?? ''); ?></td>
+                        <td><?php echo e($row['staff_type_name'] ?? ''); ?></td>
+                        <td><?php echo e($row['phonenumber'] ?? ''); ?></td>
+                        <td><?php echo isset($row['joining_date']) ? $row['joining_date'] : ''; ?></td>
+						
                       </tr>
                     <?php } } ?>
                   </tbody>
@@ -210,7 +208,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
           </div>
         </div>
         <div class="row">
-          <div class="col-md-6"><div class="form-group"><label>Employee Status</label>
+          <div class="col-md-6"><div class="form-group"><label>Employee Status !!</label>
             <select name="employee_status" class="form-control">
               <option value="">-- Employee Status --</option>
                 <option value="Active">Active</option>
@@ -220,6 +218,20 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
 				<option value="Retired">Retired</option>
             </select>
           </div></div>
+		  
+		  
+  <div class="col-md-6"><div class="form-group"><label>Reporting Manager / Team Leader</label>
+    <select name="reporting_manager" class="form-control">
+      <option value="">-- Select Reporting Manager --</option>
+      <?php if (!empty($all_employees)) { foreach ($all_employees as $emp) {  ?>
+        <option value="<?php echo (int)$emp['staffid']; ?>"
+          <?php echo (isset($editing_reporting_manager) && $editing_reporting_manager == (int)$emp['staffid'] ? 'selected' : ''); ?>>
+          <?php echo e($emp['full_name']); ?> (<?php echo e($emp['email']); ?>)
+        </option>
+      <?php } } ?>
+    </select>
+  </div></div>
+
           
         </div>
       </div>
@@ -253,6 +265,9 @@ function loadDesignations(depId, done){
 }
 
 function openStaffModal(data){
+
+
+//alert(JSON.stringify(data));
   var $m = $('#staff_modal');
   var $f = $m.find('form');
   $f.find('#additional').html('<input type="hidden" name="staffid" value="'+(data.staffid||'')+'"/>');
@@ -279,6 +294,7 @@ function openStaffModal(data){
   $f.find('select[name=hr_manager_approver]').val(data.hr_manager_approver||'');
   $f.find('select[name=reporting_approver]').val(data.reporting_approver||'');
   $f.find('select[name=employee_status]').val(data.employee_status||'');
+  $f.find('select[name=reporting_manager]').val(data.reporting_manager||'');
   $m.modal('show');
 }
 

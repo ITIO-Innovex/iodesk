@@ -92,7 +92,8 @@ class Webmail extends AdminController
 	 //Display Inbox Listing 
 	public function inbox()
 	{
-	    $data['title'] = _l('Webmail Setup');
+	    $mailer_email = $_SESSION['webmail']['mailer_email'] ?? "";
+	    $data['title'] = $mailer_email.' - Webmail';
 		$data['email_signature'] = get_staff_signature();
 		//print_r($_SESSION['mailersdropdowns']);
 		if(empty($_SESSION['mailersdropdowns'])){
@@ -101,6 +102,7 @@ class Webmail extends AdminController
 		}else{
 		
 		$data['inboxemail']=$this->webmail_model->getinboxemail();
+		
 		////////////////////////////////////////////
 		$this->load->view('admin/webmail/inbox', $data);
 		}
