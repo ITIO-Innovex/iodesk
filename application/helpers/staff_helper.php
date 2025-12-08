@@ -481,6 +481,25 @@ function get_staff_branch_name($branchid='')
 		return 0;
 }
 
+function get_staff_designations_name($id='')
+{   
+        // Fetch company Name from company id
+		if(empty($id)){
+		return 0;
+		}
+		
+		if(isset($id)&&$id){
+		$CI = & get_instance();
+		$CI->db->where('id', $id);
+		$com = $CI->db->select('title')->from(db_prefix() . 'designations')->get()->row();
+		if(isset($com)&&$com->title){
+		return $com->title;
+		}
+		}
+		
+		return 0;
+}
+
 function get_staff_staff_type($staffid='')
 {   
         // Fetch company Name from company id
