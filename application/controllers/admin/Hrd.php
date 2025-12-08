@@ -4659,6 +4659,20 @@ class Hrd extends AdminController
         $data['holidays'] = $holidays;
         $this->load->view('admin/hrd/holidays_list', $data);
     }
+	
+	/* Holidays List - simple listing page */
+    public function organization_chart()
+    {
+       
+		$this->db->select('staffid, CONCAT(firstname, " ", lastname) AS full_name, reporting_manager, designation_id, branch');
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('reporting_manager !=', null);
+        $employees = $this->db->get(db_prefix() . 'staff')->result_array();
+        $data = [];
+        $data['title'] = 'Organization Chart';
+        $data['employees'] = $employees;
+        $this->load->view('admin/hrd/organization_chart', $data);
+    }
 
     /* My Documents - list & upload for current staff */
     public function my_document()
