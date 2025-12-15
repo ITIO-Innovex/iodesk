@@ -32,6 +32,8 @@ class Hrd extends AdminController
             $this->branch_manager();
         } elseif ($type == 'holiday_list') {
             $this->holiday_list();
+        } elseif ($type == 'payroll_components') {
+            $this->payroll_components();
         } elseif ($type == 'todays_thought') {
             $this->todays_thought();
         } elseif ($type == 'leave_rule') {
@@ -1030,6 +1032,28 @@ class Hrd extends AdminController
         $data['holiday_lists'] = $this->hrd_model->get_holiday_list();
         $data['title'] = 'Holiday List';
         $this->load->view('admin/hrd/setting/holiday_list', $data);
+    }
+
+    /* View Payroll Components */
+    public function payroll_components()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Payroll Components');
+        }
+
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } else {
+            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+                $this->db->where('company_id', $_SESSION['super_view_company_id']);
+            } else {
+                $this->db->where('company_id', get_staff_company_id());
+            }
+        }
+
+        $data['components'] = $this->hrd_model->get_payroll_components();
+        $data['title'] = 'Payroll Components';
+        $this->load->view('admin/hrd/setting/payroll_components', $data);
     }
 
     /* View Today's Thought */
@@ -3078,6 +3102,62 @@ class Hrd extends AdminController
             set_alert('success', 'Holiday added successfully');exit;
         }
         redirect(admin_url('hrd/setting/holiday_list'));
+    }
+
+    // Add/Edit Payroll Component
+    public function payrollcomponent()
+    {
+        if (!staff_can('view_setting', 'hr_department')) {
+            access_denied('Payroll Components');
+        }
+
+        $id = $this->input->post('id');
+        $data = [
+            'name'       => $this->input->post('name'),
+            'type'       => $this->input->post('type'),
+            'is_active'  => $this->input->post('is_active') !== null ? 1 : 0,
+            'company_id' => get_staff_company_id(),
+        ];
+
+        if ($id) {
+            $this->db->where('id', $id);
+            $this->db->update('it_crm_payroll_components', $data);
+            log_activity('Updated Payroll Component : ' . json_encode($data, JSON_PRETTY_PRINT));
+            set_alert('success', 'Payroll component updated successfully');
+            exit;
+        } else {
+            $this->db->insert('it_crm_payroll_components', $data);
+            log_activity('Added Payroll Component : ' . json_encode($data, JSON_PRETTY_PRINT));
+            set_alert('success', 'Payroll component added successfully');
+            exit;
+        }
+        redirect(admin_url('hrd/setting/payroll_components'));
+    }
+
+    // Delete Payroll Component
+    public function delete_payroll_component($id)
+    {
+        if (!staff_can('view_setting', 'hr_department')) {
+            access_denied('Payroll Components');
+        }
+        $this->db->where('id', $id);
+        $this->db->delete('it_crm_payroll_components');
+        log_activity('Payroll Component Deleted ID: ' . $id);
+        set_alert('success', 'Payroll component deleted successfully');
+        redirect(admin_url('hrd/setting/payroll_components'));
+    }
+
+    // Toggle Payroll Component Status (AJAX)
+    public function toggle_payroll_component($id)
+    {
+        if (!staff_can('view_setting', 'hr_department')) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+        $new_status = $this->input->post('status') == 1 ? 1 : 0;
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_payroll_components', ['is_active' => $new_status]);
+        echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
 
     // Add/Edit Today's Thought

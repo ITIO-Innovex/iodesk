@@ -500,6 +500,26 @@ function get_staff_designations_name($id='')
 		return 0;
 }
 
+function get_staff_department_name($id='')
+{   
+        // Fetch company Name from company id
+		if(empty($id)){
+		return 0;
+		}
+		
+		if(isset($id)&&$id){
+		$CI = & get_instance();
+		$CI->db->where('departmentid', $id);
+		$CI->db->where('company_id', get_staff_company_id());
+		$com = $CI->db->select('name')->from(db_prefix() . 'departments')->get()->row();
+		if(isset($com)&&$com->name){
+		return $com->name;
+		}
+		}
+		
+		return 0;
+}
+
 function get_staff_staff_type($staffid='')
 {   
         // Fetch company Name from company id
@@ -1263,3 +1283,61 @@ function getAttendanceStatus($staffId, $shiftID, $date, $staffType = null, $atte
 
         return in_array($date, $holidays);
     }
+	
+function amountInWords($number)
+{
+    $number = round($number, 2);
+    $no = floor($number);
+    $decimal = round(($number - $no) * 100);
+
+    $words = [
+        0 => 'Zero', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four',
+        5 => 'Five', 6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine',
+        10 => 'Ten', 11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen',
+        14 => 'Fourteen', 15 => 'Fifteen', 16 => 'Sixteen',
+        17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen',
+        20 => 'Twenty', 30 => 'Thirty', 40 => 'Forty',
+        50 => 'Fifty', 60 => 'Sixty', 70 => 'Seventy',
+        80 => 'Eighty', 90 => 'Ninety'
+    ];
+
+    $digits = ['', 'Thousand', 'Lakh', 'Crore'];
+
+    function twoDigits($n, $words)
+    {
+        if ($n < 21) return $words[$n];
+        return $words[floor($n / 10) * 10] . ($n % 10 ? ' ' . $words[$n % 10] : '');
+    }
+
+    $str = [];
+
+    if ($no >= 10000000) {
+        $str[] = twoDigits(floor($no / 10000000), $words) . ' Crore';
+        $no %= 10000000;
+    }
+    if ($no >= 100000) {
+        $str[] = twoDigits(floor($no / 100000), $words) . ' Lakh';
+        $no %= 100000;
+    }
+    if ($no >= 1000) {
+        $str[] = twoDigits(floor($no / 1000), $words) . ' Thousand';
+        $no %= 1000;
+    }
+    if ($no >= 100) {
+        $str[] = $words[floor($no / 100)] . ' Hundred';
+        $no %= 100;
+    }
+    if ($no > 0) {
+        $str[] = twoDigits($no, $words);
+    }
+
+    $rupees = implode(' ', $str);
+
+    $paise = '';
+    if ($decimal > 0) {
+        $paise = ' and ' . twoDigits($decimal, $words) . ' Paise';
+    }
+
+    return trim($rupees) . ' Rupees' . $paise . ' Only';
+}
+
