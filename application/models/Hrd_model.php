@@ -428,6 +428,73 @@ class Hrd_model extends App_Model
         }
         return false;
     }
+
+    /**
+     * Get payroll component(s)
+     * @param  mixed $id Optional - component id
+     * @param  array $where Optional - where conditions
+     * @return mixed object if id passed else array
+     */
+    public function get_payroll_components($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+            $this->db->where($where);
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'payroll_components')->row();
+        }
+
+        $this->db->where($where);
+        $this->db->order_by('name', 'asc');
+        return $this->db->get(db_prefix() . 'payroll_components')->result_array();
+    }
+
+    /**
+     * Add payroll component
+     * @param array $data component data
+     */
+    public function add_payroll_component($data)
+    {
+        $this->db->insert(db_prefix() . 'payroll_components', $data);
+        $insert_id = $this->db->insert_id();
+        if ($insert_id) {
+            log_activity('Payroll Component Added [ComponentID: ' . $insert_id . ', Name: ' . $data['name'] . ']');
+            return $insert_id;
+        }
+        return false;
+    }
+
+    /**
+     * Update payroll component
+     * @param array $data component data
+     * @param mixed $id component id
+     * @return bool
+     */
+    public function update_payroll_component($data, $id)
+    {
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'payroll_components', $data);
+        if ($this->db->affected_rows() > 0) {
+            log_activity('Payroll Component Updated [ComponentID: ' . $id . ', Name: ' . $data['name'] . ']');
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Soft delete payroll component
+     * @param mixed $id component id
+     * @return bool
+     */
+    public function delete_payroll_component($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'payroll_components', ['is_active' => 0]);
+        if ($this->db->affected_rows() > 0) {
+            log_activity('Payroll Component Deactivated [ComponentID: ' . $id . ']');
+            return true;
+        }
+        return false;
+    }
     /**
      * Get today's thought
      * @param  mixed $id Optional - thought id

@@ -322,16 +322,13 @@ function get_company_logo($uri = '', $href_class = '', $type = '', $company_id =
 
     if ($company_logo != '') {
         $logo = '<a href="' . $logoURL . '" class="logo img-responsive' . ($href_class != '' ? ' ' . $href_class : '') . '">
-        <img src="' . base_url('uploads/company/' . $company_logo) . '" class="img-responsive logoadmin" alt="' . e($company_name) . '">
-        </a>';
+        <img src="' . base_url('uploads/company/' . $company_logo) . '" class="img-responsive logoadmin" alt="' . e($company_name) . '"></a>';
     } elseif ($company_name != '') {
          $logo = '<a href="' . $logoURL . '" class="logo img-responsive' . ($href_class != '' ? ' ' . $href_class : '') . '">
-        <img src="' . base_url('uploads/company/default-logo.png') . '" class="img-responsive logoadmin" alt="' . e($company_name) . '">
-        </a>';
+        <img src="' . base_url('uploads/company/default-logo.png') . '" class="img-responsive logoadmin" alt="' . e($company_name) . '"></a>';
     } else {
         $logo = '<a href="' . $logoURL . '" class="logo img-responsive' . ($href_class != '' ? ' ' . $href_class : '') . '">
-        <img src="' . base_url('uploads/company/default-logo.png') . '" class="img-responsive logoadmin" alt="Logo">
-        </a>';
+        <img src="' . base_url('uploads/company/default-logo.png') . '" class="img-responsive logoadmin" alt="Logo"></a>';
     }
 
 
