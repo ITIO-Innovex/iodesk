@@ -358,7 +358,7 @@ function app_init_admin_sidebar_menu_items()
 	
 	 $CI->app_menu->add_sidebar_menu_item('hr_department', [
         'collapse' => true,
-        'name'     => _l('HR & Attendance'),
+        'name'     => _l('HR_Attendance'),
         'position' => 12,
         'icon'     => 'fa-solid fa-person-booth',
         'badge'    => [],
