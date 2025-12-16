@@ -2093,6 +2093,7 @@ class Hrd extends AdminController
         $this->db->join(db_prefix() . 'designations des', 'des.id = s.designation_id', 'left');
 		$this->db->join(db_prefix() . 'hrd_branch_manager br', 'br.id = s.branch', 'left');
 		$this->db->join(db_prefix() . 'hrd_staff_type st', 'st.id = s.staff_type', 'left');
+		$this->db->where('s.active', 1);
         $this->db->order_by('s.firstname', 'asc');
         $data['staff_rows'] = $this->db->get()->result_array();
 

@@ -348,6 +348,29 @@ class Payroll_model extends App_Model
     }
 
     /**
+     * Get payroll months for a specific staff
+     */
+    public function get_staff_payroll_months($staffId, $companyId = null)
+    {
+        if (!$staffId) {
+            return [];
+        }
+
+        $this->db->select('pr.payroll_month');
+        $this->db->from($this->runsTable . ' pr');
+        $this->db->join($this->runItemsTable . ' pi', 'pi.run_id = pr.id', 'inner');
+        $this->db->where('pi.staffid', $staffId);
+        if ($companyId) {
+            $this->db->where('pr.company_id', $companyId);
+        }
+        $this->db->where('pr.payroll_month IS NOT NULL');
+        $this->db->group_by('pr.payroll_month');
+        $this->db->order_by('pr.payroll_month', 'desc');
+
+        return array_column($this->db->get()->result_array(), 'payroll_month');
+    }
+
+    /**
      * Fetch generated salary slips for a given month.
      *
      * @param int|null $companyId

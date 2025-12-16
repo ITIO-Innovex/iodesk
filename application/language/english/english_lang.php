@@ -4270,4 +4270,5 @@ $lang['Add New Employee Type'] = 'Add New Employee Type';
 $lang['New Branch Manager'] = 'New Branch Manager';
 $lang['Add New Branch Manager'] = 'Add New Branch Manager';
 $lang['Add New Attendance Status'] = 'Add New Attendance Status';
+$lang['HR_Attendance'] = 'HR & Attendance';
 ?>

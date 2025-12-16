@@ -16,7 +16,7 @@ class Payroll extends AdminController
             $this->components();
             return;
         } elseif ($type === 'ctc') {
-            $this->ctc();
+            $this->ctc_admin();
             return;
         } elseif ($type === 'ctc-details') {
             $this->ctc_details();
@@ -28,10 +28,13 @@ class Payroll extends AdminController
             $this->generated_salary_slip();
             return;
         } elseif ($type === 'salary_slip') {
-            $this->salary_slip();
+            $this->salary_slip_admin_view();
             return;
         } elseif ($type === 'salary_slip_download') {
             $this->salary_slip_download();
+            return;
+        } elseif ($type === 'download_salary_slip') {
+            $this->download_salary_slip();
             return;
         }
 
@@ -62,7 +65,7 @@ class Payroll extends AdminController
     /**
      * Payroll CTC (Staff management mirror)
      */
-    public function ctc()
+    public function ctc_admin()
     {
         if (!staff_can('view_own', 'hr_department')) {
             access_denied('Staff Management');
@@ -78,6 +81,8 @@ class Payroll extends AdminController
         $this->db->join(db_prefix() . 'designations des', 'des.id = s.designation_id', 'left');
         $this->db->join(db_prefix() . 'hrd_branch_manager br', 'br.id = s.branch', 'left');
         $this->db->join(db_prefix() . 'hrd_staff_type st', 'st.id = s.staff_type', 'left');
+		
+		$this->db->where('s.active', 1);
         $this->db->order_by('s.firstname', 'asc');
         $data['staff_rows'] = $this->db->get()->result_array();
 
@@ -128,6 +133,51 @@ class Payroll extends AdminController
 
         $data['title'] = 'Payroll CTC';
         $this->load->view('admin/payroll/setting/ctc', $data);
+    }
+
+    /**
+     * Logged-in staff CTC view (self)
+     */
+    public function ctc()
+    {
+        if (!is_staff_member()) {
+            access_denied('Payroll CTC');
+        }
+
+        $staffId = get_staff_user_id();
+        $companyId = $this->current_company_id();
+
+        $staff = $this->db->where('staffid', $staffId)->get(db_prefix() . 'staff')->row_array();
+        if (!$staff || !$staff['active']) {
+            show_error('Staff record not found or inactive.');
+        }
+
+        $structure = $this->payroll_model->get_staff_structure($staffId);
+        if (!$structure) {
+            show_error('CTC structure not configured. Please contact HR.');
+        }
+
+        $componentIds = [];
+        if (!empty($structure['items'])) {
+            $componentIds = array_unique(array_filter(array_column($structure['items'], 'component_id')));
+        }
+
+        $components = [];
+        if (!empty($componentIds)) {
+            $rows = $this->payroll_model->get_components('', ['id' => $componentIds]);
+            foreach ($rows as $row) {
+                $components[$row['id']] = $row;
+            }
+        }
+
+        $data = [
+            'title'      => 'My CTC',
+            'staff'      => $staff,
+            'structure'  => $structure,
+            'components' => $components,
+        ];
+
+        $this->load->view('admin/payroll/setting/ctc_details', $data);
     }
 
     /**
@@ -488,9 +538,9 @@ class Payroll extends AdminController
     }
 
     /**
-     * View individual salary slip for staff + month
+     * View individual salary slip for staff + month (admin)
      */
-    public function salary_slip()
+    public function salary_slip_admin_view()
     {
         if (!staff_can('view_own', 'hr_department')) {
             access_denied('Salary Slip');
@@ -523,6 +573,99 @@ class Payroll extends AdminController
     }
 
     /**
+     * Logged-in staff salary slip page
+     */
+    public function salary_slip()
+    {
+        if (!is_staff_member()) {
+            access_denied('Salary Slip');
+        }
+
+        $staffId   = get_staff_user_id();
+        $companyId = $this->current_company_id();
+        $months    = $this->payroll_model->get_staff_payroll_months($staffId, $companyId);
+
+        $data = [
+            'title'       => 'My Salary Slip',
+            'months'      => $months,
+            'default_month' => $months[0] ?? date('Y-m'),
+            'staffid'     => $staffId,
+        ];
+
+        $this->load->view('admin/payroll/salary_slip_self', $data);
+    }
+
+    /**
+     * Ajax endpoint to fetch salary slip for logged-in staff
+     */
+    public function salary_slip_fetch()
+    {
+        if (!is_staff_member()) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $month = $this->input->get('month');
+        if (!$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid month']);
+            return;
+        }
+
+        $staffId   = get_staff_user_id();
+        $companyId = $this->current_company_id();
+        $slip      = $this->payroll_model->get_staff_salary_slip($staffId, $month, $companyId);
+
+        if (!$slip) {
+            echo json_encode(['success' => false, 'message' => 'Salary slip not found for selected month.']);
+            return;
+        }
+
+        $response = [
+            'success'    => true,
+            'staff'      => [
+                'name'        => trim(($slip['firstname'] ?? '') . ' ' . ($slip['lastname'] ?? '')),
+                'code'        => $slip['employee_code'] ?? '-',
+                'department'  => $slip['department'] ?? '-',
+                'designation' => $slip['designation'] ?? '-',
+                'branch'      => $slip['branch_name'] ?? '-',
+                'joining_date'=> $slip['joining_date'] ?? null,
+                'joining_date_formatted' => $slip['joining_date'] ? _d($slip['joining_date']) : '-',
+            ],
+            'gross'      => (float) ($slip['gross_amount'] ?? 0),
+            'deductions' => (float) ($slip['deduction_amount'] ?? 0),
+            'net'        => (float) ($slip['net_amount'] ?? 0),
+            'earnings'   => $slip['details']['earnings'] ?? [],
+            'deduction_rows' => $slip['details']['deductions'] ?? [],
+            'month'      => $month,
+            'month_formatted' => date('F Y', strtotime($month . '-01')),
+        ];
+
+        echo json_encode($response);
+    }
+
+    /**
+     * Self-service download list page
+     */
+    public function download_salary_slip()
+    {
+        if (!is_staff_member()) {
+            access_denied('Salary Slip Download');
+        }
+
+        $staffId = get_staff_user_id();
+        $companyId = $this->current_company_id();
+        $months = $this->payroll_model->get_staff_payroll_months($staffId, $companyId);
+
+        $data = [
+            'title'  => 'Download Salary Slip',
+            'months' => $months,
+            'staffid' => $staffId,
+        ];
+
+        $this->load->view('admin/payroll/salary_slip_download', $data);
+    }
+
+    /**
      * Download salary slip as PDF
      */
     public function salary_slip_download()
@@ -532,10 +675,14 @@ class Payroll extends AdminController
         }
 
         $staffId = (int) $this->input->get('id');
+		
+		if($staffId=="" || $staffId==0){
+		$staffId = get_staff_user_id();
+		}
         $month   = $this->input->get('month');
-
+        
         if ($staffId <= 0 || !$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
-            show_error('Invalid salary slip download request');
+            show_error('Invalid salary slip download request!!');
         }
 
         $companyId = $this->current_company_id();

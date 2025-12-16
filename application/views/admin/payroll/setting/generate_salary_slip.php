@@ -44,6 +44,9 @@
     text-align: center;
     color: #6b7280;
   }
+  .table .checkbox {
+     padding-left: 20px;
+}
 </style>
 <div id="wrapper">
   <div class="content">
