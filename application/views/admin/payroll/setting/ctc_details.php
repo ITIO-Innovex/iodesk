@@ -36,11 +36,40 @@
     font-size: 18px;
     color: #111827;
   }
+  @media print {
+    body * {
+      visibility: hidden !important;
+    }
+    #wrapper, #wrapper * {
+      visibility: visible !important;
+    }
+    #wrapper {
+      position: absolute !important;
+      left: 0;
+      top: 0;
+      width: 100%;
+      margin: 0 !important;
+    }
+    #side-menu,
+    .mobile-menu-toggle,
+    .admin #side-menu {
+      display: none !important;
+    }
+	#print-button {
+      display: none !important;
+    }
+	a[href]:after {
+        content: none !important;
+    }
+  }
 </style>
 <div id="wrapper">
   <div class="content">
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
+	  <div class="text-right tw-mb-2" id="print-button">
+		<a href="javascript:window.print()" class="btn btn-default btn-sm" title="Print Salary Slip"><i class="fa-solid fa-print"></i></a>
+        </div>
         <div class="ctc-slip-card">
           <div class="tw-flex tw-flex-col sm:tw-flex-row tw-justify-between tw-gap-4 tw-mb-6">
             <div>
@@ -166,7 +195,6 @@ $netPay = $totalEarnings - $totalDeductions;
                   <thead>
                     <tr>
                       <th>Component</th>
-                      <th>Calculation</th>
                       <th class="text-right">Amount</th>
                     </tr>
                   </thead>
@@ -174,15 +202,14 @@ $netPay = $totalEarnings - $totalDeductions;
                     <?php foreach ($earnings as $earning) { ?>
                       <tr>
                         <td><?php echo e($earning['label']); ?></td>
-                        <td><?php echo e($earning['reference']); ?></td>
                         <td class="text-right"><?php echo $earning['amount']; ?></td>
                       </tr>
                     <?php } ?>
                   </tbody>
                   <tfoot>
                     <tr>
-                      <th colspan="2" class="text-right">Total Earnings</th>
-                      <th class="text-right"><?php echo app_format_money($totalEarnings, get_base_currency()); ?></th>
+                      <th class="text-right">Total Earnings</th>
+                      <th class="text-right"><?php echo number_format(($totalEarnings ?? 0), 2, '.', ''); ?></th>
                     </tr>
                   </tfoot>
                 </table>
@@ -195,7 +222,6 @@ $netPay = $totalEarnings - $totalDeductions;
                   <thead>
                     <tr>
                       <th>Component</th>
-                      <th>Calculation</th>
                       <th class="text-right">Amount</th>
                     </tr>
                   </thead>
@@ -203,19 +229,22 @@ $netPay = $totalEarnings - $totalDeductions;
                     <?php if (!empty($deductions)) { foreach ($deductions as $deduction) { ?>
                       <tr>
                         <td><?php echo e($deduction['label']); ?></td>
-                        <td><?php echo e($deduction['reference']); ?></td>
                         <td class="text-right"><?php echo $deduction['amount']; ?></td>
                       </tr>
                     <?php } } else { ?>
                       <tr>
-                        <td colspan="3" class="text-center text-muted">No deductions configured</td>
+                        <td colspan="2" class="text-center text-muted">No deductions configured</td>
                       </tr>
                     <?php } ?>
                   </tbody>
                   <tfoot>
                     <tr>
-                      <th colspan="2" class="text-right">Total Deductions</th>
-                      <th class="text-right"><?php echo app_format_money($totalDeductions, get_base_currency()); ?></th>
+                      <th  class="text-right">Total Deductions</th>
+                      <th class="text-right"><?php echo number_format(($totalDeductions ?? 0), 2, '.', ''); ?></th>
+                    </tr>
+					<tr>
+                      <th  class="text-right">Net CTC</th>
+                      <th class="text-right"><?php echo number_format(($netPay ?? 0), 2, '.', ''); ?></th>
                     </tr>
                   </tfoot>
                 </table>
@@ -223,24 +252,7 @@ $netPay = $totalEarnings - $totalDeductions;
             </div>
           </div>
 
-          <div class="tw-mt-6 tw-grid sm:tw-grid-cols-3 tw-gap-4">
-		  <div class="row">
-            <div class="summary-pill col-sm-4 mail-bg">
-              <span>Gross Earnings</span>
-              <strong><?php echo app_format_money($totalEarnings, get_base_currency()); ?></strong>
-            </div>
-            <div class="summary-pill col-sm-4 mail-bg">
-              <span>Total Deductions</span>
-              <strong><?php echo app_format_money($totalDeductions, get_base_currency()); ?></strong>
-            </div>
-            <div class="summary-pill col-sm-4 mail-bg">
-              <span>Net CTC</span>
-              <strong><?php echo app_format_money($netPay, get_base_currency()); ?></strong>
-            </div>
-			</div>
-          </div>
-
-          <p class="tw-mt-6 tw-text-xs tw-text-neutral-500">* This is a system generated slip and does not require signature.</p>
+          <p class="tw-mt-6 tw-text-xs tw-text-neutral-500">* This is a system generated slip and does not require signature!!.</p>
         </div>
       </div>
     </div>

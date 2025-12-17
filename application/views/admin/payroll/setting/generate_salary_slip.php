@@ -65,7 +65,7 @@
                   <input type="month" name="month" value="<?php echo html_escape($selected_month); ?>" class="form-control" required />
                 </div>
                 <div class="tw-pt-3">
-                  <button type="submit" class="btn btn-default">Apply</button>
+                  <button type="submit" class="btn btn-default tw-mt-2">Apply</button>
                 </div>
               <?php echo form_close(); ?>
             </div>
