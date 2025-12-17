@@ -4271,4 +4271,11 @@ $lang['New Branch Manager'] = 'New Branch Manager';
 $lang['Add New Branch Manager'] = 'Add New Branch Manager';
 $lang['Add New Attendance Status'] = 'Add New Attendance Status';
 $lang['HR_Attendance'] = 'HR & Attendance';
+$lang['New Payroll Component'] = 'New Payroll Component';
+$lang['Component Code'] = 'Component Code';
+$lang['Component Title'] = 'Component Title';
+$lang['Type'] = 'Type';
+$lang['Is %'] = 'Is %';
+$lang['Percent Of'] = 'Percent Of';
+$lang['Add New Payroll Component'] = 'Add New Payroll Component';
 ?>
