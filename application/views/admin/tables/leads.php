@@ -320,10 +320,14 @@ return App_table::find('leads')
             $emailicon="";
             $emailcounter=$this->ci->leads_model->countEmail(e($aRow['email']));
 			if($emailcounter > 0){
+			
 			$emailicon="<a href='" . admin_url('webmail/inbox?fd=INBOX&stype=from_email&skey=' . $aRow['email']) . "' target='_blank' title='Move to mail box'><i class='fa-solid fa-envelope tw-text-danger-800' title='Received ".$emailcounter." New Email'></i><a>";
 			}
 
             $row[] = ($aRow['email'] != '' ? '<a href="mailto:' . e($aRow['email']) . '">' . e($aRow['email']) . '</a>&nbsp;<span>'.$emailicon.'</span>' : '');
+			
+			
+			$row[] = ($aRow['email'] != '' ? '<i class="fa-solid fa-file-signature sent_nda_sign" title="Sent NDA Sign" class="sent_nda_sign"  data-nda-name="'. e($aRow['name']) .'" data-email="'. e($aRow['email']) .'"></i>' : '');
 
            /* $row[] = ($aRow['phonenumber'] != '' ? '<a href="tel:' . e($aRow['phonenumber']) . '">' . e($aRow['phonenumber']) . '</a>' : '');*/
 			$row[] = ($aRow['website'] != '' ? '<a  href="' . maybe_add_http(e($aRow['website'])) . '" target="_blank" title="' . e($aRow['website']) . '"><i class="fa-solid fa-globe"></i></a>' : '');

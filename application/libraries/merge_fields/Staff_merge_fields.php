@@ -162,6 +162,8 @@ class Staff_merge_fields extends App_merge_fields
         $fields['{staff_lastname}']    = '';
         $fields['{staff_email}']       = '';
         $fields['{staff_datecreated}'] = '';
+		$fields['{nda_link}'] 		   = '';
+
 
         if (!$staff) {
             return $fields;
@@ -179,6 +181,7 @@ class Staff_merge_fields extends App_merge_fields
         $fields['{staff_lastname}']    = e($staff->lastname);
         $fields['{staff_email}']       = e($staff->email);
         $fields['{staff_datecreated}'] = e($staff->datecreated);
+		$fields['{nda_link}'] = $password;
 
 
         $custom_fields = get_custom_fields('staff');
