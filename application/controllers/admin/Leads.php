@@ -2295,4 +2295,20 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
         $this->db->update('it_crm_deals_stage', ['status' => $new_status]);
         echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
+	
+	// Toggle Deal Stage Status (AJAX)
+    public function send_nda_sign()
+    {
+	$name=$_POST['ndaname'];
+	$email=$_POST['email'];
+	
+	 send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), 'www.eindia.com','');//Email,StaffID,NDA LINK,CCMAIL
+
+        
+        echo json_encode([
+        'status'  => true,
+        'message' => 'NDA sent successfully'
+    ]);
+    exit;
+    }
 }

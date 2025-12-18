@@ -275,6 +275,10 @@
                                'name'     => _l('leads_dt_email'),
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-email'],
                               ];
+							  $_table_data[] = [
+                               'name'     => _l('nda_sign'),
+                               'th_attrs' => ['class' => 'toggleable', 'id' => 'th-sign'],
+                              ];
                               /*$_table_data[] = [
                                'name'     => _l('leads_dt_phonenumber'),
                                'th_attrs' => ['class' => 'toggleable', 'id' => 'th-phone'],
@@ -1445,8 +1449,50 @@ $(document).ready(function () {
     }
     });
 });
+$(document).on('click', '.sent_nda_sign', function (e) {
+    e.preventDefault(); 
 
-   
+    var ndaname = $(this).data('nda-name');   // get data attribute
+    var email = $(this).data('email');
+	var $icon = $(this); // store clicked icon
+	//alert(ndaname);alert(email);
+	if(ndaname=="" || email==""){
+	alert("Name / Email is Blank");
+	return false
+	}
+	
+	// Optional confirmation
+    if (!confirm('Are you sure you want to send the NDA for signing?')) {
+        return false;
+    }
+	
+	$.ajax({
+        url: '<?= admin_url('leads/send_nda_sign') ?>',   // your backend file
+        type: 'POST',
+		dataType: 'json',
+        data: {
+            ndaname: ndaname,
+            email: email
+        },
+        beforeSend: function () {
+            $('.sent_nda_sign').prop('disabled', true);
+        },
+        success: function (response) {
+		//alert(response.message);
+		    $icon.addClass('text-success');
+			$icon.removeClass('sent_nda_sign').addClass('disabled');
+            $icon.attr('title', 'NDA Sent');
+            alert('NDA sent successfully for signing!');
+        },
+        error: function () {
+            alert('Something went wrong. Please try again.');
+        },
+        complete: function () {
+            $('.sent_nda_sign').prop('disabled', false);
+        }
+    });
+	
+ });  
 </script>
 </body>
 </html>
