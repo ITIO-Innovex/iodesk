@@ -121,6 +121,7 @@ return App_table::find('leads')
         $aColumns = array_merge($aColumns, [
             'company',
             db_prefix() . 'leads.email as email',
+			db_prefix() . 'leads.nda_status as nda_status',
             db_prefix() . 'leads.hash as hash',
             db_prefix() . 'leads.phonenumber as phonenumber',
             db_prefix() .'leads.country_code as country_code',
@@ -326,8 +327,11 @@ return App_table::find('leads')
 
             $row[] = ($aRow['email'] != '' ? '<a href="mailto:' . e($aRow['email']) . '">' . e($aRow['email']) . '</a>&nbsp;<span>'.$emailicon.'</span>' : '');
 			
-			
-			$row[] = ($aRow['email'] != '' ? '<i class="fa-solid fa-file-signature sent_nda_sign" title="Sent NDA Sign" class="sent_nda_sign"  data-nda-name="'. e($aRow['name']) .'" data-email="'. e($aRow['email']) .'"></i>' : '');
+			if(e($aRow['nda_status'])==1){
+			$row[] = ($aRow['email'] != '' ? '<i class="fa-solid fa-circle-check text-success sent_nda_sign" title=" NDA Sign already Sent" class="sent_nda_sign"  data-nda-name="'. e($aRow['name']) .'" data-nda-id="'. e($aRow['id']) .'" data-email="'. e($aRow['email']) .'"></i>' : '');
+			}else{
+			$row[] = ($aRow['email'] != '' ? '<i class="fa-solid fa-file-signature sent_nda_sign" title="Sent NDA Sign'. e($aRow['nda_status']) .'" class="sent_nda_sign"  data-nda-name="'. e($aRow['name']) .'" data-nda-id="'. e($aRow['id']) .'" data-email="'. e($aRow['email']) .'"></i>' : '');
+			}
 
            /* $row[] = ($aRow['phonenumber'] != '' ? '<a href="tel:' . e($aRow['phonenumber']) . '">' . e($aRow['phonenumber']) . '</a>' : '');*/
 			$row[] = ($aRow['website'] != '' ? '<a  href="' . maybe_add_http(e($aRow['website'])) . '" target="_blank" title="' . e($aRow['website']) . '"><i class="fa-solid fa-globe"></i></a>' : '');

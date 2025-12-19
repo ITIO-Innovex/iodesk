@@ -94,6 +94,9 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
         if (is_admin()) {
             $data['tickets_report'] = (new app\services\TicketsReportByStaff())->filterBy('this_month');
         }
+		
+       //send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), 'VK GUPTA', 'www.eindia.com','');
+       //Email,StaffID,NDA LINK,CCMAIL
 
         $data = hooks()->apply_filters('before_dashboard_render', $data);
         $this->load->view('admin/dashboard/dashboard', $data);

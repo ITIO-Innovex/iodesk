@@ -1454,6 +1454,8 @@ $(document).on('click', '.sent_nda_sign', function (e) {
 
     var ndaname = $(this).data('nda-name');   // get data attribute
     var email = $(this).data('email');
+	var ndaid = $(this).data('nda-id');
+	//alert(ndaid);
 	var $icon = $(this); // store clicked icon
 	//alert(ndaname);alert(email);
 	if(ndaname=="" || email==""){
@@ -1462,7 +1464,7 @@ $(document).on('click', '.sent_nda_sign', function (e) {
 	}
 	
 	// Optional confirmation
-    if (!confirm('Are you sure you want to send the NDA for signing?')) {
+    if (!confirm('Are you sure you want to send the NDA for signing to ' + email + ' ?')) {
         return false;
     }
 	
@@ -1472,23 +1474,32 @@ $(document).on('click', '.sent_nda_sign', function (e) {
 		dataType: 'json',
         data: {
             ndaname: ndaname,
-            email: email
+            email: email,
+			ndaid: ndaid
         },
         beforeSend: function () {
             $('.sent_nda_sign').prop('disabled', true);
+			$icon.removeClass('fa-solid fa-file-signature').addClass('fa-solid fa-atom fa-spin');
         },
+		
         success: function (response) {
 		//alert(response.message);
+		   if(response.status){ 
 		    $icon.addClass('text-success');
 			$icon.removeClass('sent_nda_sign').addClass('disabled');
             $icon.attr('title', 'NDA Sent');
             alert('NDA sent successfully for signing!');
+			}else{
+			$('.sent_nda_sign').prop('disabled', false);
+			alert('NDA Not sent');
+			}
         },
         error: function () {
             alert('Something went wrong. Please try again.');
         },
         complete: function () {
             $('.sent_nda_sign').prop('disabled', false);
+			$icon.removeClass('fa-solid fa-atom fa-spin').addClass('fa-solid fa-file-signature');
         }
     });
 	

@@ -2299,16 +2299,41 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
 	// Toggle Deal Stage Status (AJAX)
     public function send_nda_sign()
     {
-	$name=$_POST['ndaname'];
-	$email=$_POST['email'];
+	$name=trim($_POST['ndaname']);
+	$email=trim($_POST['email']);
+	$ndaid=trim($_POST['ndaid']);
 	
-	 send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), 'www.eindia.com','');//Email,StaffID,NDA LINK,CCMAIL
-
-        
-        echo json_encode([
+	$nda_url=get_nda_url(get_staff_company_id());
+	
+	if(isset($nda_url)&&$nda_url){
+	}else{
+	$nda_url="www.nourl.com";
+	}
+	
+	//$sent = send_mail_template('nda_sign', $email, get_staff_user_id(), $name, 'www.eindia.com','');
+	  $sent = send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), $name, $nda_url,'');
+	 //Email,StaffID,ReceiverName,NDA LINK,CCMAIL
+	 if (!$sent) {
+	 echo json_encode([
+        'status'  => false,
+        'message' => 'NDA Not sent successfully'
+    ]);
+    exit;
+	 
+	 }else{
+	 
+	 $this->db->where('id', $ndaid);
+     $this->db->update(db_prefix() . 'leads', ['nda_status' => 1]);
+				
+	 echo json_encode([
         'status'  => true,
         'message' => 'NDA sent successfully'
     ]);
     exit;
+	 
+	 }
+
+        
+        
     }
 }

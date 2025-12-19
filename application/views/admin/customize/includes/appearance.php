@@ -128,7 +128,7 @@
         <h4 class="bold mt-4"><?php echo _l('lead_setting'); ?></h4>
         <hr class="hr-panel-separator" />
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label for="automatically_assign_to_staff"><?php echo _l('automatically_assign_to_staff'); ?></label>
                     <select name="automatically_assign_to_staff" class="form-control">
@@ -137,7 +137,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label for="lead_auto_assign_to_staff"><?php echo _l('lead_auto_assign_to_staff'); ?></label>
                     <select name="lead_auto_assign_to_staff" class="form-control">
@@ -146,6 +146,12 @@
                                 <option value="<?php echo $staff['staffid']; ?>" <?php echo (isset($company->lead_auto_assign_to_staff) && $company->lead_auto_assign_to_staff == $staff['staffid']) ? 'selected' : ''; ?>><?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?></option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+            </div>
+			<div class="col-md-4">
+                <div class="form-group">
+                    <label for="lead_auto_assign_to_staff"><?php echo 'NDA SIGN Link'; ?></label>
+                    <input type="nda_url" name="nda_url" class="form-control" value="<?php echo isset($company->nda_url) ? $company->nda_url : ''; ?>" placeholder="NDA Url" />
                 </div>
             </div>
         </div>
