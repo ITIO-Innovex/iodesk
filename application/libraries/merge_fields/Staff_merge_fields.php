@@ -150,7 +150,7 @@ class Staff_merge_fields extends App_merge_fields
     * @param  string $password password is used only when sending welcome email, 1 time
     * @return array
     */
-    public function format($staff_id, $password = '')
+    public function format($staff_id, $password = '', $receivername = '')
     {
         $fields = [];
 
@@ -163,6 +163,8 @@ class Staff_merge_fields extends App_merge_fields
         $fields['{staff_email}']       = '';
         $fields['{staff_datecreated}'] = '';
 		$fields['{nda_link}'] 		   = '';
+		$fields['{receivername}'] 	   = '';
+		
 
 
         if (!$staff) {
@@ -181,7 +183,8 @@ class Staff_merge_fields extends App_merge_fields
         $fields['{staff_lastname}']    = e($staff->lastname);
         $fields['{staff_email}']       = e($staff->email);
         $fields['{staff_datecreated}'] = e($staff->datecreated);
-		$fields['{nda_link}'] = $password;
+		$fields['{nda_link}'] 		   = $password;
+		$fields['{receivername}']      = $receivername;
 
 
         $custom_fields = get_custom_fields('staff');
