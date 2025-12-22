@@ -2310,8 +2310,9 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
 	$nda_url="www.nourl.com";
 	}
 	
-	//$sent = send_mail_template('nda_sign', $email, get_staff_user_id(), $name, 'www.eindia.com','');
-	  $sent = send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), $name, $nda_url,'');
+	   //$sent = send_mail_template('nda_sign', $email, get_staff_user_id(), $name, 'www.eindia.com','');
+	  $sent = send_mail_template('nda_sign', 'jverma437@gmail.com', get_staff_user_id(), $name, $nda_url,'vikashg@itio.in');
+	  //$sent = send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), $name, $nda_url,'');
 	 //Email,StaffID,ReceiverName,NDA LINK,CCMAIL
 	 if (!$sent) {
 	 echo json_encode([

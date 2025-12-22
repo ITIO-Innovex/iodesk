@@ -16,7 +16,7 @@
                             </a>
                         </li>
                         <?php //} ?>
-						<?php if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8) {   ?>
+						<?php if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role==8 || $GLOBALS['current_user']->role==0) {   ?>
                         <li role="presentation" >
                             <a href="#home_tab_tasks" aria-controls="home_tab_tasks" role="tab" data-toggle="tab">
                                 <i class="fa fa-tasks menu-icon"></i> <?php echo _l('home_my_tasks'); ?>
