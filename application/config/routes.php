@@ -223,6 +223,7 @@ $route['admin/customize/get_form_layout'] = 'admin/customize/get_form_layout';
 $route['admin/customize/save_form_layout'] = 'admin/customize/save_form_layout';
 $route['admin/customize/get_form_layout_status'] = 'admin/customize/get_form_layout_status';
 $route['admin/customize/get_company_deal_form_type'] = 'admin/customize/get_company_deal_form_type';
+$route['admin/customize/smtp_setting'] = 'admin/customize/smtp_setting';
 
 // User Utility routes
 $route['admin/user_utility'] = 'admin/user_utility/index';

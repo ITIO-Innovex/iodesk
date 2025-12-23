@@ -61,8 +61,8 @@ class Direct_email extends AdminController
 
 	
 	
-    //$senderName       = get_staff_company_name() ? get_staff_company_name() : 'Mailert CRM';
-	$senderName="Draft and Sign";//"NDA Esign";
+    $senderName       = get_staff_company_name() ? get_staff_company_name() : 'Mailert CRM';
+	 //$senderName="Draft and Sign";//"NDA Esign";
     $mail = new PHPMailer(true);
 
     try {
