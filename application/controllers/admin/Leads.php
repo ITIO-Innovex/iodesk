@@ -5,6 +5,9 @@ use app\services\LeadProfileBadges;
 use app\services\leads\LeadsKanban;
 use app\services\imap\ConnectionErrorException;
 use Ddeboer\Imap\Exception\MailboxDoesNotExistException;
+use PHPMailer\PHPMailer\PHPMailer; // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\Exception;  // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\SMTP;
 
 header('Content-Type: text/html; charset=utf-8');
 defined('BASEPATH') or exit('No direct script access allowed');
@@ -2299,9 +2302,9 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
 	// Toggle Deal Stage Status (AJAX)
     public function send_nda_sign()
     {
-	$name=trim($_POST['ndaname']);
-	$email=trim($_POST['email']);
-	$ndaid=trim($_POST['ndaid']);
+	$name  = trim($_POST['ndaname'] ?? ' Hi');
+    $email = trim($_POST['email'] ?? 'vikashg@itio.in');
+    $ndaid = trim($_POST['ndaid'] ?? '');
 	
 	$nda_url=get_nda_url(get_staff_company_id());
 	
@@ -2311,14 +2314,78 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
 	}
 	
 	   //$sent = send_mail_template('nda_sign', $email, get_staff_user_id(), $name, 'www.eindia.com','');
-	  $sent = send_mail_template('nda_sign', 'jverma437@gmail.com', get_staff_user_id(), $name, $nda_url,'vikashg@itio.in');
+	  //$sent = send_mail_template('nda_sign', 'jverma437@gmail.com', get_staff_user_id(), $name, $nda_url,'vikashg@itio.in');
 	  //$sent = send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), $name, $nda_url,'');
 	 //Email,StaffID,ReceiverName,NDA LINK,CCMAIL
+	 
+	 ////////////Sent EMAIL////////////
+	 
+$recipientEmail="vikashg@itio.in";	 
+//$name="Vimalesh";
+$mailSub="NDA Sign  -  ITIO Innovex Private Limited !!";
+$mailbody="<p>Dear ".$name.",</p>
+<p>Please find the NDA e-signing link below:</p>
+<p><a href='".$nda_url."' target='_blank'>".$nda_url."</a></p>
+<p>Kindly complete the signing at your convenience.</p>
+<p>Regards,<br><span>Draft And Sign - CRM</span></p>";
+//=============================
+
+		$sct=2;
+		//exit;
+		// SMTP Details from session
+		if($sct==2){
+		$mailer_smtp_host="smtppro.zoho.in";
+        $mailer_password="India@992@@";
+		$senderEmail="mailers@itio.in";
+		$mailer_username="mailers@itio.in";
+		}else{
+		$mailer_smtp_host="smtp.office365.com";
+        $mailer_password="cxyycfidoixtjywk";//"xsjdygwdifwunzuh";
+		$senderEmail="draftandsign@outlook.com";
+		$mailer_username="draftandsign@outlook.com";
+		}
+		
+		
+		$senderName="NDA Esign";//"NDA Esign";
+		$mailer_smtp_port="587";//"587";
+		
+		$mail = new PHPMailer(true);
+		
+		
+	try {
+	//echo "==============";
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	//$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port = $mailer_smtp_port;
+    // Enable SMTP debugging (testing only)
+    $mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
+    $mail->Debugoutput = 'html';
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	$mail->Priority = 1; 
+	$mail->setFrom($senderEmail, $senderName);
+	$mail->addAddress($recipientEmail);
+	// Add hardcoded BCC
+	//$mail->addBCC('jverma437@gmail.com');
+	$mail->Subject = $mailSub;
+	$mail->Body = $mailbody;
+    $sent=$mail->send();
+	//echo "==============!!";exit;
 	 if (!$sent) {
 	 echo json_encode([
         'status'  => false,
         'message' => 'NDA Not sent successfully'
     ]);
+	log_activity('NDA sent successfully -  [ Name: ' . $name . ']');
     exit;
 	 
 	 }else{
@@ -2330,11 +2397,28 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
         'status'  => true,
         'message' => 'NDA sent successfully'
     ]);
+	log_activity('NDA sent successfully -  [ Name: ' . $name . ']');
     exit;
 	 
 	 }
+    //echo "Email sent successfully!";
+	
+    
+	} catch (Exception $e) {
+		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
+		return false;
+	}
+	
+	
+		
+	 
+	 /////////////////////////////////
+	 
+	 
+	
 
         
         
     }
+	//============================
 }

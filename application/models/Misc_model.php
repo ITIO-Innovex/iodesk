@@ -295,6 +295,9 @@ class Misc_model extends App_Model
 				  $this->db->where('staff.company_id', $_SESSION['super_view_company_id']);
 				  }
 		}
+		if (!is_admin()) {
+		$this->db->where(db_prefix() . 'staff.staffid', get_staff_user_id());
+		}
         $this->db->join(db_prefix() . 'staff', db_prefix() . 'staff.staffid=' . db_prefix() . 'notes.addedfrom');
         $this->db->order_by('dateadded', 'desc');
         return $notes = $this->db->get(db_prefix() . 'notes')->result_array();
