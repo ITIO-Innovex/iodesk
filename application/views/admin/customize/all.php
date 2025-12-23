@@ -50,6 +50,7 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="active"><a href="#company-tab" role="tab" data-toggle="tab">Company</a></li>
                             <li><a href="#deal-tab" role="tab" data-toggle="tab" class="DealTab">Deal</a></li>
+							<li><a href="<?php echo admin_url('customize/smtp_setting');?>" target="_blank">Other SMTP Setting</a></li>
 							<?php /*?><li><a href="#leads-tab" role="tab" data-toggle="tab">Leads</a></li><?php */?>
                         </ul>
                         <div class="tab-content" style="margin-top:20px;">

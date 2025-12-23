@@ -2356,7 +2356,7 @@ $mailbody='<!DOCTYPE html>
         <tr>
           <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
 
-            <p style="margin:0 0 16px;">Dear <strong>"'.$name.'"</strong>,</p>
+            <p style="margin:0 0 16px;">Dear <strong>'.$name.'</strong>,</p>
 
             <p style="margin:0 0 16px;">
               Please find the NDA e-signing link below:

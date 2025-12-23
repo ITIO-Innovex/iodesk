@@ -127,6 +127,95 @@ $data['deal_form_type'] = $this->db->where('company_id', $company_id)->get('it_c
         $this->load->view('admin/customize/all', $data);
     }
 
+    public function smtp_setting()
+    {
+        if (staff_cant('view', 'settings')) {
+            access_denied('settings');
+        }
+
+        $company_id = get_staff_company_id();
+
+        $company = $this->db->where('company_id', $company_id)
+            ->get('it_crm_company_master')
+            ->row();
+
+        $smtp_fields = [
+            'smtp_encryption',
+            'smtp_host',
+            'smtp_port',
+            'smtp_email',
+            'smtp_username',
+            'smtp_password',
+        ];
+
+        $decode_smtp = function ($json) use ($smtp_fields) {
+            $decoded = [];
+            if (!empty($json)) {
+                $decoded = json_decode($json, true);
+                if (!is_array($decoded)) {
+                    $decoded = [];
+                }
+            }
+            $prepared = [];
+            foreach ($smtp_fields as $field) {
+                $prepared[$field] = $decoded[$field] ?? '';
+            }
+            return $prepared;
+        };
+
+        $nda_smtp    = $decode_smtp($company->nda_smtp ?? '');
+        $direct_smtp = $decode_smtp($company->direct_mail_smtp ?? '');
+
+        if ($this->input->post()) {
+            if (staff_cant('edit', 'settings')) {
+                access_denied('settings');
+            }
+
+            $nda_input    = $this->input->post('nda') ?? [];
+            $direct_input = $this->input->post('direct') ?? [];
+
+            $prepare_smtp = function ($input) use ($smtp_fields) {
+                $prepared = [];
+                foreach ($smtp_fields as $field) {
+                    $prepared[$field] = $input[$field] ?? '';
+                }
+                return $prepared;
+            };
+
+            $update = [
+                'nda_smtp'         => json_encode($prepare_smtp($nda_input)),
+                'direct_mail_smtp' => json_encode($prepare_smtp($direct_input)),
+            ];
+
+            $this->db->where('company_id', $company_id)
+                ->update('it_crm_company_master', $update);
+
+            if ($this->db->affected_rows() >= 0) {
+                set_alert('success', _l('settings_updated'));
+            } else {
+                set_alert('danger', _l('problem_updating', 'SMTP Settings'));
+            }
+
+            redirect(admin_url('customize/smtp_setting'));
+        }
+
+        $data = [
+            'title'       => _l('smtp_settings', 'SMTP Settings'),
+            'smtp_fields' => [
+                'smtp_encryption' => 'SMTP Encryption',
+                'smtp_host'       => 'SMTP Host',
+                'smtp_port'       => 'SMTP Port',
+                'smtp_email'      => 'SMTP Email',
+                'smtp_username'   => 'SMTP Username',
+                'smtp_password'   => 'SMTP Password',
+            ],
+            'nda_smtp'    => $nda_smtp,
+            'direct_smtp' => $direct_smtp,
+        ];
+
+        $this->load->view('admin/customize/smtp_setting', $data);
+    }
+
     public function delete_custom_option($name)
     {
         // Not used for company master
