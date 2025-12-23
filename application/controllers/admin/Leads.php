@@ -2364,8 +2364,8 @@ $mailbody="<p>Dear ".$name.",</p>
 	//$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
     $mail->Port = $mailer_smtp_port;
     // Enable SMTP debugging (testing only)
-    $mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
-    $mail->Debugoutput = 'html';
+    //$mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
+    //$mail->Debugoutput = 'html';
     // Email settings
 	$mail->isHTML(true); // Set email format to plain text
 	$mail->CharSet = 'UTF-8';
