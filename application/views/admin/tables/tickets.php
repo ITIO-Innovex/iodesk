@@ -107,15 +107,20 @@ return App_table::find('tickets')
 
         $where  = [];
 		
-if(!is_super()){
-array_push($where, 'AND ' . db_prefix() . 'tickets.company_id = ' . $this->ci->db->escape_str(get_staff_company_id()));
-}else{
-  
-if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+
+
+        if(is_super()){
+		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 array_push($where, 'AND ' . db_prefix() . 'tickets.company_id = ' . $this->ci->db->escape_str($_SESSION['super_view_company_id']));
  }
+		
+		}elseif(is_admin()){
+		array_push($where, 'AND ' . db_prefix() . 'tickets.company_id = ' . $this->ci->db->escape_str(get_staff_company_id()));
 
-}
+		}else{
+		array_push($where, 'AND ' . db_prefix() . 'tickets.assigned = ' . $this->ci->db->escape_str(get_staff_user_id()));
+		}
+		
 
 
         if ($filtersWhere = $this->getWhereFromRules()) {

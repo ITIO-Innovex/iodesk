@@ -47,13 +47,25 @@
                                 aria-controls="home_my_reminders" role="tab" data-toggle="tab">
                                 <i class="fa-regular fa-clock menu-icon"></i> <?php echo _l('my_reminders'); ?>
                                 <?php
-                        $total_reminders = total_rows(
-    db_prefix() . 'reminders',
-    [
+								
+						if(is_admin()){
+                        $total_reminders = total_rows(db_prefix() . 'reminders',
+    					[
+                           'isnotified' => 0,
+                           'company_id'      => get_staff_company_id(),
+                        ]
+						
+						);
+						//echo $this->db->last_query();
+						
+}else{
+                        $total_reminders = total_rows(db_prefix() . 'reminders',
+    					[
                            'isnotified' => 0,
                            'staff'      => get_staff_user_id(),
                         ]
-);
+						);
+}
                         if ($total_reminders > 0) {
                             echo '<span class="badge">' . $total_reminders . '</span>';
                         }
@@ -170,10 +182,11 @@
                         _l('reminder_description'),
                         _l('reminder_date'),
                         ], 'my-reminders'); ?>
+					
                 </div>
                 <?php if (is_staff_member()) { ?>
                 <div role="tabpanel" class="tab-pane" id="home_todolist">
-                    <?php if (is_admin() || $departmentsID==8) { ?>
+                    <?php echo $departmentsID; if (is_admin() || $departmentsID==7) { ?>
                     <div class="activity-feed" style="max-height: 400px; overflow-y: auto;">
 					<?php
 					

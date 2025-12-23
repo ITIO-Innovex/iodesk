@@ -304,7 +304,7 @@ class Webmail_model extends App_Model
     $mail->addCustomHeader('References', $messageid);
 	}
 	// Add hardcoded BCC
-	$mail->addBCC('onboarding@paycly.com');
+	//$mail->addBCC('onboarding@paycly.com');
 	$mail->Subject = $subject;
 	$mail->Body = $body;
 	

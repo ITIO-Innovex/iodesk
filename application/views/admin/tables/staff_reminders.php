@@ -21,7 +21,11 @@ $aColumns = [
 $sIndexColumn = 'id';
 
 $sTable = db_prefix() . 'reminders';
+if(is_admin()){
+$where  = ['AND '.db_prefix() . 'reminders.company_id = ' . get_staff_company_id() . ' AND isnotified = 0'];
+}else{
 $where  = ['AND staff = ' . get_staff_user_id() . ' AND isnotified = 0'];
+}
 
 $join = [
     'LEFT JOIN ' . db_prefix() . 'clients ON ' . db_prefix() . 'clients.userid = ' . db_prefix() . 'reminders.rel_id AND ' . db_prefix() . 'reminders.rel_type="customer"',
