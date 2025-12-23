@@ -584,6 +584,39 @@ function get_nda_url($company_id)
 		
 		return 0;
 }
+
+function get_nda_setting($company_id)
+{   
+        
+		if(isset($company_id)&&$company_id){
+		$CI = & get_instance();
+		$CI->db->where('company_id', $company_id);
+		$com = $CI->db->select('nda_url,nda_smtp,')->from(db_prefix() . 'company_master')->get()->row();
+		
+		if(isset($com)&&$com->nda_url&&$com->nda_smtp){
+		return $com;
+		}else{
+		echo "Nda Setting not configured";exit;
+		}
+		}
+		
+		return 0;
+}
+
+function get_direct_mail_smtp($company_id)
+{   
+        
+		if(isset($company_id)&&$company_id){
+		$CI = & get_instance();
+		$CI->db->where('company_id', $company_id);
+		$com = $CI->db->select('direct_mail_smtp')->from(db_prefix() . 'company_master')->get()->row();
+		if(isset($com)&&$com->direct_mail_smtp){
+		return $com->direct_mail_smtp;
+		}
+		}
+		
+		return 0;
+}
 //Get Approver ID by Spprover Type hr_approver,admin_approver,hr_manager_approver,reporting_approver
 function get_approver_id($approver_type = 'hr_approver')
 { 

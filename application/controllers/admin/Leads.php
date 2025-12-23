@@ -2306,50 +2306,92 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
     $email = trim($_POST['email'] ?? 'vikashg@itio.in');
     $ndaid = trim($_POST['ndaid'] ?? '');
 	
-	$nda_url=get_nda_url(get_staff_company_id());
+	$ndadata=get_nda_setting(get_staff_company_id());
 	
-	if(isset($nda_url)&&$nda_url){
+	
+	
+	
+	if(isset($ndadata->nda_url)&&$ndadata->nda_url){
+	$nda_url=$ndadata->nda_url;
 	}else{
-	$nda_url="www.nourl.com";
+	echo "Nda URL Setting not configured";exit;
 	}
 	
-	   //$sent = send_mail_template('nda_sign', $email, get_staff_user_id(), $name, 'www.eindia.com','');
-	  //$sent = send_mail_template('nda_sign', 'jverma437@gmail.com', get_staff_user_id(), $name, $nda_url,'vikashg@itio.in');
-	  //$sent = send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), $name, $nda_url,'');
-	 //Email,StaffID,ReceiverName,NDA LINK,CCMAIL
+	if(isset($ndadata->nda_smtp)&&$ndadata->nda_smtp){
+	$nda_smtp=$ndadata->nda_smtp;
+	$config = json_decode($nda_smtp, true);
+	
+    $mailer_smtp_host = trim($config['smtp_host']);
+	$senderEmail= trim($config['smtp_email']);
+	$mailer_username= trim($config['smtp_username']);
+	$mailer_password= trim($config['smtp_password']);
+	$mailer_smtp_port= trim($config['smtp_port']);
+	$senderName="Draft and Sign";//"NDA Esign";
+	}else{
+	echo "Nda SMTP Setting not configured";exit;
+	}
+	
+
+
 	 
 	 ////////////Sent EMAIL////////////
 	 
 $recipientEmail="vikashg@itio.in";	 
 //$name="Vimalesh";
 $mailSub="NDA Sign  -  ITIO Innovex Private Limited !!";
-$mailbody="<p>Dear ".$name.",</p>
-<p>Please find the NDA e-signing link below:</p>
-<p><a href='".$nda_url."' target='_blank'>".$nda_url."</a></p>
-<p>Kindly complete the signing at your convenience.</p>
-<p>Regards,<br><span>Draft And Sign - CRM</span></p>";
-//=============================
 
-		$sct=2;
-		//exit;
-		// SMTP Details from session
-		if($sct==2){
-		$mailer_smtp_host="smtppro.zoho.in";
-        $mailer_password="India@992@@";
-		$senderEmail="mailers@itio.in";
-		$mailer_username="mailers@itio.in";
-		}else{
-		$mailer_smtp_host="smtp.office365.com";
-        $mailer_password="cxyycfidoixtjywk";//"xsjdygwdifwunzuh";
-		$senderEmail="draftandsign@outlook.com";
-		$mailer_username="draftandsign@outlook.com";
-		}
-		
-		
-		$senderName="NDA Esign";//"NDA Esign";
-		$mailer_smtp_port="587";//"587";
-		
-		$mail = new PHPMailer(true);
+$mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA E-Signing</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6; padding:20px;">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+            <p style="margin:0 0 16px;">Dear <strong>"'.$name.'"</strong>,</p>
+
+            <p style="margin:0 0 16px;">
+              Please find the NDA e-signing link below:
+            </p>
+
+            <p style="margin:0 0 20px; text-align:center;">
+              <a href="'.$nda_url.'"
+                 target="_blank"
+                 style="display:inline-block; background-color:#2563eb; color:#ffffff; text-decoration:none; padding:12px 22px; border-radius:6px; font-weight:bold;">
+                Sign NDA
+              </a>
+            </p>
+
+            <p style="margin:0 0 20px;">
+              Kindly complete the signing at your convenience.
+            </p>
+
+            <p style="margin:0;">
+              Regards,<br>
+              <strong>Draft And Sign - CRM</strong>
+            </p>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
+
+//=============================
+  $mail = new PHPMailer(true);
 		
 		
 	try {
@@ -2408,16 +2450,8 @@ $mailbody="<p>Dear ".$name.",</p>
 		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
 		return false;
 	}
-	
-	
-		
 	 
 	 /////////////////////////////////
-	 
-	 
-	
-
-        
         
     }
 	//============================

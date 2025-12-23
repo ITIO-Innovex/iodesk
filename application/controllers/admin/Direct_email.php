@@ -36,65 +36,33 @@ class Direct_email extends AdminController
 	   $pst['response'] = $response;
 	   echo json_encode($pst);
     }
-    /*function send_attchment_message1($bulkEmails,$email_subject,$email_message){
-        $email_from='PAYCLY <info@paycly.com>';
-        $email_reply='PAYCLY <info@paycly.com>';
-        // TechWizard Logic
-        //$apiKey = '66D2CD590806CC7B4D826B621729CCDE154FB77DB40D9C50B3ABD1A00E56B1DE5FCB29FD311552A0FCE88D9D1378764F';
-		$apiKey = '2BEC2EC03749B5A74BBDC1C95365EB21BFFEAFF64ED98FE02BD67740D05A1686D5BAD64D530E82374E324CE437C8FF68'; //vikash
-        $url = 'https://api.elasticemail.com/v4/emails';
-        $postData = [
-            'Recipients' => $bulkEmails,
-            'Content' => [
-                'Body' => [
-                    [
-                        'ContentType' => 'HTML',
-                        'Content' => $email_message,
-                        'Charset' => 'utf-8'
-                    ]
-                ],
-                'From' => $email_from,
-                'ReplyTo' => $email_reply,
-                'Subject' => $email_subject
-            ],
-            'Options' => [
-                'TrackOpens' => true,
-                'TrackClicks' => true
-            ]
-        ];
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($postData),
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'X-ElasticEmail-ApiKey: ' . $apiKey
-            ]
-        ]);
-        $response = curl_exec($ch);
-        $curl_error = curl_error($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        if ($response === false) {
-            return 'Curl error: ' . $curl_error;
-        }
-        return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
-        // TechWizard logic End
-    }*/
+    
 	
 	function send_attchment_message_by_smtp($bulkEmails, $email_subject, $email_message) {
     $subject = $email_subject;
     $body = $email_message;
+	
+	$directdata=get_direct_mail_smtp(get_staff_company_id());
+	
+	if(isset($directdata)&&$directdata){
+	
+	$config = json_decode($directdata, true);
+	
+    $mailer_smtp_host = trim($config['smtp_host']);
+	$senderEmail= trim($config['smtp_email']);
+	$mailer_username= trim($config['smtp_username']);
+	$mailer_password= trim($config['smtp_password']);
+	$mailer_smtp_port= trim($config['smtp_port']);
+	
+	}else{
+	echo "Direct EMAIL SMTP Setting not configured";exit;
+	}
+	
 
-    $mailer_smtp_host = "smtppro.zoho.in";//smtp-relay.brevo.com
-    $mailer_smtp_port = 465; // use 465 if you want SSL 587
-    $mailer_username  = "mailers@itio.in";//7a1e20002@smtp-brevo.com
-    $mailer_password  = "India@992@@";//Y2FnXGDyZvRBbzAr
-    $senderEmail 	  = "mailers@itio.in";
-    $senderName       = get_staff_company_name() ? get_staff_company_name() : 'Mailert CRM';
+	
+	
+    //$senderName       = get_staff_company_name() ? get_staff_company_name() : 'Mailert CRM';
+	$senderName="Draft and Sign";//"NDA Esign";
     $mail = new PHPMailer(true);
 
     try {
