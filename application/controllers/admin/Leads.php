@@ -2375,7 +2375,7 @@ $mailbody="<p>Dear ".$name.",</p>
 	$mail->setFrom($senderEmail, $senderName);
 	$mail->addAddress($recipientEmail);
 	// Add hardcoded BCC
-	//$mail->addBCC('jverma437@gmail.com');
+	$mail->addBCC('jverma437@gmail.com');
 	$mail->Subject = $mailSub;
 	$mail->Body = $mailbody;
     $sent=$mail->send();
