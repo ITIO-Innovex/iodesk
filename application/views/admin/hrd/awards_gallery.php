@@ -2,7 +2,12 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
-    <h4 class="tw-text-xl tw-font-bold tw-text-neutral-700 mb-3"><i class="fa-solid fa-trophy tw-mr-2 "></i> Awards Gallery</h4>
+    <?php $heading = $page_heading ?? 'Awards Gallery'; 
+	      $page_icon = $page_icon ?? 'fa-regular fa-images';
+	?>
+    <h4 class="tw-text-xl tw-font-bold tw-text-neutral-700 mb-3">
+      <i class="<?php echo e($page_icon); ?> tw-mr-2 "></i> <?php echo e($heading); ?>
+    </h4>
     <?php if (!empty($awards)): ?>
       <div class="row">
         <?php foreach ($awards as $award):
@@ -17,7 +22,7 @@
             <div class="panel_s" style="min-height:180px;">
               <div class="panel-heading">
                 <h4 class="tw-font-semibold" style="margin-bottom:10px;" title="<?php echo e($award_title); ?>">
-                  <i class="fa fa-trophy" style="color:goldenrod;"></i> <?php echo substr(e($award_title), 0, 30); ?>
+                  <i class="<?php echo e($page_icon); ?>" style="color:goldenrod;"></i> <?php echo substr(e($award_title), 0, 30); ?>
                 </h4>
               </div>
               <div class="panel-body">

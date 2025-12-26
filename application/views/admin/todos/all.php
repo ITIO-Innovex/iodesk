@@ -19,7 +19,7 @@
                                     <?php echo _l('unfinished_todos_title'); ?></h4>
                                 <ul class="list-unstyled todo unfinished-todos todos-sortable">
                                     <li class="no-todos hide ui-state-disabled tw-neutral-500 tw-opacity-80">
-                                        <?php echo _l('no_unfinished_todos_found'); ?>
+                                        <?php echo _l('no_unfinished_todos_found'); ?>!!
                                     </li>
                                 </ul>
                             </div>
@@ -133,7 +133,7 @@ function render_li_items(finished, obj) {
         obj.todoid + '" ' + checked +
         '><label></label></div></div> <div class="media-body"><div class="todo-description' + todo_finished_class +
         ' no-padding-left">' + obj.description + '<a href="#" onclick="delete_todo_item(this,' + obj.todoid +
-        '); return false;" class="pull-right text-muted"><i class="fa fa-remove fa-lg"></i></a><a href="#" onclick="edit_todo_item(' +
+        '); return false;" class="pull-right text-muted"><i class="fa fa-remove text-danger fa-lg"></i></a><a href="#" onclick="edit_todo_item(' +
         obj.todoid +
         '); return false;" class="pull-right text-muted mright5"><i class="fa-regular fa-pen-to-square tw-mr-2"></i></a></div><span class="todo-date tw-text-sm tw-text-neutral-500">' +
         obj.dateadded + '</span></div></div></li>';

@@ -4201,7 +4201,7 @@ $lang['attendance_request'] = 'Attendance Request';
 $lang['uploaded_document'] = 'Uploaded Document';
 $lang['leave_application'] = 'Leave Application';
 $lang['saturday_rule'] = 'Saturday Rule';
-$lang['HR & Attendance'] = 'HR & Attendance';
+$lang['HR & Attendance'] = 'HR Attendance';
 $lang['Self Service'] = 'Self Service';
 $lang['Attendance'] = 'Attendance';
 $lang['Leave Application'] = 'Leave Application';
@@ -4278,4 +4278,18 @@ $lang['Type'] = 'Type';
 $lang['Is %'] = 'Is %';
 $lang['Percent Of'] = 'Percent Of';
 $lang['Add New Payroll Component'] = 'Add New Payroll Component';
+$lang['smtp_settings'] = 'SMTP Settings';
+$lang['nda_smtp_settings'] = 'NDA SMTP Settings';
+$lang['direct_smtp_settings'] = 'Direct SMTP Settings';
+$lang['nda_sign'] = 'NDA Sign';
+$lang['features'] = 'features';
+$lang['Conversation'] = 'Conversation';
+$lang['Direct Email'] = 'Direct Email';
+$lang['Status'] = 'Status';
+$lang['Group'] = 'Group';
+$lang['Reports'] = 'Reports';
+$lang['Team Document'] = 'Team Document';
+$lang['Finance'] = 'Finance';
+$lang['Companies'] = 'Companies';
 ?>
+

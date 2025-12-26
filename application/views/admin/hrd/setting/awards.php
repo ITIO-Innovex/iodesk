@@ -2,20 +2,21 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
-  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-trophy tw-mr-2 "></i>  Awards <i class="fa-solid fa-circle-info" title="Display All Uploaded Award Images" style=" color:khaki;"></i></span></h4>
+  <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-trophy tw-mr-2 "></i>  Gallery / Awards <i class="fa-solid fa-circle-info" title="Display All Uploaded Gallery / Awards Images" style=" color:khaki;"></i></span></h4>
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">
           <div class="panel-body panel-table-fullxx">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
-              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Awards</h4>
-              <a href="#" class="btn btn-primary" onclick="$('#award_modal').modal('show');return false;">Add Award Image</a>
+              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Gallery / Awards</h4>
+              <a href="#" class="btn btn-primary" onclick="$('#award_modal').modal('show');return false;">Add Gallery / Awards Image</a>
             </div>
             <div class="table-responsive">
-              <table class="table dt-table" data-order-col="2" data-order-type="desc">
+              <table class="table dt-table" data-order-col="3" data-order-type="desc">
                 <thead>
                   <tr>
-                    <th>Award Title</th>
+                    <th>Title</th>
+                    <th>Type</th>
                     <th>Image(s)</th>
                     <th>Added on</th>
                     <th>Status</th>
@@ -29,9 +30,12 @@
                     $statusVal = isset($a['status']) ? (int)$a['status'] : 1;
                     $statusLbl = $statusVal === 1 ? '<span class="label label-success">Active</span>' : '<span class="label label-danger">Inactive</span>';
                     $awardId = (int)$a['id'];
+                    $galleryType = strtolower($a['gallery_type'] ?? 'awards');
+                    $galleryTypeLbl = $galleryType === 'gallery' ? '<span class="label label-info">Gallery</span>' : '<span class="label label-warning">Awards</span>';
                   ?>
                   <tr>
                     <td><?php echo e($name); ?></td>
+                    <td><?php echo $galleryTypeLbl; ?></td>
                     <td>
                       <?php if (!empty($a['images'])) {
                         foreach ($a['images'] as $img) {
@@ -79,12 +83,19 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Add Award Image</h4>
+        <h4 class="modal-title">Add Gallery / Awards Image</h4>
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>Award Title</label>
+          <label>Title</label>
           <input type="text" name="award_title" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select name="gallery_type" class="form-control" required>
+            <option value="awards" selected>Awards</option>
+            <option value="gallery">Gallery</option>
+          </select>
         </div>
         <div class="form-group">
           <label>Image</label>
