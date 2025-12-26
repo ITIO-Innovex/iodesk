@@ -291,6 +291,7 @@ $route['admin/hrd/setting/awards_update/(:num)'] = 'admin/hrd/awards_update/$1';
 $route['admin/hrd/setting/awards_delete/(:num)'] = 'admin/hrd/awards_delete/$1';
 $route['admin/hrd/setting/delete_award_image/(:num)'] = 'admin/hrd/delete_award_image/$1';
 $route['admin/hrd/awards'] = 'admin/hrd/awards_gallery';
+$route['admin/hrd/gallery'] = 'admin/hrd/gallery';
 
 // Database Backup routes
 $route['admin/database_backups'] = 'admin/database_backups/index';
@@ -298,4 +299,4 @@ $route['admin/database_backups/export_backup'] = 'admin/database_backups/export_
 $route['admin/database_backups/download/(.+)'] = 'admin/database_backups/download/$1';
 $route['admin/database_backups/delete'] = 'admin/database_backups/delete';
 
-$route['admin/hrd/gallery'] = 'admin/hrd/gallery_latest';
+$route['admin/hrd/gallery/latest'] = 'admin/hrd/gallery_latest';

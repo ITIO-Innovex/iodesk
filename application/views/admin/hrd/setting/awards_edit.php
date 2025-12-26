@@ -2,13 +2,21 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
-    <h4 class="tw-text-neutral-700"><i class="fa-solid fa-trophy tw-mr-2 "></i> Edit Award</h4>
+    <h4 class="tw-text-neutral-700"><i class="fa-solid fa-trophy tw-mr-2 "></i> Edit Gallery / Awards</h4>
     <div class="panel_s">
       <div class="panel-body">
         <?php echo form_open_multipart(admin_url('hrd/setting/awards_update/'.$award['id'])); ?>
           <div class="form-group">
-            <label>Award Title</label>
+            <label>Title</label>
             <input type="text" name="award_title" class="form-control" value="<?php echo e($award['award_title']); ?>" required>
+          </div>
+          <div class="form-group">
+            <label>Type</label>
+            <?php $currentType = strtolower($award['gallery_type'] ?? 'awards'); ?>
+            <select name="gallery_type" class="form-control" required>
+              <option value="awards" <?php echo $currentType === 'awards' ? 'selected' : ''; ?>>Awards</option>
+              <option value="gallery" <?php echo $currentType === 'gallery' ? 'selected' : ''; ?>>Gallery</option>
+            </select>
           </div>
           <div class="form-group">
             <label>Add More Images</label>

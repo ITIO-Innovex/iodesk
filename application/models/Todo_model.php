@@ -46,7 +46,14 @@ class Todo_model extends App_Model
         $this->db->select();
         $this->db->from(db_prefix().'todos');
         $this->db->where('finished', $finished);
+		
+		if(is_admin()){
+		$this->db->where('company_id', get_staff_company_id());
+		}else{
         $this->db->where('staffid', get_staff_user_id());
+		}
+		
+		
         $this->db->order_by('item_order', 'asc');
         if ($page != '' && $this->input->post('todo_page')) {
             $position = ($page * $this->todo_limit);
@@ -79,6 +86,7 @@ class Todo_model extends App_Model
         $data['dateadded']   = date('Y-m-d H:i:s');
         $data['description'] = nl2br($data['description']);
         $data['staffid']     = get_staff_user_id();
+		$data['company_id']  = get_staff_company_id();
         $this->db->insert(db_prefix().'todos', $data);
 
         return $this->db->insert_id();

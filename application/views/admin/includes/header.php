@@ -148,6 +148,11 @@
                 <li>
                 <a onclick="window.history.back()"><i class="fa fa-arrow-circle-left tw-text-neutral-400 tw-text-xl tw-text-white" data-toggle="tooltip" title="Go Back" data-placement="bottom" aria-hidden="true"></i></a>
                 </li>
+                <li class="icon header-signout">
+                    <a href="#" onclick="logout(); return false;" data-toggle="tooltip" title="<?php echo _l('nav_logout'); ?>" data-placement="bottom">
+                        <i class="fa-solid fa-right-from-bracket tw-text-neutral-400 tw-text-xl tw-text-white"></i>
+                    </a>
+                </li>
                 <?php do_action_deprecated('after_render_top_search', [], '3.0.0', 'admin_navbar_start'); ?>
                 <?php hooks()->do_action('admin_navbar_start'); ?>
                 <?php if (is_staff_member()) { ?>

@@ -4881,12 +4881,15 @@ class Hrd extends AdminController
         $staffid = get_staff_user_id();
         $title = trim((string)$this->input->post('award_title'));
         $savedAny = false;
+        $galleryType = strtolower((string) $this->input->post('gallery_type'));
+        $galleryType = in_array($galleryType, ['gallery', 'awards']) ? $galleryType : 'awards';
         // main awards insert
         $award_data = [
             'staff' => $staffid,
             'award_title' => $title,
             'addedon' => date('Y-m-d H:i:s'),
             'status' => 1,
+            'gallery_type' => $galleryType,
         ];
         $this->db->insert('it_crm_hrd_awards', $award_data);
         $award_id = $this->db->insert_id();
@@ -5342,8 +5345,10 @@ class Hrd extends AdminController
         }
         if ($this->input->method() === 'post') {
             $title = trim((string)$this->input->post('award_title'));
+            $galleryType = strtolower((string) $this->input->post('gallery_type'));
+            $galleryType = in_array($galleryType, ['gallery', 'awards']) ? $galleryType : 'awards';
             $this->db->where('id', $id);
-            $this->db->update('it_crm_hrd_awards', ['award_title'=>$title]);
+            $this->db->update('it_crm_hrd_awards', ['award_title'=>$title, 'gallery_type' => $galleryType]);
             $savedAny = false;
             $allowedImageExts = ['jpg','jpeg','png','gif','webp'];
             if (isset($_FILES['image'])) {
@@ -5418,16 +5423,41 @@ class Hrd extends AdminController
         echo json_encode(['success'=>false]);
     }
 
-    public function awards_gallery()
+    private function find_awards_with_images($where = [])
     {
-        // Get all awards
+        if (!empty($where)) {
+            $this->db->where($where);
+        }
         $this->db->order_by('addedon', 'desc');
         $awards = $this->db->get('it_crm_hrd_awards')->result_array();
         foreach ($awards as &$a) {
             $a['images'] = $this->db->get_where('it_crm_hrd_awards_images', ['awards_id'=>$a['id'], 'status'=>1])->result_array();
         }
         unset($a);
-        $data = ['title' => 'Awards Gallery', 'awards' => $awards];
+        return $awards;
+    }
+
+    public function awards_gallery()
+    {
+        $awards = $this->find_awards_with_images(['gallery_type' => 'awards']);
+        $data = [
+            'title' => 'Awards Gallery',
+            'page_heading' => 'Awards Gallery',
+			'page_icon' => 'fa-solid fa-trophy',
+            'awards' => $awards,
+        ];
+        $this->load->view('admin/hrd/awards_gallery', $data);
+    }
+
+    public function gallery()
+    {
+        $awards = $this->find_awards_with_images(['gallery_type' => 'gallery']);
+        $data = [
+            'title' => 'Gallery',
+            'page_heading' => 'Gallery',
+			'page_icon' => 'fa-regular fa-images',
+            'awards' => $awards,
+        ];
         $this->load->view('admin/hrd/awards_gallery', $data);
     }
 
