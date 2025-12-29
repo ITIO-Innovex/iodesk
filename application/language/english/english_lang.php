@@ -4291,5 +4291,6 @@ $lang['Reports'] = 'Reports';
 $lang['Team Document'] = 'Team Document';
 $lang['Finance'] = 'Finance';
 $lang['Companies'] = 'Companies';
+$lang['Need Login?'] = 'Need Login?';
 ?>
 
