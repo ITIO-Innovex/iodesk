@@ -318,10 +318,10 @@ return App_table::find('leads')
                 }
                 $row[] = $consentHTML;
             }
-            $company = $aRow['company'];
+            $company = $aRow['company'] ?? '';
 
-         $row[] = '<span title="' . e($company) . '">' 
-       . e(strlen($company) > 30 ? substr($company, 0, 30) . '...' : $company) 
+$row[] = '<span title="' . e($company) . '">'
+       . e(strlen($company) > 30 ? substr($company, 0, 30) . '...' : $company)
        . '</span>';
             $emailicon="";
             $emailcounter=$this->ci->leads_model->countEmail(e($aRow['email']));
