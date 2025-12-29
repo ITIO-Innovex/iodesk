@@ -203,18 +203,20 @@ return App_table::find('leads')
             }
 
 //Display  by company id and superadmin
-	if(!is_super()){
-	$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . get_staff_company_id() . ')';
-	}else{
-	
-		if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
+	if(is_super()){
+	if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
 		$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . $_SESSION['super_view_company_id'] . ')';
 		}else{
 		$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . get_staff_company_id() . ')';
 		}
-		
-
-	
+	}elseif(is_admin()){	
+	$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . get_staff_company_id() . ')';
+	}else{
+	//$where[] = 'AND ' . db_prefix() . 'leads.assigned  IN (' . get_staff_user_id() . ')';
+	$where[] = 'AND (' 
+    . db_prefix() . 'leads.assigned IN (' . get_staff_user_id() . ') 
+    OR ' . db_prefix() . 'leads.addedfrom IN (' . get_staff_user_id() . ')
+)';
 	}
         $aColumns = hooks()->apply_filters('leads_table_sql_columns', $aColumns);
 
@@ -247,8 +249,7 @@ return App_table::find('leads')
 		}else{
 		array_push($where, ' AND is_deal=0');
 		}
-
-
+        //log_message('error', 'Display data - ' . print_r($where, true));
         $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, $additionalColumns);
 
         $output  = $result['output'];
@@ -317,7 +318,11 @@ return App_table::find('leads')
                 }
                 $row[] = $consentHTML;
             }
-            $row[] = e($aRow['company']);
+            $company = $aRow['company'];
+
+         $row[] = '<span title="' . e($company) . '">' 
+       . e(strlen($company) > 30 ? substr($company, 0, 30) . '...' : $company) 
+       . '</span>';
             $emailicon="";
             $emailcounter=$this->ci->leads_model->countEmail(e($aRow['email']));
 			if($emailcounter > 0){
