@@ -13,7 +13,7 @@ class Departments extends AdminController
         parent::__construct();
         $this->load->model('departments_model');
 
-        if (!is_admin()) {
+        if (!is_admin() && !is_department_admin()) {
             access_denied('Departments');
         }
     }

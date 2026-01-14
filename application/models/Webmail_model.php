@@ -225,6 +225,7 @@ class Webmail_model extends App_Model
     {
 	
 	//print_r($data);
+	//print_r($_SESSION['webmail']);exit;
 	
 		$recipientEmail=isset($_POST['recipientEmail']) ? $_POST['recipientEmail'] : "";
 		$messageid=isset($_POST['messageid']) ? $_POST['messageid'] : "";
@@ -250,6 +251,7 @@ class Webmail_model extends App_Model
         $mailer_password=$_SESSION['webmail']['mailer_password'];
 		$senderEmail=$_SESSION['webmail']["mailer_email"];
 		$senderName=$_SESSION['webmail']["mailer_name"];
+		$encryption=$_SESSION['webmail']["encryption"];
 		$mail = new PHPMailer(true);
 		
 		
@@ -260,7 +262,15 @@ class Webmail_model extends App_Model
     $mail->SMTPAuth = true;
     $mail->Username = $mailer_username; // Replace with your email
     $mail->Password = $mailer_password; // Replace with your email password or app-specific password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    
+	
+	
+	if($encryption=="tls"){
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	}else{
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+	}
+	
     $mail->Port = $mailer_smtp_port;
 
     // Email settings

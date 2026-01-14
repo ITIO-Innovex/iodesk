@@ -15,13 +15,16 @@ class Staff extends AdminController
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data('staff');
         }
-		//$company_id = get_staff_company_id();
+        //$company_id = get_staff_company_id();
         $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
 		//print_r($data['staff_members']);exit;
         $data['title']         = _l('staff_members');
         // Retrive Mail Boxs
         // $id = get_staff_user_id();
         // $data['webmails'] = $this->staff_model->getWebMails();
+        // Load department list for webmail setup modal
+        $this->load->model('webmail_setup_model');
+        $data['departmentlist'] = $this->webmail_setup_model->getlist('', '');
         $this->load->view('admin/staff/manage', $data);
     }
 	
@@ -629,6 +632,43 @@ unset($data['id']);
         }else{
             http_response_code(400); // Faliure
             echo json_encode(['status' => 'error', 'message' => 'Fetching Mailer failed or Mailer Not Available!']);
+        }
+    }
+    
+    public function getStaffWebmail($staffEmail = '')
+    {
+        if (!$staffEmail) {
+            echo json_encode([]);
+            return;
+        }
+        
+     
+		
+		$this->db->where('mailer_email', $staffEmail);
+        $webmail = $this->db->get(db_prefix().'webmail_setup')->result_array();
+        
+        if (!empty($webmail) && isset($webmail[0])) {
+            echo json_encode($webmail[0]);
+        } else {
+            echo json_encode([]);
+        }
+    }
+    
+    public function getStaffInfo($staffid = '')
+    {
+        if (!$staffid) {
+            echo json_encode([]);
+            return;
+        }
+        
+        $this->db->select('firstname, lastname, email');
+        $this->db->where('staffid', $staffid);
+        $staff = $this->db->get(db_prefix() . 'staff')->row_array();
+        
+        if ($staff) {
+            echo json_encode($staff);
+        } else {
+            echo json_encode([]);
         }
     }
     public function assignedTo(){

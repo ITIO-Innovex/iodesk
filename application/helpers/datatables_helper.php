@@ -282,11 +282,11 @@ function data_tables_init($aColumns, $sIndexColumn, $sTable, $join = [], $where 
     return [
         'rResult' => $rResult,
         'output'  => [
-            'draw'                 => $data['draw'] ? intval($data['draw']) : 0,
+            'draw'                 => isset($data['draw']) ? (int) $data['draw'] : 0,
             'iTotalRecords'        => $iTotal,
             'iTotalDisplayRecords' => $iFilteredTotal,
             'aaData'               => [],
-            'sOrder'               => $sOrder
+            'sOrder'               => $sOrder,
         ],
     ];
 }

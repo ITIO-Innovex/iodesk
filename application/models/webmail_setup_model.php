@@ -36,10 +36,12 @@ class Webmail_setup_model extends App_Model
             return $this->db->get(db_prefix().'webmail_setup')->result_array();
 			
         }else{
-		$this->db->where('staffid', 0); // for hide staff Added data from admin list
+		//$this->db->where('staffid', 0); // for hide staff Added data from admin list
 		}
 
         return $this->db->get(db_prefix().'webmail_setup')->result_array();
+		
+		//echo $this->db->last_query();exit; //return 
     }
 	
 	// for update
@@ -73,10 +75,13 @@ class Webmail_setup_model extends App_Model
 	//print_r($data);
        
         $data['date_created']      = date('Y-m-d H:i:s');
-        $data['staffid']       = get_staff_user_id();
-		if (is_admin()){
-		$data['staffid']       = 0;
-		}
+        // staffid should be set by controller - don't override if already set
+        if (!isset($data['staffid']) || $data['staffid'] === '') {
+            $data['staffid']       = get_staff_user_id();
+            if (is_admin()){
+                $data['staffid']       = 0;
+            }
+        }
         $data['share_in_projects'] = isset($data['share_in_projects']) ? 1 : 0;
 		
 		

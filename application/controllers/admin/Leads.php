@@ -2303,7 +2303,7 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
     public function send_nda_sign()
     {
 	$name  = trim($_POST['ndaname'] ?? ' Hi');
-    $email = trim($_POST['email'] ?? 'vikashg@itio.in');
+    $recipientEmail = trim($_POST['email'] ?? 'vikashg@itio.in');
     $ndaid = trim($_POST['ndaid'] ?? '');
 	
 	$ndadata=get_nda_setting(get_staff_company_id());
@@ -2336,7 +2336,7 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
 	 
 	 ////////////Sent EMAIL////////////
 	 
-$recipientEmail="vikashg@itio.in";	 
+//$recipientEmail="vikashg@itio.in";	 
 //$name="Vimalesh";
 $mailSub="NDA Sign  -  ITIO Innovex Private Limited !!";
 
