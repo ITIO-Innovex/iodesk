@@ -72,7 +72,7 @@ class Webmail_setup_model extends App_Model
 	public function create($data)
     {
 	
-	//print_r($data);
+	print_r($data);exit;
        log_message('error', 'Controller data1 - ' . print_r($data, true));
         $data['date_created']      = date('Y-m-d H:i:s');
         // staffid should be set by controller - don't override if already set
