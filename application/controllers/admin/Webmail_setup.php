@@ -111,7 +111,7 @@ class Webmail_setup extends AdminController
 				}
             }
         }
-        
+        log_message('error', 'Controller data - ' . print_r($data, true));
         $this->webmail_setup_model->create($data);
         set_alert('success', _l('added_successfully', _l('Webmail Setup')));
         
