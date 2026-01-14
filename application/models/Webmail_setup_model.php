@@ -73,7 +73,7 @@ class Webmail_setup_model extends App_Model
     {
 	
 	//print_r($data);exit;
-       log_message('error', 'Controller data1 - ' . print_r($data, true));
+       //log_message('error', 'Controller data1 - ' . print_r($data, true));
         $data['date_created']      = date('Y-m-d H:i:s');
         // staffid should be set by controller - don't override if already set
         if (!isset($data['staffid']) || $data['staffid'] === '') {
@@ -84,7 +84,7 @@ class Webmail_setup_model extends App_Model
         }
         $data['share_in_projects'] = isset($data['share_in_projects']) ? 1 : 0;
 		
-		log_message('error', 'Modal data2 - ' . print_r($data, true));
+		//log_message('error', 'Modal data2 - ' . print_r($data, true));
         $this->db->insert(db_prefix().'webmail_setup', $data);
 		
 		if ($this->db->affected_rows() > 0) {
