@@ -112,8 +112,23 @@ foreach ($rResult as $aRow) {
         }
         $row[] = $_data;
     }
-    $row[] = '';
-	/*<a href="" onclick="assignMail(' . $aRow['staffid'] . '); return false;" >Button</a>*/
+    
+    // Assigned To column - check if staff has assigned mailer
+    $this->ci->db->select('id, mailer_name, mailer_email, mailer_password');
+    //$this->ci->db->where('staffid', $aRow['staffid']);
+    $this->ci->db->where('mailer_email', $aRow['email']);
+    $this->ci->db->where('mailer_status', 1);
+    $assigned_mailer = $this->ci->db->get(db_prefix() . 'webmail_setup')->row_array();
+	$icon='<i class="fa fa-plus text-success"></i>';
+    if ($assigned_mailer) {
+       $icon='<i class="fa-solid fa-envelope-circle-check text-success fa-2x" title="Webmail Already Setup"></i>';
+    } else {
+        $icon='<i class="fa-regular fa-square-plus text-danger fa-2x" title="Add New Webmail Setup"></i>';
+    }
+    
+    // Webmail Setup column - show icon to open webmail setup modal (send staff email too)
+    $email_js = "'" . e($aRow['email']) . "'";
+    $row[] = '<a href="#" onclick="openWebmailSetup(' . $aRow['staffid'] . ', ' . $email_js . '); return false;" title="Webmail Setup">'.$icon.'</a> ';
 
     $row['DT_RowClass'] = 'has-row-options';
 

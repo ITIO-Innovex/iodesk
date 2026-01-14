@@ -158,8 +158,15 @@ Dep - <?php echo e($entry['departmentid']); ?>
 <option value="<?=$item['departmentid'];?>"><?=$item['name'];?></option>
 <?php  } ?>
 </select></td><?php } ?>
-<td><br /></label><button onclick="test_dep_imap_connection(); return false;" class="btn btn-success">Test IMAP Connection</button></td>
-</tr>
+<td>
+    <?php /*?><label for="assignto" class="control-label">Assign To Staff</label><?php */?>
+    <?php
+    $selected_staff = [];
+    // Note: id will be "assignto[]" by default; we'll target by name in JS
+    echo render_select('assignto[]', $staff_members, ['staffid', ['firstname', 'lastname']], 'Assign To Staff', $selected_staff, ['multiple' => true, 'data-actions-box' => true, 'data-live-search' => true], [], '', '', false);
+    ?>
+</td>
+</tr><tr data-name="bulk_pdf_exporter"><td><br /></label><button onclick="test_dep_imap_connection(); return false;" class="btn btn-success">Test IMAP Connection</button></td></tr>
 </tbody>
 </table>
 </div>   
@@ -198,6 +205,10 @@ $(function() {
         $form.attr('action', $form.data('create-url'));
         $form.find('input[type="text"]').val('');
         $form.find('#share_in_projects').prop('checked', false);
+        // Reset assignto multi-select
+        var $assigntoSelect = $('select[name="assignto[]"]');
+        $assigntoSelect.selectpicker('val', []);
+        $assigntoSelect.selectpicker('refresh');
     });
 });
 
@@ -225,6 +236,16 @@ function edit_mailer_entry(id) {
 		//alert(folder);
 		$('#folder').html('<option value="' + folder + '" selected>' + folder + '</option>');
 		$('#folder').selectpicker('refresh');
+		
+		// Handle assignto multi-select - convert comma-separated string to array
+        var $assigntoSelect = $('select[name="assignto[]"]');
+        if (response.assignto && response.assignto !== '') {
+            var assigned_staff = response.assignto.split(',');
+            $assigntoSelect.selectpicker('val', assigned_staff);
+        } else {
+            $assigntoSelect.selectpicker('val', []);
+        }
+        $assigntoSelect.selectpicker('refresh');
         
         $entryModal.modal('show');
     }, 'json');

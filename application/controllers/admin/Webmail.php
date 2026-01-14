@@ -19,7 +19,7 @@ class Webmail extends AdminController
 		$data['staffid']="";
 		$_SESSION['mail_limit']=30;
 		$staffid=get_staff_user_id();
-		if (!is_client_logged_in() && !is_admin() && is_staff_logged_in()) {
+		if (!is_client_logged_in()  && is_staff_logged_in()) { //&& !is_admin()
 		$wheredata=' staffid=' . $staffid;
 		$data['staffid']=get_staff_user_id();
 		$data['departmentid']  = $this->webmail_model->departmentid(get_staff_user_id(), $wheredata);

@@ -46,7 +46,7 @@ $out_time = $attendance[0]['out_time'] ?? '';
 	</div>
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
 	<i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i>                         
-	<span class="tw-truncate tw-text-sm">Role : <?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?> [<?=get_user_type();?>]
+	<span class="tw-truncate tw-text-sm">Role : <?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?> <?php  if(isset($GLOBALS['current_user']->designation_id)&&$GLOBALS['current_user']->designation_id) { echo get_staff_designations_name($GLOBALS['current_user']->designation_id);} ?> [<?=get_user_type();?>] 
 	</span>                     
 	</div> 
 	

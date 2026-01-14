@@ -472,7 +472,7 @@ class Hrd_model extends App_Model
     public function update_payroll_component($data, $id)
     {
         $this->db->where('id', $id);
-        $this->db->update(db_prefix() . 'payroll_components', $data);
+        $this->db->update('it_crm_payroll_components', $data);
         if ($this->db->affected_rows() > 0) {
             log_activity('Payroll Component Updated [ComponentID: ' . $id . ', Name: ' . $data['name'] . ']');
             return true;
@@ -488,7 +488,7 @@ class Hrd_model extends App_Model
     public function delete_payroll_component($id)
     {
         $this->db->where('id', $id);
-        $this->db->update(db_prefix() . 'payroll_components', ['is_active' => 0]);
+        $this->db->update('it_crm_payroll_components', ['is_active' => 0]);
         if ($this->db->affected_rows() > 0) {
             log_activity('Payroll Component Deactivated [ComponentID: ' . $id . ']');
             return true;

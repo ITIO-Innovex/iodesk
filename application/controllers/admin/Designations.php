@@ -11,7 +11,7 @@ class Designations extends AdminController
         $this->load->model('departments_model');
         $this->load->dbforge();
 
-        if (!is_admin()) {
+        if (!is_admin() && !is_department_admin()) {
             access_denied('Designations');
         }
 
