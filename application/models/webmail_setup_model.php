@@ -84,7 +84,7 @@ class Webmail_setup_model extends App_Model
         }
         $data['share_in_projects'] = isset($data['share_in_projects']) ? 1 : 0;
 		
-		
+		log_message('error', 'Modal data - ' . print_r($data, true));
         $this->db->insert(db_prefix().'webmail_setup', $data);
 		
 		if ($this->db->affected_rows() > 0) {
