@@ -4291,6 +4291,9 @@ $lang['Reports'] = 'Reports';
 $lang['Team Document'] = 'Team Document';
 $lang['Finance'] = 'Finance';
 $lang['Companies'] = 'Companies';
-$lang['Need Login?'] = 'Need Login?';
+$lang['New Email'] = 'New Email';
+$lang['Email Sent'] = 'Email Sent';
+$lang['Email Sent Successfully'] = 'Email Sent Successfully';
+$lang['webmail setup'] = 'webmail setup';
 ?>
 
