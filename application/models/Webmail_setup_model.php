@@ -72,7 +72,7 @@ class Webmail_setup_model extends App_Model
 	public function create($data)
     {
 	
-	//print_r($data);exit;
+	   //print_r($data);exit;
        //log_message('error', 'Controller data1 - ' . print_r($data, true));
         $data['date_created']      = date('Y-m-d H:i:s');
         // staffid should be set by controller - don't override if already set
@@ -162,6 +162,32 @@ class Webmail_setup_model extends App_Model
         ]);
 		if ($this->db->affected_rows() > 0) {
 		log_activity('Webmail Setup Status Changed [FieldID: ' . $id . ' - Active: ' . $status . ']');
+            return true;
+        }
+
+        return false;
+        
+    }
+	
+	//Update Priority
+	public function priority($id)
+    {
+	    
+	   $staffid=get_staff_user_id();
+       $this->db->where('staffid', $staffid);
+		
+		$this->db->update(db_prefix().'webmail_setup', [
+            'priority' => 0,
+        ]);
+		//log_message('error', 'QUERY 1 - '.$this->db->last_query() );
+		
+		$this->db->where('id', $id);
+        $this->db->update(db_prefix().'webmail_setup', [
+            'priority' => 1,
+        ]);
+		//log_message('error', 'QUERY 2 - '.$this->db->last_query() );
+		if ($this->db->affected_rows() > 0) {
+		log_activity('Webmail Setup Priority Changed [FieldID: ' . $id . ' - Priority: Main ]');
             return true;
         }
 

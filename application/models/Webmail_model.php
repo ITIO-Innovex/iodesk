@@ -98,6 +98,7 @@ class Webmail_model extends App_Model
 		}
 		$this->db->where('email', $mailer_email);
 		//$this->db->group_by('id');
+		$this->db->where('uniqid >=', 1);
         $counter=$this->db->get(db_prefix() . 'emails')->result_array(); //return
 		$_SESSION['inbox-total-email']=$counter[0]['total_email'];
 		//echo $this->db->last_query();exit;
@@ -126,6 +127,7 @@ class Webmail_model extends App_Model
 		$this->db->where('folder', $folder);
 		}
 		$this->db->where('email', $mailer_email);
+		$this->db->where('uniqid >=', 1);
 		$this->db->limit($_SESSION['mail_limit'],$page);
         $mails=$this->db->get(db_prefix() . 'emails')->result_array(); //return
 		//echo $this->db->last_query();//exit;

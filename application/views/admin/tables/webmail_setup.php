@@ -15,6 +15,7 @@ $aColumns = [
     'mailer_smtp_host',
     'mailer_imap_host',
     'mailer_status',
+    'priority',
     'date_created',
 ];
 
@@ -48,6 +49,7 @@ $additionalSelect = [
     'mailer_imap_port',
     'creator',
     'creator_name',
+    'priority',
 ];
 
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, $additionalSelect);
@@ -100,11 +102,26 @@ foreach ($rResult as $aRow) {
             . '</a>';
     } else {
         $statusUrl = admin_url('webmail_setup/statuson/' . $aRow['id']);
-        $statusHtml = '<a href ' . $statusUrl . ' class="text-danger _delete" title="' . _l('settings_no') . '">'
+        $statusHtml = '<a href="' . $statusUrl . '" class="text-danger _delete" title="' . _l('settings_no') . '">'
             . '<i class="fa-solid fa-toggle-off fa-xl" style="margin-top:10px;"></i>'
             . '</a>';
     }
     $row[] = $statusHtml;
+
+    // Column: Priority (toggle link - increment/decrement)
+    $currentPriority = isset($aRow['priority']) ? (int)$aRow['priority'] : 0;
+    $priorityUpUrl = admin_url('webmail_setup/priorityup/' . $aRow['id']);
+    $priorityDownUrl = admin_url('webmail_setup/prioritydown/' . $aRow['id']);
+    $priorityHtml = '<div style="text-align: center;">';
+    $priorityHtml .= '<a href="' . $priorityUpUrl . '" class="text-success" title="Increase Priority" style="display: inline-block; margin-right: 5px;">';
+    $priorityHtml .= '<i class="fa-solid fa-arrow-up fa-lg"></i>';
+    $priorityHtml .= '</a>';
+    $priorityHtml .= '<span style="display: inline-block; min-width: 30px; font-weight: bold;">' . $currentPriority . '</span>';
+    $priorityHtml .= '<a href="' . $priorityDownUrl . '" class="text-danger" title="Decrease Priority" style="display: inline-block; margin-left: 5px;">';
+    $priorityHtml .= '<i class="fa-solid fa-arrow-down fa-lg"></i>';
+    $priorityHtml .= '</a>';
+    $priorityHtml .= '</div>';
+    $row[] = $priorityHtml;
 
     // Column: Created by + time
     $createdCol = e($aRow['creator_name']) . ' - ' . e(time_ago($aRow['date_created'])) . '<br />' . e(_dt($aRow['date_created']));

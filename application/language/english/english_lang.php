@@ -4270,7 +4270,7 @@ $lang['Add New Employee Type'] = 'Add New Employee Type';
 $lang['New Branch Manager'] = 'New Branch Manager';
 $lang['Add New Branch Manager'] = 'Add New Branch Manager';
 $lang['Add New Attendance Status'] = 'Add New Attendance Status';
-$lang['HR_Attendance'] = 'HR & Attendance';
+$lang['HR_Attendance'] = 'HRMS';
 $lang['New Payroll Component'] = 'New Payroll Component';
 $lang['Component Code'] = 'Component Code';
 $lang['Component Title'] = 'Component Title';
@@ -4295,5 +4295,8 @@ $lang['New Email'] = 'New Email';
 $lang['Email Sent'] = 'Email Sent';
 $lang['Email Sent Successfully'] = 'Email Sent Successfully';
 $lang['webmail setup'] = 'webmail setup';
+$lang['webmail setup priority'] = 'webmail setup priority';
+$lang['problem_updating'] = 'problem_updating';
+$lang['webmail setup priority updated'] = 'webmail setup priority updated';
 ?>
 

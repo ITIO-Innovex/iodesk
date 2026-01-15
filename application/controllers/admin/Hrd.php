@@ -1631,7 +1631,7 @@ class Hrd extends AdminController
 			$leave_for = ($data['leave_for'] == 2) ? 'Half Day' : 'Full Day';
 			//log_message('error', 'Emaill - ' . $hrdid);exit;
 			$staffemail=get_staff_email($hrdid);
-			$mail_subject=$leave_for . " Leave Application by ".get_staff_full_name($data['staffid'])." for :".$data['from_date']." to ".$data['to_date'];
+			$mail_subject=$leave_for . " Leave Application by ".get_staff_full_name($data['staffid'])." from :".$data['from_date']." to ".$data['to_date'];
 			$mail_details=$mail_subject."<br><br>".$data['leave_reson'];
             send_mail_template('project_mail', $staffemail, $hrdid, $insert_id, $mail_details, $mail_subject            );
 			set_alert('success', 'Leave application submitted successfully');

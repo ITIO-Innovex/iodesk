@@ -25,7 +25,7 @@
 
 <div>			
 <span class="dropdown">
-  <button class="btn btn-default buttons-collection btn-default-dt-options dropdown-toggle" type="button" data-toggle="dropdown" style="width: 180px !important;"><span title="<?=$_SESSION['webmail']['mailer_email'];?>"><?=substr($_SESSION['webmail']['mailer_email'],0,18);?></span>
+  <button class="btn btn-default buttons-collection btn-default-dt-options dropdown-toggle" type="button" data-toggle="dropdown" style="width: 180px !important;"><span title="<?=$_SESSION['webmail']['mailer_email'] ?? '';?>"><?=substr($_SESSION['webmail']['mailer_email'] ?? '',0,18);?></span>
   <span class="caret"></span></button>
   <ul class="dropdown-menu">
 	<?php  foreach ($_SESSION['mailersdropdowns'] as $item) { ?>
@@ -51,7 +51,8 @@
 					<?php } ?>  
 					<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Deleted" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Deleted'){ echo 'folder-active';} ?>">Deleted</a>
-                    </li>
+                    </li><?php if(count($_SESSION['folderlist']) <= 3 ){?>
+					<li class="tw-p-1" style="display: flex;justify-content: right;"> <a href="<?php echo admin_url('webmail/getfolderlist'); ?>" class="text-danger _delete"><i class="fa-solid fa-folder-plus text-warning fa-2x" title="Fetch all folder"></i></a> </li><?php } ?>
                 </ul>
             </div>
             <div class="col-md-10">
@@ -112,7 +113,7 @@ $mailcss="";
 if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 ?>
 <tr class="table<?=$message['id'];?>">
-<td style="width:35px;"><div class="tw-rounded-full <?php echo $randomWord;?> tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-8 tw-w-8 -tw-mt-1 group-hover:!tw-bg-primary-700"><?=strtoupper(substr($message['from_email'],0,2));?></div></td>
+<td style="width:35px;"><div class="tw-rounded-full <?php echo $randomWord;?> tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-8 tw-w-8 -tw-mt-1 group-hover:!tw-bg-primary-700"><?=strtoupper(substr($message['from_email'] ?? '',0,2));?></div></td>
 <td style="width:50px;"><div>
 <?php if(isset($message['isfalg'])&&$message['isfalg']==1){ ?>
 <i class="fa-solid fa-fire-flame-simple tw-text-info-800 tw-cursor-pointer isflag" data-mid="<?=$message['id'];?>" data-fid="0" title="Click for normal"></i>
@@ -136,14 +137,14 @@ if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 </div>
 </td>
 
-	<td class="hrefmodal tw-cursor-pointer <?php echo $mailcss;?> isread<?=$message['id'];?>" data-mid="<?=$message['id'];?>" data-fid="0" data-tid="<?=$message['subject'];?>" data-id="msg<?=$cnt;?>" title="<?=$message['subject'];?>" mailto="<?=htmlspecialchars($message['from_email']);?>" mailtox="<?=htmlspecialchars($message['to_emails']);?>" mailcc="<?=htmlspecialchars($message['cc_emails']);?>" mailbcc="<?=htmlspecialchars($message['bcc_emails']);?>" messageid="<?=$message['messageid'];?>" data-date="<?=$message['date'];?>" data-folder="<?=$message['folder'];?>" data-body="<?=htmlspecialchars($message['body'], ENT_QUOTES, 'UTF-8');?>" data-attachments="<?=htmlspecialchars(isset($message['attachments']) ? $message['attachments'] : '', ENT_QUOTES, 'UTF-8');?>"><div class="w-36 h-36 bg-red-600 rounded-full"></div> <span> <b><?=$message['subject'];?></b><br>From : <?=htmlspecialchars($message['from_email']);?> To : <?=htmlspecialchars($message['to_emails']);?></span></td>
+	<td class="hrefmodal tw-cursor-pointer <?php echo $mailcss;?> isread<?=$message['id'];?>" data-mid="<?=$message['id'];?>" data-fid="0" data-tid="<?=$message['subject'];?>" data-id="msg<?=$cnt;?>" title="<?=$message['subject'];?>" mailto="<?=htmlspecialchars($message['from_email'] ?? '');?>" mailtox="<?=htmlspecialchars($message['to_emails'] ?? '');?>" mailcc="<?=htmlspecialchars($message['cc_emails'] ?? '');?>" mailbcc="<?=htmlspecialchars($message['bcc_emails'] ?? '');?>" messageid="<?=$message['messageid'];?>" data-date="<?=$message['date'];?>" data-folder="<?=$message['folder'];?>" data-body="<?=htmlspecialchars($message['body'] ?? '', ENT_QUOTES, 'UTF-8');?>" data-attachments="<?=htmlspecialchars(isset($message['attachments']) && $message['attachments'] !== null ? $message['attachments'] : '', ENT_QUOTES, 'UTF-8');?>"><div class="w-36 h-36 bg-red-600 rounded-full"></div> <span> <b><?=$message['subject'];?></b><br>From : <?=htmlspecialchars($message['from_email'] ?? '');?> To : <?=htmlspecialchars($message['to_emails'] ?? '');?></span></td>
 	<td class="w-25 text-end" style="min-width: 130px;"><span><?=$message['date'];?></span><?php if(!empty($_SESSION['webmail']['folder'])&&$_SESSION['webmail']['folder']=="Search"){ echo "<br><span  class='text-info'> ".$message['folder']."</span>"; } ?></td>
 </tr>
 <tr><td colspan="2" style="display:none;" id="msg<?=$cnt;?>">
 
 
 <?php
-echo '<iframe srcdoc="' . htmlspecialchars($message['body']) . '" style="width: 100%; min-height:50px; border: none;" onload="adjustIframeHeight(this)"></iframe>';
+echo '<iframe srcdoc="' . htmlspecialchars($message['body'] ?? '') . '" style="width: 100%; min-height:50px; border: none;" onload="adjustIframeHeight(this)"></iframe>';
 // Directory to save attachments
 
 ?>

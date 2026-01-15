@@ -1,7 +1,8 @@
 <?php
 
 //use app\services\imap\Imap;
-
+use app\services\imap\Imap;
+use app\services\imap\ConnectionErrorException;
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Webmail extends AdminController
@@ -263,5 +264,71 @@ class Webmail extends AdminController
 		}
 		
     }
+	
+	// function for get inbox mail list
+       public function getfolderlist()
+        {
+		if(isset($_SESSION['webmail'])&&$_SESSION['webmail']){
+		
+		//print_r($_SESSION['webmail']);
+		
+		app_check_imap_open_function();
+
+       
+        $mailer_imap_host = trim($_SESSION['webmail']['mailer_imap_host'] ?? '');
+        $mailer_imap_port = trim($_SESSION['webmail']['mailer_imap_port'] ?? '');
+        $mailer_email     = trim($_SESSION['webmail']['mailer_email'] ?? '');
+		$mailer_username  = trim($_SESSION['webmail']['mailer_username'] ?? '');
+        $mailer_password  = trim($_SESSION['webmail']['mailer_password'] ?? '');
+        $encryption       = trim($_SESSION['webmail']['encryption'] ?? '');
+		
+		 $imap = new Imap(
+           $mailer_username ? $mailer_username : $mailer_email,
+           $mailer_password,
+           $mailer_imap_host,
+           $encryption
+        );
+		
+		try {
+            $mailbox=$imap->getSelectableFolders();
+			
+			//print_r($mailbox);
+			
+			foreach ($mailbox as $box) {
+			
+			$folder=htmlspecialchars($box);
+     
+			
+		$this->db->where('email', $mailer_email);
+        $this->db->where('folder', $folder);
+        $result=$this->db->select('email')->from(db_prefix() . 'emails')->get()->row(); 
+		
+		if(isset($result)&&$result->email){
+		//echo "Duplicate - ".$result->email;
+		}else{
+		
+		$data['uniqid']=0;
+		$data['email']=$mailer_email;
+		$data['folder']=$folder;
+		$this->db->insert(db_prefix() . 'emails', $data);
+		//echo $this->db->last_query();
+		}
+		  
+	   }
+			
+		
+			
+        } catch (ConnectionErrorException $e) {
+           set_alert('warning', _l('problem_deleting', _l('Folder Setup Failed')));
+		   redirect(admin_url('webmail/inbox'));
+        }
+		set_alert('success', _l('added_successfully', _l('Folder Setup')));
+		redirect(admin_url('webmail/inbox'));
+		}else{
+		set_alert('warning', _l('problem_deleting', _l('Folder Setup Failed')));
+		redirect(admin_url('webmail/inbox'));
+		}
+		
+		}
 
 }

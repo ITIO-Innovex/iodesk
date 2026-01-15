@@ -69,6 +69,9 @@ class Webmail_setup extends AdminController
         if (isset($data['fakepasswordremembered'])) {
             unset($data['fakepasswordremembered']);
         }
+		if (isset($data['emailprovider'])) {
+            unset($data['emailprovider']);
+        }
         if (isset($data['source'])) {
             unset($data['source']);
 			$data['mailer_smtp_host']="smtppro.zoho.in";
@@ -111,7 +114,7 @@ class Webmail_setup extends AdminController
 				}
             }
         }
-        log_message('error', 'Controller data !! - ' . print_r($data, true));
+        //log_message('error', 'Controller data !! - ' . print_r($data, true));
         $this->webmail_setup_model->create($data);
         set_alert('success', _l('added_successfully', _l('Webmail Setup')));
         
@@ -138,6 +141,9 @@ class Webmail_setup extends AdminController
             }
             if (isset($data['fakepasswordremembered'])) {
                 unset($data['fakepasswordremembered']);
+            }
+			if (isset($data['emailprovider'])) {
+            unset($data['emailprovider']);
             }
 			
 			if (isset($data['source'])) {
@@ -256,6 +262,30 @@ class Webmail_setup extends AdminController
         redirect(admin_url('webmail_setup'));
     }
 	
+	//Increase Priority
+    public function prioritychange($id)
+    {
+        if (!$id) {
+            redirect(admin_url('webmail_setup'));
+        }
+        
+        
+        
+       
+            //log_message('error', 'USER ID - '.$id );
+            $response = $this->webmail_setup_model->priority($id);
+            if ($response == true) {
+                set_alert('success', _l('webmail setup priority updated', _l('webmail setup priority')));
+            } else {
+                set_alert('warning', _l('problem_updating', _l('webmail setup priority')));
+            }
+       
+        
+        redirect(admin_url('webmail_setup'));
+    }
+	
+
+	
 	
 	public function folders()
     {
@@ -277,6 +307,8 @@ class Webmail_setup extends AdminController
             ]);
         }
     }
+	
+	
 
     public function test_imap_connection()
     {
