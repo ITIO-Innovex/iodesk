@@ -1,6 +1,10 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
 <?php //print_r($webmaillist);?>
+<style>
+.form-group { margin-bottom: 0px !important;}
+.control-label { font-size: 12px !important;}
+</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -28,6 +32,7 @@
         <th class="toggleable">SMTP HOST</th>
         <th class="toggleable">IMAP HOST</th>
 		<th class="toggleable">Status</th>
+		<th class="toggleable">Priority</th>
 		<th class="">Created</th>
 		<?php /*?><th class="">Download Email</th><?php */?>
       </tr>
@@ -50,8 +55,7 @@
         <td style="text-align:left;"><?php echo e($entry['mailer_email']); ?><br />
 		<?php if(isset($entry['departmentid'])&& $entry['departmentid']<>0){ ?>
 Dep - <?php echo e($entry['departmentid']); ?>
-<?php } ?>
-</td>
+<?php } ?></td>
         <td><?php echo e($entry['mailer_username']); ?><br />
 <?php echo substr_replace(e($entry['mailer_password']),'*****',2,7); ?></td>
         
@@ -66,8 +70,20 @@ Dep - <?php echo e($entry['departmentid']); ?>
 				<?php }else{ ?>
 <a href="<?php echo admin_url('webmail_setup/statuson/' . $entry['id']); ?>" class="text-danger _delete" title="Activate">
 <i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
+				<?php } ?>				 </td>
+		<td style="text-align: center;">
+			<?php 
+			$currentPriority = isset($entry['priority']) ? (int)$entry['priority'] : 0;
+			?>
+			<?php if($entry['staffid'] == get_staff_user_id()){ ?>
+			<?php if(e($entry['priority'])==1){ ?>
+<a href="<?php echo admin_url('webmail_setup/prioritychange/' . $entry['id']); ?>" class="text-danger _delete" title="Deactive">
+<i class="fa-solid fa-toggle-on fa-xl text-success" style="margin-top:10px;"></i> </a>
+				<?php }else{ ?>
+<a href="<?php echo admin_url('webmail_setup/prioritychange/' . $entry['id']); ?>" class="text-danger _delete" title="Activate">
+<i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
 				<?php } ?>
-				 </td>
+				<?php } ?>		</td>
 		  <td><?php echo e($entry['creator_name']); ?> - <?php echo e(time_ago($entry['date_created'])); ?><br />
 <?php echo e(_dt($entry['date_created'])); ?></td>
 <?php /*?><td><a href="<?php echo base_url('cronjob/download_email_from_cron/' . $entry['id']);?>" target="_blank" title="Download / Update Email"><i class="fa-solid fa-cloud-arrow-down"></i></a></td><?php */?>
@@ -84,7 +100,7 @@ Dep - <?php echo e($entry['departmentid']); ?>
     </div>
 </div>
 <div class="modal fade" id="entryModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <?php echo form_open(admin_url('webmail_setup/webmail_setup_create/'), ['data-create-url' => admin_url('webmail_setup/webmail_setup_create/'), 'data-update-url' => admin_url('webmail_setup/webmail_setup_update')]); ?>
         <div class="modal-content">
             <div class="modal-header">
@@ -98,10 +114,18 @@ Dep - <?php echo e($entry['departmentid']); ?>
                 <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1" />
                  
 <div class="table-responsive">
-<span class="text-danger">All fields is required</span>
+
   <table class="table table-bordered roles no-margin">
     <tbody>
-	
+	<tr data-name="bulk_pdf_exporter">
+        <td><span class="text-danger">All fields is required</span></td>
+        <td><select name="emailprovider" id="emailprovider" class="form-control" onchange="emailProviderChanged(this.value)">
+<option value="">Select Email Provider</option>
+<option value="1">Zoho Mail</option>
+<option value="2">GMail</option>
+<option value="3">Webmail</option>
+</select></td>
+      </tr>
       <tr data-name="bulk_pdf_exporter">
         <td><?php echo render_input('mailer_name', 'Name','', 'text', ['required' => 'true']); ?></td>
         <td><?php echo render_input('mailer_email', 'Email','', 'text', ['required' => 'true']); ?></td>
@@ -109,7 +133,7 @@ Dep - <?php echo e($entry['departmentid']); ?>
 	  
 	  <tr data-name="bulk_pdf_exporter">
         <td><?php echo render_input('mailer_username', 'Username','', 'text', ['required' => 'true']); ?></td>
-        <td><?php echo render_input('mailer_password', 'Password', '', 'password', ['required' => 'true']); ?></td>
+        <td><?php echo render_input('mailer_password', 'Password <span id="AppPass"></span>', '', 'password', ['required' => 'true']); ?></td>
       </tr>
 	  
 	  <tr data-name="bulk_pdf_exporter">
@@ -149,15 +173,15 @@ Dep - <?php echo e($entry['departmentid']); ?>
                             <select name="folder" class="form-control selectpicker" id="folder"></select>
                         </div></td>
       </tr>
-	  
-	  <tr data-name="bulk_pdf_exporter"><?php if (is_admin()) {?>
+<?php if (is_admin()) {?>	  
+	  <tr data-name="bulk_pdf_exporter">
         <td><label for="departmentid" class="control-label">Assign Department</label>
 <select name="departmentid" id="departmentid" class="form-control">
 <option value="">Select Department</option>
 <?php  foreach ($departmentlist as $item) { ?>
 <option value="<?=$item['departmentid'];?>"><?=$item['name'];?></option>
 <?php  } ?>
-</select></td><?php } ?>
+</select></td>
 <td>
     <?php /*?><label for="assignto" class="control-label">Assign To Staff</label><?php */?>
     <?php
@@ -166,7 +190,9 @@ Dep - <?php echo e($entry['departmentid']); ?>
     echo render_select('assignto[]', $staff_members, ['staffid', ['firstname', 'lastname']], 'Assign To Staff', $selected_staff, ['multiple' => true, 'data-actions-box' => true, 'data-live-search' => true], [], '', '', false);
     ?>
 </td>
-</tr><tr data-name="bulk_pdf_exporter"><td><br /></label><button onclick="test_dep_imap_connection(); return false;" class="btn btn-success">Test IMAP Connection</button></td></tr>
+</tr>
+<?php } ?>
+<tr data-name="bulk_pdf_exporter"><td><button onclick="test_dep_imap_connection(); return false;" class="btn btn-success">Test IMAP Connection</button></td></tr>
 </tbody>
 </table>
 </div>   
@@ -286,6 +312,43 @@ $(document).ready(function(){
 });
 </script>
 
+<script>
+function emailProviderChanged(value) {
+  if (value === "") return;
+
+  const mailer_smtp_host = document.getElementById("mailer_smtp_host");
+  const mailer_smtp_port = document.getElementById("mailer_smtp_port");
+  const mailer_imap_host = document.getElementById("mailer_imap_host");
+  const mailer_imap_port = document.getElementById("mailer_imap_port");
+
+  
+  if (value == 1) {
+    //alert("Zoho Mail selected");
+	mailer_smtp_host.value = "smtppro.zoho.in";
+	mailer_smtp_port.value = "465";
+	mailer_imap_host.value = "imappro.zoho.in";
+	mailer_imap_port.value = "993";
+	
+	document.getElementById("ssl").checked = true;
+	document.getElementById("AppPass").innerText = " (Zoho Mail)";
+  } else if (value == 2) {
+    mailer_smtp_host.value = "smtp.gmail.com";
+	mailer_smtp_port.value = "465";
+	mailer_imap_host.value = "imap.gmail.com";
+	mailer_imap_port.value = "993";
+	document.getElementById("ssl").checked = true;
+	document.getElementById("AppPass").innerText = " (App Password)";
+  } else if (value == 3) {
+    //alert("Webmail selected");
+	mailer_smtp_host.value = "";
+	mailer_smtp_port.value = "";
+	mailer_imap_host.value = "";
+	mailer_imap_port.value = "";
+	document.getElementById("ssl").checked = true;
+	document.getElementById("AppPass").innerText = "";
+  }
+}
+</script>
 </body>
 
 </html>
