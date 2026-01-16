@@ -58,9 +58,115 @@ class Webmail_setup extends AdminController
 	//Add Webmail Setup 
     public function webmail_setup_create()
     {
-	
+
         $data = $this->input->post();
-		//log_message('error', 'Display data - ' . print_r($data, true));
+        
+        // Validate required fields before processing
+        $validation_errors = [];
+        
+        if (empty($data['mailer_email'])) {
+            $validation_errors[] = 'Email is required';
+        } elseif (!filter_var($data['mailer_email'], FILTER_VALIDATE_EMAIL)) {
+            $validation_errors[] = 'Please enter a valid email address';
+        }
+        
+        if (empty($data['mailer_password'])) {
+            $validation_errors[] = 'Password is required';
+        } elseif (strlen(trim($data['mailer_password'])) < 1) {
+            $validation_errors[] = 'Password cannot be empty or contain only spaces';
+        }
+        
+        // If validation errors exist, return JSON response for AJAX requests
+        if (!empty($validation_errors)) {
+            if ($this->input->is_ajax_request()) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => implode(', ', $validation_errors),
+                    'errors' => $validation_errors
+                ]);
+                exit;
+            } else {
+                set_alert('danger', implode(', ', $validation_errors));
+                redirect(admin_url('webmail_setup'));
+            }
+        }
+		
+		log_message('error', 'Display mailer_email - '.$data['mailer_email'] );
+		log_message('error', 'Display mailer_password - '.$data['mailer_password'] );
+		         
+        
+        // Test SMTP connection before saving
+        if (isset($data['source']) && $data['source'] == 'staff') {
+		
+		
+            $smtp_host = "smtppro.zoho.in";
+            $smtp_port = "465";
+            $imap_host = "imappro.zoho.in";
+            $imap_port = "993";
+            $encryption = "ssl";
+            //$data['mailer_email']="mrityunjoyk@itio.in";
+			//$data['mailer_password']="Mkumar@25467vkg";
+            
+            // Test IMAP connection
+            try {
+                app_check_imap_open_function();
+                
+                // Log connection attempt for debugging
+                log_message('error', 'IMAP Connection Attempt - Email: ' . $data['mailer_email'] . ', Host: ' . $imap_host . ', Port: ' . $imap_port . ', Encryption: ' . $encryption);
+                
+                $imap = new Imap(
+                    $data['mailer_email'],
+                    $data['mailer_password'],
+                    $imap_host,
+                    $encryption
+                );
+                
+                $connection = $imap->testConnection();
+                $connection->getMailbox('INBOX');
+                
+                log_message('error', 'IMAP Connection Successful for: ' . $data['mailer_email']);
+                
+            } catch (ConnectionErrorException $e) {
+                log_message('error', 'IMAP ConnectionErrorException: ' . $e->getMessage() . ' for email: ' . $data['mailer_email']);
+                
+                if ($this->input->is_ajax_request()) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'IMAP authentication failed. Please check your email and password. Error: ' . $e->getMessage()
+                    ]);
+                    exit;
+                } else {
+                    set_alert('danger', 'IMAP authentication failed. Please check your email and password. Error: ' . $e->getMessage());
+                    redirect(admin_url('webmail_setup'));
+                }
+            } catch (MailboxDoesNotExistException $e) {
+                log_message('error', 'IMAP MailboxDoesNotExistException: ' . $e->getMessage() . ' for email: ' . $data['mailer_email']);
+                
+                if ($this->input->is_ajax_request()) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Mailbox not found: ' . $e->getMessage()
+                    ]);
+                    exit;
+                } else {
+                    set_alert('danger', 'Mailbox not found: ' . $e->getMessage());
+                    redirect(admin_url('webmail_setup'));
+                }
+            } catch (Exception $e) {
+                log_message('error', 'IMAP General Exception: ' . $e->getMessage() . ' for email: ' . $data['mailer_email']);
+                
+                if ($this->input->is_ajax_request()) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Connection test failed: ' . $e->getMessage()
+                    ]);
+                    exit;
+                } else {
+                    set_alert('danger', 'Connection test failed: ' . $e->getMessage());
+                    redirect(admin_url('webmail_setup'));
+                }
+            }
+        }
 		
 		if (isset($data['fakeusernameremembered'])) {
             unset($data['fakeusernameremembered']);
