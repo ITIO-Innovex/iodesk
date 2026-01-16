@@ -104,8 +104,7 @@ class Webmail_setup extends AdminController
             $imap_host = "imappro.zoho.in";
             $imap_port = "993";
             $encryption = "ssl";
-            //$data['mailer_email']="mrityunjoyk@itio.in";
-			//$data['mailer_password']="Mkumar@25467vkg";
+            
             
             // Test IMAP connection
             try {
