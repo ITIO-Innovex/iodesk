@@ -101,6 +101,12 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
         $data = hooks()->apply_filters('before_dashboard_render', $data);
         $this->load->view('admin/dashboard/dashboard', $data);
     }
+	
+	public function eindia() 
+    {
+	$data['title'] = "Eindia";
+	$this->load->view('admin/dashboard/eindia', $data);
+	}
 
     // Chart weekly payments statistics on home page / ajax
     public function weekly_payments_statistics($currency)

@@ -101,6 +101,7 @@ if (file_exists(APPPATH . 'config/my_email.php')) {
 }
 }
 $_SESSION['smtp_fetch_type']=$smtp_fetch_type;
+$_SESSION['smtp_fetch_detailsV']=$config['smtp_user']." <> ".$config['smtp_host']." <> ".$config['smtp_port']." <> ".$config['smtp_crypto'];
 //print_r($_SESSION);
 //print_r($config);
 //echo "============>";exit;

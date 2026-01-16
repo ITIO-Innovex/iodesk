@@ -126,15 +126,17 @@
                     <?php echo render_input('mailer_email', '', '', 'text', ['required' => 'true', 'id' => 'mailer_email']); ?>
                 </div>
                 
+                <div class="loaderssmtp"></div>
+                
                 <div class="form-group">
                     <label for="mailer_password" class="control-label">Password (Zoho Email)</label>
-                    <?php echo render_input('mailer_password', '', '', 'text', ['required' => 'true', 'id' => 'mailer_password']); ?>
+                    <?php echo render_input('mailer_password', '', '', 'password', ['required' => 'true', 'id' => 'mailer_password']); ?>
                 </div>
                            
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+               <!-- <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>-->
+                <button type="submit" class="btn btn-primary loaderssmtp"><?php echo _l('submit'); ?></button>
             </div>
         </div>
         <!-- /.modal-content -->
@@ -260,17 +262,56 @@ $(function() {
     // Handle form submission
     $('#webmail-setup-form').on('submit', function(e) {
         e.preventDefault();
+		
+		  
+        // Additional client-side validation for password
+        var password = $('#mailer_password').val().trim();
+        if (!password) {
+            alert_float('warning', 'Password is required');
+            $('#mailer_password').focus();
+            return false;
+        }
+        
+        // Check if password contains only whitespace
+        if (password.length === 0 || /^\s*$/.test(password)) {
+            alert_float('warning', 'Password cannot be empty or contain only spaces');
+            $('#mailer_password').focus();
+            return false;
+        }
+        
+		$(".loaderssmtp").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
         var formData = $(this).serialize();
         var url = $(this).attr('action');
         
         $.post(url, formData).done(function(response) {
-            alert_float('success', 'Webmail setup saved successfully');
-            $('#webmailSetupModal').modal('hide');
-            // Reload the table
-            if ($.fn.DataTable.isDataTable('.table-staff')) {
-                $('.table-staff').DataTable().ajax.reload(null, false);
-            } else {
-                window.location.reload();
+            try {
+                var result = typeof response === 'string' ? JSON.parse(response) : response;
+                
+                if (result.success === false) {
+				$(".loaderssmtp").html('<?php echo _l('submit'); ?>');
+				alert("Wrong Password - please check your password");
+                    // Show validation error message
+                    alert_float('danger', result.message || 'Failed to save webmail setup');
+                } else {
+                    // Success case
+                    alert_float('success', 'Webmail setup saved successfully');
+                    $('#webmailSetupModal').modal('hide');
+                    // Reload the table
+                    if ($.fn.DataTable.isDataTable('.table-staff')) {
+                        $('.table-staff').DataTable().ajax.reload(null, false);
+                    } else {
+                        window.location.reload();
+                    }
+                }
+            } catch(e) {
+                // If response is not JSON, assume success (backward compatibility)
+                alert_float('success', 'Webmail setup saved successfully');
+                $('#webmailSetupModal').modal('hide');
+                if ($.fn.DataTable.isDataTable('.table-staff')) {
+                    $('.table-staff').DataTable().ajax.reload(null, false);
+                } else {
+                    window.location.reload();
+                }
             }
         }).fail(function(xhr) {
             var message = 'Failed to save webmail setup';

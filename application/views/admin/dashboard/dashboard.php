@@ -34,8 +34,8 @@ $out_time = $attendance[0]['out_time'] ?? '';
 	             
 	<div class="top_stats_wrapper modal-content"> 
 				 			                				
-	<div class="row ">     
-	                
+	<div class="row ">  
+	              
 	<div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6">                         
 	<i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i>                         
 	<span class="tw-truncate tw-text-sm">Name : <?php echo e(get_staff_full_name()); ?></span>                     
@@ -143,13 +143,77 @@ $out_time = $attendance[0]['out_time'] ?? '';
         </div>
     </div>
 </div>
+
+<!-- Webmail Setup Modal -->
+<div class="modal fade" id="webmailSetupModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <?php echo form_open(admin_url('webmail_setup/webmail_setup_create/'), ['data-create-url' => admin_url('webmail_setup/webmail_setup_create/'), 'data-update-url' => admin_url('webmail_setup/webmail_setup_update'), 'id' => 'webmail-setup-form']); ?>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><?php echo 'Webmail Setup'; ?> <span id="staff-info-header" class="text-muted"></span></h4>
+            </div>
+            <div class="modal-body">
+                <!-- fake fields are a workaround for chrome autofill getting the wrong fields -->
+                <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value='' tabindex="-1" />
+                <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1" />
+                <input type="hidden" name="staffid" id="webmail_staffid" value="" />
+				<input type="hidden" name="source" value="staff" />
+				<input type="hidden" name="mailer_name" id="mailer_name" value="" />
+				<input type="hidden" name="mailer_email" id="mailer_email" value="" />
+                 
+                <div class="form-group">
+                <div class="text-center">
+        <img src="https://static.zohocdn.com/iam/v2/components/images/newZoho_logo.5f6895fcb293501287eccaf0007b39a5.svg" class="" alt="ZOHO"></div>    
+                </div>
+                
+                <div class="loaderssmtp"></div>
+                
+              
+                
+                <div class="form-group">
+                    <label for="mailer_password" class="control-label">Password (Zoho Email)</label>
+                    <?php echo render_input('mailer_password', '', '', 'password', ['required' => 'true', 'id' => 'mailer_password']); ?>
+                </div>
+                           
+            </div>
+            <div class="modal-footer">
+               <!-- <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>-->
+                <button type="submit" class="btn btn-primary loaderssmtp"><?php echo _l('submit'); ?></button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+        <?php echo form_close(); ?>
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- End Webmail Setup Modal -->
 <script>
 app.calendarIDs = '<?php echo json_encode($google_ids_calendars); ?>';
 </script>
 <?php init_tail(); ?>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>
 <?php //$this->load->view('admin/dashboard/google_js'); ?>
+<?php if($_SESSION['smtp_fetch_type']=="CompanySMTP"){ 
+$staffId    = $GLOBALS['current_user']->staffid ?? '';
+$staffEmail = $GLOBALS['current_user']->email ?? '';
 
+if(isset($staffId)&&$staffId&&isset($staffEmail)&&$staffEmail){
+?>
+<script>
+  $(function () {
+    openWebmailSetup(
+      <?= (int)$staffId ?>,
+      <?= json_encode($staffEmail) ?>
+    );
+  });
+</script>
+<?php
+ }
+
+ }
+ ?>
 
 </body>
 <script>
@@ -161,6 +225,150 @@ document.getElementById('yearSelect').addEventListener('change', function () {
     const selectedYear = this.value;
     // Redirect to the same page with new year parameter
     window.location.href = '?year=' + selectedYear;
+});
+</script>
+<script>
+function openWebmailSetup(staffId, staffEmail) {
+    $('#webmailSetupModal').modal('show');
+    $('#webmail_staffid').val(staffId);
+    
+    // If email is passed from table, pre-fill it immediately
+    if (staffEmail) {
+        $('#webmailSetupModal #mailer_email').val(staffEmail);
+    }
+    
+    // Get staff information via AJAX (for full name and to confirm email)
+    $.get(admin_url + 'staff/getStaffInfo/' + staffId, function(staffInfo) {
+        if (staffInfo && staffInfo.email) {
+            // Display staff information in modal header
+            var staffName = staffInfo.firstname + ' ' + staffInfo.lastname;
+            $('#staff-info-header').html(' - <small>' + staffName + ' (' + staffInfo.email + ')</small>');
+            
+            // Pre-populate email field with staff email
+            $('#webmailSetupModal #mailer_email').val(staffInfo.email);
+            // Pre-populate name field with staff full name
+            $('#webmailSetupModal #mailer_name').val(staffName);
+        }
+        
+        // Check if webmail setup already exists for this staff
+        $.get(admin_url + 'staff/getStaffWebmail/' + staffEmail, function(response) {
+            if (response && response.id) {
+                // Edit mode - populate form with existing data
+                var $form = $('#webmail-setup-form');
+                $form.attr('action', $form.data('update-url') + '/' + response.id);
+                $form.find('#mailer_name').val(response.mailer_name || '');
+                $form.find('#mailer_email').val(response.mailer_email || '');
+                // Populate password field with existing password
+                $form.find('#mailer_password').val(response.mailer_password || '');
+            } else {
+                // Create mode - form already populated with staff info above
+                var $form = $('#webmail-setup-form');
+                $form.attr('action', $form.data('create-url'));
+            }
+        }, 'json').fail(function() {
+            // If no existing setup, form is already set for create mode
+            var $form = $('#webmail-setup-form');
+            $form.attr('action', $form.data('create-url'));
+        });
+    }, 'json').fail(function() {
+        // If staff info fetch fails, just show modal
+        $('#staff-info-header').html('');
+    });
+}
+// Webmail Setup Modal handlers
+var $webmailModal = $('#webmailSetupModal');
+$(function() {
+    appValidateForm($webmailModal.find('form'), {
+        mailer_name: 'required',
+        mailer_email: 'required',
+        mailer_password: 'required',
+    });
+    
+    setTimeout(function() {
+        $($webmailModal.find('form')).trigger('reinitialize.areYouSure');
+    }, 1000);
+    
+    $webmailModal.on('hidden.bs.modal', function() {
+        var $form = $webmailModal.find('form');
+        $form.attr('action', $form.data('create-url'));
+        $form[0].reset();
+        $('#staff-info-header').html(''); // Clear staff info header
+    });
+    
+    // Handle form submission
+    $('#webmail-setup-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Additional client-side validation for password
+        var password = $('#mailer_password').val().trim();
+        if (!password) {
+            alert_float('warning', 'Password is required');
+            $('#mailer_password').focus();
+            return false;
+        }
+        
+        // Check if password contains only whitespace
+        if (password.length === 0 || /^\s*$/.test(password)) {
+            alert_float('warning', 'Password cannot be empty or contain only spaces');
+            $('#mailer_password').focus();
+            return false;
+        }
+        $(".loaderssmtp").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+        var formData = $(this).serialize();
+        var url = $(this).attr('action');
+        
+        $.post(url, formData).done(function(response) {
+            try {
+                var result = typeof response === 'string' ? JSON.parse(response) : response;
+                
+                if (result.success === false) { 
+				$(".loaderssmtp").html('<?php echo _l('submit'); ?>');
+				alert("Wrong Password - please check your password");
+                    // Show validation error message
+                    alert_float('danger', result.message || 'Failed to save webmail setup');
+                } else {
+                    // Success case
+                    alert_float('success', 'Webmail setup saved successfully');
+                    $('#webmailSetupModal').modal('hide');
+                    // Reload the table
+                    if ($.fn.DataTable.isDataTable('.table-staff')) {
+                        $('.table-staff').DataTable().ajax.reload(null, false);
+                    } else {
+                        window.location.reload();
+                    }
+                }
+            } catch(e) {
+                // If response is not JSON, assume success (backward compatibility)
+                alert_float('success', 'Webmail setup saved successfully');
+                $('#webmailSetupModal').modal('hide');
+                if ($.fn.DataTable.isDataTable('.table-staff')) {
+                    $('.table-staff').DataTable().ajax.reload(null, false);
+                } else {
+                    window.location.reload();
+                }
+            }
+        }).fail(function(xhr) { 
+            var message = 'Failed to save webmail setup';
+            if (xhr.responseText) {
+                try {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        message = response.message;
+                    }
+                } catch(e) {
+                    // Not JSON, use default message
+                }
+            }
+			
+            alert_float('danger', message);
+        });
+    });
+});
+
+$(document).ready(function(){
+    $("#webmailSetupModal #mailer_email").on("keyup", function(){
+        // In future, you can add additional reactive behaviors here if needed
+    });
 });
 </script>
 </html>

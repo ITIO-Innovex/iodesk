@@ -53,9 +53,10 @@
             <a href="#" onclick="edit_mailer_entry(<?php echo e($entry['id']); ?>); return false;" class="text-muted">Edit</a> | <a href="<?php echo admin_url('webmail_setup/delete/' . $entry['id']); ?>"
                 class="text-danger _delete">Delete </a><?php } ?></div></td>
         <td style="text-align:left;"><?php echo e($entry['mailer_email']); ?><br />
-		<?php if(isset($entry['departmentid'])&& $entry['departmentid']<>0){ ?>
-Dep - <?php echo e($entry['departmentid']); ?>
-<?php } ?></td>
+<?php if(isset($entry['departmentid'])&& $entry['departmentid']<>0){ ?>Dep - <?php echo e($entry['departmentid']); ?><?php } ?>
+
+
+</td>
         <td><?php echo e($entry['mailer_username']); ?><br />
 <?php echo substr_replace(e($entry['mailer_password']),'*****',2,7); ?></td>
         
@@ -70,7 +71,7 @@ Dep - <?php echo e($entry['departmentid']); ?>
 				<?php }else{ ?>
 <a href="<?php echo admin_url('webmail_setup/statuson/' . $entry['id']); ?>" class="text-danger _delete" title="Activate">
 <i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
-				<?php } ?>				 </td>
+				<?php } ?><?php if(e($entry['priority'])==1){ ?><i class="fa-solid fa-circle-check text-warning" title="Default / Primary"></i><?php } ?>				 </td>
 		<td style="text-align: center;">
 			<?php 
 			$currentPriority = isset($entry['priority']) ? (int)$entry['priority'] : 0;
