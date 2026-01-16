@@ -3067,12 +3067,13 @@ class Hrd extends AdminController
             $this->db->where('id', $id);
             $this->db->update('it_crm_hrd_interviews_master', $data);
             set_alert('success', 'Interview updated successfully');
-            exit;
+            echo json_encode(['success' => true, 'message' => 'Interview updated successfully']);
         } else {
             $this->db->insert('it_crm_hrd_interviews_master', $data);
             set_alert('success', 'Interview added successfully');
-            exit;
+            echo json_encode(['success' => true, 'message' => 'Interview added successfully']);
         }
+        exit;
         redirect(admin_url('hrd/interviews'));
     }
     // Add/Edit Holiday List

@@ -1,9 +1,8 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-//$this->load->model('staff_model');
+
 $company_id=$_SESSION['staff_company_id'];
 
-//Fetch company Name from company id
 if(isset($company_id)&&$company_id){
 		
 		$CI = & get_instance();
@@ -26,17 +25,11 @@ if(isset($settings['smtp_encryption'])&&$settings['smtp_encryption']&&isset($set
 			} else {
 			$config['smtp_user'] = trim($settings['smtp_username']);
 			}
+			$config['smtp_email'] = trim($settings['smtp_email']);
 			$config['smtp_pass']    = trim($settings['smtp_password']);
 			$config['smtp_port']    = trim($settings['smtp_port']);
 			$config['smtp_crypto']  = trim($settings['smtp_encryption']);
-			
 			$_SESSION['staff_fromemai']=$settings['smtp_email'];
-			$_SESSION['staff_company']=get_staff_company_name($company_id);
-			
+			$smtp_fetch_type="CompanySMTP";
 		}
-		
 }
-
-
-//print_r($config);
-//echo "============>";exit;
