@@ -266,7 +266,23 @@
   $('#d-process').text(process_name);
   
   $('#d-comments').text(it.comments||''); $('#interviews_details').modal('show'); }
-  function manage_interview(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
+  function manage_interview(form){ 
+    var data=$(form).serialize();
+    $.post(form.action, data).done(function(response){
+      try {
+        var result = JSON.parse(response);
+        if (result.success) {
+          $('#interviews_modal').modal('hide');
+          window.location.reload();
+        }
+      } catch(e) {
+        window.location.reload();
+      }
+    }).fail(function() {
+      alert('Error occurred while saving interview');
+    });
+    return false; 
+  }
 </script>
 <?php init_tail(); ?>
 <script>

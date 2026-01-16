@@ -35,6 +35,7 @@ if (get_option('smtp_username') == '') {
 } else {
     $config['smtp_user'] = trim(get_option('smtp_username'));
 }
+$config['smtp_email']    = trim($config['smtp_user']); // Added New By Vikash 16012026
 
 $config['smtp_pass']    = get_instance()->encryption->decrypt(get_option('smtp_password'));
 $config['smtp_port']    = trim(get_option('smtp_port'));
@@ -77,9 +78,29 @@ $config['dkim_private_string'] = '';                    // DKIM private key, set
 $config['dkim_selector']       = '';                       // DKIM selector.
 $config['dkim_passphrase']     = '';                       // DKIM passphrase, used if your key is encrypted.
 $config['dkim_identity']       = '';                       // DKIM Identity, usually the email address used as the source of the email.
+$smtp_fetch_type="SuperSMTP";
+$smtp_fetch_type_status=2;
 
-if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']&&$_SESSION['staff_company_id']<>1){
+if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']){
+$_SESSION['staff_company']=get_staff_company_name($_SESSION['staff_company_id']);
+}
+
+
+
+if(isset($_SESSION['staff_user_id'])&&$_SESSION['staff_user_id']){
+    $user_smtp_userid=$_SESSION['staff_user_id'];
+	if (file_exists(APPPATH . 'config/staff_smtp_details.php')) {
+		include_once(APPPATH . 'config/staff_smtp_details.php');
+	}
+}
+
+// If Staff SMTP Not Available than  set $smtp_fetch_type_status==1 and get default company SMTP Details
+if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']&&$_SESSION['staff_company_id']<>1&&$smtp_fetch_type_status==1){
 if (file_exists(APPPATH . 'config/my_email.php')) {
     include_once(APPPATH . 'config/my_email.php');
 }
 }
+$_SESSION['smtp_fetch_type']=$smtp_fetch_type;
+//print_r($_SESSION);
+//print_r($config);
+//echo "============>";exit;

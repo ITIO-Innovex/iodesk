@@ -917,7 +917,7 @@ function csrf_jquery_ajax_setup() {
 
     $(document).ajaxError(function(event, request, settings) {
         if (request.status === 419) {
-            alert_float('warning', 'Page expired, refresh the page make an action.')
+            alert_float('warning', 'action.')
         }
     });
 }
