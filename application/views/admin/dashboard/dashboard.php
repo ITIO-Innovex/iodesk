@@ -176,6 +176,44 @@ $out_time = $attendance[0]['out_time'] ?? '';
                     <label for="mailer_password" class="control-label">Password (Zoho Email)</label>
                     <?php echo render_input('mailer_password', '', '', 'password', ['required' => 'true', 'id' => 'mailer_password']); ?>
                 </div>
+				
+<div class="form-group">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Please enable <b>IMAP</b> before submitting your password.
+</div>
+
+<h4>How to Enable IMAP in Zoho Mail</h4>
+
+<ol>
+    <li class="tw-my-2">
+        <b>Step 1: Login to Zoho Mail</b>
+        <ul>
+            <li>Open <a href="https://mail.zoho.in" target="_blank">https://mail.zoho.in</a></li>
+            <li>Login using your Zoho email ID and password</li>
+        </ul>
+    </li>
+
+    <li class="tw-my-2">
+        <b>Step 2: Open Mail Settings</b>
+        <ul>
+            <li>Click the <i class="fa-solid fa-gear"></i> <b>Settings</b> (top-right corner)</li>
+            <li>Go to <b>Mail Accounts</b></li>
+            <li>Select your email account</li>
+        </ul>
+    </li>
+
+        <li class="tw-my-2">
+        <b>Step 3: Checked Below </b>
+        <ul>
+            <li>Chacked on <b><i class="fa-solid fa-circle-check text-primary"></i> Pop Access</b></li>
+            <li>Chacked on <b><i class="fa-solid fa-circle-check text-primary"></i> IMAP Access</b></li>
+            <li>Chacked on <b><i class="fa-solid fa-circle-check text-primary"></i> SMTP Save copy of send email</b></li>
+            <li>Click <b>Save</b></li>
+        </ul>
+        
+    </li>
+</ol>
+				</div>
                            
             </div>
             <div class="modal-footer">
