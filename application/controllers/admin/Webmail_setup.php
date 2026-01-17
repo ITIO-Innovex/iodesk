@@ -75,7 +75,9 @@ class Webmail_setup extends AdminController
         } elseif (strlen(trim($data['mailer_password'])) < 1) {
             $validation_errors[] = 'Password cannot be empty or contain only spaces';
         }
-        
+        $data['mailer_name']=trim($data['mailer_name']);
+		$data['mailer_password']=trim($data['mailer_password']);
+		$data['mailer_email']=trim($data['mailer_email']);
         // If validation errors exist, return JSON response for AJAX requests
         if (!empty($validation_errors)) {
             if ($this->input->is_ajax_request()) {
@@ -90,7 +92,7 @@ class Webmail_setup extends AdminController
                 redirect(admin_url('webmail_setup'));
             }
         }
-		
+		log_message('error', 'Display mailer_name - '.$data['mailer_name'] );
 		log_message('error', 'Display mailer_email - '.$data['mailer_email'] );
 		log_message('error', 'Display mailer_password - '.$data['mailer_password'] );
 		         
