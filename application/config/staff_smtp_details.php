@@ -3,11 +3,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 		
 		$CI = & get_instance();
 		$CI->db->where('staffid', $user_smtp_userid);
-		//$CI->db->like('mailer_email', '@itio.in', 'after'); // email ends with @itio.in
+		$CI->db->like('mailer_email', '@itio.in'); // email ends with @itio.in
 		$CI->db->order_by('priority', 'DESC');
 		$CI->db->limit(1);
 		$settings = $CI->db->select('*')->from(db_prefix() . 'webmail_setup')->get()->result_array();
-		
+		//echo $this->db->last_query();exit;
 		if (!empty($settings)) {
 		$settings=$settings[0];
 		//print_r($settings);exit;
