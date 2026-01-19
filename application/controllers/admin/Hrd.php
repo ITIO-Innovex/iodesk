@@ -1,4 +1,9 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer; // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\Exception;  // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\SMTP;
+header('Content-Type: text/html; charset=utf-8');
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Hrd extends AdminController
@@ -5475,4 +5480,167 @@ class Hrd extends AdminController
         $data = ['title' => 'Latest Awards Gallery', 'images' => $images];
         $this->load->view('admin/hrd/awards_gallery_latest', $data);
     }
+
+    public function get_interview_locations()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode([]);
+            exit;
+        }
+
+        // Get interview locations from branch manager table
+        $this->db->select('branch_address');
+        $this->db->from('it_crm_hrd_branch_manager');
+        $this->db->where('company_id', get_staff_company_id());
+        $this->db->where('status', 1); // Only active locations
+        $this->db->order_by('branch_address', 'asc');
+        $locations = $this->db->get()->result_array();
+
+        echo json_encode($locations);
+    }
+
+    public function save_interview_schedule()
+    {
+        //log_message('error', 'save_interview_schedule method called');
+        
+        if (!staff_can('view_setting',  'hr_department')) {
+            log_message('error', 'Access denied for save_interview_schedule');
+            if ($this->input->is_ajax_request()) {
+                echo json_encode(['success' => false, 'message' => 'Access denied']);
+                exit;
+            } else {
+                access_denied('Interview Schedule');
+            }
+        }
+
+        //log_message('error', 'POST data received: ' . print_r($this->input->post(), true));
+
+        // Get form data
+        $data = [
+            'interviewer_id' => $this->input->post('interviewer_id'),
+            'interviewer_name' => $this->input->post('interviewer_name'),
+            'interviewer_email' => $this->input->post('interviewer_email'),
+            'interviewer_designation' => $this->input->post('interviewer_designation'),
+            'interview_mode' => $this->input->post('interview_mode'),
+            'interview_date_time' => $this->input->post('interview_date_time'),
+            'interview_location' => $this->input->post('interview_location'),
+            'interview_virtual_meeting_link' => $this->input->post('interview_virtual_meeting_link'),
+            'sender_id' => get_staff_user_id()
+        ];
+        
+        //log_message('error', 'Processed data: ' . print_r($data, true));
+        
+        // Validate required fields
+        $validation_errors = [];
+        
+        if (empty($data['interviewer_name'])) {
+            $validation_errors[] = 'Interviewer name is required';
+        }
+        
+        if (empty($data['interviewer_email'])) {
+            $validation_errors[] = 'Interviewer email is required';
+        } elseif (!filter_var($data['interviewer_email'], FILTER_VALIDATE_EMAIL)) {
+            $validation_errors[] = 'Invalid interviewer email format';
+        }
+        
+        if (empty($data['interviewer_designation'])) {
+            $validation_errors[] = 'Interviewer designation is required';
+        }
+        
+        if (empty($data['interview_mode'])) {
+            $validation_errors[] = 'Interview mode is required';
+        }
+        
+        if (empty($data['interview_date_time'])) {
+            $validation_errors[] = 'Interview date and time is required';
+        }
+        
+        // Mode-specific validation
+        if ($data['interview_mode'] === 'Virtual' && empty($data['interview_virtual_meeting_link'])) {
+            $validation_errors[] = 'Virtual meeting link is required for virtual interviews';
+        }
+        
+        if ($data['interview_mode'] !== 'Virtual' && $data['interview_mode'] !== 'Telephonic' && empty($data['interview_location'])) {
+            $validation_errors[] = 'Interview location is required for non-virtual interviews';
+        }
+
+        // If validation errors exist, return JSON response
+        if (!empty($validation_errors)) {
+            log_message('error', 'Validation errors: ' . implode(', ', $validation_errors));
+            if ($this->input->is_ajax_request()) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => implode(', ', $validation_errors),
+                    'errors' => $validation_errors
+                ]);
+                exit;
+            } else {
+                set_alert('danger', implode(', ', $validation_errors));
+                redirect(admin_url('hrd/interviews'));
+            }
+        }
+
+        // Verify interview exists and belongs to company
+        $this->db->where('id', $data['interviewer_id']);
+        $this->db->where('company_id', get_staff_company_id());
+        $interview = $this->db->get('it_crm_hrd_interviews_master')->row();
+
+        if (!$interview) {
+            log_message('error', 'Interview not found: ' . $data['interview_id']);
+            if ($this->input->is_ajax_request()) {
+                echo json_encode(['success' => false, 'message' => 'Interview not found']);
+                exit;
+            } else {
+                set_alert('danger', 'Interview not found');
+                redirect(admin_url('hrd/interviews'));
+            }
+        }
+
+        // Convert date time to proper format
+        $data['interview_date_time'] = date('Y-m-d H:i:s', strtotime($data['interview_date_time']));
+		
+		//////////Email//////////////////
+		
+		
+		
+		
+			
+       $this->hrd_model->send_interviews_mail($data);
+		
+		////////////////////////////////
+
+        // Insert interview schedule
+        $this->db->insert('it_crm_hrd_interviews_mails', $data);
+        $schedule_id = $this->db->insert_id();
+
+        //log_message('error', 'Database insert result: ' . $schedule_id);
+
+        if ($schedule_id) {
+            // Log activity
+            log_activity('Interview scheduled for ID: ' . $data['interviewer_id'] . ' by ' . get_staff_full_name(get_staff_user_id()));
+            
+            if ($this->input->is_ajax_request()) {
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'Interview scheduled successfully',
+                    'schedule_id' => $schedule_id
+                ]);
+                exit;
+            } else {
+                set_alert('success', 'Interview scheduled successfully');
+                redirect(admin_url('hrd/interviews'));
+            }
+        } else {
+            log_message('error', 'Failed to insert into database');
+            if ($this->input->is_ajax_request()) {
+                echo json_encode(['success' => false, 'message' => 'Failed to schedule interview']);
+                exit;
+            } else {
+                set_alert('danger', 'Failed to schedule interview');
+                redirect(admin_url('hrd/interviews'));
+            }
+        }
+    }
+	
+	
 }

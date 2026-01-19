@@ -60,14 +60,14 @@
                 <th>Qualification</th>
                 <th>Designation</th>
                 <th>Experience</th>
-                <th>Current Salary</th>
+                <?php /*?><th>Current Salary</th>
                 <th>Notice (days)</th>
                 <th>Location</th>
                 <th>City</th>
-                <th>Source</th>
+                <th>Source</th><?php */?>
                 <th>Process</th>
                 <?php /*?><th>Status</th><?php */?>
-                <th>Added On</th>
+                <?php /*?><th>Added On</th><?php */?>
                 <th><?php echo _l('options'); ?></th>
               </thead>
               <tbody>
@@ -102,18 +102,23 @@
                   <td><?php echo e($it['qualification']); ?></td>
                   <td><?php echo e($it['designation']); ?></td>
                   <td><?php echo e($it['total_experience']); ?></td>
-                  <td><?php echo e($it['current_salary']); ?></td>
+                  <?php /*?><td><?php echo e($it['current_salary']); ?></td>
                   <td><?php echo (int)$it['notice_period_in_days']; ?></td>
                   <td><?php echo e($it['location']); ?></td>
                   <td><?php echo e($it['city']); ?></td>
-                  <td><?php echo e($source_name); ?></td>
+                  <td><?php echo e($source_name); ?></td><?php */?>
                   <td><?php echo e($process_name); ?></td>
                  <?php /*?> <td><?php echo $st===1?'<span class="label label-success">Active</span>':'<span class="label label-danger">Inactive</span>'; ?></td><?php */?>
-                  <td><?php echo e($it['addedon']); ?></td>
+                  <?php /*?><td><?php echo e($it['addedon']); ?></td><?php */?>
                   <td>
+				  
+				  
                     <div class="tw-flex tw-items-center tw-space-x-3">
-                      <a href="#" onclick="view_interview(this);return false;" data-all='<?php echo json_encode($it, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a>
+					<a href="#" onclick="interview_email(this);return false;" data-id="<?php echo (int)$it['id']; ?>" data-name="<?php echo e($it['full_name']); ?>" data-email="<?php echo e($it['email_id']); ?>" data-designation="<?php echo e($it['designation']); ?>"  class="tw-text-success-500" title="Send Interview Invitation"><i class="fa-regular fa-envelope menu-icon fa-lg text-primary"></i></a>
+					
+                      <?php /*?><a href="#" onclick="view_interview(this);return false;" data-all='<?php echo json_encode($it, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a><?php */?>
                       <a href="#" onclick="edit_interview(this);return false;" data-all='<?php echo json_encode($it, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-pen-to-square fa-lg"></i></a>
+					  
                     </div>
                   </td>
                 </tr>
@@ -139,23 +144,22 @@
       <div class="modal-body">
         <div id="additional"></div>
         <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>Full Name</label><input type="text" name="full_name" class="form-control" required></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Phone</label><input type="text" name="phone_number" class="form-control" required></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Email</label><input type="email" name="email_id" class="form-control"></div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>Qualification</label><input type="text" name="qualification" class="form-control"></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Designation</label><input type="text" name="designation" class="form-control"></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Total Experience</label><input type="text" name="total_experience" class="form-control"></div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>Current Salary</label><input type="text" name="current_salary" class="form-control"></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Notice Period (days)</label><input type="number" name="notice_period_in_days" class="form-control"></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Location</label><input type="text" name="location" class="form-control"></div></div>
-        </div>
-        <div class="row">
-          <div class="col-md-4"><div class="form-group"><label>City</label><input type="text" name="city" class="form-control"></div></div>
-          <div class="col-md-4"><div class="form-group"><label>Source</label>
+          <div class="col-md-6"><div class="form-group"><label>Full Name</label><input type="text" name="full_name" class="form-control" required></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Phone</label><input type="text" name="phone_number" class="form-control" required></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Email</label><input type="email" name="email_id" class="form-control"></div></div>
+        
+          <div class="col-md-6"><div class="form-group"><label>Qualification</label><input type="text" name="qualification" class="form-control"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Designation</label><input type="text" name="designation" class="form-control"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Total Experience</label><input type="text" name="total_experience" class="form-control"></div></div>
+       
+        
+          <div class="col-md-6"><div class="form-group"><label>Current Salary</label><input type="text" name="current_salary" class="form-control"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Notice Period (days)</label><input type="number" name="notice_period_in_days" class="form-control"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Location</label><input type="text" name="location" class="form-control"></div></div>
+        
+        
+          <div class="col-md-6"><div class="form-group"><label>City</label><input type="text" name="city" class="form-control"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Source</label>
             <select name="source" class="form-control">
               <option value="">-- Select Source --</option>
               <?php foreach ($interview_sources as $source) { ?>
@@ -163,7 +167,7 @@
               <?php } ?>
             </select>
           </div></div>
-          <div class="col-md-4"><div class="form-group"><label>Process Status</label>
+          <div class="col-md-6"><div class="form-group"><label>Process Status</label>
             <select name="process_status" class="form-control">
               <option value="">-- Select Process --</option>
               <?php foreach ($interview_processes as $process) { ?>
@@ -171,10 +175,9 @@
               <?php } ?>
             </select>
           </div></div>
-        </div>
-        <div class="row">
+        
           <div class="col-md-12"><div class="form-group"><label>Comments</label><textarea  name="comments" rows="5" class="form-control"></textarea></div></div>
-        </div>
+        
         <?php /*?><div class="form-group"><label>Status</label>
           <select name="status" class="form-control">
             <option value="1">Active</option>
@@ -266,6 +269,253 @@
   $('#d-process').text(process_name);
   
   $('#d-comments').text(it.comments||''); $('#interviews_details').modal('show'); }
+
+
+</script>
+<?php init_tail(); ?>
+<script>
+$(document).ready(function(){
+    $('#toggleBtn').click(function(){
+        $('.togglesearch').slideToggle(); // smoothly show/hide form
+    });
+});
+
+function interview_email(element) {
+    var id = $(element).data('id');
+    var name = $(element).data('name');
+    var email = $(element).data('email');
+    var designation = $(element).data('designation');
+    
+    // Create a modal for sending interview invitation
+    var modalHtml = `
+      <div class="modal fade" id="interview_email_modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <h4 class="modal-title">Schedule Interview : <span> To ` + name + ` [` + email + `] </span></h4>
+            </div>
+            <div class="modal-body">
+              <!-- Hidden fields -->
+              <input type="hidden" name="interviewer_id" value="` + id + `">
+              <input type="hidden" name="interviewer_name" value="` + name + `">
+              <input type="hidden" name="interviewer_email" value="` + email + `">
+              <input type="hidden" name="interviewer_designation" value="` + designation + `">
+              
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    For Post :: ` + designation + `
+                  </div>
+                </div>
+                
+              </div>
+              
+              <div class="row">
+                
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="control-label">Interview Mode</label>
+                    <select name="interview_mode" class="form-control" required>
+                      <option value="">Select Interview Mode</option>
+                      <option value="Onsite">Onsite</option>
+                      <option value="Virtual">Virtual</option>
+                      <option value="Telephonic">Telephonic</option>
+                      <option value="Technical">Technical</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="control-label">Date & Time</label>
+                    <input type="datetime-local" name="interview_date_time" class="form-control" required>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group" id="interview_location_group" style="display: none;">
+                    <label class="control-label">Interview Location</label>
+                    <select name="interview_location" class="form-control" required>
+                      <option value="">Select Location</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group" id="virtual_meeting_group" style="display: none;">
+                    <label class="control-label">Virtual Meeting Link</label>
+                    <input type="text" name="interview_virtual_meeting_link" class="form-control" placeholder="https://zoom.us/meeting/...">
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" onclick="save_interview_schedule()">Schedule Interview</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Remove existing modal if present
+    $('#interview_email_modal').remove();
+    
+    // Add modal to body and show it
+    $('body').append(modalHtml);
+    $('#interview_email_modal').modal('show');
+    
+    // Load interview locations dynamically after modal is fully shown
+    $('#interview_email_modal').on('shown.bs.modal', function() {
+        load_interview_locations();
+    });
+    
+    // Handle interview mode change
+    $('select[name="interview_mode"]').on('change', function() {
+        var mode = $(this).val(); 
+        if (mode === 'Virtual') {
+            $('#virtual_meeting_group').show();
+			$('#interview_location_group').hide();
+            $('select[name="interview_location"]').prop('required', false);
+            $('input[name="interview_virtual_meeting_link"]').prop('required', true);
+		} else if (mode === 'Onsite' || mode === 'Technical') {
+		    $('#virtual_meeting_group').hide();
+			$('#interview_location_group').show();
+            $('select[name="interview_location"]').prop('required', true);
+            $('input[name="interview_virtual_meeting_link"]').prop('required', false);
+		} else if (mode === 'Telephonic') {
+		    $('#virtual_meeting_group').hide();
+			$('#interview_location_group').hide();
+            $('select[name="interview_location"]').prop('required', false);
+            $('input[name="interview_virtual_meeting_link"]').prop('required', false);
+        } else {
+            $('#virtual_meeting_group').hide();
+			$('#interview_location_group').show();
+            $('select[name="interview_location"]').prop('required', true);
+            $('input[name="interview_virtual_meeting_link"]').prop('required', false);
+        }
+    });
+  }
+  
+  function load_interview_locations() {
+    console.log('Loading interview locations...');
+    var url = site_url + 'admin/hrd/get_interview_locations';
+    console.log('Request URL:', url);
+    
+    $.get(url, function(response) {
+        console.log('Response received:', response);
+        console.log('Response type:', typeof response);
+        
+        try {
+            var locations = JSON.parse(response);
+            console.log('Parsed locations:', locations);
+            
+            var select = $('select[name="interview_location"]');
+            console.log('Location select element:', select.length > 0 ? 'found' : 'not found');
+            
+            if (select.length === 0) {
+                console.error('Location select not found in DOM');
+                return;
+            }
+            
+            select.empty().append('<option value="">Select Location</option>');
+            
+            if (locations && locations.length > 0) {
+                console.log('Adding', locations.length, 'locations to dropdown');
+                $.each(locations, function(index, location) {
+                    console.log('Adding location:', location.branch_address);
+                    select.append('<option value="' + location.branch_address + '">' + location.branch_address + '</option>');
+                });
+                console.log('Final select HTML:', select.html());
+            } else {
+                console.log('No locations found in response');
+                select.append('<option value="">No locations available</option>');
+            }
+        } catch(e) {
+            console.error('Error parsing locations response:', e);
+            console.error('Response was:', response);
+            var select = $('select[name="interview_location"]');
+            if (select.length > 0) {
+                select.append('<option value="">Error loading locations</option>');
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        console.error('Failed to load interview locations:', {
+            status: status,
+            error: error,
+            responseText: xhr.responseText
+        });
+        var select = $('select[name="interview_location"]');
+        if (select.length > 0) {
+            select.append('<option value="">Failed to load locations</option>');
+        }
+    });
+  }
+  
+  function save_interview_schedule() {
+    var formData = $('#interview_email_modal').find('input, select, textarea').serialize();
+	formData += '&<?= $this->security->get_csrf_token_name(); ?>=<?= $this->security->get_csrf_hash(); ?>';
+    //alert(formData);
+    // Basic validation
+    var interviewerName = $('#interview_email_modal input[name="interviewer_name"]').val();
+    var interviewerEmail = $('#interview_email_modal input[name="interviewer_email"]').val();
+    var interviewMode = $('#interview_email_modal select[name="interview_mode"]').val();
+    var interviewDateTime = $('#interview_email_modal input[name="interview_date_time"]').val();
+    var interviewLocation = $('#interview_email_modal select[name="interview_location"]').val();
+    var virtualLink = $('#interview_email_modal input[name="interview_virtual_meeting_link"]').val();
+    
+    if (!interviewerName || !interviewerEmail || !interviewMode || !interviewDateTime) {
+        alert_float('warning', 'Please fill in all required fields');
+        return;
+    }
+    
+    if (interviewMode === 'Virtual' && !virtualLink) {
+        alert_float('warning', 'Please provide virtual meeting link for virtual interviews');
+        return;
+    }
+    
+    if ((interviewMode !== 'Virtual' && interviewMode !== 'Telephonic') && !interviewLocation) {
+        alert_float('warning', 'Please select interview location');
+        return;
+    }
+    
+    // Show loading state
+    var saveBtn = $('#interview_email_modal .btn-primary');
+    var originalText = saveBtn.text();
+    saveBtn.html('<i class="fa fa-spinner fa-spin"></i> Scheduling...').prop('disabled', true);
+    
+    // Save interview schedule via AJAX
+    $.post(site_url + 'admin/hrd/save_interview_schedule', formData)
+      .done(function(response) {
+        try { 
+            var result = JSON.parse(response);
+            if (result.success) {
+                alert_float('success', 'Interview scheduled successfully');
+                $('#interview_email_modal').modal('hide');
+                // Optionally reload page to show updated data
+                window.location.reload();
+            } else {
+                alert_float('danger', result.message || 'Failed to schedule interview');
+            }
+        } catch(e) { 
+            alert_float('success', 'Interview scheduled successfully');
+            $('#interview_email_modal').modal('hide');
+            window.location.reload();
+        }
+    }).fail(function() { 
+        alert_float('danger', 'Error occurred while scheduling interview');
+    }).always(function() { 
+        // Restore button state
+        saveBtn.html(originalText).prop('disabled', false);
+    });
+  }
   function manage_interview(form){ 
     var data=$(form).serialize();
     $.post(form.action, data).done(function(response){
@@ -283,13 +533,5 @@
     });
     return false; 
   }
-</script>
-<?php init_tail(); ?>
-<script>
-$(document).ready(function(){
-    $('#toggleBtn').click(function(){
-        $('.togglesearch').slideToggle(); // smoothly show/hide form
-    });
-});
 </script>
 </body></html>

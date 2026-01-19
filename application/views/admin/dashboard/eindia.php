@@ -53,7 +53,13 @@
               <?php foreach ($_SESSION as $key => $value): ?>
               <tr>
                 <td><?= htmlspecialchars($key) ?></td>
-                <td><?= htmlspecialchars((string) $value) ?></td>
+                <td><?php
+        if (is_array($value) || is_object($value)) {
+            echo htmlspecialchars(json_encode($value, JSON_PRETTY_PRINT));
+        } else {
+            echo htmlspecialchars((string) $value);
+        }
+        ?></td>
               </tr>
               <?php endforeach; ?>
             </tbody>

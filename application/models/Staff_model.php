@@ -507,6 +507,7 @@ class Staff_model extends App_Model
         $data['datecreated'] = date('Y-m-d H:i:s');
         if (isset($data['departments'])) {
             $departments = $data['departments'];
+			$data['department_id'] = $data['departments'][0];
             unset($data['departments']);
         }
 
@@ -524,7 +525,8 @@ class Staff_model extends App_Model
         if ($data['admin'] == 1) {
             $data['is_not_staff'] = 0;
         }
-
+		
+//print_r($data);exit;
         $this->db->insert(db_prefix() . 'staff', $data);
         $staffid = $this->db->insert_id();
         if ($staffid) {
@@ -546,12 +548,14 @@ class Staff_model extends App_Model
             if (isset($custom_fields)) {
                 handle_custom_fields_post($staffid, $custom_fields);
             }
+			//print_r($departments);echo "";exit;
             if (isset($departments)) {
                 foreach ($departments as $department) {
                     $this->db->insert(db_prefix() . 'staff_departments', [
                         'staffid'      => $staffid,
                         'departmentid' => $department,
                     ]);
+					//echo $this->db->last_query();exit;
                 }
             }
 
