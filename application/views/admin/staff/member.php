@@ -203,7 +203,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
 								if(isset($member)&&$member->staffid){
 								$departmentid=get_departments_id($member->staffid);
 								} 
-								
+								//echo $departmentid = (int) get_departments_id();
 								if(is_department_admin()){
 								//$departmentsID==8
 								$departments = array_filter($departments, function ($dept) {

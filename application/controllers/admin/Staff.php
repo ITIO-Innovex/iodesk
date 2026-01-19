@@ -59,7 +59,6 @@ class Staff extends AdminController
         if ($this->input->post()) {
             $data = $this->input->post();
 			
-			//print_r($data);exit;
             // Don't do XSS clean here.
             $data['email_signature'] = $this->input->post('email_signature', false);
             $data['email_signature'] = html_entity_decode($data['email_signature']);

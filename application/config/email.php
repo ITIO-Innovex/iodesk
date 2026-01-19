@@ -101,7 +101,12 @@ if (file_exists(APPPATH . 'config/my_email.php')) {
 }
 }
 $_SESSION['smtp_fetch_type']=$smtp_fetch_type;
-$_SESSION['smtp_fetch_detailsV']=$config['smtp_user']." <> ".$config['smtp_host']." <> ".$config['smtp_port']." <> ".$config['smtp_crypto'];
+$_SESSION['STAFFSMTP']['smtp_user']=$config['smtp_user'];
+$_SESSION['STAFFSMTP']['smtp_host']=$config['smtp_host'];
+$_SESSION['STAFFSMTP']['smtp_port']=$config['smtp_port'];
+$_SESSION['STAFFSMTP']['smtp_crypto']=$config['smtp_crypto'];
+$_SESSION['STAFFSMTP']['smtp_pass']=base64_encode($config['smtp_pass']); // password Encrypt
+
 //print_r($_SESSION);
 //print_r($config);
 //echo "============>";exit;

@@ -1,4 +1,9 @@
 <?php
+
+use PHPMailer\PHPMailer\PHPMailer; // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\Exception;  // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\SMTP;
+header('Content-Type: text/html; charset=utf-8');
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Hrd_model extends App_Model
@@ -1122,5 +1127,159 @@ if ($in_time >= $start_time && $in_time <= $end_time) {
 		$this->db->where('company_id', $company_id);
         return $this->db->get(db_prefix() . 'hrd_attendance_update_request')->result_array();
     }
+	
+	function send_interviews_mail($data){
+	//log_message('error', 'Display data - ' . print_r($data, true));
+	//log_message('error', 'Display data - ' . print_r($_SESSION['STAFFSMTP'], true));
+	//log_message('error', 'Display data - ' . base64_decode($_SESSION['STAFFSMTP']['smtp_pass']));
+	$msg="";
+	
+	if(isset($data['interview_date_time'])&&$data['interview_date_time']){
+	$msg.='<p style="margin:0 0 16px;">Date & Time: <strong>'.$data['interview_date_time'].'</strong>,</p>';
+	}
+	
+	if(isset($data['interview_mode'])&&$data['interview_mode']){
+	$msg.='<p style="margin:0 0 16px;">Interview Mode: <strong>'.$data['interview_mode'].'</strong>,</p>';
+	}
+	
+	if(isset($data['interview_location'])&&$data['interview_location']){
+	$msg.='<p style="margin:0 0 16px;">Onsite Location: <strong>'.$data['interview_location'].'</strong>,</p>';
+	}
+	
+	if(isset($data['interview_virtual_meeting_link'])&&$data['interview_virtual_meeting_link']){
+	$msg.='<p style="margin:0 0 16px;">Virtual Meeting Link:  <strong>'.$data['interview_virtual_meeting_link'].'</strong>,</p>';
+	}
+	
+	//if(isset($data['interview_date_time'])&&$data['interview_date_time']){
+	$msg.='<p style="margin:0 0 16px;">Contact Person:  <strong>'.e(get_staff_full_name()).'</strong>,</p>';
+	//}
+	
+	//===============================
+	$mailer_username    = trim($_SESSION['STAFFSMTP']['smtp_user']);
+	$mailer_password    = trim(base64_decode($_SESSION['STAFFSMTP']['smtp_pass']));
+	$mailer_smtp_host   = trim($_SESSION['STAFFSMTP']['smtp_host']);
+	$mailer_smtp_port	= trim($_SESSION['STAFFSMTP']['smtp_port']);
+	$mailer_smtp_crypto	= trim($_SESSION['STAFFSMTP']['smtp_crypto']);
+	//==================================================
+	
+    $recipientEmail 	= $data['interviewer_email'];
+	$recipientName 		= $data['interviewer_name'];
+	$mailSub			= "Interview Invitation - ".$data['interviewer_designation'];
+	$senderEmail 		= $mailer_username;
+	$senderName			= e(get_staff_full_name());
+	
+	//log_message('error', 'mailer_username - ' .$mailer_username );
+	//log_message('error', 'mailer_password - ' .$mailer_password );
+	//log_message('error', 'mailer_smtp_host - ' .$mailer_smtp_host );
+	//log_message('error', 'mailer_smtp_port - ' .$mailer_smtp_port );
+	//log_message('error', 'mailer_smtp_crypto - ' .$mailer_smtp_crypto );
+	//log_message('error', 'recipientEmail - ' .$recipientEmail );
+	//log_message('error', 'recipientName - ' .$recipientName );
+	//log_message('error', 'mailSub - ' .$mailSub );
+	//log_message('error', 'senderEmail - ' .$senderEmail );
+	//log_message('error', 'senderName - ' .$senderName );
+	
+$mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA E-Signing</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6; padding:20px;">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+            <p style="margin:0 0 16px;">Dear <strong>'.$recipientName.'</strong></p>
+
+            <p style="margin:0 0 16px;"> Thank you for applying to <strong>'.get_staff_company_name().'</strong> </p>
+			
+			<p style="margin:0 0 16px;"> Your application for the <strong>'.$data['interviewer_designation'].'</strong> position stood out to us, and we would like to invite you to attend an interview to discuss your profile in more detail and help you learn more about our organization. </p>
+
+            <p style="margin:0 0 16px;"> The interview will be approximately <strong>30-60 minutes</strong> in duration. </p>
+<p style="margin:0 0 16px;"><strong>Interview Details: </strong> </p>
+
+            '.$msg.'
+<p style="margin:0 0 16px;">Kindly confirm your availability and preferred interview mode ('.$data['interview_mode'].') by replying to this email.</p>
+
+<p style="margin:0 0 16px;">We look forward to your response.</p>
+
+
+            <p style="margin:0;">
+              Best regards,<br>
+              <strong>'.$senderName.'</strong>
+            </p>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
+
+//log_message('error', 'senderName - ' .$mailbody );
+//=============================
+  $mail = new PHPMailer(true);
+		
+		
+	try {
+	//echo "==============";
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+    //$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port = $mailer_smtp_port;
+    // Enable SMTP debugging (testing only)
+    //$mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
+    //$mail->Debugoutput = 'html';
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	$mail->Priority = 1; 
+	$mail->setFrom($senderEmail, $senderName);
+	$mail->addAddress($recipientEmail, $recipientName);
+	// Add hardcoded BCC
+	//$mail->addBCC('jverma437@gmail.com');
+	$mail->Subject = $mailSub;
+	$mail->Body = $mailbody;
+    $sent=$mail->send();
+	//echo "==============!!";exit;
+	 if (!$sent) {
+	 log_message('error', $mailSub.'Mail Not Sent');
+	 log_activity($mailSub.' not sent successfully -  [ Name: ' . $recipientName . ']');
+	//log_activity('NDA sent successfully -  [ Name: ' . $name . ']');
+    //exit;
+	 
+	 }else{
+	//log_message('error', 'Mail Not Sent 66');
+	log_activity($mailSub.' sent successfully -  [ Name: ' . $recipientName . ']');
+    //exit;
+	 
+	 }
+    
+	
+    
+	} catch (Exception $e) {
+		log_message('error', $mailSub.'Mail Not Sent');
+	}
+	 
+	 /////////////////////////////////
+	
+	}
 	
 }
