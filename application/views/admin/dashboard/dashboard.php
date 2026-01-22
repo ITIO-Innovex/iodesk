@@ -24,12 +24,7 @@
 // Get Attendance Time
 $in_time  = $attendance[0]['in_time']  ?? '';
 $out_time = $attendance[0]['out_time'] ?? '';
-
-$subscription_status=subscription_status();
-
-//echo "Key - ".get_option('paymentmethod_stripe_ideal_api_secret_key');
-//echo "Key - ".get_option('paymentmethod_stripe_ideal_api_publishable_key');
-
+$subscription_status=subscription_status(); // for check subscription
 
 ?>
 

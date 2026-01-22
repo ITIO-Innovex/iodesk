@@ -101,10 +101,23 @@ class Services extends AdminController
                     $this->db->update(db_prefix() . 'services_user_subscriptions', [
                         'status' => 'active',
                     ]);
+					
+                    $this->db->where('subscription_id', $payment['subscription_id']);
+                    $subs = $this->db->get(db_prefix() . 'services_user_subscriptions')->row_array();
+					
+					if($subs){
+					$_SESSION['cms_subscription_id']=$payment['subscription_id'];
+					$_SESSION['cms_subscription_start_date']=$subs['start_date'];
+					$_SESSION['cms_subscription_end_date']=$subs['end_date'];
+					$_SESSION['cms_subscription_status']=$subs['status'];
+					$_SESSION['cms_subscription_created_at']=$subs['created_at'];
+					}
 
                     $this->db->where('company_id', $companyId);
                     $this->db->where('invoice_no', $invoiceNo);
                     $payment = $this->db->get(db_prefix() . 'services_subscriptions_invoices')->row_array();
+					set_alert('success', 'Payment Completed');
+					
                 }
             } catch (Exception $e) {
                 log_message('error', 'Stripe session check failed: ' . $e->getMessage());
