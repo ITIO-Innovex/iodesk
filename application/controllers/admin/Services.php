@@ -119,7 +119,7 @@ class Services extends AdminController
             $this->form_validation->set_rules('plan_name', 'Plan Name', 'required|max_length[100]');
             $this->form_validation->set_rules('price', 'Price', 'required|numeric');
             $this->form_validation->set_rules('currency', 'Currency', 'required|max_length[10]');
-            $this->form_validation->set_rules('billing_cycle', 'Billing Cycle', 'required|in_list[monthly,yearly,per_month]');
+            $this->form_validation->set_rules('billing_cycle', 'Billing Cycle', 'required|in_list[monthly,yearly,pro_data]');
             $this->form_validation->set_rules('duration', 'Duration', 'required|integer');
             $this->form_validation->set_rules('no_of_staff', 'No of Staff', 'required|integer');
             $this->form_validation->set_rules('tax', 'Tax', 'numeric');
