@@ -58,7 +58,7 @@ init_head(); ?>
           <select class="form-control selectpicker" name="billing_cycle" id="billing_cycle" data-none-selected-text="Select billing cycle">
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
-            <option value="per_month">Pro Month / Pro Data</option>
+            <option value="pro_data">Pro Month / Pro Data</option>
           </select>
         </div>
         <div class="form-group">
