@@ -1297,10 +1297,15 @@ class Hrd extends AdminController
         $data['requests'] = $this->db->get()->result_array();
 		//print_r($data['requests']);exit;
 //echo $this->db->last_query();exit;
-        // Pass staff information to view
-        $data['staff'] = $data['requests'][0]['firstname']." ".$data['requests'][0]['lastname'];
-        $data['staffid'] = $data['requests'][0]['staffid'];
-        $data['title'] = 'Attendance Request - ' . trim($data['staff']);
+        // Pass staff information to view (guard against empty results)
+        if (!empty($data['requests'])) {
+            $data['staff'] = $data['requests'][0]['firstname']." ".$data['requests'][0]['lastname'];
+            $data['staffid'] = $data['requests'][0]['staffid'];
+        } else {
+            $data['staff'] = '';
+            $data['staffid'] = '';
+        }
+        $data['title'] = 'Attendance Request' . ($data['staff'] !== '' ? ' - ' . trim($data['staff']) : '');
         $this->load->view('admin/hrd/attendance_request', $data);
     }
 
@@ -4863,6 +4868,7 @@ class Hrd extends AdminController
         if (!staff_can('view_setting',  'hr_department')) {
             access_denied('Awards');
         }
+		$this->db->where('company_id', get_staff_company_id());
         // get all awards
         $this->db->order_by('addedon', 'desc');
         $awards = $this->db->get('it_crm_hrd_awards')->result_array();
@@ -4895,6 +4901,7 @@ class Hrd extends AdminController
             'award_title' => $title,
             'addedon' => date('Y-m-d H:i:s'),
             'status' => 1,
+			'company_id' => get_staff_company_id(),
             'gallery_type' => $galleryType,
         ];
         $this->db->insert('it_crm_hrd_awards', $award_data);
@@ -5434,6 +5441,7 @@ class Hrd extends AdminController
         if (!empty($where)) {
             $this->db->where($where);
         }
+		$this->db->where('company_id', get_staff_company_id());
         $this->db->order_by('addedon', 'desc');
         $awards = $this->db->get('it_crm_hrd_awards')->result_array();
         foreach ($awards as &$a) {

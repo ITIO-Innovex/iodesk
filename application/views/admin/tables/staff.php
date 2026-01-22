@@ -121,14 +121,15 @@ foreach ($rResult as $aRow) {
     $assigned_mailer = $this->ci->db->get(db_prefix() . 'webmail_setup')->row_array();
 	$icon='<i class="fa fa-plus text-success"></i>';
     if ($assigned_mailer) {
-       $icon='<i class="fa-solid fa-envelope-circle-check text-success fa-2x" title="Webmail Already Setup"></i>';
+       //$icon='<i class="fa-solid fa-envelope-circle-check text-success fa-2x" title="Webmail Already Setup"></i>';
     } else {
-        $icon='<i class="fa-regular fa-square-plus text-danger fa-2x" title="Add New Webmail Setup"></i>';
+        //$icon='<i class="fa-regular fa-square-plus text-danger fa-2x" title="Add New Webmail Setup"></i>';
     }
     
     // Webmail Setup column - show icon to open webmail setup modal (send staff email too)
     $email_js = "'" . e($aRow['email']) . "'";
-    $row[] = '<a href="#" onclick="openWebmailSetup(' . $aRow['staffid'] . ', ' . $email_js . '); return false;" title="Webmail Setup">'.$icon.'</a> ';
+    //$row[] = '<a href="#" onclick="openWebmailSetup(' . $aRow['staffid'] . ', ' . $email_js . '); return false;" title="Webmail Setup">'.$icon.'</a> ';
+	$row[]='';
 
     $row['DT_RowClass'] = 'has-row-options';
 

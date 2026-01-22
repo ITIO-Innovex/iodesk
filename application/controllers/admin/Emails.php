@@ -13,9 +13,11 @@ class Emails extends AdminController
     /* List all email templates */
     public function index()
     {
-        if (staff_cant('view', 'email_templates')) {
+        //if (staff_cant('view', 'email_templates')) {
+		if (!is_super()) {
             access_denied('email_templates');
         }
+		
         $langCheckings = get_option('email_templates_language_checks');
         if ($langCheckings == '') {
             $langCheckings = [];

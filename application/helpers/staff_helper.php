@@ -1332,6 +1332,42 @@ function getAttendanceStatus($staffId, $shiftID, $date, $staffType = null, $atte
         return in_array($date, $holidays);
     }
 	
+function subscription_status()
+{
+$cms_subscription_id        = !empty($_SESSION['cms_subscription_id']) ? $_SESSION['cms_subscription_id'] : '';
+$cms_subscription_end_date = !empty($_SESSION['cms_subscription_end_date']) ? $_SESSION['cms_subscription_end_date'] : '';
+$cms_subscription_status   = !empty($_SESSION['cms_subscription_status']) ? $_SESSION['cms_subscription_status'] : '';
+
+    // If subscription ID is blank
+    if (empty($cms_subscription_id)) {
+        return 'no_subscription';
+    }
+
+    // If status is not active
+    if ($cms_subscription_status !== 'active') {
+        return 'no_active_subscription';
+    }
+
+    // Check expiry
+    $today = date('Y-m-d');
+
+    if (!empty($cms_subscription_end_date) && $cms_subscription_end_date < $today) {
+        return 'expired_subscription';
+    }
+
+    return 'active';
+}
+
+function get_remaining_days_in_month($include_today = true)
+{
+    $today = new DateTime();
+    $lastDayOfMonth = new DateTime('last day of this month');
+
+    $days = $today->diff($lastDayOfMonth)->days;
+
+    return $include_today ? $days + 1 : $days;
+}
+	
 function amountInWords($number)
 {
     $number = round($number, 2);

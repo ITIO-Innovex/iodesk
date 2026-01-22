@@ -25,6 +25,10 @@
 $in_time  = $attendance[0]['in_time']  ?? '';
 $out_time = $attendance[0]['out_time'] ?? '';
 
+$subscription_status=subscription_status();
+
+
+
 ?>
 
 <?php init_head(); ?>
@@ -92,8 +96,18 @@ $out_time = $attendance[0]['out_time'] ?? '';
 		</div>
 		<?php }elseif(is_admin() || is_department_admin()){ ?>
 		<div class="col-md-12 mtop20">
+<?php if($subscription_status<>'active'){ ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> <?php echo _l($subscription_status);?> <span style="float:right"><a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Subscribe Now</a></span></div>
+                  </div>
+<?php }else{ ?>
 <a href="<?php echo admin_url('staff');?>" class="fancy-btn"><i class="fa-solid fa-users menu-icon"></i> Add New Staff</a>
-<a href="<?php //echo admin_url('dashboard/testemail');?>" class="fancy-btn hide"><i class="fa-solid fa-users menu-icon"></i> Test Email</a>
+
+<?php } ?>		
+
+
+				  
+<?php /*?><a href="<?php //echo admin_url('dashboard/testemail');?>" class="fancy-btn hide"><i class="fa-solid fa-users menu-icon"></i> Test Email</a><?php */?>
 		</div>
 		<?php } ?>
             <?php //$this->load->view('admin/includes/alerts'); ?>

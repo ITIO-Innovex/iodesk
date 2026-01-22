@@ -706,6 +706,10 @@ class Payroll extends AdminController
         $staffName = trim(($slip['firstname'] ?? '') . ' ' . ($slip['lastname'] ?? '')) ?: 'staff';
         $fileName = slug_it('Salary-Slip-' . $staffName . '-' . $month) . '.pdf';
 
+        // Ensure no output is sent before the PDF stream
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         $pdf->Output($fileName, 'D');
     }
 

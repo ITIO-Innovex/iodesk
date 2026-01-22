@@ -485,8 +485,13 @@ class Staff_model extends App_Model
         if ($email) {
             die('Email already exists');
         }
+		
+		if(isset($data['admin'])&&$data['admin']){
+		
+		}else{
 
         $data['admin'] = 0;
+		}
 
         if (is_admin()) {
             if (isset($data['administrator'])) {

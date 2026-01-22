@@ -51,15 +51,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
 |       my-controller/my-method -> my_controller/my_method
 */
 
-$route['default_controller']   = 'clients';
+$route['default_controller']   = 'landing';
 $route['404_override']         = '';
 $route['translate_uri_dashes'] = false;
 
 /**
  * Handle /index requests - redirect to default controller
  */
-$route['index'] = 'clients';
-$route['index/(:any)'] = 'clients/$1';
+$route['index'] = 'landing';
+$route['index/(:any)'] = 'landing/$1';
 
 /**
  * Dashboard clean route
@@ -89,7 +89,7 @@ $route['admin/items/search'] = 'admin/invoice_items/search';
 /**
  * In case if client access directly to url without the arguments redirect to clients url
  */
-$route['/'] = 'clients';
+$route['/'] = 'landing';
 
 /**
  * @deprecated
@@ -237,6 +237,25 @@ $route['admin/designation'] = 'admin/designations/index';
 $route['admin/designations'] = 'admin/designations/index';
 $route['admin/designation/manage'] = 'admin/designations/manage';
 $route['admin/designation/delete/(:num)'] = 'admin/designations/delete/$1';
+
+// Services - Subscriptions routes
+$route['admin/services/subscriptions'] = 'admin/services/subscriptions';
+$route['admin/services/subscriptions/manage'] = 'admin/services/subscriptions_manage';
+$route['admin/services/subscriptions/delete/(:num)'] = 'admin/services/subscriptions_delete/$1';
+$route['admin/services/choose_subscriptions'] = 'admin/services/choose_subscriptions';
+$route['admin/services/invoice/(:num)'] = 'admin/services/invoice/$1';
+$route['admin/services/my_subscriptions'] = 'admin/services/my_subscriptions';
+$route['admin/services/payment_status'] = 'admin/services/payment_status';
+
+// Services - User Subscriptions routes
+$route['admin/services/user_subscriptions'] = 'admin/services/user_subscriptions';
+$route['admin/services/user_subscriptions/manage'] = 'admin/services/user_subscriptions_manage';
+$route['admin/services/user_subscriptions/delete/(:num)'] = 'admin/services/user_subscriptions_delete/$1';
+
+// Services - Subscription Invoices routes
+$route['admin/services/subscriptions_invoices'] = 'admin/services/subscriptions_invoices';
+$route['admin/services/subscriptions_invoices/manage'] = 'admin/services/subscriptions_invoices_manage';
+$route['admin/services/subscriptions_invoices/delete/(:num)'] = 'admin/services/subscriptions_invoices_delete/$1';
 
 // HRD - Manage Attendance by Date
 $route['admin/hrd/manage_attendance_by_date'] = 'admin/hrd/manage_attendance_by_date';
