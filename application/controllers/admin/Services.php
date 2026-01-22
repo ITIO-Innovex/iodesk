@@ -63,6 +63,7 @@ class Services extends AdminController
     {
         $companyId = get_staff_company_id();
         $invoiceNo = $this->input->get('invoice_no');
+        $sessionId = $this->input->get('session_id');
         if (!$invoiceNo) {
             show_404();
         }
@@ -73,6 +74,41 @@ class Services extends AdminController
 
         if (!$payment) {
             show_404();
+        }
+
+        if ($sessionId && $payment['payment_status'] !== 'paid') {
+            try {
+                $this->load->library('stripe_core');
+                $session = $this->stripe_core->retrieve_session([
+                    'id'     => $sessionId,
+                    'expand' => ['payment_intent'],
+                ]);
+				//print_r($session);
+				//print_r($session->payment_status)."=====>";exit;
+
+                if ($session->payment_status === 'paid') {
+                    $this->db->where('company_id', $companyId);
+                    $this->db->where('invoice_no', $invoiceNo);
+                    $this->db->update(db_prefix() . 'services_subscriptions_invoices', [
+                        'payment_status' => 'paid',
+                        'payment_method' => 'Stripe',
+						'payment_id' => $session->payment_intent->id,
+						'payment_json' => json_encode($session),
+                    ]);
+
+                    $this->db->where('company_id', $companyId);
+                    $this->db->where('subscription_id', $payment['subscription_id']);
+                    $this->db->update(db_prefix() . 'services_user_subscriptions', [
+                        'status' => 'active',
+                    ]);
+
+                    $this->db->where('company_id', $companyId);
+                    $this->db->where('invoice_no', $invoiceNo);
+                    $payment = $this->db->get(db_prefix() . 'services_subscriptions_invoices')->row_array();
+                }
+            } catch (Exception $e) {
+                log_message('error', 'Stripe session check failed: ' . $e->getMessage());
+            }
         }
 
         $data['title'] = 'Payment Status';
@@ -454,13 +490,61 @@ class Services extends AdminController
         }
 		
 	if($pay_type==1){
-	    //echo "<br>Invoice Number :".$invoice_no;
-		//echo "<br>Amount :".$amount;
-		//echo "<br>Total Amount :".$total_amount;
-		//echo "<br>payment_method :".$data['payment_method'];
-		//echo "<br>Redirect to Payment Gateway";
-		set_alert('warning', 'Payment Gateway not connected');
-    redirect(admin_url('services/payment_status?invoice_no='.$invoice_no));
+        try {
+            $strp=$this->load->library('stripe_core');
+
+            if (!$this->stripe_core->has_api_key() || !$this->stripe_core->get_publishable_key()) {
+                set_alert('warning', 'Stripe keys are not configured.');
+                redirect(admin_url('services/payment_status?invoice_no=' . $invoice_no));
+            }
+
+            $currency = strtolower($plan->currency ?? 'inr');
+            if ($currency !== 'inr') {
+                set_alert('warning', 'International payments are restricted to registered Indian businesses. Please use INR.');
+                redirect(admin_url('services/payment_status?invoice_no=' . $invoice_no));
+            }
+            $amountCents = (int) round($total_amount * 100);
+            $successUrl = admin_url('services/payment_status?invoice_no=' . $invoice_no . '&session_id={CHECKOUT_SESSION_ID}');
+            $cancelUrl = admin_url('services/payment_status?invoice_no=' . $invoice_no);
+
+            $sessionData = [
+                'payment_method_types' => ['card'],
+                'mode'                 => 'payment',
+                'billing_address_collection' => 'required',
+                'line_items'           => [
+                    [
+                        'price_data' => [
+                            'currency'     => $currency,
+                            'unit_amount'  => $amountCents,
+                            'product_data' => [
+                                'name'        => $plan->plan_name,
+                                'description' => 'Subscription ' . ($plan->billing_cycle ?? ''),
+                            ],
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'success_url' => $successUrl,
+                'cancel_url'  => $cancelUrl,
+                'metadata'    => [
+                    'invoice_no'      => $invoice_no,
+                    'company_id'      => $company_id,
+                    'subscription_id' => $subscription_id,
+                ],
+            ];
+
+            $staffEmail = $this->db->select('email')->where('staffid', get_staff_user_id())->get(db_prefix().'staff')->row();
+            if ($staffEmail && $staffEmail->email) {
+                $sessionData['customer_email'] = $staffEmail->email;
+            }
+
+            $session = $this->stripe_core->create_session($sessionData);
+            redirect_to_stripe_checkout($session->id);
+        } catch (Exception $e) {
+            log_message('error', 'Stripe checkout failed: ' . $e->getMessage());
+            set_alert('warning', $e->getMessage());
+            redirect(admin_url('services/payment_status?invoice_no=' . $invoice_no));
+        }
 	
 	}else{
 	// Set Data in Session		
