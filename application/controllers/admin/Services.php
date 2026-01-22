@@ -119,10 +119,14 @@ class Services extends AdminController
             $this->form_validation->set_rules('plan_name', 'Plan Name', 'required|max_length[100]');
             $this->form_validation->set_rules('price', 'Price', 'required|numeric');
             $this->form_validation->set_rules('currency', 'Currency', 'required|max_length[10]');
-            $this->form_validation->set_rules('billing_cycle', 'Billing Cycle', 'required|in_list[monthly,yearly,pro_data]');
+            $this->form_validation->set_rules('billing_cycle', 'Billing Cycle', 'required|in_list[monthly,yearly,pro_data,per_month]');
             $this->form_validation->set_rules('duration', 'Duration', 'required|integer');
-            $this->form_validation->set_rules('no_of_staff', 'No of Staff', 'required|integer');
-            $this->form_validation->set_rules('tax', 'Tax', 'numeric');
+            if ($this->input->post('no_of_staff') !== '') {
+                $this->form_validation->set_rules('no_of_staff', 'No of Staff', 'trim|integer');
+            }
+            if ($this->input->post('tax') !== '') {
+                $this->form_validation->set_rules('tax', 'Tax', 'trim|numeric');
+            }
             $this->form_validation->set_rules('status', 'Status', 'in_list[active,inactive]');
 
             $is_ajax = $this->input->is_ajax_request();
@@ -130,6 +134,7 @@ class Services extends AdminController
 
             if ($this->form_validation->run() === false) {
                 $errors = validation_errors();
+                log_message('error', 'Subscriptions validation failed: ' . $errors);
                 if ($is_ajax) {
                     echo json_encode(['success' => false, 'message' => $errors]);
                     die;
@@ -139,11 +144,14 @@ class Services extends AdminController
             }
 
             $data = $this->input->post();
+           //log_message('error', 'Display data11 - ' . print_r($data, true));
             if (empty($id)) {
                 $insert_id = $this->services_subscriptions_model->add($data);
                 $success = (bool) $insert_id;
                 $message = $success ? _l('added_successfully', 'Subscription') : _l('problem_adding', 'Subscription');
             } else {
+			//log_message('error', 'Display data11 - '.$id );
+			//log_message('error', 'Display data11 - ' . print_r($data, true));
                 $success = $this->services_subscriptions_model->update((int) $id, $data);
                 $message = $success ? _l('updated_successfully', 'Subscription') : _l('problem_updating', 'Subscription');
             }
