@@ -69,17 +69,22 @@ class Services_subscriptions_model extends App_Model
         $price = isset($data['price']) ? (float) $data['price'] : null;
         $currency = trim($data['currency'] ?? 'INR');
         $billing_cycle = $data['billing_cycle'] ?? '';
+        if ($billing_cycle === 'per_month') {
+            $billing_cycle = 'pro_data';
+        }
         $duration = isset($data['duration']) ? (int) $data['duration'] : 0;
-        $no_of_staff = isset($data['no_of_staff']) ? (int) $data['no_of_staff'] : 0;
+        $no_of_staff = isset($data['no_of_staff']) && $data['no_of_staff'] !== ''
+            ? (int) $data['no_of_staff']
+            : null;
         $tax = isset($data['tax']) ? (float) $data['tax'] : 0.00;
         $features = $data['features'] ?? null;
         $status = $data['status'] ?? 'active';
 
-        $allowed_cycles = ['monthly', 'yearly', 'per_month'];
+        $allowed_cycles = ['monthly', 'yearly', 'pro_data'];
         $allowed_status = ['active', 'inactive'];
 
         if ($requireAll) {
-            if ($plan_name === '' || $price === null || $currency === '' || $billing_cycle === '' || $duration <= 0 || $no_of_staff <= 0) {
+            if ($plan_name === '' || $price === null || $currency === '' || $billing_cycle === '' || $duration <= 0) {
                 return false;
             }
         }
