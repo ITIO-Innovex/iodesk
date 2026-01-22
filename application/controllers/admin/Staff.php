@@ -202,6 +202,7 @@ class Staff extends AdminController
 				$company_id = $this->staff_model->addcompany($data);
 				unset($data_staff['companyname']);
 				unset($data_staff['website']);
+				unset($data_staff['deal_form_type']);
 				$data_staff['company_id']=$company_id;
 				$data_staff['administrator']=1;
 				$data_staff['role']=0;

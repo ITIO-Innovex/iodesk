@@ -116,7 +116,8 @@
                     <div class="tw-flex tw-items-center tw-space-x-3">
 					<a href="#" onclick="interview_email(this);return false;" data-id="<?php echo (int)$it['id']; ?>" data-name="<?php echo e($it['full_name']); ?>" data-email="<?php echo e($it['email_id']); ?>" data-designation="<?php echo e($it['designation']); ?>"  class="tw-text-success-500" title="Send Interview Invitation"><i class="fa-regular fa-envelope menu-icon fa-lg text-primary"></i></a>
 					
-                      <?php /*?><a href="#" onclick="view_interview(this);return false;" data-all='<?php echo json_encode($it, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a><?php */?>
+                     <a href="#" onclick="view_interview(this);return false;" data-all='<?php echo json_encode($it, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a>
+					 
                       <a href="#" onclick="edit_interview(this);return false;" data-all='<?php echo json_encode($it, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-pen-to-square fa-lg"></i></a>
 					  
                     </div>
@@ -243,7 +244,22 @@
   });
   function new_interview(){ $('#interviews_modal').modal('show'); $('.edit-title').addClass('hide'); }
   function edit_interview(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('id', it.id)); $('#interviews_modal input[name=full_name]').val(it.full_name); $('#interviews_modal input[name=phone_number]').val(it.phone_number); $('#interviews_modal input[name=email_id]').val(it.email_id); $('#interviews_modal input[name=qualification]').val(it.qualification); $('#interviews_modal input[name=designation]').val(it.designation); $('#interviews_modal input[name=total_experience]').val(it.total_experience); $('#interviews_modal input[name=current_salary]').val(it.current_salary); $('#interviews_modal input[name=notice_period_in_days]').val(it.notice_period_in_days); $('#interviews_modal input[name=location]').val(it.location); $('#interviews_modal input[name=city]').val(it.city); $('#interviews_modal select[name=source]').val(it.source||''); $('#interviews_modal select[name=process_status]').val(it.process_status||''); $('#interviews_modal textarea[name=comments]').val(it.comments); $('#interviews_modal select[name=status]').val(it.status||1); $('#interviews_modal').modal('show'); $('.add-title').addClass('hide'); }
-  function view_interview(invoker){ var it=$(invoker).data('all'); $('#d-name').text(it.full_name); $('#d-phone').text(it.phone_number); $('#d-email').text(it.email_id||''); $('#d-qual').text(it.qualification||''); $('#d-desig').text(it.designation||''); $('#d-exp').text(it.total_experience||''); $('#d-salary').text(it.current_salary||''); $('#d-notice').text(it.notice_period_in_days||''); var st=parseInt(it.status||1,10); $('#d-status').removeClass('label-success label-danger').addClass(st===1?'label-success':'label-danger').text(st===1?'Active':'Inactive'); $('#d-location').text(it.location||''); $('#d-city').text(it.city||''); 
+  
+  
+  function view_interview(invoker){
+    var it = $(invoker).data('all') || {};
+    $('#d-name').text(it.full_name || '');
+    $('#d-phone').text(it.phone_number || '');
+    $('#d-email').text(it.email_id || '');
+    $('#d-qual').text(it.qualification || '');
+    $('#d-desig').text(it.designation || '');
+    $('#d-exp').text(it.total_experience || '');
+    $('#d-salary').text(it.current_salary || '');
+    $('#d-notice').text(it.notice_period_in_days || '');
+    var st = parseInt(it.status || 1, 10);
+    $('#d-status').removeClass('label-success label-danger').addClass(st===1?'label-success':'label-danger').text(st===1?'Active':'Inactive');
+    $('#d-location').text(it.location || '');
+    $('#d-city').text(it.city || '');
   // Get source name
   var source_name = '';
   if (it.source) {
@@ -268,7 +284,9 @@
   }
   $('#d-process').text(process_name);
   
-  $('#d-comments').text(it.comments||''); $('#interviews_details').modal('show'); }
+  $('#d-comments').text(it.comments || '');
+  $('#interviews_details').appendTo('body').modal('show');
+  }
 
 
 </script>

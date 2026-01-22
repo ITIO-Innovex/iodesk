@@ -1,5 +1,8 @@
 <?php
-
+use PHPMailer\PHPMailer\PHPMailer; // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\Exception;  // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\SMTP;
+header('Content-Type: text/html; charset=utf-8');
 defined('BASEPATH') or exit('No direct script access allowed');
 
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
@@ -82,7 +85,31 @@ class Authentication_model extends App_Model
                         'email'  => $email,
                         'userid' => $user->$_id,
                     ]);
-
+					
+					// Store Subscription//////////
+					
+					$tables = db_prefix() . 'services_user_subscriptions';
+					$this->db->where('company_id', $user->company_id);
+                    $subscriptions_data = $this->db->get($tables)->row();
+					
+					
+					$subscription_id = !empty($subscriptions_data->subscription_id) ? $subscriptions_data->subscription_id : '';
+					$start_date      = !empty($subscriptions_data->start_date) ? $subscriptions_data->start_date : '';
+					$end_date        = !empty($subscriptions_data->end_date) ? $subscriptions_data->end_date : '';
+					$status          = !empty($subscriptions_data->status) ? $subscriptions_data->status : '';
+					$created_at      = !empty($subscriptions_data->created_at) ? $subscriptions_data->created_at : '';
+					
+					//echo "XXXXXXXXX";exit;
+                    $subscription_data = [
+                    'cms_subscription_id'   => $subscription_id,
+                    'cms_subscription_start_date'  => $start_date,
+                    'cms_subscription_end_date' => $end_date,
+					'cms_subscription_status' => $status,
+					'cms_subscription_created_at' => $created_at,
+                   ];
+				   $this->session->set_userdata($subscription_data);
+				   //print_r($subscription_data);exit;
+				
                     $user_data = [
                         'staff_user_id'   => $user->$_id,
                         'staff_logged_in' => true,
@@ -102,6 +129,8 @@ class Authentication_model extends App_Model
                     'userid'          => $user->userid,
                     'contact_user_id' => $user->$_id,
                 ]);
+				
+				
 
                 $user_data = [
                     'client_user_id'   => $user->userid,
@@ -109,6 +138,7 @@ class Authentication_model extends App_Model
                     'client_logged_in' => true,
                 ];
             }
+			
             $this->session->set_userdata($user_data);
 
             if (!$twoFactorAuth) {
@@ -701,4 +731,128 @@ class Authentication_model extends App_Model
 
         return $this->encryption->decrypt($string);
     }
+	
+	
+	function send_activation_mail($data){
+	
+	//print_r($data);exit;
+	//log_message('error', 'Display data - ' . print_r($data, true));
+	
+	$companyname=get_option('companyname');
+	$support_email="info@itio.in";	
+	$website=get_option('main_domain');
+	$msg="";
+	
+	
+	
+	//===============================
+	$mailer_username    = trim($_SESSION['STAFFSMTP']['smtp_user']);
+	$mailer_password    = trim(base64_decode($_SESSION['STAFFSMTP']['smtp_pass']));
+	$mailer_smtp_host   = trim($_SESSION['STAFFSMTP']['smtp_host']);
+	$mailer_smtp_port	= trim($_SESSION['STAFFSMTP']['smtp_port']);
+	$mailer_smtp_crypto	= trim($_SESSION['STAFFSMTP']['smtp_crypto']);
+	//==================================================
+	
+    $recipientEmail 	= $data['email'];
+	$recipientName 		= $data['firstname'].' '.$data['lastname'];
+	$mailSub			= "Activate Your Account - ".$companyname;
+	$senderEmail 		= $mailer_username;
+	$senderName			= e(get_staff_full_name());
+	
+	//exit;
+$activation_link=site_url('authentication/acticate_account?salt='.base64_encode($data['company_id']));
+
+$mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+<p style="margin:0 0 16px;">Dear <strong>'.$recipientName.'</strong>,</p>
+<p style="margin:0 0 16px;">Thank you for registering with <strong>'.$companyname.'</strong>.</p>
+<p style="margin:0 0 16px;">To complete your registration, please verify your email address by clicking the button below:</p>
+<p style="margin:0 0 16px;"><a href="'.$activation_link.'" target="_blank" style="background-color: #007bff; color: #ffffff; padding: 12px 24px; text-decoration: none; display: inline-block;">Activate Account</a></p>
+<p style="margin:0 0 16px;">If the button does not work, copy and paste the following link into your browser:</p>
+<p style="margin:0 0 16px;"><a href="'.$activation_link.'" target="_blank" >'.$activation_link.'</a></p>
+<p style="margin:0 0 16px;"><em><strong>This activation link is valid for a limited time.</strong></em></p>
+<p style="margin:0 0 16px;"><em><strong>If you did not create this account, please ignore this email.</strong></em></p>
+<p style="margin:0 0 16px;"><em><strong>If you need any assistance, feel free to contact our support team.</strong></em></p>
+<p style="margin:0 0 16px;"><em><strong>Best regards,</strong></em><br><em><strong>'.$companyname.' Team</strong></em><br><em><strong>'.$support_email.'</strong></em><br><em><strong>'.$website.'</strong></em></p>
+
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
+
+//log_message('error', 'senderName - ' .$mailbody );
+//=============================
+  $mail = new PHPMailer(true);
+		
+		
+	try {
+	//echo "==============";
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+    //$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port = $mailer_smtp_port;
+    // Enable SMTP debugging (testing only)
+    //$mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
+    //$mail->Debugoutput = 'html';
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	$mail->Priority = 1; 
+	$mail->setFrom($senderEmail, $senderName);
+	$mail->addAddress($recipientEmail, $recipientName);
+	// Add hardcoded BCC
+	$mail->addBCC('vikashg@itio.in');
+	$mail->Subject = $mailSub;
+	$mail->Body = $mailbody;
+    $sent=$mail->send();
+	//echo "==============!!";exit;
+	 if (!$sent) {
+	 log_message('error', $mailSub.'Mail Not Sent');
+	 log_activity($mailSub.' not sent successfully -  [ Name: ' . $recipientName . ']');
+	//log_activity('NDA sent successfully -  [ Name: ' . $name . ']');
+    //exit;
+	 
+	 }else{
+	//log_message('error', 'Mail Not Sent 66');
+	log_activity($mailSub.' sent successfully -  [ Name: ' . $recipientName . ']');
+    //exit;
+	 
+	 }
+    
+	
+    
+	} catch (Exception $e) {
+		log_message('error', $mailSub.'Mail Not Sent');
+	}
+	 
+	 /////////////////////////////////
+	
+	}
 }

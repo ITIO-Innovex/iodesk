@@ -34,7 +34,8 @@ $_SESSION['templatesub']=" ".$mail_subject;
 //echo $_SESSION['templatesub'];exit;
 if(isset($cc)&&$cc){
 }else{
-$cc="vikashg@itio.in";
+//$cc="vikashg@itio.in";
+$cc="";
 }
 
         parent::__construct();

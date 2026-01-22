@@ -141,7 +141,7 @@
 		  
         </ul>
       </div>
-	  <?php if(is_admin()){?>
+	  <?php $display=1; if(is_admin() && $display==2 ){?>
 	  <div class="sm:tw-border-r sm:tw-border-solid sm:tw-border-neutral-200 tw-pr-10 tw-w-96 tw-p-2" style="box-shadow: -2px -2px 9px #d4d4d4, 0px 0px 0px #ffffff !important;backdrop-filter: saturate(125%) blur(10px);">
         <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"><i class="fa-solid fa-file-text tw-mx-2"></i> Payroll</h4>
         <ul class="reports tw-space-y-1">

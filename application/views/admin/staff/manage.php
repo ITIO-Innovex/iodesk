@@ -24,7 +24,7 @@
                             _l('staff_dt_active'),
 							_l('Company Name'),
                             
-                            'Webmail Setup',
+                            /*'Webmail Setup',*/
 							
                         ];
                         $custom_fields = get_custom_fields('staff', ['show_on_table' => 1]);

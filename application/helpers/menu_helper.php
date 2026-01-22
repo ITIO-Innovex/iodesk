@@ -255,6 +255,56 @@ function app_init_admin_sidebar_menu_items()
 			'badge'    => [],
 		]);
     }
+
+    
+        $CI->app_menu->add_sidebar_menu_item('subscriptions_menu', [
+            'collapse' => true,
+            'name'     => 'Subscriptions',
+            'position' => 55,
+            'icon'     => 'fa-solid fa-file-invoice-dollar',
+            'badge'    => [],
+        ]);
+		
+		if (is_super()) {
+		
+		$CI->app_menu->add_sidebar_children_item('subscriptions_menu', [
+            'slug'     => 'user-subscriptions',
+            'name'     => 'Subscriber',
+            'href'     => admin_url('services/user_subscriptions'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('subscriptions_menu', [
+            'slug'     => 'subscriptions-invoices',
+            'name'     => 'Invoices',
+            'href'     => admin_url('services/subscriptions_invoices'),
+            'position' => 10,
+            'badge'    => [],
+        ]);
+
+        $CI->app_menu->add_sidebar_children_item('subscriptions_menu', [
+            'slug'     => 'subscriptions',
+            'name'     => 'Subscriptions',
+            'href'     => admin_url('services/subscriptions'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+
+        
+
+        
+    }
+	if (is_admin()) {
+	
+	 $CI->app_menu->add_sidebar_children_item('subscriptions_menu', [
+            'slug'     => 'plan_subscriptions',
+            'name'     => 'My Subscriptions',
+            'href'     => admin_url('services/my_subscriptions'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+	}
 	
 	
 	

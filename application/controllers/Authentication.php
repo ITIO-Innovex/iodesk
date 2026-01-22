@@ -12,13 +12,14 @@ class Authentication extends ClientsController
 
     public function index()
     {
-        $this->login();
+        //$this->login();
+		$this->get_register();
     }
 
     // Added for backward compatibilies
     public function admin()
     {
-        redirect(admin_url('authentication'));
+        //redirect(admin_url('authentication'));
     }
 
     public function login()
@@ -77,12 +78,130 @@ class Authentication extends ClientsController
 
     public function register()
     {
-        if (get_option('allow_registration') != 1 || is_client_logged_in()) {
+        $this->handle_register('register', true, false);
+    }
+
+    public function get_register()
+    {
+	
+	
+        $this->handle_register('get_register', false, true);
+    }
+
+    public function verify()
+    {
+        $data['title'] = 'Registration Successful';
+        $data['bodyclass'] = 'customers_verify';
+        $this->data($data);
+        $this->view('verify');
+        $this->disableNavigation();
+        $this->disableSubMenu();
+        $this->layout();
+    }
+	
+	public function acticate_account()
+    {
+        
+		$salt = $this->input->get('salt');
+        //echo $salt;
+		
+		$data['title'] = 'Account activated';
+		
+		if(isset($salt)&&$salt){
+		$company_id=base64_decode($salt);
+		$company_name=get_staff_company_name($company_id);
+		}else{
+		$data['title'] = 'Wong';
+		}
+		
+		if(isset($company_name)&&$company_name&&$company_id){
+		
+        $this->db->where('company_id', $company_id)->update(db_prefix().'company_master', ['active' => 1]);
+		//echo $this->db->last_query();exit;
+        if ($this->db->affected_rows() > 0) {
+            log_activity('Company Status Updated [CompanyID: ' . $company_id . ']');
+        }else{
+		$data['title'] = '404';
+		}
+		
+		
+		}
+		
+        //$data['bodyclass'] = 'customers_verify';
+        $this->data($data);
+        $this->view('acticate_account');
+        $this->disableNavigation();
+        $this->disableSubMenu();
+        $this->layout();
+    }
+	public function post_register()
+    {
+        
+		if ($this->input->post()) {
+		
+            $data = $this->input->post();
+			$data_staff = $data;
+			$data['deal_form_type']=1;
+			$data['active']=0;
+			
+			
+			$company_id = $this->staff_model->addcompany($data);
+			//echo $this->db->last_query();exit;
+			  if(isset($company_id)&&$company_id){
+			    unset($data_staff['companyname']);
+				unset($data_staff['website']);
+				unset($data_staff['deal_form_type']);
+				unset($data['active']);
+				$data_staff['company_id']=$company_id;
+				$data_staff['admin']=1;
+				$data_staff['role']=0;
+				$data_staff['send_welcome_email']=0;
+				$data_staff['password']=rand(100000,999999);
+				
+                $id = $this->staff_model->add($data_staff);
+				
+                if ($id) {
+				$this->authentication_model->send_activation_mail($data_staff);
+		
+                    set_alert('success', _l('added_successfully', 'Company'));
+                    redirect(site_url('authentication/verify/' . $company_id));
+                }
+				
+				}else{
+				
+				}
+				
+		}
+    }
+
+    public function staff_email_exists()
+    {
+        if ($this->input->is_ajax_request() && $this->input->post()) {
+            $email = $this->input->post('email');
+            if (!$email) {
+                echo json_encode(true);
+                return;
+            }
+            $this->db->where('email', $email);
+            $total_rows = $this->db->count_all_results(db_prefix() . 'staff');
+            echo json_encode($total_rows === 0);
+            return;
+        }
+        show_404();
+    }
+
+    private function handle_register($view, $enforceAllowRegistration, $disableNav)
+    {
+        if ($enforceAllowRegistration && get_option('allow_registration') != 1) {
+            redirect(site_url());
+        }
+
+        if (is_client_logged_in()) {
             redirect(site_url());
         }
 
         $requiredFields = get_required_fields_for_registration();
-       
+
         $honeypot = get_option('enable_honeypot_spam_validation') == 1;
 
         $fields = [
@@ -98,20 +217,20 @@ class Authentication extends ClientsController
 
         $emailRules = 'trim|is_unique[' . db_prefix() . 'contacts.email]|valid_email';
 
-        foreach(['contact', 'company'] as $fieldsKey) {
-            foreach($requiredFields[$fieldsKey] as $key => $field) {
+        foreach (['contact', 'company'] as $fieldsKey) {
+            foreach ($requiredFields[$fieldsKey] as $key => $field) {
                 $formKey = strafter($key, '_');
 
-                if(isset($fields[$formKey])) {
+                if (isset($fields[$formKey])) {
                     $formKey = $fields[$formKey];
                 }
-                
-                if($key !== 'contact_email'){
-                    if($field['is_required']) {
+
+                if ($key !== 'contact_email') {
+                    if ($field['is_required']) {
                         $this->form_validation->set_rules($formKey, $field['label'], 'required');
                     }
                 } else {
-                    if($field['is_required']) {
+                    if ($field['is_required']) {
                         $emailRules .= '|required';
                     }
 
@@ -128,7 +247,7 @@ class Authentication extends ClientsController
                 ['required' => _l('terms_and_conditions_validation')]
             );
         }
-       
+
         $this->form_validation->set_rules('password', _l('clients_register_password'), 'required');
         $this->form_validation->set_rules('passwordr', _l('clients_register_password_repeat'), 'required|matches[password]');
 
@@ -178,7 +297,7 @@ class Authentication extends ClientsController
                     if ($customerCountry) {
                         $callingCode = '+' . ltrim($customerCountry->calling_code, '+');
 
-                        if (startsWith($data['contact_phonenumber'], $customerCountry->calling_code)) { // with calling code but without the + prefix
+                        if (startsWith($data['contact_phonenumber'], $customerCountry->calling_code)) {
                             $data['contact_phonenumber'] = '+' . $data['contact_phonenumber'];
                         } elseif (!startsWith($data['contact_phonenumber'], $callingCode)) {
                             $data['contact_phonenumber'] = $callingCode . $data['contact_phonenumber'];
@@ -197,7 +316,7 @@ class Authentication extends ClientsController
                       'firstname'           => $data[$fields['firstname']],
                       'lastname'            => $data[$fields['lastname']],
                       'email'               => $data[$fields['email']],
-                      'contact_phonenumber' => $data['contact_phonenumber'] ,
+                      'contact_phonenumber' => $data['contact_phonenumber'],
                       'website'             => $data['website'],
                       'title'               => $data['title'],
                       'password'            => $data['passwordr'],
@@ -255,7 +374,11 @@ class Authentication extends ClientsController
         $data['honeypot']  = $honeypot;
         $data['fields']    = $fields;
         $this->data($data);
-        $this->view('register');
+        $this->view($view);
+        if ($disableNav) {
+            $this->disableNavigation();
+            $this->disableSubMenu();
+        }
         $this->layout();
     }
 
