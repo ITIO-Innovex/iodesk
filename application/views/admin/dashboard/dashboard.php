@@ -248,7 +248,8 @@ app.calendarIDs = '<?php echo json_encode($google_ids_calendars); ?>';
 $staffId    = $GLOBALS['current_user']->staffid ?? '';
 $staffEmail = $GLOBALS['current_user']->email ?? '';
 
-if(isset($staffId)&&$staffId&&isset($staffEmail)&&$staffEmail){
+if(isset($staffId)&&$staffId&&isset($staffEmail)&&$staffEmail&&
+    str_ends_with($staffEmail, '@itio.in')){
 ?>
 <script>
   $(function () {

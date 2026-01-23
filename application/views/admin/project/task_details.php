@@ -106,6 +106,10 @@ border-radius: 20px;
 <input type="hidden" name="task_status" value="<?php echo $task['task_status']; ?>">
 <input type="hidden" name="task_priority" value="<?php echo $task['task_priority']; ?>">
 <div class="form-group">
+<label for="task_owner" class="control-label"><small class="req text-danger">* </small>Task Name</label>
+<input type="text" class="form-control" name="task_name" value="<?php echo $task['task_name']; ?>" required>
+</div>
+<div class="form-group">
                 <label for="task_owner" class="control-label"><small class="req text-danger">* </small><?php echo _l('Owner'); ?></label>
                 <select class="form-control chosen-select" id="task_owner" name="task_owner[]" required multiple data-placeholder="Select Owner(s)" title="Owner">
                   <?php if (isset($staff_members) && is_array($staff_members)) { ?>
@@ -507,6 +511,7 @@ waitForJQuery(function() {
       var endDate = $form.find('input[name="task_end_date"]').val();
       var taskStatus = $form.find('input[name="task_status"]').val();
       var taskPriority = $form.find('input[name="task_priority"]').val();
+	  var taskName = $form.find('input[name="task_name"]').val();
 	  var taskTags = $form.find('input[name="task_tags"]').val();
 	  var taskProgress = $form.find('input[name="task_progress"]').val();
       
@@ -523,6 +528,7 @@ waitForJQuery(function() {
         endDate: endDate,
         taskStatus: taskStatus,
         taskPriority: taskPriority,
+		taskName: taskName,
 		taskTags: taskTags,
         taskReminder: taskReminder,
         reminderDailyTime: reminderDailyTime,
@@ -538,6 +544,7 @@ waitForJQuery(function() {
         task_end_date: endDate,
         task_status: taskStatus,
         task_priority: taskPriority,
+		task_name: taskName,
 		task_progress: taskProgress,
 		task_tags: taskTags,
         task_reminder: taskReminder,

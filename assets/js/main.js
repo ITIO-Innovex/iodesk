@@ -3908,8 +3908,8 @@ function init_editor(selector, settings) {
     },
     plugins: [
       "advlist", "autoresize", "autosave", "lists", "link", "image", "codesample",
-      "visualblocks", "code", "fullscreen",
-      "media", "save", "table",
+      "visualblocks", "code", "fullscreen", "textcolor",
+      "media", "save", "table", "keyboard"
     ],
     toolbar: "fontfamily fontsize | forecolor backcolor | bold italic | alignleft aligncenter alignright alignjustify | image link | bullist numlist | restoredraft",
     contextmenu: "link image | paste copy",
@@ -3918,6 +3918,17 @@ function init_editor(selector, settings) {
       // Default fontsize is 12
       ed.on("init", function () {
         this.getDoc().body.style.fontSize = "12pt";
+      });
+      
+      // Add keyboard shortcuts
+      ed.addShortcut('ctrl+b', 'Bold', function () {
+        ed.execCommand('Bold');
+      });
+      ed.addShortcut('ctrl+i', 'Italic', function () {
+        ed.execCommand('Italic');
+      });
+      ed.addShortcut('ctrl+u', 'Underline', function () {
+        ed.execCommand('Underline');
       });
     },
   };

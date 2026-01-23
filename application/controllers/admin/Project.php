@@ -744,6 +744,7 @@ class Project extends AdminController
             'task_end_date' => $this->input->post('task_end_date'),
             'task_status' => $this->input->post('task_status'),
             'task_priority' => $this->input->post('task_priority'),
+			'task_name' => $this->input->post('task_name'),
 			'task_progress' => $this->input->post('task_progress'),
 			'task_tags' => $tagsString,
             'task_reminder' => $task_reminder,

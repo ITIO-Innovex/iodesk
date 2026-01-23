@@ -9,11 +9,11 @@
   <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  Staff Type <i class="fa-solid fa-circle-info" title="For count Saturday on attendance" style=" color:khaki;"></i></span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
     <div class="row">
       <div class="col-md-12">
-        <?php /*?><div class="tw-mb-2 sm:tw-mb-4"> 
+        <div class="tw-mb-2 sm:tw-mb-4"> 
           <a href="#" onclick="new_staff_type(); return false;" class="btn btn-primary"> 
             <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Staff Type'); ?> 
           </a> 
-        </div><?php */?>
+        </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (isset($staff_types) && count($staff_types) > 0) { ?>
