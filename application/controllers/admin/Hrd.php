@@ -767,6 +767,24 @@ class Hrd extends AdminController
         redirect(admin_url('hrd/setting/staff_type'));
     }
 
+    public function staff_types_list()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('Staff Type');
+        }
+
+        $list = $this->db->select('id, title')
+            ->where('company_id', get_staff_company_id())
+            ->where('status', 1)
+            ->order_by('title', 'asc')
+            ->get(db_prefix() . 'hrd_staff_type')
+            ->result_array();
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($list));
+    }
+
     // Add/Edit Shift Manager
     public function shiftmanager()
     {

@@ -657,6 +657,46 @@ function get_admin_email()
                return $approverArr['admin_approver'] ?? get_staff_user_id();
 }
 
+
+function get_services_subscriptions()
+{   
+
+        $subscription_id = (int) ($_SESSION['cms_subscription_id'] ?? 0);
+        
+		if(isset($subscription_id)&&$subscription_id){
+		$CI = & get_instance();
+		$row = $CI->db
+        ->select('*')
+		->from(db_prefix() . 'services_subscriptions')
+		->where('id', $subscription_id)
+		->get()
+		->row();
+		return $row;
+		}
+
+	return false;
+}
+
+function get_services_subscriptions_no_of_staff()
+{   
+
+        $subscription_id = (int) ($_SESSION['cms_subscription_id'] ?? 0);
+        
+		if(isset($subscription_id)&&$subscription_id){
+		$CI = & get_instance();
+		$row = $CI->db
+        ->select('no_of_staff')
+		->from(db_prefix() . 'services_subscriptions')
+		->where('id', $subscription_id)->get()->row();
+		if(isset($row)&&$row->no_of_staff){
+		return $row->no_of_staff;
+		}
+		}
+
+	return 0;
+}
+
+
 function get_deal_form_type($company_id)
 {   
         // Fetch company Name from company id

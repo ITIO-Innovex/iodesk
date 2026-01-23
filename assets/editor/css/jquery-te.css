@@ -372,6 +372,13 @@ if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 .jqte_editor div, .jqte_editor p {
 	margin:0 0 7px
 }
+
+.jqte_editor b, strong {
+    font-weight: 600 !important;
+}
+.jqte_editor i {
+  font-style: italic !important;
+}
 .jqte_editor a:link, .jqte_editor a:link * {
 	color:#0066FF !important;
 	text-decoration:underline;

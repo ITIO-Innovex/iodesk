@@ -1136,6 +1136,20 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa-solid fa-users-rectangle',
             'badge'    => [],
         ]);
+		$CI->app_menu->add_setup_menu_item('branch_manager', [
+            'href'     => admin_url('hrd/setting/branch_manager'),
+            'name'     => 'Branch',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-code-branch',
+            'badge'    => [],
+        ]);
+		$CI->app_menu->add_setup_menu_item('staff_type', [
+            'href'     => admin_url('hrd/setting/staff_type'),
+            'name'     => 'Staff Type',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-users',
+            'badge'    => [],
+        ]);
 		
     }
 }

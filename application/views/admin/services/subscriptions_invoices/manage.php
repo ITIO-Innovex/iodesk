@@ -15,6 +15,7 @@ init_head(); ?>
             <?php render_datatable([
               'ID',
               'Invoice No',
+              'Payment ID',
               'Company ID',
               'Subscription ID',
               'Amount',
@@ -101,6 +102,55 @@ init_head(); ?>
   </div>
 </div>
 
+<div class="modal fade" id="subscription_invoice_view_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Invoice Details</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered table-striped">
+          <tbody>
+            <tr><th>ID</th><td id="view_invoice_id"></td></tr>
+            <tr><th>Invoice No</th><td id="view_invoice_no"></td></tr>
+            <tr><th>Company ID</th><td id="view_company_id"></td></tr>
+            <tr><th>Subscription ID</th><td id="view_subscription_id"></td></tr>
+            <tr><th>Amount</th><td id="view_amount"></td></tr>
+            <tr><th>Currency</th><td id="view_currency"></td></tr>
+            <tr><th>Tax</th><td id="view_tax"></td></tr>
+            <tr><th>Total Amount</th><td id="view_total_amount"></td></tr>
+            <tr><th>Invoice Date</th><td id="view_invoice_date"></td></tr>
+            <tr><th>Due Date</th><td id="view_due_date"></td></tr>
+            <tr><th>Payment Status</th><td id="view_payment_status"></td></tr>
+            <tr><th>Payment Method</th><td id="view_payment_method"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="subscription_invoice_payment_json_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Payment Details (JSON)</h4>
+      </div>
+      <div class="modal-body">
+        <pre id="payment_json_content" class="tw-whitespace-pre-wrap tw-text-xs"></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php init_tail(); ?>
 <script>
   function open_subscription_invoice_modal() {
@@ -137,9 +187,35 @@ init_head(); ?>
     $('#subscription_invoice_modal').modal('show');
   }
 
+  function view_subscription_invoice(el) {
+    $('#view_invoice_id').text($(el).data('id'));
+    $('#view_invoice_no').text($(el).data('invoice-no'));
+    $('#view_company_id').text($(el).data('company-id'));
+    $('#view_subscription_id').text($(el).data('subscription-id'));
+    $('#view_amount').text($(el).data('amount'));
+    $('#view_currency').text($(el).data('currency'));
+    $('#view_tax').text($(el).data('tax'));
+    $('#view_total_amount').text($(el).data('total-amount'));
+    $('#view_invoice_date').text($(el).data('invoice-date'));
+    $('#view_due_date').text($(el).data('due-date'));
+    $('#view_payment_status').text($(el).data('payment-status'));
+    $('#view_payment_method').text($(el).data('payment-method'));
+    $('#subscription_invoice_view_modal').modal('show');
+  }
+
+  function view_payment_json(el) {
+    var jsonValue = $(el).data('payment-json') || '';
+    if (!jsonValue) {
+      $('#payment_json_content').text('No payment data found.');
+    } else {
+      $('#payment_json_content').text(jsonValue);
+    }
+    $('#subscription_invoice_payment_json_modal').modal('show');
+  }
+
   $(function(){
-    // Columns: 0 ID, 1 Invoice No, 2 Company ID, 3 Subscription ID, 4 Amount, 5 Currency, 6 Tax, 7 Total, 8 Invoice Date, 9 Due Date, 10 Status, 11 Options
-    initDataTable('.table-services_subscriptions_invoices', window.location.href, [11], [11], undefined, [0, 'desc']);
+    // Columns: 0 ID, 1 Invoice No, 2 Payment ID, 3 Company ID, 4 Subscription ID, 5 Amount, 6 Currency, 7 Tax, 8 Total, 9 Invoice Date, 10 Due Date, 11 Status, 12 Options
+    initDataTable('.table-services_subscriptions_invoices', window.location.href, [12], [12], undefined, [0, 'desc']);
 
     $('#subscription-invoice-form').on('submit', function(e){
       e.preventDefault();

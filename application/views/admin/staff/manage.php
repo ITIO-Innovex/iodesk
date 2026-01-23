@@ -5,14 +5,33 @@
         <div class="row">
             <div class="col-md-12">
             <div id="" class="alert d-none ajaxAlert" role="alert"></div>
+			    <?php $total_staff = (isset($staff_members) && is_array($staff_members)) ? count($staff_members) : 0; ?>
+			    
+				<?php 
+				$assign_no_of_staff = (int) get_services_subscriptions_no_of_staff();
+				if ($total_staff < $assign_no_of_staff) {
+				?>
                 <?php if (staff_can('create',  'staff') || is_department_admin()) { ?>
+                
                 <div class="tw-mb-2 sm:tw-mb-4">
                     <a href="<?php echo admin_url('staff/member'); ?>" class="btn btn-primary">
                         <i class="fa-regular fa-plus tw-mr-1"></i>
                         <?php echo _l('new_staff'); ?>
                     </a>
+                    <span class="label label-info" style="margin-left: 8px;">Total Staff: <?php echo $total_staff; ?> / <?php echo $assign_no_of_staff;?></span>
+					
                 </div>
                 <?php } ?>
+				<?php } ?>
+				<?php if (($total_staff == $assign_no_of_staff) || $assign_no_of_staff==0) { ?>
+				<div class="tw-mb-2 sm:tw-mb-4">
+				<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Your current plan allows up to (<?php echo $assign_no_of_staff;?>) staff members. You have reached this limit.
+To add more staff, please upgrade your plan. <span style="float:right"><a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Upgrade Plan</a></span></div>
+                  </div>
+				</div>
+					<?php } ?>
+				
                 <div class="panel_s">
                     <div class="panel-body panel-table-full">
                         <?php

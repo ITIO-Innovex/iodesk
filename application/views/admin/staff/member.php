@@ -10,6 +10,41 @@
         </div>
         <?php } ?>
         <div class="row">
+            <?php
+           
+            if (!isset($departments) || !is_array($departments) || count($departments) === 0) {
+            ?>
+			<div class="col-md-8 col-md-offset-2 msgbox_department">
+                    <div class="alert alert-warning">
+                        <div class=" tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add departments before creating staff.  <span style="float:right"><a href="#" onclick="new_department_staff(); return false;" class="btn btn-warning btn-sm ms-2">Add New Departments</a></span></div>
+                    </div>
+                </div>
+			<?php
+            }
+			?>
+			<?php
+            if (!isset($designation) || !is_array($designation) || count($designation) === 0) {
+            ?>
+			<div class="col-md-8 col-md-offset-2 msgbox_designation">
+                    <div class="alert alert-warning">
+                        
+ 						<div class=" tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add designation before creating staff.  <span style="float:right"><a href="#" onclick="open_designation_staff_modal(); return false;" class="btn btn-warning btn-sm ms-2">Add New Designation</a></span></div>
+                    </div>
+                </div>
+			<?php } ?>
+			
+			<?php
+            if (!isset($staff_types) || !is_array($staff_types) || count($staff_types) === 0) {
+           ?>
+			<div class="col-md-8 col-md-offset-2 msgbox_staff_type">
+                    <div class="alert alert-warning">
+                        <div class=" tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add New Staff before creating staff.  <span style="float:right"><a href="#" onclick="open_staff_type_staff_modal(); return false;" class="btn btn-warning btn-sm ms-2">Add New Staff Types</a></span></div>
+                    </div>
+                </div>
+			<?php
+            }
+			?>
+           
             <?php if (isset($member)) { ?>
             <div class="col-md-12">
                 <?php if (total_rows(db_prefix() . 'departments', ['email' => $member->email]) > 0) { ?>
@@ -213,7 +248,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
 								}
 								
 								?>
-								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '<label for="departments" class="control-label"> <small class="req text-danger">* </small>Department</label>', $departmentid, ['required' => 'true']); ?>
+ 								<?php echo render_select('departments[]', $departments, ['departmentid', 'name'], '<label for="departments" class="control-label"> <small class="req text-danger">* </small>Department</label> <a href="#" id="add_more_department" onclick="new_department_staff(); return false;" class="text-primary" style="margin-left:6px;">Add More</a>', $departmentid, ['required' => 'true']); ?>
 								
 								<?php 
 								$designation_id="";
@@ -221,25 +256,13 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
 								$designation_id=$member->designation_id;
 								} 
 								?>
-								<?php echo render_select('designation_id', $designation, ['id', 'title'], '<label for="designation_id" class="control-label"> <small class="req text-danger">* </small>Designation</label>', $designation_id, ['required' => 'true']); ?>
+								<?php echo render_select('designation_id', $designation, ['id', 'title'], '<label for="designation_id" class="control-label"> <small class="req text-danger">* </small>Designation</label> <a href="#" id="add_more_designation" onclick="new_designation_staff(); return false;" class="text-primary" style="margin-left:6px;">Add More</a>', $designation_id, ['required' => 'true']); ?>
 
                                 <?php
                                 // Prefill custom staff fields if editing
-                                $staff_branch = isset($member) && isset($member->branch) ? (int)$member->branch : '';
                                 $employee_code = isset($member) && isset($member->employee_code) ? $member->employee_code : '';
                                 $staff_type = isset($member) && isset($member->staff_type) ? (int)$member->staff_type : '';
                                 ?>
-                                <div class="form-group">
-                                    <label class="control-label"><small class="req text-danger">* </small>Branch</label>
-                                    <select name="branch" class="form-control" required>
-                                        <option value="">-- Select Branch --</option>
-                                        <?php if (isset($branches) && is_array($branches)) { foreach ($branches as $b) { ?>
-                                            <option value="<?php echo (int)$b['id']; ?>" <?php echo ($staff_branch !== '' && (int)$staff_branch === (int)$b['id']) ? 'selected' : ''; ?>>
-                                                <?php echo e($b['branch_name']); ?>
-                                            </option>
-                                        <?php } } ?>
-                                    </select>
-                                </div>
 
                                 <div class="form-group">
                                     <label class="control-label"><small class="req text-danger">* </small>Employee Code</label>
@@ -247,7 +270,7 @@ RTL (Right to Left) - Displays text from right to left. Common for Arabic/Hebrew
                                 </div>
 
                                 <div class="form-group">
-                                    <label class="control-label"><small class="req text-danger">* </small>Staff Type</label>
+                                    <label class="control-label"><small class="req text-danger">* </small>Staff Type</label><a href="#" id="add_more_staff_types" onclick="new_dstaff_types(); return false;" class="text-primary" style="margin-left:6px;">Add More</a>
                                     <select name="staff_type" class="form-control" required>
                                         <option value="">-- Select Staff Type --</option>
                                         <?php if (isset($staff_types) && is_array($staff_types)) { foreach ($staff_types as $st) { ?>
@@ -629,10 +652,225 @@ radioButton.checked = true;  // Check the radio button
         </div>
         <div class="btn-bottom-pusher"></div>
     </div>
+<div class="modal fade" id="department_staff_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <?php echo form_open(admin_url('departments/department'), ['id' => 'department-staff-form']); ?>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><?php echo _l('new_department'); ?></h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value='' tabindex="-1" />
+                <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1" />
+                <?php echo render_input('name', 'department_name'); ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+            </div>
+        </div>
+        <?php echo form_close(); ?>
+    </div>
+</div>
+<div class="modal fade" id="designation_staff_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <?php echo form_open(admin_url('designation/manage'), ['id' => 'designation-staff-form']); ?>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add Designation</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value='' tabindex="-1" />
+                <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1" />
+                <div class="form-group">
+                    <label for="designation_staff_department" class="control-label">Department</label>
+                    <select class="form-control selectpicker" data-live-search="true" name="department_id" id="designation_staff_department" data-none-selected-text="Select department">
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="designation_staff_title" class="control-label">Designation</label>
+                    <input type="text" class="form-control" id="designation_staff_title" name="title" placeholder="e.g. Senior Developer">
+                </div>
+                <div class="checkbox checkbox-primary">
+                    <input type="checkbox" id="designation_staff_active" name="is_active" checked>
+                    <label for="designation_staff_active">Active</label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+            </div>
+        </div>
+        <?php echo form_close(); ?>
+    </div>
+</div>
+<div class="modal fade" id="staff_type_staff_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <?php echo form_open(admin_url('hrd/stafftype'), ['id' => 'staff-type-staff-form']); ?>
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Add New Staff Type !!</h4>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value='' tabindex="-1" />
+                <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value='' tabindex="-1" />
+                <?php echo render_input('name', 'Staff Type Title'); ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+            </div>
+        </div>
+        <?php echo form_close(); ?>
+    </div>
+</div>
     <?php init_tail(); ?>
     <script>
+    function new_department_staff() {
+        $('#department_staff_modal').modal('show');
+        $('#department_staff_modal input[name="name"]').val('');
+    }
+    function reload_designation_departments(selected) {
+        $.getJSON('<?php echo admin_url('designations/departments'); ?>', function(list) {
+            var $sel = $('#designation_staff_department');
+            $sel.empty();
+            $sel.append('<option value="">Select department</option>');
+            list.forEach(function(it){
+                var opt = $('<option>').attr('value', it.id).text(it.name);
+                if (selected && parseInt(selected) === parseInt(it.id)) opt.attr('selected', 'selected');
+                $sel.append(opt);
+            });
+            $sel.selectpicker('refresh');
+        });
+    }
+    function open_designation_staff_modal() {
+        $('#designation_staff_title').val('');
+        $('#designation_staff_active').prop('checked', true);
+        reload_designation_departments();
+        $('#designation_staff_modal').modal('show');
+    }
+    function new_designation_staff() {
+        open_designation_staff_modal();
+    }
+    function open_staff_type_staff_modal() {
+        $('#staff_type_staff_modal input[name="name"]').val('');
+        $('#staff_type_staff_modal').modal('show');
+    }
+    function new_dstaff_types() {
+        open_staff_type_staff_modal();
+    }
     $(function() {
-        function loadDesignationsByDept(deptId, preselectId){
+        function reload_staff_departments_select(selectedName) {
+            $.getJSON('<?php echo admin_url('designations/departments'); ?>', function(list) {
+                var $sel = $('select[name="departments[]"]');
+                $sel.empty();
+                $sel.append($('<option>', { value: '', text: '-- Select Department --' }));
+                list.forEach(function(it){
+                    var opt = $('<option>').attr('value', it.id).text(it.name);
+                    if (selectedName && String(it.name).toLowerCase() === String(selectedName).toLowerCase()) {
+                        opt.attr('selected', 'selected');
+                    }
+                    $sel.append(opt);
+                });
+                if ($sel.hasClass('selectpicker')) { $sel.selectpicker('refresh'); }
+            });
+        }
+
+        function handle_department_submit(form) {
+            var $form = $(form);
+            var newName = $form.find('input[name="name"]').val();
+            $.post($form.attr('action'), $form.serialize()).done(function(response) {
+                var res = {};
+                try { res = JSON.parse(response); } catch (e) {}
+                if (res.success) {
+                    alert_float('success', res.message || 'Department added');
+                    $('#department_staff_modal').modal('hide');
+					$('.msgbox_department').hide();
+                    reload_staff_departments_select(newName);
+                } else {
+                    alert_float('warning', res.message || 'Validation failed');
+                }
+            }).fail(function(xhr) {
+                var error = {};
+                try { error = JSON.parse(xhr.responseText); } catch (e) {}
+                alert_float('danger', error.message || 'Request failed');
+            });
+            return false;
+        }
+
+        appValidateForm($('#department-staff-form'), { name: 'required' }, handle_department_submit);
+
+        function handle_designation_submit(form) {
+            var $form = $(form);
+            var newTitle = $form.find('input[name="title"]').val();
+            var deptId = $form.find('select[name="department_id"]').val();
+            $.post($form.attr('action'), $form.serialize()).done(function(response) {
+                var res = {};
+                try { res = JSON.parse(response); } catch (e) {}
+                if (res.success) {
+				    $('.msgbox_designation').hide();
+                    alert_float('success', res.message || 'Designation added');
+                    $('#designation_staff_modal').modal('hide');
+                    if (!deptId) {
+                        var deptVal = $('select[name="departments[]"]').val();
+                        if ($.isArray(deptVal)) { deptId = deptVal[0] || ''; }
+                        else { deptId = deptVal || ''; }
+                    }
+                    if (deptId) {
+                        loadDesignationsByDept(deptId, null, newTitle);
+                    }
+                } else {
+                    alert_float('warning', res.message || 'Validation failed');
+                }
+            }).fail(function(xhr) {
+                var error = {};
+                try { error = JSON.parse(xhr.responseText); } catch (e) {}
+                alert_float('danger', error.message || 'Request failed');
+            });
+            return false;
+        }
+
+        appValidateForm($('#designation-staff-form'), { department_id: 'required', title: 'required' }, handle_designation_submit);
+
+        function reload_staff_types_select(selectedName) {
+            $.getJSON(admin_url + 'hrd/staff_types_list', function(list) {
+                var $sel = $('select[name="staff_type"]');
+                $sel.empty();
+                $sel.append($('<option>', { value: '', text: '-- Select Staff Type --' }));
+                list.forEach(function(it){
+                    var opt = $('<option>', { value: it.id, text: it.title });
+                    if (selectedName && String(it.title).toLowerCase() === String(selectedName).toLowerCase()) {
+                        opt.attr('selected', 'selected');
+                    }
+                    $sel.append(opt);
+                });
+                if ($sel.hasClass('selectpicker')) { $sel.selectpicker('refresh'); }
+            });
+        }
+
+        function handle_staff_type_submit(form) {
+            var $form = $(form);
+            var newName = $form.find('input[name="name"]').val();
+            $.post($form.attr('action'), $form.serialize()).done(function() {
+                alert_float('success', 'Staff type added');
+                $('#staff_type_staff_modal').modal('hide');
+				$('.msgbox_staff_type').hide();
+                reload_staff_types_select(newName);
+            }).fail(function() {
+                alert_float('danger', 'Request failed');
+            });
+            return false;
+        }
+
+        appValidateForm($('#staff-type-staff-form'), { name: 'required' }, handle_staff_type_submit);
+
+        function loadDesignationsByDept(deptId, preselectId, preselectTitle){
             if(!deptId){ return; }
             $.get(admin_url + 'hrd/designations_by_department', { department_id: deptId }, function(resp){
                 var $sel = $('select[name="designation_id"]');
@@ -646,6 +884,7 @@ radioButton.checked = true;  // Check the radio button
                 items.forEach(function(item){
                     var $opt = $('<option>', { value: item.id, text: item.title });
                     if (preselectId && String(preselectId) === String(item.id)) { $opt.prop('selected', true); }
+                    else if (!preselectId && preselectTitle && String(item.title).toLowerCase() === String(preselectTitle).toLowerCase()) { $opt.prop('selected', true); }
                     $sel.append($opt);
                 });
 
@@ -726,7 +965,6 @@ radioButton.checked = true;  // Check the radio button
             lastname: 'required',
             username: 'required',
             employee_code: 'required',
-            branch: 'required',
             staff_type: 'required',
             password: {
                 required: {

@@ -13,7 +13,7 @@ $get_saturday_rule = $shift_details[0]['saturday_rule'] ?? '-';
 $staff_type = (isset($GLOBALS['current_user']->staff_type) && $GLOBALS['current_user']->staff_type)? $GLOBALS['current_user']->staff_type: null;
 $staff_type_title =get_staff_staff_type($staff_type);
 
-if(empty($shift_details)){ echo "Shift Not Mapped. contact web admin"; exit;} ?>
+if(empty($shift_details)){ echo "Shift Not Mapped. contact web admin"; } ?>
 
 <style media="print">
 /* Show only the calendar when printing */
@@ -64,6 +64,19 @@ table {
 <div id="wrapper">
   <div class="content">
   <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  My Attendance</span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
+  <?php if(empty($shift_details)){ ?>
+  <div class="row">
+      <div class="col-md-12">
+        
+        
+          <div class="alert alert-danger tw-bg-danger-500">
+		  <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Shift Not Mapped. contact web admin <span style="float:right"><a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Subscribe Now</a></span></div>
+		  </div>
+		  
+		  </div>
+		  </div>
+   <?php }else{ ?>
+		  
     <div class="row">
       <div class="col-md-12">
         
@@ -377,6 +390,8 @@ $inTime="00.00";$outTime="00.00";
         </div>
       </div>
     </div>
+	
+   <?php } ?>
   </div>
 </div>
 
