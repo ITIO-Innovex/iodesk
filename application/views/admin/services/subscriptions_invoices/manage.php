@@ -8,16 +8,16 @@ init_head(); ?>
           <div class="panel-body">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-4">
               <h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Subscription Invoices</h4>
-              <a href="#" class="btn btn-primary" onclick="open_subscription_invoice_modal(); return false;">
+              <?php /*?><a href="#" class="btn btn-primary" onclick="open_subscription_invoice_modal(); return false;">
                 <i class="fa-regular fa-plus tw-mr-1"></i> Add New Invoice
-              </a>
+              </a><?php */?>
             </div>
             <?php render_datatable([
               'ID',
               'Invoice No',
               'Payment ID',
-              'Company ID',
-              'Subscription ID',
+              'Company Name',
+              'Subscription',
               'Amount',
               'Currency',
               'Tax',
@@ -207,8 +207,15 @@ init_head(); ?>
     var jsonValue = $(el).data('payment-json') || '';
     if (!jsonValue) {
       $('#payment_json_content').text('No payment data found.');
+    } else if (typeof jsonValue === 'object') {
+      $('#payment_json_content').text(JSON.stringify(jsonValue, null, 2));
     } else {
-      $('#payment_json_content').text(jsonValue);
+      try {
+        var parsed = JSON.parse(jsonValue);
+        $('#payment_json_content').text(JSON.stringify(parsed, null, 2));
+      } catch (e) {
+        $('#payment_json_content').text(jsonValue);
+      }
     }
     $('#subscription_invoice_payment_json_modal').modal('show');
   }

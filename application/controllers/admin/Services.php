@@ -10,6 +10,7 @@ class Services extends AdminController
         $this->load->model('services_subscriptions_model');
         $this->load->model('services_user_subscriptions_model');
         $this->load->model('services_subscriptions_invoices_model');
+        $this->load->model('currencies_model');
 
         if (!is_admin()) {
             access_denied('Service Subscriptions');
@@ -18,11 +19,17 @@ class Services extends AdminController
 
     public function subscriptions()
     {
+	
+	   if (!is_super()) {
+            access_denied('Service Subscriptions');
+        }
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data('services_subscriptions');
         }
 
         $data['title'] = 'Service Subscriptions';
+        $data['currencies'] = $this->currencies_model->get();
+        $data['default_currency'] = $this->currencies_model->get_base_currency();
         $this->load->view('admin/services/subscriptions/manage', $data);
     }
 
@@ -61,6 +68,32 @@ class Services extends AdminController
         $data['plan'] = $plan;
         $data['payments'] = $payments;
         $this->load->view('admin/services/my_subscriptions/manage', $data);
+    }
+
+    public function subscriptions_invoice_pdf($id)
+    { 
+	
+        if (!is_numeric($id)) {
+            show_404();
+        }
+
+        $companyId = get_staff_company_id();
+		if (!is_super()) {
+        $this->db->where('company_id', $companyId);
+		}
+        $this->db->where('id', (int) $id);
+        $invoice = $this->db->get(db_prefix() . 'services_subscriptions_invoices')->row_array();
+
+        if (!$invoice) {
+            show_404();
+        }
+
+        $pdf = app_pdf('subscription_invoice', LIBSPATH . 'pdf/Subscription_invoice_pdf', $invoice);
+        $fileName = 'subscription-invoice-' . ($invoice['invoice_no'] ?? $invoice['id']) . '.pdf';
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $pdf->Output($fileName, 'D');
     }
 
     public function payment_status()
@@ -320,6 +353,11 @@ class Services extends AdminController
 
     public function subscriptions_invoices()
     {
+	
+	    if (!is_super()) {
+            access_denied('Subscriptions invoices');
+        }
+		
         if ($this->input->is_ajax_request()) {
             $this->app->get_table_data('services_subscriptions_invoices');
         }
@@ -434,7 +472,8 @@ class Services extends AdminController
 	
 	$todayDate = new DateTime();
 	$days=$plan->duration ?? 0;
-    $endDate   = (clone $todayDate)->modify("+$days days");
+    $endDate   = (clone $todayDate)->modify("+$days days")->modify('-1 day');
+	
 	
 	$payment_status="unpaid";	
 	$payment_method="";
@@ -467,7 +506,7 @@ class Services extends AdminController
 		$status="new";
 		}
 		
-		
+		//print_r($data);exit;
 		$this->db->insert(db_prefix() . 'services_subscriptions_invoices', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {

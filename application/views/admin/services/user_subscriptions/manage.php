@@ -8,14 +8,14 @@ init_head(); ?>
           <div class="panel-body">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-4">
               <h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Service Company Subscriptions</h4>
-              <a href="#" class="btn btn-primary" onclick="open_user_subscription_modal(); return false;">
+              <?php /*?><a href="#" class="btn btn-primary" onclick="open_user_subscription_modal(); return false;">
                 <i class="fa-regular fa-plus tw-mr-1"></i> Add New Company Subscription
-              </a>
+              </a><?php */?>
             </div>
             <?php render_datatable([
               'ID',
-              'Company ID',
-              'Subscription ID',
+              'Company Name',
+              'Subscription',
               'Start Date',
               'End Date',
               'Status',

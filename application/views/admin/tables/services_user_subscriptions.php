@@ -23,7 +23,16 @@ foreach ($rResult as $aRow) {
     $row = [];
     foreach ($aColumns as $col) {
         $_data = $aRow[$col];
-        if ($col === 'status') {
+		
+		if ($col === 'company_id') {
+		$_data = get_staff_company_name($aRow['company_id']);
+		}
+		
+		if ($col === 'subscription_id') {
+		$_data = get_subscriptions_title($aRow['subscription_id']);
+		}
+		
+            if ($col === 'status') {
             if ($aRow['status'] === 'active') {
                 $_data = '<span class="label label-success">'._l('active').'</span>';
             } elseif ($aRow['status'] === 'expired') {
@@ -36,8 +45,8 @@ foreach ($rResult as $aRow) {
     }
 
     $options = '<div class="tw-flex tw-items-center tw-space-x-3">';
-    $options .= '<a href="#" class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700" onclick="edit_user_subscription(this,' . e($aRow['id']) . '); return false" data-company-id="' . e($aRow['company_id']) . '" data-subscription-id="' . e($aRow['subscription_id']) . '" data-start-date="' . e($aRow['start_date']) . '" data-end-date="' . e($aRow['end_date']) . '" data-status="' . e($aRow['status']) . '"><i class="fa-regular fa-pen-to-square fa-lg"></i></a>';
-    $options .= '<a href="' . admin_url('services/user_subscriptions/delete/' . $aRow['id']) . '" class="tw-mt-px tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700 _delete"><i class="fa-regular fa-trash-can fa-lg"></i></a>';
+    $options .= '<a href="#" class="tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700" onclick="edit_user_subscription(this,' . e($aRow['id']) . '); return false" data-company-id="' . e($aRow['company_id']) . '" data-subscription-id="' . e($aRow['subscription_id']) . '" data-start-date="' . e($aRow['start_date']) . '" data-end-date="' . e($aRow['end_date']) . '" data-status="' . e($aRow['status']) . '"><i class="fa-regular fa-pen-to-square fa-lg tw-hidden"></i></a>';
+    $options .= '<a href="' . admin_url('services/user_subscriptions/delete/' . $aRow['id']) . '" class="tw-mt-px tw-text-neutral-500 hover:tw-text-neutral-700 focus:tw-text-neutral-700 _delete"><i class="fa-regular fa-trash-can fa-lg tw-hidden"></i></a>';
     $options .= '</div>';
 
     $row[] = $options;

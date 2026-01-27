@@ -570,6 +570,22 @@ function get_company_status($company_id)
 		return 0;
 }
 
+function get_subscriptions_title($sid)
+{   
+        
+		if(isset($sid)&&$sid){
+		$CI = & get_instance();
+		$CI->db->where('id', $sid);
+		$com = $CI->db->select('plan_name')->from(db_prefix() . 'services_subscriptions')->get()->row();
+		
+				if(isset($com)&&$com->plan_name){
+				return $com->plan_name;
+				}
+		}
+		
+		return 0;
+}
+
 function get_nda_url($company_id)
 {   
         

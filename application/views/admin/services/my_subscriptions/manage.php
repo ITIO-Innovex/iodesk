@@ -69,6 +69,7 @@ $subscription_status=subscription_status();
                       <th>Due Date</th>
                       <th>Status</th>
                       <th>Method</th>
+                      <th>Download</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -82,6 +83,15 @@ $subscription_status=subscription_status();
                         <td><?php echo e($payment['due_date'] ?? ''); ?></td>
                         <td><?php echo e(ucfirst($payment['payment_status'] ?? '')); ?></td>
                         <td><?php echo e($payment['payment_method'] ?? ''); ?></td>
+                        <td>
+                          <?php if (!empty($payment['id'])) { ?>
+                            <a class="btn btn-default btn-sm" href="<?php echo admin_url('services/subscriptions_invoice_pdf/' . $payment['id']); ?>">
+                              <i class="fa-solid fa-download"></i> Download
+                            </a>
+                          <?php } else { ?>
+                            -
+                          <?php } ?>
+                        </td>
                       </tr>
                     <?php } ?>
                   </tbody>
