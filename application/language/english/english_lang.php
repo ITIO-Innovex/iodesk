@@ -4301,5 +4301,6 @@ $lang['webmail setup priority updated'] = 'webmail setup priority updated';
 $lang['no_subscription'] = 'You do not have an active subscription. Please subscribe to continue.';
 $lang['no_active_subscription'] = 'Your subscription is currently inactive. Please subscribe to continue.';
 $lang['expired_subscription'] = 'Your subscription has expired. Please renew to continue using our services.';
+$lang['crm_setup'] = 'CRM Setup Guide';
 ?>
 

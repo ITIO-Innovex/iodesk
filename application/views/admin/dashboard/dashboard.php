@@ -26,6 +26,14 @@ $in_time  = $attendance[0]['in_time']  ?? '';
 $out_time = $attendance[0]['out_time'] ?? '';
 $subscription_status=subscription_status(); // for check subscription
 
+
+$active_department_count  = $active_department_count  ?? '';
+$active_designation_count  = $active_designation_count  ?? '';
+$display_setup=1;
+if(isset($company_details['company_logo'])&&$company_details['company_logo']&&isset($company_details['settings'])&&$company_details['settings']&&isset($company_details['company_logo'])&&$company_details['direct_mail_smtp']&&isset($active_department_count)&&$active_department_count&&$active_designation_count&&$active_designation_count){
+$display_setup=0;
+}
+
 ?>
 
 <?php init_head(); ?>
@@ -93,6 +101,8 @@ $subscription_status=subscription_status(); // for check subscription
 		</div>
 		<?php }elseif(is_admin() || is_department_admin()){ ?>
 		<div class="col-md-12 mtop20">
+		
+			
 <?php if($subscription_status<>'active'){ ?>
 <div class="alert alert-danger tw-bg-danger-500">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> <?php echo _l($subscription_status);?> <span style="float:right"><a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Subscribe Now</a></span></div>
@@ -100,7 +110,12 @@ $subscription_status=subscription_status(); // for check subscription
 <?php }else{ ?>
 <a href="<?php echo admin_url('staff');?>" class="fancy-btn"><i class="fa-solid fa-users menu-icon"></i> Add New Staff</a>
 
-<?php } ?>		
+<?php } ?>	
+<?php if($display_setup==1){ ?> 
+<div class="alert alert-danger tw-bg-warning-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> CRM Settings Guide where you can set up and manage all modules from one place.” <span style="float:right"><a href="<?php echo admin_url('crm_setup');?>" class="btn btn-warning btn-sm ms-2">CRM SETUP GUIDE</a></span></div>
+
+<?php } ?>	
 
 
 				  

@@ -8,7 +8,7 @@
                     <div class="panel-body">
                         <h4 class="tw-mb-4 tw-font-semibold tw-text-lg"><i class="fa-solid fa-gear"></i> CRM Setup</h4>
                         <div class="alert alert-info">
-                            This is a demo CRM setup page. The categories below are placeholders.
+                            This is the CRM setup page. The categories below are placeholders to help you configure each module.
                         </div>
                        
                         <div class="row">
@@ -104,7 +104,7 @@ if (isset($company_logo)&&$company_logo&&isset($company_website)&&$company_websi
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Manage your Company Name, Domain, Logo, Favicon etc <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Company Profile</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Manage your company name, domain, logo, favicon, and other branding details. etc <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Company Profile</a></span></div>
 </div>
 <?php } ?>
 
@@ -116,7 +116,7 @@ if (isset($company_logo)&&$company_logo&&isset($company_website)&&$company_websi
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Manage your nda url for send nda email from leads  <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2" target="_blank">NDA URL</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure your NDA URL used for sending NDA emails from Leads and Deals.  <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2" target="_blank">NDA URL</a></span></div>
 </div>
 <?php } ?>
                                         
@@ -141,7 +141,7 @@ Added Global Email SMTP Details
 </div>
 <?php } else { ?>										
 										<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Setup SMTP Details for Send all internal Email <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2">Global Email</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending all internal system emails. <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2">Global Email</a></span></div>
                   </div>
 <?php } ?>				  
 
@@ -152,7 +152,7 @@ Added Direct Email SMTP Details
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Setup SMTP Details for Send Direct Email <span style="float:right"><a href="<?php echo admin_url('customize/smtp_setting');?>" class="btn btn-warning btn-sm ms-2">Direct Email</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending direct emails. <span style="float:right"><a href="<?php echo admin_url('customize/smtp_setting');?>" class="btn btn-warning btn-sm ms-2">Direct Email</a></span></div>
 </div>
 				  
 <?php } ?>				  
@@ -164,7 +164,7 @@ Added NDA Email SMTP Details
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Setup SMTP Details for Send NDA Email from Leads / Deals <span style="float:right"><a href="<?php echo admin_url('customize/smtp_setting');?>" class="btn btn-warning btn-sm ms-2">NDA Email</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending NDA emails from Leads and Deals. <span style="float:right"><a href="<?php echo admin_url('customize/smtp_setting');?>" class="btn btn-warning btn-sm ms-2">NDA Email</a></span></div>
                   </div>
 <?php } ?>				  
                                             
@@ -186,7 +186,7 @@ Active department count: <?php echo $department_count; ?>
 </div>
 <?php } else { ?>
 										<div class="alert alert-danger tw-bg-danger-500 msgbox_department">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add departments before creating staff. <span style="float:right"><a href="<?php echo admin_url('departments');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Departments</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add departments before creating staff members. <span style="float:right"><a href="<?php echo admin_url('departments');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Departments</a></span></div>
                   </div>
 <?php } ?>
 <?php
@@ -197,7 +197,7 @@ Active designation count: <?php echo $designation_count; ?>
 </div>
 <?php } else { ?>
 				  						<div class="alert alert-danger tw-bg-danger-500 msgbox_designation">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add designation before creating staff. <span style="float:right"><a href="<?php echo admin_url('designation');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Designation</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add designations before creating staff members. <span style="float:right"><a href="<?php echo admin_url('designation');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Designation</a></span></div>
                   </div>
 <?php } ?>
 <?php
@@ -208,7 +208,7 @@ Active staff type count: <?php echo $staff_type_count; ?>
 </div>
 <?php } else { ?>
 				 						<div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add New Staff before creating staff. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/staff_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Staff Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add staff type to activate staff-related features. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/staff_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Staff Type</a></span></div>
                   </div>
 <?php } ?>
                                             
@@ -222,7 +222,7 @@ Active staff type count: <?php echo $staff_type_count; ?>
                                             <strong>Leads / Deals</strong>
                                         </div>
                                         <div class="panel-body">
-<?php
+<?php /*?><?php
 $lead_source_count = (int) ($active_lead_source_count ?? 0);
 if ($lead_source_count > 0) { ?>
 <div class="alert alert-success">
@@ -232,7 +232,7 @@ Active lead source count: <?php echo $lead_source_count; ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_department">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add lead sources before using lead module. <span style="float:right"><a href="<?php echo admin_url('leads/sources');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Lead Source</a></span></div>
 </div>
-<?php } ?>
+<?php } ?><?php */?>
 <?php
 $task_status_count = (int) ($active_task_status_count ?? 0);
 if ($task_status_count > 0) { ?>
@@ -241,7 +241,7 @@ Active task status count: <?php echo $task_status_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_designation">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add task status before using lead module. <span style="float:right"><a href="<?php echo admin_url('leads/task_status');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Task Status</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> PPlease add task statuses before using the Leads module. <span style="float:right"><a href="<?php echo admin_url('leads/task_status');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Task Status</a></span></div>
 </div>
 <?php } ?>
 <?php
@@ -252,7 +252,7 @@ Active deal stage count: <?php echo $deal_stage_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add deal stage before using lead module. <span style="float:right"><a href="<?php echo admin_url('leads/deal_stage');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Deal Stage</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add deal stages before using the Leads module. <span style="float:right"><a href="<?php echo admin_url('leads/deal_stage');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Deal Stage</a></span></div>
 </div>
 <?php } ?>
 				  
@@ -283,7 +283,7 @@ Active shift type count: <?php echo $shift_type_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift type to manage your leave. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Shift Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift types to manage attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Shift Type</a></span></div>
 </div>
 <?php } ?>
                          
@@ -296,7 +296,7 @@ Active shift manager count: <?php echo $shift_manager_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift manager to manage your Attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_manager');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Shift Manager</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift managers to manage attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_manager');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Shift Manager</a></span></div>
 </div>
 <?php } ?>
                                    
@@ -310,7 +310,7 @@ Active employee type count: <?php echo $employee_type_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add employee type to manage your staff. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/employee_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Employee Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add employee types to manage staff records. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/employee_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Employee Type</a></span></div>
 </div>
 <?php } ?>
                                       
@@ -323,7 +323,7 @@ Active branch manager count: <?php echo $branch_manager_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add branch manager to manage your attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/branch_manager');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Branch Manager</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add branch managers to manage attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/branch_manager');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Branch Manager</a></span></div>
 </div>
 <?php } ?>
 
@@ -337,7 +337,7 @@ Active leave type count: <?php echo $leave_type_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add leave lype to  manage your leave. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Leave Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add leave types to manage employee leave. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Leave Type</a></span></div>
 </div>
 <?php } ?>
 
@@ -350,7 +350,7 @@ Active leave rule count: <?php echo $leave_rule_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview rule to manage your leave. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Leave Rule</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview rules to manage interviews. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Leave Rule</a></span></div>
 </div>
 <?php } ?>
 
@@ -372,7 +372,7 @@ Active project group count: <?php echo $project_group_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to structure and manage your projects. <span style="float:right"><a href="<?php echo admin_url('project/project_group');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Project Group</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to organize and manage your projects effectively. <span style="float:right"><a href="<?php echo admin_url('project/project_group');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Project Group</a></span></div>
 </div>
 <?php } ?>
                                         </div>
@@ -394,7 +394,7 @@ Active interview process count: <?php echo $interview_process_count; ?>
 </div>
 <?php } else{ ?>
  <div class="alert alert-danger tw-bg-danger-500">
- <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview process to  manage your interviews. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_process');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Interview Process</a></span></div>
+ <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_process');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Interview Process</a></span></div>
  </div>
 <?php } ?>
                                         
@@ -406,7 +406,7 @@ Active interview source count: <?php echo $interview_source_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview source to manage your interviews. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_source');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Interview Source</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_source');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Interview Source</a></span></div>
 </div>
 <?php } ?>
                                         </div>
@@ -427,7 +427,7 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Chatgtp API Key for AI Support <span style="float:right"><a href="<?php echo admin_url('ai_content_generator');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Chatgtp API Key</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure your ChatGPT API key to enable AI-powered support. <span style="float:right"><a href="<?php echo admin_url('ai_content_generator');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Chatgtp API Key</a></span></div>
 </div>
 <?php } ?>
                                         </div>

@@ -13,10 +13,20 @@ init_head(); ?>
 <?php } ?>
             <h4 class="tw-mb-4 tw-font-semibold tw-text-lg">Payment Details</h4>
             <div class="panel_s">
-              <div class="panel-body">
+              <div class="panel-body mail-bg">
                 <div class="row">
-                  <div class="col-md-6"><strong>Invoice No:</strong> <?php echo e($payment['invoice_no']); ?></div>
-                  <div class="col-md-6"><strong>Payment Status:</strong> <?php echo e(ucfirst($payment['payment_status'] ?? '')); ?></div>
+                  <div class="col-md-4"><strong>Payment ID:</strong> <?php echo e(ucfirst($payment['payment_id'] ?? '')); ?></div>
+				  <div class="col-md-4"><strong>Invoice No:</strong> <?php echo e($payment['invoice_no']); ?></div>
+                  <div class="col-md-4"><strong>Payment Status:</strong> 
+				  
+				  <?php $payment_status=e(ucfirst($payment['payment_status'])) ?? ''; 
+				  if($payment_status=='Paid'){ ?>
+				  <span class="btn btn-success btn-sm ms-2"><i class="fa-regular fa-circle-check"></i> <?php echo $payment_status;?></span>
+				  <?php }else{ ?>
+				  <span class="btn btn-danger btn-sm ms-2"><i class="fa-regular fa-circle-xmark"></i> <?php echo 'Failed';?></span>
+				  <?php } ?>
+				  
+				  </div>
                 </div>
                 <div class="row mtop10">
                   <div class="col-md-4"><strong>Amount:</strong> <?php echo e($payment['currency'] ?? 'INR'); ?> <?php echo number_format((float) ($payment['amount'] ?? 0), 2); ?></div>
@@ -29,7 +39,7 @@ init_head(); ?>
                   <div class="col-md-4"><strong>Payment Method:</strong> <?php echo e($payment['payment_method'] ?? ''); ?></div>
                 </div>
                 <div class="mtop20">
-                  <a href="<?php echo admin_url('services/my_subscriptions'); ?>" class="btn btn-default">Back to My Subscription</a>
+                  <a href="<?php echo admin_url('services/my_subscriptions'); ?>" class="btn btn-warning">Back to My Subscription</a>
                 </div>
               </div>
             </div>

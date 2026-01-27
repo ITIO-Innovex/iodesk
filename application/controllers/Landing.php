@@ -10,7 +10,10 @@ class Landing extends CI_Controller
         $this->load->model('services_subscriptions_model');
         $plans = $this->services_subscriptions_model->get();
         $data['pricing_plans'] = array_values(array_filter($plans, function ($plan) {
-            return isset($plan['status']) ? $plan['status'] === 'active' : true;
+            //return isset($plan['status']) ? $plan['status'] === 'active' : true;
+			return
+            (!isset($plan['status']) || $plan['status'] === 'active') &&
+            (!isset($plan['id']) || $plan['id'] != 4);
         }));
         $this->load->view('landing/index', $data);
     }
