@@ -28,7 +28,7 @@
                     <h1>All-in-one HRM for growing teams</h1>
                     <p>Manage recruitment, attendance, payroll, and performance in one secure platform.</p>
                     <div class="mt-4">
-                        <a href="<?php echo base_url('admin'); ?>" class="btn btn-primary btn-lg">Go to Admin</a>
+                        <a href="<?php echo base_url('admin'); ?>" class="btn btn-primary btn-lg">Go to Login</a>
                         <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn btn-success btn-lg">Get Start Now</a>
                     </div>
                 </div>

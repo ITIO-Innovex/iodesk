@@ -49,16 +49,30 @@ init_head(); ?>
           <label for="price" class="control-label">Price</label>
           <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="0.00">
         </div>
+        <?php
+          $currencies = $currencies ?? [];
+          if (is_array($default_currency ?? null)) {
+              $defaultCurrency = $default_currency['name'] ?? 'INR';
+          } elseif (is_object($default_currency ?? null)) {
+              $defaultCurrency = $default_currency->name ?? 'INR';
+          } else {
+              $defaultCurrency = 'INR';
+          }
+        ?>
         <div class="form-group">
           <label for="currency" class="control-label">Currency</label>
-          <input type="text" class="form-control" id="currency" name="currency" value="INR">
+          <select class="form-control selectpicker" name="currency" id="currency" data-none-selected-text="Select currency">
+            <?php foreach ($currencies as $currency) { ?>
+              <option value="<?php echo e($currency['name']); ?>"><?php echo e($currency['name']); ?></option>
+            <?php } ?>
+          </select>
         </div>
         <div class="form-group">
           <label for="billing_cycle" class="control-label">Billing Cycle</label>
           <select class="form-control selectpicker" name="billing_cycle" id="billing_cycle" data-none-selected-text="Select billing cycle">
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
-            <option value="pro_data">Pro Month / Pro Data</option>
+            <option value="pro_data">Pro Month / Pro Rata</option>
           </select>
         </div>
         <div class="form-group">
@@ -101,7 +115,7 @@ init_head(); ?>
     $('#subscription_id').val('');
     $('#plan_name').val('');
     $('#price').val('');
-    $('#currency').val('INR');
+    $('#currency').selectpicker('val', '<?php echo e($defaultCurrency); ?>');
     $('#billing_cycle').selectpicker('val', 'monthly');
     $('#duration').val('');
     $('#no_of_staff').val('');
@@ -116,7 +130,7 @@ init_head(); ?>
     $('#subscription_id').val(id);
     $('#plan_name').val($(el).data('plan-name'));
     $('#price').val($(el).data('price'));
-    $('#currency').val($(el).data('currency'));
+    $('#currency').selectpicker('val', $(el).data('currency'));
     $('#billing_cycle').selectpicker('val', $(el).data('billing-cycle'));
     $('#duration').val($(el).data('duration'));
     $('#no_of_staff').val($(el).data('no-of-staff'));
