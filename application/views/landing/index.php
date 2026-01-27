@@ -8,8 +8,8 @@
 	<!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body { color: #1f2937; }
-        .hero { padding: 90px 0; background: #f8fafc; }
+        body { color: #1f2937; background-image: linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%) !important; }
+        .hero { padding: 90px 0; }
         .hero h1 { font-weight: 700; margin-bottom: 20px; }
         .hero p { font-size: 18px; color: #4b5563; }
         .section { padding: 70px 0; }
@@ -29,7 +29,7 @@
                     <p>Manage recruitment, attendance, payroll, and performance in one secure platform.</p>
                     <div class="mt-4">
                         <a href="<?php echo base_url('admin'); ?>" class="btn btn-primary btn-lg">Go to Admin</a>
-                        <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn btn-default btn-lg">Get Start Now</a>
+                        <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn btn-success btn-lg">Get Start Now</a>
                     </div>
                 </div>
                 <div class="col-md-5 text-center">
@@ -95,7 +95,8 @@
                 <p class="text-muted">Simple plans that scale with your business.</p>
             </div>
             <div class="row">
-                <?php if (!empty($pricing_plans)) { ?>
+                <?php if (!empty($pricing_plans)) {
+				 ?>
                     <?php foreach ($pricing_plans as $plan) {
                         $price = number_format((float) $plan['price'], 2);
                         $currency = $plan['currency'] ?? 'INR';

@@ -30,7 +30,11 @@ class Services extends AdminController
     {
         $plans = $this->services_subscriptions_model->get();
         $activePlans = array_values(array_filter($plans, function ($plan) {
-            return isset($plan['status']) ? $plan['status'] === 'active' : true;
+            //return isset($plan['status']) ? $plan['status'] === 'active' : true;
+			return
+            (!isset($plan['status']) || $plan['status'] === 'active') &&
+            (!isset($plan['id']) || $plan['id'] != 4);
+			
         }));
 
         $data['title'] = 'Choose Subscription';

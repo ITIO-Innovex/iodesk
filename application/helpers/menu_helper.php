@@ -255,6 +255,16 @@ function app_init_admin_sidebar_menu_items()
 			'badge'    => [],
 		]);
     }
+	
+	if (is_admin()) {
+		$CI->app_menu->add_sidebar_menu_item('crm_setup', [
+			'name'     => _l('crm_setup'),
+			'href'     => admin_url('crm_setup'),
+			'icon'     => 'fa-solid fa-gears',
+			'position' => 90,
+			'badge'    => [],
+		]);
+    }
 
     
         $CI->app_menu->add_sidebar_menu_item('subscriptions_menu', [

@@ -97,7 +97,27 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
 		
        //send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), 'VK GUPTA', 'www.eindia.com','');
        //Email,StaffID,NDA LINK,CCMAIL
-
+	   
+	   $company_id    = get_staff_company_id();
+	   $company_details   = [];
+	   $company_details = (array) $this->db->select('company_logo, favicon, settings, direct_mail_smtp')
+                ->where('company_id', $company_id)
+                ->get(db_prefix() . 'company_master')
+                ->row_array();
+            $ai_details_count = (int) $this->db->where('company_id', $company_id)
+                ->count_all_results(db_prefix() . 'ai_details');
+				
+        
+		
+		$department_count = (int) $this->db->where('company_id', $company_id)
+                ->count_all_results(db_prefix() . 'departments');
+            $designation_count = (int) $this->db->where('company_id', $company_id)
+                ->where('is_active', 1)
+                ->count_all_results(db_prefix() . 'designations');
+		
+		$data['company_details']                = $company_details;
+		$data['active_department_count']        = $department_count;
+        $data['active_designation_count']       = $designation_count;		
         $data = hooks()->apply_filters('before_dashboard_render', $data);
         $this->load->view('admin/dashboard/dashboard', $data);
     }

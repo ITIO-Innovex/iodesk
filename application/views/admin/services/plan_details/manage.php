@@ -37,7 +37,7 @@ $end_date   = $endDate->format('F d, Y');
 					<?php /*?><p><strong>Tax:</strong> <?php echo number_format((float) $plan['tax'], 2); ?> %</p><?php */?>
                     <p><strong>Billing Cycle:</strong> <?php echo e(ucfirst(str_replace('_', ' ', $plan['billing_cycle'] ?? 'monthly'))); ?></p>
                     <p><strong>Duration:</strong> <?php echo $duration; ?> Days</p>
-                    <p><strong>No of Staff:</strong> <?php echo isset($plan['no_of_staff']) ? e($plan['no_of_staff']) : 'N/A'; ?></p>
+                    <p><strong>No of Staff:</strong> <?php echo isset($plan['no_of_staff']) ? e($plan['no_of_staff']) : 'N/A'; ?></p><p class="mtop10">&nbsp;</p>
                   </div>
                 </div>
               </div>
@@ -62,9 +62,13 @@ $end_date   = $endDate->format('F d, Y');
                     <?php } ?>
 					<h4 class="tw-font-semibold">Amount to pay : <?php echo e($plan['currency'] ?? 'INR'); ?> <?php echo $price; ?> + Tax:</strong> <?php echo number_format((float) $plan['tax'], 2); ?> %</h4>
                     <div class="mtop20">
+					<a href="<?php echo admin_url('services/choose_subscriptions'); ?>" class="btn btn-danger" title="Back to subscriptions">
+                        Back
+                      </a>
                       <a href="<?php echo admin_url('services/subscriptions_payment?pid='.$plan['id']); ?>" class="btn btn-primary">
                         Pay Now
-                      </a>
+                      </a> <p class="text-right"><a href="<?php echo admin_url('services/plan_details/4'); ?>" class="mtop20" title="Use CRM features on selected dates each month.">Change Plan to Pro Date Access</a>
+
                     </div>
                   </div>
                 </div>
