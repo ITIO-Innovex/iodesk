@@ -280,8 +280,12 @@ class Webmail_model extends App_Model
 	$mail->CharSet = 'UTF-8';
 	$mail->Encoding = 'base64';
 	$mail->WordWrap = 50;               // set word wrap
-	$mail->Priority = 1; 
-	$mail->setFrom($senderEmail, $senderName);
+	//$mail->Priority = 1; 
+	$senderName = trim($senderName);
+    $senderName = strip_tags($senderName);
+    $senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
+	//$mail->setFrom($senderEmail, $senderName);
+	$mail->setFrom($senderEmail, $senderName, false);
 	$mail->addAddress($recipientEmail);
 	if (isset($recipientCC) && $recipientCC != "") {
 	

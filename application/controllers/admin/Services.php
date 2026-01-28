@@ -49,6 +49,32 @@ class Services extends AdminController
         $this->load->view('admin/services/choose_subscriptions/manage', $data);
     }
 
+    public function upgrade_plan()
+    {
+	
+	    $subscription_id=$_SESSION['cms_subscription_id'];
+		if(!$subscription_id) { show_404();}
+	    $plan = $this->services_subscriptions_model->get((int) $subscription_id);
+        if(!$plan) { show_404();}
+		
+       $planPrice = (float) $plan->price; // 9999.00
+       //$planPrice=100.00;
+       $plans = $this->services_subscriptions_model->get();
+
+		$activePlans = array_values(array_filter($plans, function ($plan) use ($planPrice) {
+			return
+				(!isset($plan['status']) || $plan['status'] === 'active') &&
+				(!isset($plan['id']) || $plan['id'] != 4) &&
+				isset($plan['price']) &&
+				(float)$plan['price'] > $planPrice;
+		}));
+
+        $data['title'] = 'Upgrade Plan';
+        $data['plans'] = $activePlans;
+		$data['planstype'] = 'Upgrade';
+        $this->load->view('admin/services/choose_subscriptions/manage', $data);
+    }
+
     public function my_subscriptions()
     {
         $companyId = get_staff_company_id();
@@ -64,9 +90,14 @@ class Services extends AdminController
         $this->db->order_by('id', 'desc');
         $payments = $this->db->get(db_prefix() . 'services_subscriptions_invoices')->result_array();
 
+        $activeStaffCount = (int) $this->db->where('company_id', $companyId)
+            ->where('active', 1)
+            ->count_all_results(db_prefix() . 'staff');
+
         $data['title'] = 'My Subscription';
         $data['plan'] = $plan;
         $data['payments'] = $payments;
+        $data['active_staff_count'] = $activeStaffCount;
         $this->load->view('admin/services/my_subscriptions/manage', $data);
     }
 
@@ -101,6 +132,7 @@ class Services extends AdminController
         $companyId = get_staff_company_id();
         $invoiceNo = $this->input->get('invoice_no');
         $sessionId = $this->input->get('session_id');
+		$invoiceType = $this->input->get('invoice_type');
         if (!$invoiceNo) {
             show_404();
         }
@@ -133,21 +165,73 @@ class Services extends AdminController
 						'payment_json' => json_encode($session),
                     ]);
 
+                    
+					if($invoiceType=="staff"){
+					
+					$no_off_staff=(int) $payment['staff_added'];
+					$this->db->set(
+						'staff_limit',
+						'staff_limit + ' . $no_off_staff,
+						FALSE
+					);
+					$this->db->where('company_id', $companyId);
+					$this->db->update('it_crm_services_user_subscriptions');
+                    log_activity('Added Staff in Subscription [invoice No: ' . $invoiceNo . ', No of Staff Added: ' . $no_off_staff . ']');
+					}elseif($invoiceType=="upgrade"){
+					
+					$pid=$payment['subscription_id'];
+					$newplan = $this->services_subscriptions_model->get((int) $pid);
+					//print_r($newplan);
+					
+					if(isset($newplan)&&$newplan->id){
+					
+					$todayDate = new DateTime();
+	                $days=$newplan->duration ?? 0;
+                    $endDate   = (clone $todayDate)->modify("+$days days")->modify('-1 day');
+	
+					$data = [
+    				'subscription_id' => $pid,
+    				'staff_limit'     => $newplan->no_of_staff,
+    				'start_date'      => $todayDate->format('Y-m-d'),   // YYYY-MM-DD
+    				'end_date'        => $endDate->format('Y-m-d'),       // YYYY-MM-DD
+					];
+
+$this->db->where('company_id', $companyId);
+$this->db->where('status', 'active'); // recommended
+$subs = $this->db->update('it_crm_services_user_subscriptions', $data);
+                        if($subs){
+						$_SESSION['cms_subscription_id']=$pid;
+						$_SESSION['cms_subscription_start_date']=$todayDate->format('Y-m-d');
+						$_SESSION['cms_subscription_end_date']=$endDate->format('Y-m-d');
+						$_SESSION['cms_subscription_status']='active';
+						$_SESSION['cms_subscription_created_at']=$todayDate->format('Y-m-d');
+						}
+log_activity('Activate New Plan [invoice No: ' . $invoiceNo . ', Plan: ' . $newplan->plan_name . ']');
+					
+					
+					}
+					
+					
+					}else{
+					
+					// Update User Subscriptions
                     $this->db->where('company_id', $companyId);
                     $this->db->where('subscription_id', $payment['subscription_id']);
                     $this->db->update(db_prefix() . 'services_user_subscriptions', [
                         'status' => 'active',
                     ]);
 					
+					// Set Session ///////
                     $this->db->where('subscription_id', $payment['subscription_id']);
                     $subs = $this->db->get(db_prefix() . 'services_user_subscriptions')->row_array();
 					
-					if($subs){
-					$_SESSION['cms_subscription_id']=$payment['subscription_id'];
-					$_SESSION['cms_subscription_start_date']=$subs['start_date'];
-					$_SESSION['cms_subscription_end_date']=$subs['end_date'];
-					$_SESSION['cms_subscription_status']=$subs['status'];
-					$_SESSION['cms_subscription_created_at']=$subs['created_at'];
+						if($subs){
+						$_SESSION['cms_subscription_id']=$payment['subscription_id'];
+						$_SESSION['cms_subscription_start_date']=$subs['start_date'];
+						$_SESSION['cms_subscription_end_date']=$subs['end_date'];
+						$_SESSION['cms_subscription_status']=$subs['status'];
+						$_SESSION['cms_subscription_created_at']=$subs['created_at'];
+						}
 					}
 
                     $this->db->where('company_id', $companyId);
@@ -196,6 +280,58 @@ class Services extends AdminController
         $data['title'] = 'Subscription Plan Details';
         $data['plan'] = (array) $plan;
         $this->load->view('admin/services/plan_details/manage', $data);
+    }
+
+    public function upgrated_plan_details($id)
+    {
+        if (!is_numeric($id)) {
+            show_404();
+        }
+		
+		$subscription_id=$_SESSION['cms_subscription_id'];
+		if(!$subscription_id) { show_404();}
+	    $old_plan = $this->services_subscriptions_model->get((int) $subscription_id);
+        
+		if(!$old_plan) { show_404();}
+
+        $plan = $this->services_subscriptions_model->get((int) $id);
+        if (!$plan) {
+            show_404();
+        }
+
+        $data['title'] = 'Subscription Plan Details';
+        $data['plan'] = (array) $plan;
+		$data['old_plan'] = (array) $old_plan;
+        $this->load->view('admin/services/upgrated_plan_details/manage', $data);
+    }
+
+    public function upgrade_staff()
+    {
+	
+	    $companyId = get_staff_company_id();
+
+        $this->db->select('sus.*, s.plan_name, s.price, s.currency, s.billing_cycle, s.no_of_staff, s.duration, s.features, s.tax');
+        $this->db->from(db_prefix() . 'services_user_subscriptions sus');
+        $this->db->join(db_prefix() . 'services_subscriptions s', 's.id = sus.subscription_id', 'left');
+        $this->db->where('sus.company_id', $companyId);
+        $this->db->order_by('sus.id', 'desc');
+        $plan = $this->db->get()->row_array();
+
+        /*$this->db->where('company_id', $companyId);
+        $this->db->order_by('id', 'desc');
+        $payments = $this->db->get(db_prefix() . 'services_subscriptions_invoices')->result_array();*/
+
+        $activeStaffCount = (int) $this->db->where('company_id', $companyId)
+            ->where('active', 1)
+            ->count_all_results(db_prefix() . 'staff');
+			
+        $requestedStaff = (int) $this->input->post('no_of_staff');
+        $data['title'] = 'Upgrade Staff';
+        $data['requested_staff'] = $requestedStaff;
+		$data['plan'] = $plan;
+        //$data['payments'] = $payments;
+        $data['active_staff_count'] = $activeStaffCount;
+        $this->load->view('admin/services/upgrade_staff/manage', $data);
     }
 
     public function subscriptions_manage()
@@ -492,6 +628,8 @@ class Services extends AdminController
     'due_date'        => $todayDate->format('Y-m-d'),
     'payment_method'  => $payment_method,
     'created_at'      => $todayDate->format('Y-m-d'),
+	'invoice_type'    => $plan->plan_name.' - '.$plan->id,
+	'staff_added'     => $plan->no_of_staff,
     ];
 	
 	   $pay_type=1;	
@@ -538,6 +676,7 @@ class Services extends AdminController
             'start_date'      => $todayDate->format('Y-m-d'),
             'end_date'        => $endDate->format('Y-m-d'),
             'status'          => $status,
+			'staff_limit'     => $plan->no_of_staff,
             'created_at'      => date('Y-m-d H:i:s')
         ];
 
@@ -619,5 +758,266 @@ class Services extends AdminController
        
 		
 		
+	}
+	
+	
+	public function subscriptions_add_staff_payment()
+    {
+	 $postdata=$id = $this->input->post();
+	 
+	 //print_r($postdata['extraStaff']);
+
+	
+	
+	$id = $this->input->post('subscription_id');
+	 if (!is_numeric($id)) {
+            show_404();
+        }else{
+		$subscription_id = $id;
+		}
+
+        $plan = $this->services_subscriptions_model->get((int) $id);
+        if (!$plan) {
+            show_404();
+        }
+		
+	$amount=$postdata['base_amount'];
+	$total_amount=$postdata['amount'];
+	$staff_added=$postdata['extraStaff'];
+	$todayDate = new DateTime();
+	$days=$plan->duration ?? 0;
+    $endDate   = (clone $todayDate)->modify("+$days days")->modify('-1 day');
+	
+	
+	$payment_status="unpaid";	
+	$payment_method="Online";
+	$status="new";
+	
+	$invoice_no=(10000+get_staff_company_id()).date("YmdHis"); // Generate Invoice Number
+	$company_id=get_staff_company_id(); // Get Company ID
+	$data = [
+    'invoice_no'      => $invoice_no,
+	'company_id'      => $company_id,
+    'subscription_id' => $id,
+    'amount'          => $amount,
+    'currency'        => $plan->currency, // corrected (was price)
+    'tax'             => $plan->tax,
+    'total_amount'    => $total_amount,
+    'invoice_date'    => $todayDate->format('Y-m-d'),
+    'due_date'        => $todayDate->format('Y-m-d'),
+    'payment_method'  => $payment_method,
+    'created_at'      => $todayDate->format('Y-m-d'),
+	'invoice_type'    => 'Staff Expansion - '.$staff_added,
+	'staff_added'     => $staff_added,
+    ];
+	
+	
+	
+	   $pay_type=1;	
+	
+//print_r($data);exit;
+		$this->db->insert(db_prefix() . 'services_subscriptions_invoices', $data);
+        $insert_id = $this->db->insert_id();
+        if ($insert_id) {
+        log_activity('Subscription Invoice Added [Plan: ' . $invoice_no . ', ID: ' . $insert_id . ']');
+		}
+	if($pay_type==1){
+        try {
+            $strp=$this->load->library('stripe_core');
+
+            if (!$this->stripe_core->has_api_key() || !$this->stripe_core->get_publishable_key()) {
+                set_alert('warning', 'Stripe keys are not configured.');
+                redirect(admin_url('services/payment_status?invoice_type=staff&invoice_no=' . $invoice_no));
+            }
+
+            $currency = strtolower($plan->currency ?? 'inr');
+            if ($currency !== 'inr') {
+                set_alert('warning', 'International payments are restricted to registered Indian businesses. Please use INR.');
+                redirect(admin_url('services/payment_status?invoice_no=' . $invoice_no));
+            }
+            $amountCents = (int) round($total_amount * 100);
+            $successUrl = admin_url('services/payment_status?invoice_type=staff&invoice_no=' . $invoice_no . '&session_id={CHECKOUT_SESSION_ID}');
+            $cancelUrl = admin_url('services/payment_status?invoice_type=staff&invoice_no=' . $invoice_no);
+
+            $sessionData = [
+                'payment_method_types' => ['card'],
+                'mode'                 => 'payment',
+                'billing_address_collection' => 'required',
+                'line_items'           => [
+                    [
+                        'price_data' => [
+                            'currency'     => $currency,
+                            'unit_amount'  => $amountCents,
+                            'product_data' => [
+                                'name'        => $plan->plan_name,
+                                'description' => 'Subscription ' . ($plan->billing_cycle ?? ''),
+                            ],
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'success_url' => $successUrl,
+                'cancel_url'  => $cancelUrl,
+                'metadata'    => [
+                    'invoice_no'      => $invoice_no,
+                    'company_id'      => $company_id,
+                    'subscription_id' => $subscription_id,
+                ],
+            ];
+
+            $staffEmail = $this->db->select('email')->where('staffid', get_staff_user_id())->get(db_prefix().'staff')->row();
+            if ($staffEmail && $staffEmail->email) {
+                $sessionData['customer_email'] = $staffEmail->email;
+            }
+
+            $session = $this->stripe_core->create_session($sessionData);
+            redirect_to_stripe_checkout($session->id);
+        } catch (Exception $e) {
+            log_message('error', 'Stripe checkout failed: ' . $e->getMessage());
+            set_alert('warning', $e->getMessage());
+            redirect(admin_url('services/payment_status?invoice_type=staff&invoice_no=' . $invoice_no));
+        }
+	
+	}else{
+	echo "Wrong path";exit;
+	set_alert('success', 'Account Activate');
+    redirect(admin_url('services/payment_status?invoice_no='.$invoice_no));
+	}
+	exit;
+	}
+	
+	
+	public function subscriptions_plan_upgrade()
+    {
+	 $postdata=$id = $this->input->post();
+	 
+	 
+	$id = $this->input->post('new_subscription_id');
+	$oldid = $this->input->post('old_subscription_id');
+	 if (!is_numeric($id)) {
+            show_404();
+        }else{
+		$subscription_id = $id;
+		}
+
+        $plan = $this->services_subscriptions_model->get((int) $id);
+        if (!$plan) {
+            show_404();
+        }
+		
+		
+		
+	                 $unused_amount=$postdata['unused_amount'];
+	                $amount = (float) $plan->price;
+					if(isset($unused_amount)&&$unused_amount){
+					$amount = ($amount - $unused_amount);
+					}
+					$tax_percent = (float) $plan->tax;
+					$tax_amount = ($amount * $tax_percent) / 100;
+					$total_amount = $amount + $tax_amount;
+	                $duration = isset($plan->duration) ? (int) $plan->duration : 0;
+	
+	
+	$todayDate = new DateTime();
+	$days=$plan->duration ?? 0;
+    $endDate   = (clone $todayDate)->modify("+$days days")->modify('-1 day');
+	
+	
+	$payment_status="unpaid";	
+	$payment_method="Online";
+	$status="new";
+	
+	$invoice_no=(10000+get_staff_company_id()).date("YmdHis"); // Generate Invoice Number
+	$company_id=get_staff_company_id(); // Get Company ID
+	$data = [
+    'invoice_no'      => $invoice_no,
+	'company_id'      => $company_id,
+    'subscription_id' => $id,
+    'amount'          => $amount,
+    'currency'        => $plan->currency, // corrected (was price)
+    'tax'             => $plan->tax,
+    'total_amount'    => $total_amount,
+    'invoice_date'    => $todayDate->format('Y-m-d'),
+    'due_date'        => $todayDate->format('Y-m-d'),
+    'payment_method'  => $payment_method,
+    'created_at'      => $todayDate->format('Y-m-d'),
+	'invoice_type'    => 'Plan Upgraded_'.$oldid.'_'.$id,
+	'staff_added'     => $plan->no_of_staff,
+    ];
+	//print_r($data);exit;
+	    
+	
+	
+	   $pay_type=1;	
+	
+//print_r($data);exit;
+		$this->db->insert(db_prefix() . 'services_subscriptions_invoices', $data);
+        $insert_id = $this->db->insert_id();
+        if ($insert_id) {
+        log_activity('Add Invoice for Upgrade Plan [Invoice No: ' . $invoice_no . ', ID: ' . $insert_id . ']');
+		}
+	if($pay_type==1){
+        try {
+            $strp=$this->load->library('stripe_core');
+
+            if (!$this->stripe_core->has_api_key() || !$this->stripe_core->get_publishable_key()) {
+                set_alert('warning', 'Stripe keys are not configured.');
+                redirect(admin_url('services/payment_status?invoice_type=upgrade&invoice_no=' . $invoice_no));
+            }
+
+            $currency = strtolower($plan->currency ?? 'inr');
+            if ($currency !== 'inr') {
+                set_alert('warning', 'International payments are restricted to registered Indian businesses. Please use INR.');
+                redirect(admin_url('services/payment_status?invoice_no=' . $invoice_no));
+            }
+            $amountCents = (int) round($total_amount * 100);
+            $successUrl = admin_url('services/payment_status?invoice_type=upgrade&invoice_no=' . $invoice_no . '&session_id={CHECKOUT_SESSION_ID}');
+            $cancelUrl = admin_url('services/payment_status?invoice_type=upgrade&invoice_no=' . $invoice_no);
+
+            $sessionData = [
+                'payment_method_types' => ['card'],
+                'mode'                 => 'payment',
+                'billing_address_collection' => 'required',
+                'line_items'           => [
+                    [
+                        'price_data' => [
+                            'currency'     => $currency,
+                            'unit_amount'  => $amountCents,
+                            'product_data' => [
+                                'name'        => $plan->plan_name,
+                                'description' => 'Subscription ' . ($plan->billing_cycle ?? ''),
+                            ],
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'success_url' => $successUrl,
+                'cancel_url'  => $cancelUrl,
+                'metadata'    => [
+                    'invoice_no'      => $invoice_no,
+                    'company_id'      => $company_id,
+                    'subscription_id' => $subscription_id,
+                ],
+            ];
+
+            $staffEmail = $this->db->select('email')->where('staffid', get_staff_user_id())->get(db_prefix().'staff')->row();
+            if ($staffEmail && $staffEmail->email) {
+                $sessionData['customer_email'] = $staffEmail->email;
+            }
+
+            $session = $this->stripe_core->create_session($sessionData);
+            redirect_to_stripe_checkout($session->id);
+        } catch (Exception $e) {
+            log_message('error', 'Stripe checkout failed: ' . $e->getMessage());
+            set_alert('warning', $e->getMessage());
+            redirect(admin_url('services/payment_status?invoice_type=upgrade&invoice_no=' . $invoice_no));
+        }
+	
+	}else{
+	echo "Wrong path";exit;
+	set_alert('success', 'Account Activate');
+    redirect(admin_url('services/payment_status?invoice_no='.$invoice_no));
+	}
+	exit;
 	}
 }

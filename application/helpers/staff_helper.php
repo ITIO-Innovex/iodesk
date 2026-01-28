@@ -1423,6 +1423,84 @@ function get_remaining_days_in_month($include_today = true)
 
     return $include_today ? $days + 1 : $days;
 }
+
+
+function calculateExtraStaffPrice(
+    float $planPrice,
+    int $baseStaff,
+    int $extraStaff,
+    string $startDate,
+    string $endDate,
+    float $taxPercent = 0
+): array {
+
+    $today = new DateTime(); // date when staff is added
+    $start = new DateTime($startDate);
+    $end   = new DateTime($endDate);
+
+    // Total days in billing cycle
+    $totalDays = $start->diff($end)->days;
+    if ($totalDays <= 0) {
+        return ['error' => 'Invalid subscription period'];
+    }
+
+    // Remaining days
+    $remainingDays = $today->diff($end)->days;
+    if ($remainingDays < 0) {
+        $remainingDays = 0;
+    }
+
+    // Price per staff per day
+    $perStaffPerDay = ($planPrice / $baseStaff) / $totalDays;
+
+    // Base amount
+    $amount = $perStaffPerDay * $remainingDays * $extraStaff;
+
+    // Tax calculation
+    $tax = ($amount * $taxPercent) / 100;
+    $total = $amount + $tax;
+
+    return [
+        'per_staff_per_day' => round($perStaffPerDay, 2),
+        'remaining_days'    => $remainingDays,
+        'base_amount'       => round($amount, 2),
+        'tax_amount'        => round($tax, 2),
+        'total_amount'      => round($total, 2)
+    ];
+}
+
+/**
+ * Calculate unused balance of current plan (pro-rata)
+ * duration = total days (30 / 365 / 1)
+ */
+function calculateUnusedPlanBalance(
+    float $planPrice,
+    int $durationInDays,
+    string $subscriptionEndDate
+) {
+    $today = new DateTime();
+    $end   = new DateTime($subscriptionEndDate);
+
+    // If plan expired, no balance
+    if ($today >= $end) {
+        return 0;
+    }
+
+    // Remaining days
+    $remainingDays = (int) $today->diff($end)->days;
+
+    if ($durationInDays <= 0 || $remainingDays <= 0) {
+        return 0;
+    }
+
+    // Per-day price
+    $perDayPrice = $planPrice / $durationInDays;
+
+    // Unused balance
+    return round($perDayPrice * $remainingDays, 2);
+}
+
+
 	
 function amountInWords($number)
 {
