@@ -1,12 +1,18 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
-init_head(); ?>
+init_head(); 
+$plantitle="";
+if(isset($planstype)&&$planstype=="Upgrade"){
+$plantitle="For Upgrade";
+}
+
+?>
 <div id="wrapper">
   <div class="content">
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">
           <div class="panel-body">
-            <h4 class="tw-mb-6 tw-font-semibold tw-text-lg"><i class="fa-solid fa-cart-plus"></i> Choose Subscription Plan</h4>
+            <h4 class="tw-mb-6 tw-font-semibold tw-text-lg"><i class="fa-solid fa-cart-plus"></i> Choose Subscription Plan <?php echo $plantitle;?></h4>
             <hr class="hr-panel-heading">
             <?php if (!empty($plans)) { ?>
               <div class="row ">
@@ -50,16 +56,18 @@ init_head(); ?>
                             <?php } ?>
                           </ul>
                         <?php } ?>
-                        <a href="<?php echo admin_url('services/plan_details/'.$plan['id']); ?>" class="btn btn-primary">
-                          Choose Plan
-                        </a>
+<?php if(isset($planstype)&&$planstype=="Upgrade"){ ?>
+<a href="<?php echo admin_url('services/upgrated_plan_details/'.$plan['id']); ?>" class="btn btn-primary">Choose Plan</a>
+<?php }else{ ?>
+<a href="<?php echo admin_url('services/plan_details/'.$plan['id']); ?>" class="btn btn-primary">Choose Plan</a>
+<?php }?>
                       </div>
                     </div>
                   </div>
                 <?php } ?>
               </div>
             <?php } else { ?>
-              <div class="alert alert-info">No active plans available.</div>
+              <div class="alert alert-info">No active plans available <?php echo strtolower($plantitle);?>.</div>
             <?php } ?>
           </div>
         </div>

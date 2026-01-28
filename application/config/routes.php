@@ -243,9 +243,12 @@ $route['admin/services/subscriptions'] = 'admin/services/subscriptions';
 $route['admin/services/subscriptions/manage'] = 'admin/services/subscriptions_manage';
 $route['admin/services/subscriptions/delete/(:num)'] = 'admin/services/subscriptions_delete/$1';
 $route['admin/services/choose_subscriptions'] = 'admin/services/choose_subscriptions';
+$route['admin/services/upgrade_plan'] = 'admin/services/upgrade_plan';
+$route['admin/services/upgrated_plan_details/(:num)'] = 'admin/services/upgrated_plan_details/$1';
 $route['admin/services/invoice/(:num)'] = 'admin/services/invoice/$1';
 $route['admin/services/my_subscriptions'] = 'admin/services/my_subscriptions';
 $route['admin/services/payment_status'] = 'admin/services/payment_status';
+$route['admin/services/upgrade_staff'] = 'admin/services/upgrade_staff';
 
 // Services - User Subscriptions routes
 $route['admin/services/user_subscriptions'] = 'admin/services/user_subscriptions';

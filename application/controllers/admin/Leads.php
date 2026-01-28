@@ -2413,7 +2413,7 @@ $mailbody='<!DOCTYPE html>
 	$mail->CharSet = 'UTF-8';
 	$mail->Encoding = 'base64';
 	$mail->WordWrap = 50;               // set word wrap
-	$mail->Priority = 1; 
+	//$mail->Priority = 1; 
 	$mail->setFrom($senderEmail, $senderName);
 	$mail->addAddress($recipientEmail);
 	// Add hardcoded BCC
