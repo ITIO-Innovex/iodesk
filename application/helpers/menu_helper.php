@@ -264,6 +264,30 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 90,
 			'badge'    => [],
 		]);
+		
+		$CI->app_menu->add_sidebar_menu_item('user_documentation', [
+			'name'     => _l('user_documentation'),
+			'href'     => base_url('user_documentation'),
+			'icon'     => 'fa-solid fa-book-open',
+			'position' => 90,
+			'badge'    => [],
+			'href_attributes' => [
+				'target' => '_blank',
+				'rel'    => 'noopener',
+			],
+		]);
+		
+		$CI->app_menu->add_sidebar_menu_item('help_center', [
+			'name'     => _l('help_center'),
+			'href'     => base_url('help_center'),
+			'icon'     => 'fa-solid fa-headset',
+			'position' => 90,
+			'badge'    => [],
+			'href_attributes' => [
+				'target' => '_blank',
+				'rel'    => 'noopener',
+			],
+		]);
     }
 
     

@@ -69,7 +69,7 @@ $start_date = $startDate->format('F d, Y');
 
 //print_r($result);
     
-echo $base_amount=number_format((float) $result['base_amount'], 2)				  
+$base_amount=number_format((float) $result['base_amount'], 2)				  
 ?>
 <?php echo form_open(admin_url('services/subscriptions_add_staff_payment'), ['id' => 'post-staff-form']); ?>
 <input type="hidden" name="subscription_id" value="<?php echo e($plan['subscription_id']); ?>" />
@@ -83,7 +83,7 @@ echo $base_amount=number_format((float) $result['base_amount'], 2)
 <input type="hidden" name="tax_amount" value="<?php echo number_format((float) $result['tax_amount'], 2);?>" />
 <input type="hidden" name="total_amount" value="<?php  echo number_format((float) $result['total_amount'], 2);?>" />
 
-                    <p>Add No of Staff : <?php echo $extraStaff;?></p>
+                    <p>No. of Staff for add : <?php echo $extraStaff;?></p>
 					<p>Period:  <strong><?php echo $start_date;?></strong> - <strong><?php echo $end_date;?> Remaining Days (<?php echo $result['remaining_days'];?>)</strong> </p>
 					<p>Per Staff Per Day (<?php echo $result['per_staff_per_day'];?>)</p>
 					<p>Base Amount (<?php echo number_format((float) $result['base_amount'], 2);?>)</p>
