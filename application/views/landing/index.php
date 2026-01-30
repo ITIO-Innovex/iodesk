@@ -1,9 +1,3 @@
-<?php 
-echo $support_email;
-echo $support_phone;
-echo $terms_of_use_url;
-echo $privacy_policy_url;
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

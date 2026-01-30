@@ -213,9 +213,9 @@ $subs = $this->db->update('it_crm_services_user_subscriptions', $data);
 						$_SESSION['cms_subscription_status']='active';
 						$_SESSION['cms_subscription_created_at']=$todayDate->format('Y-m-d');
 						}
-$log_desc="Plan Upgrated (".$no_off_staff.") with Invoice No ".$invoiceNo."Plan: " . $newplan->plan_name;
+$log_desc="Plan Upgrated (".$newplan->no_of_staff.") with Invoice No ".$invoiceNo."Plan: " . $newplan->plan_name;
 log_activity($log_desc);
-$this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_desc);					
+$this->services_subscriptions_model->log_service_activity($pid,'Invoice',$log_desc);					
 					
 					}
 					
