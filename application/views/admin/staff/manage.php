@@ -19,6 +19,7 @@
                         <?php echo _l('new_staff'); ?>
                     </a>
                     <span class="label label-info" style="margin-left: 8px;">Total Staff: <?php echo $total_staff; ?> / <?php echo $assign_no_of_staff;?></span>
+<a href="#" class="pull-right" id="crm_instruction" title="Manage Staff – User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning"></i></a>
 					
                 </div>
                 <?php } ?>
@@ -164,11 +165,93 @@ To add more staff, please upgrade your plan. <span style="float:right"><a href="
     <!-- /.modal-dialog -->
 </div>
 <!-- End Webmail Setup Modal -->
+<div class="modal fade" id="crm_instruction_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">How to Add / Edit Staff in CRM</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Here you can add / Update/ active / inactive/ change password and set permission.
+</div>
+
+
+
+<ol>
+    <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> To Add Staff</b></h4>
+        <ul>
+            <li> - Click on <strong>Add Staff Member</strong>.</li>
+            <li> - Fill in all <strong>required fields</strong> and click <strong>Submit</strong>.</li>
+			<li> - The <strong>email address must be unique</strong> for each staff member.</li>
+			<li> - Send welcome email : When Checked a mail sent on registered email with login details</li>
+        </ul>
+    </li>
+	
+	<li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Send Welcome Email</h4>
+        <ul>
+            <li> - If <strong>Send Welcome Email</strong> is checked,a welcome email with login credentials will be sent to the registered email address.</li>
+            
+        </ul>
+    </li>
+
+    <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Staff Role & Permissions</h4>
+        <ul>
+            <li><strong> - Normal Staff</strong> : 
+No default permissions are assigned.</li>
+            <li><strong> - Department Admin</strong> : 
+Can manage staff within their own department.</b></li>
+            <li><strong>Administrator</strong> : 
+Has full system access based on assigned permissions.</li>
+        </ul>
+    </li>
+
+        <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Permission Settings</h4>
+        <ul>
+            <li> - After submitting staff details, the Permissions tab will appear.</li>
+            <li> - Selecting a Role will automatically assign predefined permissions.</li>
+            <li> - Manually checked permissions will be available to the staff after login.</li>
+			<li> - Only selected permissions will be visible in the staff account.</li>
+        </ul>
+        
+    </li>
+	
+	<li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> To Change Password</h4>
+        <ul>
+            <li> - Admin must Edit the staff profile.</li>
+            <li> - Enter the new password.</li>
+            <li> - Click Save to update the password.</li>
+        </ul>
+        
+    </li>
+</ol>
+				</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
 <?php init_tail(); ?>
 <script>
 $(function() {
     initDataTable('.table-staff', window.location.href);
 });
+
+ $('#crm_instruction').on('click', function(e) {
+      e.preventDefault();
+      $('#no_of_staff').val('');
+      $('#crm_instruction_modal').modal('show');
+    });
 
 function delete_staff_member(id) {
     $('#delete_staff').modal('show');
