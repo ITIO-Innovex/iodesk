@@ -72,10 +72,11 @@ $end_date   = $endDate->format('F d, Y');
                       <p>No features listed.</p>
                     <?php } ?>
 					<?php
-					$amount = "9,999.00";        // string
-$unusedBalance = "932.4";    // string
 
-$amount = (float) str_replace(',', '', $amount);
+//$amount = "9,999.00";        // string
+//$unusedBalance = "932.4";    // string
+
+$amount = (float) str_replace(',', '', $price);
 $unusedBalance = (float) str_replace(',', '', $unusedBalance);
 
 $result = $amount - $unusedBalance;
