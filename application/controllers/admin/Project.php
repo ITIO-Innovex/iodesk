@@ -365,7 +365,7 @@ class Project extends AdminController
             $data = $this->input->post();
             
             // Debug: Log the received data
-            log_message('debug', 'Project form data: ' . print_r($data, true));
+           // log_message('debug', 'Project form data: ' . print_r($data, true));
             
             // Prepare data for database insertion
             $insert_data = array();
@@ -406,7 +406,7 @@ class Project extends AdminController
             $insert_data['progress'] = 0; // Default progress
             
             // Debug: Log the final data
-            log_message('debug', 'Final insert data: ' . print_r($insert_data, true));
+            //log_message('debug', 'Final insert data: ' . print_r($insert_data, true));
             
             // Add the project
             try {

@@ -109,4 +109,21 @@ class Services_subscriptions_model extends App_Model
             'status'        => $status,
         ];
     }
+	
+	public function log_service_activity($subscription_id, $service_type, $description)
+    {
+        $log = [
+            'date'            => date('Y-m-d H:i:s'),
+            'description'     => $description,
+			'staffid'         => get_staff_user_id(),
+			'company_id'      => get_staff_company_id(),
+            'subscription_id' => $subscription_id,
+			'service_type'    => $service_type
+        ];
+        
+
+        $this->db->insert(db_prefix() . 'service_log', $log);
+
+        return $this->db->insert_id();
+    }
 }

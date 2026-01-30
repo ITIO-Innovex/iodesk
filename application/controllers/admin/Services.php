@@ -164,6 +164,9 @@ class Services extends AdminController
 						'payment_id' => $session->payment_intent->id,
 						'payment_json' => json_encode($session),
                     ]);
+					$log_desc="Payment Completed against Invoice No ".$invoiceNo." with Payment ID ".$session->payment_intent->id;
+                    log_activity($log_desc);
+		            $this->services_subscriptions_model->log_service_activity($payment['subscription_id'],'Payment',$log_desc);
 
                     
 					if($invoiceType=="staff"){
@@ -176,7 +179,11 @@ class Services extends AdminController
 					);
 					$this->db->where('company_id', $companyId);
 					$this->db->update('it_crm_services_user_subscriptions');
-                    log_activity('Added Staff in Subscription [invoice No: ' . $invoiceNo . ', No of Staff Added: ' . $no_off_staff . ']');
+                    
+					$log_desc="Staff Expansion Completed (".$no_off_staff.") with Invoice No ".$invoiceNo;
+                    log_activity($log_desc);
+		            $this->services_subscriptions_model->log_service_activity($payment['subscription_id'],'Activate',$log_desc);
+		
 					}elseif($invoiceType=="upgrade"){
 					
 					$pid=$payment['subscription_id'];
@@ -206,8 +213,9 @@ $subs = $this->db->update('it_crm_services_user_subscriptions', $data);
 						$_SESSION['cms_subscription_status']='active';
 						$_SESSION['cms_subscription_created_at']=$todayDate->format('Y-m-d');
 						}
-log_activity('Activate New Plan [invoice No: ' . $invoiceNo . ', Plan: ' . $newplan->plan_name . ']');
-					
+$log_desc="Plan Upgrated (".$no_off_staff.") with Invoice No ".$invoiceNo."Plan: " . $newplan->plan_name;
+log_activity($log_desc);
+$this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_desc);					
 					
 					}
 					
@@ -224,6 +232,10 @@ log_activity('Activate New Plan [invoice No: ' . $invoiceNo . ', Plan: ' . $newp
 					// Set Session ///////
                     $this->db->where('subscription_id', $payment['subscription_id']);
                     $subs = $this->db->get(db_prefix() . 'services_user_subscriptions')->row_array();
+					
+$log_desc="New Plan Activated with Invoice No ".$invoiceNo." subscription_id: " . $payment['subscription_id'];
+log_activity($log_desc);
+$this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_desc);
 					
 						if($subs){
 						$_SESSION['cms_subscription_id']=$payment['subscription_id'];
@@ -819,7 +831,9 @@ log_activity('Activate New Plan [invoice No: ' . $invoiceNo . ', Plan: ' . $newp
 		$this->db->insert(db_prefix() . 'services_subscriptions_invoices', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
-        log_activity('Subscription Invoice Added [Plan: ' . $invoice_no . ', ID: ' . $insert_id . ']');
+		$log_desc="Request for Staff Expansion (".$staff_added.") with Invoice No ".$invoice_no;
+        log_activity($log_desc);
+		$this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_desc);
 		}
 	if($pay_type==1){
         try {
@@ -864,7 +878,7 @@ log_activity('Activate New Plan [invoice No: ' . $invoiceNo . ', Plan: ' . $newp
                     'subscription_id' => $subscription_id,
                 ],
             ];
-
+            //print_r($sessionData);exit;
             $staffEmail = $this->db->select('email')->where('staffid', get_staff_user_id())->get(db_prefix().'staff')->row();
             if ($staffEmail && $staffEmail->email) {
                 $sessionData['customer_email'] = $staffEmail->email;

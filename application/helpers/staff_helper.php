@@ -693,19 +693,28 @@ function get_services_subscriptions()
 	return false;
 }
 
-function get_services_subscriptions_no_of_staff()
+function get_services_subscriptions_no_of_staff($company_id = '')
 {   
 
         $subscription_id = (int) ($_SESSION['cms_subscription_id'] ?? 0);
+		
+		// check company id is found or not
+		if($company_id==""){
+				$tmpStaffUserId = get_staff_user_id();
+				if(isset($GLOBALS['current_user'])) {
+				$company_id=$GLOBALS['current_user']->company_id;
+				}
+		 }
+
         
 		if(isset($subscription_id)&&$subscription_id){
 		$CI = & get_instance();
-		$row = $CI->db
-        ->select('no_of_staff')
-		->from(db_prefix() . 'services_subscriptions')
-		->where('id', $subscription_id)->get()->row();
-		if(isset($row)&&$row->no_of_staff){
-		return $row->no_of_staff;
+		
+		$CI->db->where('company_id', $company_id);
+		$row = $CI->db->select('staff_limit')->from(db_prefix() . 'services_user_subscriptions')->get()->row();
+		//echo $CI->db->last_query();exit;
+		if(isset($row)&&$row->staff_limit){
+		return $row->staff_limit;
 		}
 		}
 

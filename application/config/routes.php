@@ -171,6 +171,8 @@ $route['register']        = 'authentication/register';
  */
 $route['terms-and-conditions'] = 'terms_and_conditions';
 $route['privacy-policy']       = 'privacy_policy';
+$route['help_center']          = 'help_center';
+$route['user_documentation']  = 'user_documentation';
 
 /**
  * @since 2.3.0

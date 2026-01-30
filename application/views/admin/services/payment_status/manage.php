@@ -40,6 +40,10 @@ init_head(); ?>
                 </div>
                 <div class="mtop20">
                   <a href="<?php echo admin_url('services/my_subscriptions'); ?>" class="btn btn-warning">Back to My Subscription</a>
+				  
+				  <a class="btn btn-danger" href="<?php echo admin_url('services/subscriptions_invoice_pdf/' . $payment['id']); ?>">
+                              <i class="fa-solid fa-download"></i> Download
+                            </a>
                 </div>
               </div>
             </div>

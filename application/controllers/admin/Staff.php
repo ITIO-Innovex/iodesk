@@ -472,6 +472,23 @@ unset($data['id']);
     /* Change status to staff active or inactive / ajax */
     public function change_staff_status($id, $status)
     {
+	
+	  // check active Staff
+	  $companyId = get_staff_company_id();
+	    
+		if(isset($status)&&$status==1){
+		
+		$assign_no_of_staff = (int) get_services_subscriptions_no_of_staff();
+		$activeStaffCount = (int) $this->db->where('company_id', $companyId)
+            ->where('active', 1)
+            ->count_all_results(db_prefix() . 'staff');
+			if ($activeStaffCount >= $assign_no_of_staff) {
+			set_alert('warning','Upgrade your staff limit for activate staff.');
+            return false; // staff limit reached
+            }
+			log_message('error', 'calculation - Assign Staff - ' . $assign_no_of_staff." Active Staff - ".$activeStaffCount." New Activated staff id -".$id);
+		}
+		
         if (staff_can('edit',  'staff')) {
             if ($this->input->is_ajax_request()) {
                 $this->staff_model->change_staff_status($id, $status);
