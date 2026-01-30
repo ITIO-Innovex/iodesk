@@ -75,6 +75,11 @@
 		<hr />
 		<?php echo render_input('settings[main_domain]','settings_general_company_main_domain',get_option('main_domain')); ?>
 		<hr />
+		<?php echo render_input('settings[support_email]','Support Email',get_option('support_email')); ?>
+		<?php echo render_input('settings[support_phone]','Support Phone',get_option('support_phone')); ?>
+		<?php echo render_input('settings[privect_policy_url]','Privacy Policy URL',get_option('privect_policy_url')); ?>
+		<?php echo render_input('settings[terms_of_use_url]','Terms of Use URL',get_option('terms_of_use_url')); ?>
+		<hr />
 		<?php render_yes_no_option('rtl_support_admin','settings_rtl_support_admin'); ?>
 		<hr />
 		<?php render_yes_no_option('rtl_support_client','settings_rtl_support_client'); ?>
