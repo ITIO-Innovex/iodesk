@@ -202,7 +202,7 @@ class Services extends AdminController
     				'start_date'      => $todayDate->format('Y-m-d'),   // YYYY-MM-DD
     				'end_date'        => $endDate->format('Y-m-d'),       // YYYY-MM-DD
 					];
-
+//log_message('error', 'upgrade plan - ' . print_r($data, true));
 $this->db->where('company_id', $companyId);
 $this->db->where('status', 'active'); // recommended
 $subs = $this->db->update('it_crm_services_user_subscriptions', $data);
@@ -235,7 +235,7 @@ $this->services_subscriptions_model->log_service_activity($pid,'Invoice',$log_de
 					
 $log_desc="New Plan Activated with Invoice No ".$invoiceNo." subscription_id: " . $payment['subscription_id'];
 log_activity($log_desc);
-$this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_desc);
+$this->services_subscriptions_model->log_service_activity($payment['subscription_id'],'Invoice',$log_desc);
 					
 						if($subs){
 						$_SESSION['cms_subscription_id']=$payment['subscription_id'];
@@ -660,7 +660,10 @@ $this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_des
 		$this->db->insert(db_prefix() . 'services_subscriptions_invoices', $data);
         $insert_id = $this->db->insert_id();
         if ($insert_id) {
-        log_activity('Subscription Invoice Added [Plan: ' . $invoice_no . ', ID: ' . $insert_id . ']');
+        //log_activity('Subscription Invoice Added [Plan: ' . $invoice_no . ', ID: ' . $insert_id . ']');
+		$log_desc="Subscription Invoice Added with Invoice No ".$invoice_no." and subscription id".$id;
+        log_activity($log_desc);
+		$this->services_subscriptions_model->log_service_activity($id,'Activate',$log_desc);
 	
 	// Check if company subscription exists
     $this->db->where('company_id', $company_id);
