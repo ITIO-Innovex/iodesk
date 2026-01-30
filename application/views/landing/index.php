@@ -1,3 +1,9 @@
+<?php 
+echo $support_email;
+echo $support_phone;
+echo $terms_of_use_url;
+echo $privacy_policy_url;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1047,8 +1053,8 @@
                 <div class="col-6 col-lg-2">
                     <h5 class="footer-title">Legal</h5>
                     <ul class="footer-links">
-                        <li><a href="https://itio.in/privacy-policy" target="_blank">Privacy Policy</a></li>
-                        <li><a href="https://itio.in/terms-of-use"  target="_blank">Terms of use</a></li>
+                        <li><a href="<?php echo $privacy_policy_url;?>" target="_blank">Privacy Policy</a></li>
+                        <li><a href="<?php echo $terms_of_use_url;?>"  target="_blank">Terms of use</a></li>
                     </ul>
                 </div>
             </div>
