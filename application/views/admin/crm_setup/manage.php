@@ -178,7 +178,7 @@ Active department count: <?php echo $department_count; ?>
 </div>
 <?php } else { ?>
 										<div class="alert alert-danger tw-bg-danger-500 msgbox_department">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add departments before creating staff members. <span style="float:right"><a href="<?php echo admin_url('departments');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Departments</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add departments before creating staff members. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_department">Add New Departments</a></span></div>
                   </div>
 <?php } ?>
 <?php
@@ -189,7 +189,7 @@ Active designation count: <?php echo $designation_count; ?>
 </div>
 <?php } else { ?>
 				  						<div class="alert alert-danger tw-bg-danger-500 msgbox_designation">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add designations before creating staff members. <span style="float:right"><a href="<?php echo admin_url('designation');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Designation</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add designations before creating staff members. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_designation">Add New Designation</a></span></div>
                   </div>
 <?php } ?>
 <?php
@@ -200,7 +200,7 @@ Active staff type count: <?php echo $staff_type_count; ?>
 </div>
 <?php } else { ?>
 				 						<div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add staff type to activate staff-related features. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/staff_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Staff Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add staff type to activate staff-related features. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_staff_type">Add New Staff Type</a></span></div>
                   </div>
 <?php } ?>
                                             
@@ -236,7 +236,7 @@ Active task status count: <?php echo $task_status_count; ?>
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> To use the Leads module, please configure task statuses first. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="task_status">Add Task Status</a></span></div>
 </div>
 <?php } ?>
-<?php
+<?php /*?><?php
 $deal_stage_count = (int) ($active_deal_stage_count ?? 0);
 if ($deal_stage_count > 0) { ?>
 <div class="alert alert-success">
@@ -246,7 +246,7 @@ Active deal stage count: <?php echo $deal_stage_count; ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> To use the Leads module, please configure deal stage first. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="deal_stage">Add Deal Stage</a></span></div>
 </div>
-<?php } ?>
+<?php } ?><?php */?>
 				  
 <?php /*?>				  <div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add lead form before using lead module. <span style="float:right"><a href="<?php echo admin_url('leads/forms');?>" class="btn btn-warning btn-sm ms-2">Add New Leads Forms</a></span></div>
@@ -288,7 +288,7 @@ Active shift manager count: <?php echo $shift_manager_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift managers to manage attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_manager');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Shift Manager</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift managers to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_shift_manager">Add Shift Manager</a></span></div>
 </div>
 <?php } ?>
                                    
@@ -302,7 +302,7 @@ Active employee type count: <?php echo $employee_type_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add employee types to manage staff records. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/employee_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Employee Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add employee types to manage staff records. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_employee_type">Add Employee Type</a></span></div>
 </div>
 <?php } ?>
                                       
@@ -315,7 +315,7 @@ Active branch manager count: <?php echo $branch_manager_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add branch managers to manage attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/branch_manager');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Branch Manager</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add branch managers to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_branch_manager">Add Branch Manager</a></span></div>
 </div>
 <?php } ?>
 
@@ -726,6 +726,320 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
     <?php echo form_close(); ?>
   </div>
 </div>
+
+<div class="modal fade" id="department_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('departments/department'), ['id' => 'department-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('new_department'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="department-additional"></div>
+            <input type="text" class="fake-autofill-field" name="fakeusernameremembered" value="" tabindex="-1" />
+            <input type="password" class="fake-autofill-field" name="fakepasswordremembered" value="" tabindex="-1" />
+            <?php echo render_input('name', 'department_name'); ?>
+            <?php if (get_option('google_api_key') != '') { ?>
+              <?php echo render_input('calendar_id', 'department_calendar_id'); ?>
+            <?php } ?>
+            <div class="checkbox checkbox-primary">
+              <input type="checkbox" name="hidefromclient" id="department_hidefromclient">
+              <label for="department_hidefromclient"><?php echo _l('department_hide_from_client'); ?></label>
+            </div>
+            <hr />
+            <?php echo render_input('email', 'department_email', '', 'email'); ?>
+            <br />
+            <h4><?php echo _l('email_to_ticket_config'); ?></h4>
+            <br />
+            <i class="fa-regular fa-circle-question pull-left tw-mt-0.5 tw-mr-1" data-toggle="tooltip"
+               data-title="<?php echo _l('department_username_help'); ?>"></i>
+            <?php echo render_input('imap_username', 'department_username'); ?>
+            <?php echo render_input('host', 'dept_imap_host'); ?>
+            <?php echo render_input('password', 'dept_email_password', '', 'password'); ?>
+            <div class="form-group">
+              <label for="department_encryption"><?php echo _l('dept_encryption'); ?></label><br />
+              <div class="radio radio-primary radio-inline">
+                <input type="radio" name="encryption" value="tls" id="department_tls">
+                <label for="department_tls">TLS</label>
+              </div>
+              <div class="radio radio-primary radio-inline">
+                <input type="radio" name="encryption" value="ssl" id="department_ssl">
+                <label for="department_ssl">SSL</label>
+              </div>
+              <div class="radio radio-primary radio-inline">
+                <input type="radio" name="encryption" value="" id="department_no_enc" checked>
+                <label for="department_no_enc"><?php echo _l('dept_email_no_encryption'); ?></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="department_folder" class="control-label">
+                <?php echo _l('imap_folder'); ?>
+                <a href="#" onclick="retrieve_imap_department_folders(); return false;">
+                  <i class="fa fa-refresh hidden" id="folders-loader"></i>
+                  <?php echo _l('retrieve_folders'); ?>
+                </a>
+              </label>
+              <select name="folder" class="form-control selectpicker" id="department_folder"></select>
+            </div>
+            <div class="form-group">
+              <div class="checkbox checkbox-primary">
+                <input type="checkbox" name="delete_after_import" id="department_delete_after_import">
+                <label for="department_delete_after_import"><?php echo _l('delete_mail_after_import'); ?>
+              </div>
+              <hr />
+              <button onclick="test_dep_imap_connection(); return false;" class="btn btn-default">
+                <?php echo _l('leads_email_integration_test_connection'); ?>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
+
+<div class="modal fade" id="designation_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('designation/manage'), ['id' => 'designation-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="designation_modal_label">Add Designation</h4>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id" id="designation_id" value="">
+        <div class="form-group">
+          <label for="designation_department_id" class="control-label">Department</label>
+          <select class="form-control selectpicker" data-live-search="true" name="department_id" id="designation_department_id" data-none-selected-text="Select department">
+            <option value="">Select department</option>
+            <?php if (!empty($departments)) { foreach ($departments as $dep) { ?>
+              <option value="<?php echo (int)$dep['departmentid']; ?>"><?php echo e($dep['name']); ?></option>
+            <?php } } ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="designation_title" class="control-label">Designation</label>
+          <input type="text" class="form-control" id="designation_title" name="title" placeholder="e.g. Senior Developer">
+        </div>
+        <div class="checkbox checkbox-primary">
+          <input type="checkbox" id="designation_is_active" name="is_active" checked>
+          <label for="designation_is_active">Active</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="staff_type_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('hrd/stafftype'), ['id' => 'staff-type-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Staff Type'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="staff-type-additional"></div>
+            <?php echo render_input('name', 'Staff Type Title'); ?>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
+
+<div class="modal fade" id="shift_manager_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl">
+    <?php echo form_open(admin_url('hrd/shiftmanager'), ['id' => 'shift-manager-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Shift'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div id="shift-manager-additional"></div>
+          <div class="col-md-4">
+            <?php echo render_input('shift_code', 'Shift Code'); ?>
+          </div>
+          <div class="col-md-4">
+            <?php echo render_input('shift_name', 'Shift Name'); ?>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="shift_in">Shift In</label>
+              <input type="time" name="shift_in" id="shift_in" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="shift_out">Shift Out</label>
+              <input type="time" name="shift_out" id="shift_out" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <?php echo render_input('grace_period', 'Grace Period (minutes)', '', 'number'); ?>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="shift_type">Shift Type</label>
+              <select name="shift_type" id="shift_type" class="form-control">
+                <option value="">-- Select Shift Type --</option>
+                <?php if (!empty($shift_types)) { foreach ($shift_types as $t) { ?>
+                  <option value="<?php echo (int)$t['id']; ?>"><?php echo e($t['title']); ?></option>
+                <?php } } ?>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <?php echo render_input('tea_break_in_minut', 'Tea Break (minutes)', '', 'number'); ?>
+          </div>
+          <div class="col-md-4">
+            <?php echo render_input('lunch_break_in_minut', 'Lunch Break (minutes)', '', 'number'); ?>
+          </div>
+          <div class="col-md-4">
+            <?php echo render_input('dinner_break_in_minut', 'Dinner Break (minutes)', '', 'number'); ?>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="first_half_start">First Half Start</label>
+              <input type="time" name="first_half_start" id="first_half_start" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="first_half_end">First Half End</label>
+              <input type="time" name="first_half_end" id="first_half_end" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="second_half_start">Second Half Start</label>
+              <input type="time" name="second_half_start" id="second_half_start" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="second_half_end">Second Half End</label>
+              <input type="time" name="second_half_end" id="second_half_end" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="saturday_rule">Saturday Rule</label>
+              <select name="saturday_rule" id="saturday_rule" class="form-control">
+                <option value="">-- Select Rule --</option>
+                <?php if (!empty($saturday_rules)) { foreach ($saturday_rules as $sr) { ?>
+                  <option value="<?php echo (int)$sr['id']; ?>"><?php echo e($sr['title']); ?></option>
+                <?php } } ?>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="saturday_work_start">Sat Work Start</label>
+              <input type="time" name="saturday_work_start" id="saturday_work_start" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="saturday_work_end">Sat Work End</label>
+              <input type="time" name="saturday_work_end" id="saturday_work_end" class="form-control" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
+
+<div class="modal fade" id="employee_type_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('hrd/employeetype'), ['id' => 'employee-type-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Employee Type'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="employee-type-additional"></div>
+            <?php echo render_input('name', 'Employee Type Title'); ?>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
+
+<div class="modal fade" id="branch_manager_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('hrd/branchmanager'), ['id' => 'branch-manager-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Branch Manager'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="branch-manager-additional"></div>
+            <?php echo render_input('branch_name', 'Branch Name'); ?>
+            <div class="form-group">
+              <label for="branch_address">Branch Address</label>
+              <textarea name="branch_address" id="branch_address" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="branch_shift">Shift</label>
+              <select name="shift" id="branch_shift" class="form-control">
+                <option value="">-- Select Shift --</option>
+                <?php if (!empty($shifts)) { foreach ($shifts as $s) { ?>
+                  <option value="<?php echo (int)$s['shift_id']; ?>"><?php echo e($s['shift_code'] . ' - ' . $s['shift_name']); ?></option>
+                <?php } } ?>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
 <?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
@@ -914,6 +1228,163 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
         .fail(function() {
           alert_float('danger', 'Failed to save task status');
         });
+    });
+
+    $('body').on('click', '#add_department', function(e) {
+      e.preventDefault();
+      $('#department-additional').html('');
+      $('#department_modal input[type="text"]').val('');
+      $('#department_modal input[type="email"]').val('');
+      $('#department_modal input[type="password"]').val('');
+      $('#department_modal input[type="checkbox"]').prop('checked', false);
+      if ($.fn.selectpicker) {
+        $('#department_folder').html('').selectpicker('refresh');
+      } else {
+        $('#department_folder').html('');
+      }
+      $('#department_modal').appendTo('body').modal('show');
+    });
+
+    $('#department-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function(response) {
+          var result = {};
+          try { result = JSON.parse(response); } catch (e) {}
+          if (result.success) {
+            alert_float('success', result.message || 'Department added successfully');
+            $('#department_modal').modal('hide');
+            window.location.reload();
+            return;
+          }
+          if (result.email_exist_as_staff) {
+            window.location.reload();
+            return;
+          }
+          alert_float('warning', result.message || 'Failed to save department');
+        })
+        .fail(function(xhr) {
+          var err = {};
+          try { err = JSON.parse(xhr.responseText); } catch (e) {}
+          alert_float('danger', err.message || 'Failed to save department');
+        });
+    });
+
+    $('body').on('click', '#add_designation', function(e) {
+      e.preventDefault();
+      $('#designation_modal_label').text('Add Designation');
+      $('#designation_id').val('');
+      $('#designation_title').val('');
+      $('#designation_is_active').prop('checked', true);
+      if ($.fn.selectpicker) {
+        $('#designation_department_id').selectpicker('refresh');
+      }
+      $('#designation_modal').appendTo('body').modal('show');
+    });
+
+    $('#designation-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function(resp) {
+          var r = {};
+          try { r = JSON.parse(resp); } catch (e) {}
+          if (r.success) {
+            alert_float('success', r.message || 'Designation added successfully');
+            $('#designation_modal').modal('hide');
+            window.location.reload();
+          } else {
+            alert_float('warning', r.message || 'Validation failed');
+          }
+        })
+        .fail(function() {
+          alert_float('danger', 'Request failed');
+        });
+    });
+
+    $('body').on('click', '#add_staff_type', function(e) {
+      e.preventDefault();
+      $('#staff-type-additional').html('');
+      $('#staff_type_modal input[name="name"]').val('');
+      $('#staff_type_modal').appendTo('body').modal('show');
+    });
+
+    $('#staff-type-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Staff type added successfully');
+          $('#staff_type_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save staff type');
+        });
+    });
+
+    $('body').on('click', '#add_shift_manager', function(e) {
+      e.preventDefault();
+      $('#shift-manager-additional').html('');
+      $('#shift_manager_modal input').not('[type="hidden"]').val('');
+      $('#shift_manager_modal select').val('');
+      $('#shift_manager_modal').appendTo('body').modal('show');
+    });
+
+    appValidateForm($("body").find('#shift-manager-form'), {
+      shift_code: 'required',
+      shift_name: 'required',
+      shift_in: 'required',
+      shift_out: 'required',
+      shift_type: 'required'
+    }, function(form) {
+      var data = $(form).serialize();
+      $.post(form.action, data).done(function () {
+        window.location.reload();
+      });
+      return false;
+    });
+
+    $('body').on('click', '#add_employee_type', function(e) {
+      e.preventDefault();
+      $('#employee-type-additional').html('');
+      $('#employee_type_modal input[name="name"]').val('');
+      $('#employee_type_modal').appendTo('body').modal('show');
+    });
+
+    $('#employee-type-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Employee type added successfully');
+          $('#employee_type_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save employee type');
+        });
+    });
+
+    $('body').on('click', '#add_branch_manager', function(e) {
+      e.preventDefault();
+      $('#branch-manager-additional').html('');
+      $('#branch_manager_modal input').not('[type="hidden"]').val('');
+      $('#branch_manager_modal textarea').val('');
+      $('#branch_manager_modal select').val('');
+      $('#branch_manager_modal').appendTo('body').modal('show');
+    });
+
+    appValidateForm($("body").find('#branch-manager-form'), {
+      branch_name: 'required',
+      branch_address: 'required'
+    }, function(form) {
+      var data = $(form).serialize();
+      $.post(form.action, data).done(function () {
+        window.location.reload();
+      });
+      return false;
     });
 
     $('body').on('click', '#leave-rule', function(e) {

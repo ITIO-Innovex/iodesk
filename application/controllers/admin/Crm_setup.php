@@ -11,6 +11,7 @@ class Crm_setup extends AdminController
 
     public function index()
     {
+        $this->load->model('hrd_model');
         $data['title'] = 'CRM Setup';
         $company_id    = get_staff_company_id();
         $active_count  = 0;
@@ -99,6 +100,20 @@ class Crm_setup extends AdminController
         $data['active_staff_type_count']        = $staff_type_count;
         $data['company_details']                = $company_details;
         $data['active_ai_details_count']        = $ai_details_count;
+        $data['departments'] = $this->db->where('company_id', $company_id)
+            ->get(db_prefix() . 'departments')
+            ->result_array();
+        $data['shift_types'] = $this->db->where('company_id', $company_id)
+            ->where('status', 1)
+            ->get(db_prefix() . 'hrd_shift_type')
+            ->result_array();
+        $data['shifts'] = $this->db->where('company_id', $company_id)
+            ->where('status', 1)
+            ->get(db_prefix() . 'hrd_shift_manager')
+            ->result_array();
+        $data['saturday_rules'] = $this->db->where('status', 1)
+            ->get(db_prefix() . 'hrd_saturday_rule')
+            ->result_array();
         $data['branches'] = $this->db->where('company_id', $company_id)
             ->where('status', 1)
             ->get(db_prefix() . 'hrd_branch_manager')
