@@ -102,6 +102,39 @@
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(1deg); }
         }
+		
+		.btn-hero-primary {
+            background: #fff;
+            color: var(--primary);
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            color: var(--primary-dark);
+        }
+
+        .btn-hero-outline {
+            background: transparent;
+            color: #fff;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            color: #fff;
+        }
 
         .hero-content {
             position: relative;
@@ -239,7 +272,7 @@
                 <div class="d-none d-md-flex align-items-center gap-4">
                     <a href="<?php echo base_url(); ?>#features" class="nav-link">Features</a>
                     <a href="<?php echo base_url(); ?>#pricing" class="nav-link">Pricing</a>
-                    <a href="<?php echo base_url('login'); ?>" class="nav-link">Login</a>
+                    <a href="<?php echo base_url('admin/authentication'); ?>" class="nav-link">Login</a>
                     <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn btn-hero-primary" style="padding: 0.75rem 1.5rem;">Get Started</a>
                 </div>
             </div>
@@ -272,7 +305,7 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="footer-brand">
-                        <img src="https://itio.in/assets/img/logo/Logo_dark.png" alt="HRM" class="img-responsive" style="max-width: 150px; margin: 0 auto;">
+                        <img src="https://itio.in/assets/img/logo/Logo_light.png" alt="HRM" class="img-responsive" style="max-width: 150px;">
                     </div>
                     <p class="footer-desc">Empowering businesses with modern HR solutions. Simplify your people management and focus on what matters most.</p>
                 </div>

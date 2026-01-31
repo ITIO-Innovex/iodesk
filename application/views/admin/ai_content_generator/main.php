@@ -64,7 +64,10 @@ if(isset($provider['viewon'])&&$provider['viewon']==2) {
 	    
 
 <?php }else{ ?>
-<div  class="alert " role="alert"><a href="#" onclick="edit_key(); return false;">Set Chatgtp API Key</a></div>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> To proceed, please add your ChatGPT API key.  <span style="float:right"><a href="#" onclick="edit_key(); return false;" class="btn btn-warning btn-sm ms-2">Set Chatgtp API Key</a></span></div>
+                  </div>
+				  
 <?php } ?>
  </div>
                 </div>

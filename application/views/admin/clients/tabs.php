@@ -1,4 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php if (isset($client) && isset($client->userid)) { ?>
+  <div class="text-muted mbot10 mleft5">ID: <?php echo e($client->userid); ?></div>
+<?php } ?>
 <ul class="nav navbar-pills navbar-pills-flat nav-tabs nav-stacked customer-tabs" role="tablist">
   <?php
   foreach(filter_client_visible_tabs($customer_tabs, $client->userid) as $key => $tab){

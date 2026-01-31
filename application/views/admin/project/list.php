@@ -60,7 +60,16 @@
   
     <div class="row">
 	<!-- Loader -->
-
+<?php $project_group_count = (int) ($project_group_count ?? 0); ?>
+<?php if ($project_group_count > 0) { ?>
+<?php /*?><div class="alert alert-success">
+Active project group count: <?php echo $project_group_count; ?>
+</div><?php */?>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to organize and manage your projects effectively. <span style="float:right"><a href="javascript:void(0);" id="add_project_group_btn" class="btn btn-warning btn-sm ms-2">Add Project Group</a></span></div>
+                  </div>
+<?php } ?>
 
       <div class="col-md-12">
 	  <div id="loader-project"><i class="fa-solid fa-spinner fa-spin fa-5x text-warning"></i></div>
@@ -278,6 +287,34 @@ Portal users can only view, follow, and comment whereas, project users will have
   </div>
   <!-- /.modal-dialog -->
 </div>
+
+<div class="modal fade" id="project_group_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('project/projectgroup'), ['id' => 'project-group-form']); ?>
+      <input type="hidden" name="inline" value="1">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Project Group</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="group_title" class="control-label">Group Title</label>
+          <input type="text" class="form-control" id="group_title" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="group_color" class="control-label">Group Color</label>
+          <input type="color" class="form-control" id="group_color" name="color" value="#757575">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
 <!-- /.modal -->
 <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-lg">
@@ -392,6 +429,34 @@ function initializeProjectModal() {
         $('#addProjectBtn').on('click', function(e) {
             e.preventDefault();
             $('#addProjectModal').modal('show');
+        });
+
+        // Add project group button click event
+        $('#add_project_group_btn').on('click', function(e) {
+            e.preventDefault();
+            $('#group_title').val('');
+            $('#group_color').val('#757575');
+            $('#project_group_modal').appendTo('body').modal('show');
+        });
+
+        $('#project-group-form').on('submit', function(e) {
+            e.preventDefault();
+            var $form = $(this);
+            $.post($form.attr('action'), $form.serialize())
+              .done(function(resp) {
+                var r = {};
+                try { r = JSON.parse(resp); } catch (e) {}
+                if (r.success) {
+                  alert_float('success', 'Project group added successfully');
+                  $('#project_group_modal').modal('hide');
+                  window.location.reload();
+                } else {
+                  alert_float('warning', 'Failed to save project group');
+                }
+              })
+              .fail(function() {
+                alert_float('danger', 'Failed to save project group');
+              });
         });
         
         // Initialize TinyMCE when modal is shown

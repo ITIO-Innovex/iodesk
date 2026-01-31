@@ -59,8 +59,11 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
+	  <div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Project is required. Please add a project to proceed. <span style="float:right"><a href="<?php echo admin_url('project');?>" class="btn btn-warning btn-sm ms-2">Add Project</a></span></div>
+                  </div>
 	  <div id="loader-project"><i class="fa-solid fa-spinner fa-spin fa-5x text-warning"></i></div>
-        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" id="addTaskBtn"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Task'); ?> </a> <span class="btn btn-warning"> Total : <?php echo count($listdata)??0?>  </span> 
+        <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" id="addTaskBtn"> <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Task'); ?> </a> <span class="btn btn-warning"> Total : <?php echo count($listdata)??0?>  </span> <span class="btn btn-info"> Projects : <?php echo (int) ($project_count ?? 0); ?> </span> 
 		<?php if(isset($project_id)&&$project_id){ ?>
 		<h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-ml-2.5 tw-inline-flex tw-items-center"># Project ID : <?php echo get_project_title($project_id);?></h4> 
 		<?php } ?>

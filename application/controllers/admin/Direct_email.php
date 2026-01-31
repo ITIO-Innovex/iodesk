@@ -19,7 +19,78 @@ class Direct_email extends AdminController
     {
         $data['title']          = 'Direct E-mail';
 		$data['email_signature'] = get_staff_signature();
+        $directSmtp = get_direct_mail_smtp(get_staff_company_id());
+        $data['direct_smtp_raw'] = $directSmtp;
+        $data['direct_smtp_config'] = $directSmtp ? json_decode($directSmtp, true) : [];
         $this->load->view('admin/directemail/email', $data);
+    }
+
+    public function save_direct_smtp()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $companyId = get_staff_company_id();
+        if (!$companyId) {
+            echo json_encode(['success' => false, 'message' => 'Company not found.']);
+            return;
+        }
+
+        $payload = [
+            'smtp_encryption' => trim((string) $this->input->post('smtp_encryption')),
+            'smtp_host'       => trim((string) $this->input->post('smtp_host')),
+            'smtp_port'       => trim((string) $this->input->post('smtp_port')),
+            'smtp_email'      => trim((string) $this->input->post('smtp_email')),
+            'smtp_username'   => trim((string) $this->input->post('smtp_username')),
+            'smtp_password'   => trim((string) $this->input->post('smtp_password')),
+        ];
+
+        if ($payload['smtp_host'] === '' || $payload['smtp_port'] === '' || $payload['smtp_email'] === '') {
+            echo json_encode(['success' => false, 'message' => 'SMTP Host, Port, and Email are required.']);
+            return;
+        }
+
+        $this->db->where('company_id', $companyId);
+        $success = $this->db->update(db_prefix() . 'company_master', [
+            'direct_mail_smtp' => json_encode($payload),
+        ]);
+
+        echo json_encode(['success' => (bool) $success, 'message' => $success ? 'SMTP details saved.' : 'Failed to save SMTP details.']);
+    }
+
+    public function save_nda_smtp()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $companyId = get_staff_company_id();
+        if (!$companyId) {
+            echo json_encode(['success' => false, 'message' => 'Company not found.']);
+            return;
+        }
+
+        $payload = [
+            'smtp_encryption' => trim((string) $this->input->post('smtp_encryption')),
+            'smtp_host'       => trim((string) $this->input->post('smtp_host')),
+            'smtp_port'       => trim((string) $this->input->post('smtp_port')),
+            'smtp_email'      => trim((string) $this->input->post('smtp_email')),
+            'smtp_username'   => trim((string) $this->input->post('smtp_username')),
+            'smtp_password'   => trim((string) $this->input->post('smtp_password')),
+        ];
+
+        if ($payload['smtp_host'] === '' || $payload['smtp_port'] === '' || $payload['smtp_email'] === '') {
+            echo json_encode(['success' => false, 'message' => 'SMTP Host, Port, and Email are required.']);
+            return;
+        }
+
+        $this->db->where('company_id', $companyId);
+        $success = $this->db->update(db_prefix() . 'company_master', [
+            'nda_smtp' => json_encode($payload),
+        ]);
+
+        echo json_encode(['success' => (bool) $success, 'message' => $success ? 'NDA SMTP details saved.' : 'Failed to save NDA SMTP details.']);
     }
     public function sendMail(){
         $email_to=$_POST['email'];

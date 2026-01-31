@@ -306,8 +306,11 @@ class Clients extends AdminController
         }
     }
 
-    public function form_contact($customer_id, $contact_id = '')
+    public function form_contact($customer_id = '', $contact_id = '')
     {
+        if ($customer_id === '' || !is_numeric($customer_id)) {
+            show_404();
+        }
         if (staff_cant('view', 'customers')) {
             if (!is_customer_admin($customer_id)) {
                 echo _l('access_denied');
@@ -593,8 +596,11 @@ class Clients extends AdminController
         redirect(admin_url('clients/client/' . $customer_id . '?group=contacts'));
     }
 
-    public function contacts($client_id)
+    public function contacts($client_id = '')
     {
+        if ($client_id === '' || !is_numeric($client_id)) {
+            show_404();
+        }
         $this->app->get_table_data('contacts', [
             'client_id' => $client_id,
         ]);

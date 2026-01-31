@@ -164,7 +164,7 @@ To add more staff, please upgrade your plan. <span style="float:right"><a href="
     </div>
     <!-- /.modal-dialog -->
 </div>
-<!-- End Webmail Setup Modal -->
+<!-- End CRM Instruction Modal -->
 <div class="modal fade" id="crm_instruction_modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">

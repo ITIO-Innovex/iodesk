@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head();  ?>
+<?php init_head(); ?>
 <style>
 .card{
     padding: 20px;
@@ -19,12 +19,58 @@
 </style>
 <div id="wrapper">
     <div class="content">
+    <?php
+        $smtpConfig = $direct_smtp_config ?? [];
+        $smtpConfigured = !empty($smtpConfig);
+    ?>
+	<?php if (is_admin()) { ?>
+    <?php if ($smtpConfigured) { ?>
+    <?php /*?><div class="alert alert-success">
+        <div class="tw-font-bold tw-my-2">
+            <i class="fa-solid fa-circle-check"></i> Direct SMTP configured
+            <span style="float:right"><a href="javascript:void(0);" id="smtp_setup" class="btn btn-success btn-sm ms-2">Update SMTP</a></span>
+        </div>
+        <div class="tw-text-sm">
+            <div><strong>SMTP Host:</strong> <?php echo e($smtpConfig['smtp_host'] ?? '-'); ?></div>
+            <div><strong>SMTP Port:</strong> <?php echo e($smtpConfig['smtp_port'] ?? '-'); ?></div>
+            <div><strong>SMTP Email:</strong> <?php echo e($smtpConfig['smtp_email'] ?? '-'); ?></div>
+            <div><strong>SMTP Username:</strong> <?php echo e($smtpConfig['smtp_username'] ?? '-'); ?></div>
+            <div><strong>SMTP Password:</strong> <?php echo !empty($smtpConfig['smtp_password']) ? '********' : '-'; ?></div>
+        </div>
+    </div><?php */?>
+    <?php } else { ?>
+	<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Before sending a direct email, please add your SMTP details <span style="float:right"><a href="javascript:void(0);" id="smtp_setup" class="btn btn-warning btn-sm ms-2">Add SMTP details</a></span></div>
+    </div>
+    <?php } ?>
+	<?php } ?>
+	
+	<?php if (!is_admin() && empty($smtpConfig)) { ?>
+	<div class="alert alert-danger">
+        <div class="tw-font-bold tw-my-2">
+            <i class="fa-solid fa-circle-check"></i> SMTP settings are not configured. Please contact the administrator before sending an email.
+            
+        </div>
+        <div class="tw-text-sm">
+            <?php /*?><div><strong>SMTP Host:</strong> <?php echo e($smtpConfig['smtp_host'] ?? '-'); ?></div>
+            <div><strong>SMTP Port:</strong> <?php echo e($smtpConfig['smtp_port'] ?? '-'); ?></div>
+            <div><strong>SMTP Email:</strong> <?php echo e($smtpConfig['smtp_email'] ?? '-'); ?></div>
+            <div><strong>SMTP Username:</strong> <?php echo e($smtpConfig['smtp_username'] ?? '-'); ?></div>
+            <div><strong>SMTP Password:</strong> <?php echo !empty($smtpConfig['smtp_password']) ? '********' : '-'; ?></div><?php */?>
+        </div>
+    </div>
+	<?php } ?>
+	
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                    <div class="card-title">
-                        <h2>Direct Email</h2>
-                    </div>
+                    <div class="col-md-12">
+                                <h2 class="no-margin">
+                                    <?php echo $title; ?>
+                                    
+                                </h2>
+                                <hr class="hr-panel-heading" />
+                            </div>
                     <div class="card-body">
                         <form id="directEmail">
                             <div class="row" style="padding:20px">
@@ -77,6 +123,58 @@
             </div>
         </div>
     </div>
+</div>
+<div class="modal fade" id="direct_smtp_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('direct_email/save_direct_smtp'), ['id' => 'direct-smtp-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Direct SMTP Details</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="control-label">SMTP Encryption</label>
+          <div>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="ssl" checked> SSL
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="tls"> TLS
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="none"> No Encryption
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="smtp_host" class="control-label">SMTP Host</label>
+          <input type="text" class="form-control" id="smtp_host" name="smtp_host" placeholder="smtp.example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="smtp_port" class="control-label">SMTP Port</label>
+          <input type="number" class="form-control" id="smtp_port" name="smtp_port" placeholder="587" required>
+        </div>
+        <div class="form-group">
+          <label for="smtp_email" class="control-label">SMTP Email</label>
+          <input type="email" class="form-control" id="smtp_email" name="smtp_email" placeholder="no-reply@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="smtp_username" class="control-label">SMTP Username</label>
+          <input type="text" class="form-control" id="smtp_username" name="smtp_username" placeholder="SMTP Username">
+        </div>
+        <div class="form-group">
+          <label for="smtp_password" class="control-label">SMTP Password</label>
+          <input type="password" class="form-control" id="smtp_password" name="smtp_password" placeholder="SMTP Password">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
 </div>
 <?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
@@ -132,6 +230,45 @@ alert("Enter Correct Email Body with min length 5");
 
    
 }
+</script>
+
+<script>
+  $(function() {
+    var smtpConfig = <?php echo json_encode($direct_smtp_config ?? []); ?>;
+
+    $('#smtp_setup').on('click', function(e) {
+      e.preventDefault();
+      var enc = (smtpConfig.smtp_encryption || 'ssl').toLowerCase();
+      if (enc !== 'ssl' && enc !== 'tls' && enc !== 'none') {
+        enc = 'ssl';
+      }
+      $('input[name="smtp_encryption"][value="' + enc + '"]').prop('checked', true);
+      $('#smtp_host').val(smtpConfig.smtp_host || '');
+      $('#smtp_port').val(smtpConfig.smtp_port || '');
+      $('#smtp_email').val(smtpConfig.smtp_email || '');
+      $('#smtp_username').val(smtpConfig.smtp_username || '');
+      $('#smtp_password').val(smtpConfig.smtp_password || '');
+      $('#direct_smtp_modal').modal('show');
+    });
+
+    $('#direct-smtp-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize()).done(function(resp) {
+        var r = {};
+        try { r = JSON.parse(resp); } catch (e) {}
+        if (r.success) {
+          alert_float('success', r.message || 'SMTP saved.');
+          $('#direct_smtp_modal').modal('hide');
+          location.reload();
+        } else {
+          alert_float('warning', r.message || 'Failed to save SMTP.');
+        }
+      }).fail(function() {
+        alert_float('danger', 'Request failed.');
+      });
+    });
+  });
 </script>
 
 <script>
