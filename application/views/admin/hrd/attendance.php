@@ -70,7 +70,7 @@ table {
         
         
           <div class="alert alert-danger tw-bg-danger-500">
-		  <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Shift Not Mapped. contact web admin <span style="float:right"><a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Subscribe Now</a></span></div>
+		  <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Shift Not Mapped. contact web admin <?php if(is_admin()){ ?><span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_manager');?>" class="btn btn-warning btn-sm ms-2">Add Shift Manager</a></span><?php } ?></div>
 		  </div>
 		  
 		  </div>

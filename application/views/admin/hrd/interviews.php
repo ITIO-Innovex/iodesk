@@ -10,18 +10,18 @@
           </a>
         </div>
 		<?php if (!empty($interview_process_count)) { ?>
-        <div class="alert alert-success">
+        <?php /*?><div class="alert alert-success">
             Total Interview Process: <?php echo (int) $interview_process_count; ?>
-        </div>
+        </div><?php */?>
         <?php } else { ?>
 		<div class="alert alert-danger tw-bg-danger-500">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_process">Add Interview Process</a></span></div>
                   </div>
         <?php } ?>
         <?php if (!empty($interview_source_count)) { ?>
-        <div class="alert alert-success">
+        <?php /*?><div class="alert alert-success">
             Total Interview Source: <?php echo (int) $interview_source_count; ?>
-        </div>
+        </div><?php */?>
         <?php } else { ?>
 				  <div class="alert alert-danger tw-bg-danger-500">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_source">Add Interview Source</a></span></div>

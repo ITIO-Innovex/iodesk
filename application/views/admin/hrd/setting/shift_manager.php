@@ -9,6 +9,12 @@
             <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Shift'); ?>
           </a>
         </div>
+        <?php $shift_type_count = (int) ($shift_type_count ?? 0); ?>
+        <?php if ($shift_type_count == 0) { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> To add a shift manager, please create shift types first. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="shift-type">Add Shift Type</a></span></div>
+</div>
+        <?php } ?>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (isset($shift_managers) && count($shift_managers) > 0) { ?>
@@ -141,6 +147,30 @@
   </div>
 </div>
 
+<div class="modal fade" id="shift_type_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('hrd/shifttype'), ['id' => 'shift-type-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Shift Type</h4>
+		<h6>Example shift types: Day, Night, Other.</h6>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="shift_type_title" class="control-label">Shift Type Title</label>
+          <input type="text" class="form-control" id="shift_type_title" name="name" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="shift_manager" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-xl">
     <?php echo form_open(admin_url('hrd/shiftmanager'), ['id' => 'shift-manager-form']); ?>
@@ -248,8 +278,30 @@
     <?php echo form_close(); ?>
   </div>
 </div>
-
+<?php init_tail(); ?>
 <script>
+  $(function() {
+    $('body').on('click', '#shift-type', function(e) {
+      e.preventDefault();
+      $('#shift_type_title').val('');
+      $('#shift_type_modal').appendTo('body').modal('show');
+    });
+
+    $('#shift-type-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Shift type added successfully');
+          $('#shift_type_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save shift type');
+        });
+    });
+  });
+
   window.addEventListener('load', function () {
     appValidateForm($("body").find('#shift-manager-form'), {
       shift_code: 'required',
@@ -320,5 +372,5 @@
     }, 'json');
   }
 </script>
-<?php init_tail(); ?>
+
 </body></html>

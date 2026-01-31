@@ -233,7 +233,7 @@ Active task status count: <?php echo $task_status_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_designation">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> PPlease add task statuses before using the Leads module. <span style="float:right"><a href="<?php echo admin_url('leads/task_status');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Task Status</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> To use the Leads module, please configure task statuses first. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="task_status">Add Task Status</a></span></div>
 </div>
 <?php } ?>
 <?php
@@ -244,7 +244,7 @@ Active deal stage count: <?php echo $deal_stage_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add deal stages before using the Leads module. <span style="float:right"><a href="<?php echo admin_url('leads/deal_stage');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add New Deal Stage</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> To use the Leads module, please configure deal stage first. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="deal_stage">Add Deal Stage</a></span></div>
 </div>
 <?php } ?>
 				  
@@ -275,7 +275,7 @@ Active shift type count: <?php echo $shift_type_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift types to manage attendance. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Shift Type</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift types to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="shift-type" >Add Shift Type</a></span></div>
 </div>
 <?php } ?>
                          
@@ -321,17 +321,7 @@ Active branch manager count: <?php echo $branch_manager_count; ?>
 
 										
 
-<?php
-$leave_type_count = (int) ($active_leave_type_count ?? 0);
-if ($leave_type_count > 0) { ?>
-<div class="alert alert-success">
-Active leave type count: <?php echo $leave_type_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add leave types to manage employee leave. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_type');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Leave Type</a></span></div>
-</div>
-<?php } ?>
+
 
 
 <?php
@@ -342,7 +332,7 @@ Active leave rule count: <?php echo $leave_rule_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview rules to manage interviews. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Leave Rule</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Leave rules must be added to manage leave applications. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" id="leave-rule">Add Leave Rule</a></span></div>
 </div>
 <?php } ?>
 
@@ -615,11 +605,137 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="shift_type_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('hrd/shifttype'), ['id' => 'shift-type-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Shift Type</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="shift_type_title" class="control-label">Shift Type Title</label>
+          <input type="text" class="form-control" id="shift_type_title" name="name" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="leave_rule_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('hrd/leaverule'), ['id' => 'leave-rule-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Leave Rule'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="leave-rule-additional"></div>
+            <?php echo render_input('title', 'Title'); ?>
+            <div class="form-group">
+              <label for="leave_rule_branch">Branch</label>
+              <select name="branch" id="leave_rule_branch" class="form-control">
+                <option value="">-- Select Branch --</option>
+                <?php if (!empty($branches)) { foreach ($branches as $b) { ?>
+                  <option value="<?php echo (int)$b['id']; ?>"><?php echo e($b['branch_name']); ?></option>
+                <?php } } ?>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="leave_rule_details">Details</label>
+              <textarea name="details" id="leave_rule_details" class="form-control editor" rows="5" required></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
+
+<div class="modal fade" id="deal_stage_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('leads/dealstage'), ['id' => 'deal-stage-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Deal Stage'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="deal-stage-additional"></div>
+            <?php echo render_input('name', 'Stage Title'); ?>
+            <?php echo render_color_picker('color', _l('Stage Color')); ?>
+            <div class="form-group">
+              <label for="deal_stage_status">Status</label>
+              <select name="status" id="deal_stage_status" class="form-control">
+                <option value="1">Active</option>
+                <option value="0">Deactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
+
+<div class="modal fade" id="task_status_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <?php echo form_open(admin_url('leads/taskstatus'), ['id' => 'task-status-form']); ?>
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><?php echo _l('Add New Task Status'); ?></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div id="task-status-additional"></div>
+            <?php echo render_input('name', 'Status Title'); ?>
+            <?php echo render_color_picker('color', _l('Status Color')); ?>
+            <?php echo render_input('statusorder', 'leads_status_add_edit_order', total_rows(db_prefix() . 'task_status') + 1, 'number'); ?>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+    <?php echo form_close(); ?>
+  </div>
+</div>
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
 <script>
   $(function() {
     var smtpConfig = <?php echo json_encode($direct_smtp_config ?? []); ?>;
     var ndaConfig = <?php echo json_encode($nda_smtp_config ?? []); ?>;
+    if ($.fn.jqte) {
+      $('.editor').jqte();
+    }
 
     $('#smtp_setup').on('click', function(e) {
       e.preventDefault();
@@ -731,6 +847,91 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
         })
         .fail(function() {
           alert_float('danger', 'Failed to save project group');
+        });
+    });
+
+    $('body').on('click', '#shift-type', function(e) {
+      e.preventDefault();
+      $('#shift_type_title').val('');
+      $('#shift_type_modal').appendTo('body').modal('show');
+    });
+
+    $('#shift-type-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Shift type added successfully');
+          $('#shift_type_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save shift type');
+        });
+    });
+
+    $('body').on('click', '#deal_stage', function(e) {
+      e.preventDefault();
+      $('#deal-stage-additional').html('');
+      $('#deal_stage_modal input[name="name"]').val('');
+      $('#deal_stage_modal input[name="color"]').val('');
+      $('#deal_stage_modal select[name="status"]').val('1');
+      $('#deal_stage_modal').appendTo('body').modal('show');
+    });
+
+    $('#deal-stage-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Deal stage added successfully');
+          $('#deal_stage_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save deal stage');
+        });
+    });
+
+    $('body').on('click', '#task_status', function(e) {
+      e.preventDefault();
+      $('#task-status-additional').html('');
+      $('#task_status_modal input[name="name"]').val('');
+      $('#task_status_modal input[name="color"]').val('');
+      $('#task_status_modal input[name="statusorder"]').val('');
+      $('#task_status_modal').appendTo('body').modal('show');
+    });
+
+    $('#task-status-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Task status added successfully');
+          $('#task_status_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save task status');
+        });
+    });
+
+    $('body').on('click', '#leave-rule', function(e) {
+      e.preventDefault();
+      $('#leave_rule_modal').appendTo('body').modal('show');
+    });
+
+    $('#leave-rule-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Leave rule added successfully');
+          $('#leave_rule_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save leave rule');
         });
     });
 
