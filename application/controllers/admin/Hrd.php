@@ -430,7 +430,7 @@ class Hrd extends AdminController
             access_denied('Leave Type');
         }
 
-        if (!is_super()) {
+        /*if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         } else {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
@@ -439,7 +439,7 @@ class Hrd extends AdminController
                 $this->db->where('company_id', get_staff_company_id());
             }
         }
-
+*/
         $data['leave_types'] = $this->hrd_model->get_leave_type();
         $data['title'] = 'Leave Type';
         $this->load->view('admin/hrd/setting/leave_type', $data);
@@ -659,20 +659,19 @@ class Hrd extends AdminController
         $data['shift_managers'] = $this->hrd_model->get_shift_manager();
 
         // Load shift types for dropdown
-        if (!is_super()) {
-            $this->db->where('company_id', get_staff_company_id());
-        } else {
-            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
-                $this->db->where('company_id', $_SESSION['super_view_company_id']);
-            } else {
-                $this->db->where('company_id', get_staff_company_id());
-            }
+        $shiftTypeCompanyId = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $shiftTypeCompanyId = $_SESSION['super_view_company_id'];
         }
+        $this->db->where('company_id', $shiftTypeCompanyId);
         $this->db->where('status', 1);
         $data['shift_types'] = $this->hrd_model->get_shift_type();
+        $data['shift_type_count'] = (int) $this->db->where('company_id', $shiftTypeCompanyId)
+            ->where('status', 1)
+            ->count_all_results(db_prefix() . 'hrd_shift_type');
 
         // Load saturday rules for dropdown
-        if (!is_super()) {
+        /*if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         } else {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
@@ -680,7 +679,7 @@ class Hrd extends AdminController
             } else {
                 $this->db->where('company_id', get_staff_company_id());
             }
-        }
+        }*/
         $this->db->where('status', 1);
         $data['saturday_rules'] = $this->hrd_model->get_saturday_rule();
 
@@ -1272,7 +1271,7 @@ class Hrd extends AdminController
             access_denied('Attendance Status');
         }
 
-        if (!is_super()) {
+       /* if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         } else {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
@@ -1280,7 +1279,7 @@ class Hrd extends AdminController
             } else {
                 $this->db->where('company_id', get_staff_company_id());
             }
-        }
+        }*/
 
         $data['attendance_statuses'] = $this->hrd_model->get_attendance_status();
         $data['title'] = 'Attendance Status';
@@ -1533,7 +1532,7 @@ class Hrd extends AdminController
         // ===== End counters =====
 
         // Load active leave types for dropdown
-        if (!is_super()) {
+        /*if (!is_super()) {
             $this->db->where('company_id', get_staff_company_id());
         } else {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
@@ -1541,7 +1540,7 @@ class Hrd extends AdminController
             } else {
                 $this->db->where('company_id', get_staff_company_id());
             }
-        }
+        }*/
         $this->db->where('status', 1);
         $data['leave_types'] = $this->hrd_model->get_leave_type();
 

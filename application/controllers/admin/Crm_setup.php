@@ -99,6 +99,10 @@ class Crm_setup extends AdminController
         $data['active_staff_type_count']        = $staff_type_count;
         $data['company_details']                = $company_details;
         $data['active_ai_details_count']        = $ai_details_count;
+        $data['branches'] = $this->db->where('company_id', $company_id)
+            ->where('status', 1)
+            ->get(db_prefix() . 'hrd_branch_manager')
+            ->result_array();
         $this->load->view('admin/crm_setup/manage', $data);
     }
 }

@@ -13,7 +13,8 @@ function app_init_admin_sidebar_menu_items()
         'icon'     => 'fa fa-home',
         'badge'    => [],
     ]);
-    if (staff_can('view',  'customers') || (have_assigned_customers() || (!have_assigned_customers() && staff_can('create',  'customers')))) {
+	
+    /*if (staff_can('view',  'customers') || (have_assigned_customers() || (!have_assigned_customers() && staff_can('create',  'customers')))) {
         $CI->app_menu->add_sidebar_menu_item('customers', [
             'name'     => _l('als_clients'),
             'href'     => admin_url('clients'),
@@ -21,7 +22,7 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa-regular fa-user',
             'badge'    => [],
         ]);
-    }
+    }*/
 
    
 
@@ -109,7 +110,7 @@ function app_init_admin_sidebar_menu_items()
     ]);*/
 
     if ((!is_staff_member() && get_option('access_tickets_to_none_staff_members') == 1) || (is_staff_member() && staff_can('view',  'tickets'))) {
-        $enable_badge = get_option('enable_support_menu_badges');
+        /*$enable_badge = get_option('enable_support_menu_badges');
         $CI->app_menu->add_sidebar_menu_item('support', [
             'collapse' => $enable_badge ? true : null,
             'name'     => _l('support'),
@@ -117,7 +118,7 @@ function app_init_admin_sidebar_menu_items()
             'icon'     => 'fa-regular fa-life-ring',
             'position' => 40,
             'badge'    => [],
-        ]);
+        ]);*/
 
         /*$CI->load->model('tickets_model');
         $statuses = $CI->tickets_model->get_ticket_status();
@@ -488,15 +489,7 @@ function app_init_admin_sidebar_menu_items()
       }
 	  
 	  
-	  if (staff_can('view_interviews',  'hr_department')){
-        $CI->app_menu->add_sidebar_children_item('hr_department', [
-            'slug'     => 'interviews',
-            'name'     => _l('Interviews'),
-            'href'     => admin_url('hrd/interviews'),
-            'position' => 10,
-            'badge'    => [],
-        ]);
-      }
+	 
    
 	 
     
@@ -721,7 +714,7 @@ function app_init_admin_sidebar_menu_items()
 	
 	
 	
-    if (is_admin()) {
+    if(is_admin()) {
     // WhatsApp Configuration 
     $CI->app_menu->add_setup_menu_item('whatsapp', [
         'collapse' => true,
@@ -800,7 +793,12 @@ function app_init_admin_sidebar_menu_items()
             'position' => 20,
             'badge'    => [],
         ]);
-        $CI->app_menu->add_setup_children_item('leads', [
+        
+		}
+		
+		if (is_super()) {
+		
+		$CI->app_menu->add_setup_children_item('leads', [
             'slug'     => 'leads-sources',
             'name'     => _l('acs_leads_sources_submenu'),
             'href'     => admin_url('leads/sources'),
@@ -808,7 +806,6 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 		
-		if (is_super()) {
 		
         $CI->app_menu->add_setup_children_item('leads', [
             'slug'     => 'leads-statuses',
@@ -829,7 +826,7 @@ function app_init_admin_sidebar_menu_items()
 		
 		
 		
-		}
+		
 		
         /*$CI->app_menu->add_setup_children_item('leads', [
             'slug'     => 'leads-email-integration',
@@ -854,7 +851,9 @@ function app_init_admin_sidebar_menu_items()
             'position' => 21,
             'badge'    => [],
         ]);
+		}
 		
+		if (is_admin()) {
 		$CI->app_menu->add_setup_children_item('leads', [
             'slug'     => 'task-status',
             'name'     => _l('Task Status'),
@@ -862,8 +861,8 @@ function app_init_admin_sidebar_menu_items()
             'position' => 20,
             'badge'    => [],
         ]);
-		}
 		
+		}
 		
 		
 		
@@ -900,7 +899,7 @@ function app_init_admin_sidebar_menu_items()
         ]);*/
 
         
-
+         }
         
         if (is_super()) {
 		
@@ -1007,7 +1006,7 @@ function app_init_admin_sidebar_menu_items()
                   ]);*/
 				  
 		}
-    }
+    
 	
 	 if (is_super()) {
 	if (staff_can('view',  'settings')) {
@@ -1090,6 +1089,17 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
 		}
+		
+		if (staff_can('view_interviews',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'interviews',
+            'name'     => _l('Interviews'),
+            'href'     => admin_url('hrd/interviews'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+		
 		
 		
 		

@@ -673,6 +673,7 @@ class Hrd_model extends App_Model
 	
 	public function get_shift_details($id = '', $where = [])
     {
+	        //log_message('error', 'ID= '.get_branch_id() );
             $this->db->select('s.*, b.*');
 			$this->db->from(db_prefix() . 'hrd_shift_manager s');
 			$this->db->join(db_prefix() . 'hrd_branch_manager b', 's.shift_id = b.shift');
@@ -837,6 +838,7 @@ class Hrd_model extends App_Model
 		
 		
 		$shift_details = $this->hrd_model->get_shift_details();
+		//log_message('error', 'Display data - '.print_r($shift_details, true) );
         if(isset($shift_details)&&$shift_details){
 		$officeIn 			= $shift_details[0]['shift_in'];
 		//log_message('error', 'Display data'.$officeIn );
