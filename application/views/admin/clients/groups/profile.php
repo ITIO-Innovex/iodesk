@@ -95,7 +95,7 @@
                     </div>
                     <div class="col-md-<?php echo !isset($client) ? 12 : 8; ?>">
                         <?php hooks()->do_action('before_customer_profile_company_field', $client ?? null); ?>
-                        <?php $value = (isset($client) ? $client->company : ''); ?>
+                        <?php $value = (isset($client) ? ($client->company_name ?? $client->company) : ''); ?>
                         <?php $attrs = (isset($client) ? [] : ['autofocus' => true]); ?>
                         <?php echo render_input('company', 'client_company', $value, 'text', $attrs); ?>
                         <div id="company_exists_info" class="hide"></div>
@@ -105,7 +105,7 @@
                       echo render_input('vat', 'client_vat_number', $value,'text',['maxlength' => '20','minlength' => '15','onkeypress' => 'return /^[a-zA-Z0-9]$/.test(String.fromCharCode(event.charCode))']);
                   } ?>
                         <?php hooks()->do_action('before_customer_profile_phone_field', $client ?? null); ?>
-                        <?php $value = (isset($client) ? $client->phonenumber : ''); ?>
+                        <?php $value = (isset($client) ? ($client->company_phonenumber ?? $client->phonenumber) : ''); ?>
                         <?php echo render_input('phonenumber', 'client_phonenumber', $value,'number',['required' => 'true','maxlength' => '15','minlength' => '10','onkeypress' => 'return event.charCode >= 48 && event.charCode <= 57']); ?>
                         <?php hooks()->do_action('after_customer_profile_company_phone', $client ?? null); ?>
                         <?php if ((isset($client) && empty($client->website)) || !isset($client)) {

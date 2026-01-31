@@ -9,10 +9,10 @@
     <div class="content">
         <div class="row">
             <div class="col-md-12">
-                <div class="tw-mb-2 sm:tw-mb-4">
+                <div class="tw-mb-21 sm:tw-mb-41">
                     <button class="btn btn-primary mbot15" data-toggle="modal" data-target="#entryModal">
-    <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Webmail Setup'); ?>
-</button>
+    <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Webmail Setup'); ?> 
+</button> <a href="javascript:void(0);" class="pull-right" id="crm_instruction" title="Manage Webmail Setup – User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning"></i></a>
                 </div>
                 <div class="panel_s">
                     <div class="panel-body panel-table-full">
@@ -209,11 +209,61 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+<!-- End CRM Instruction Modal -->
+<div class="modal fade" id="crm_instruction_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">How to Add SMTP Details in CRM</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Please enter all required SMTP details correctly and click the `Save` button to store the configuration.
+</div>
+
+
+
+<ol>
+    <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Step-Based Instruction (Good for Setup Pages)</b></h4>
+        <ul>
+            <li> - Enter your <strong>SMTP Host</strong>, <strong>Port</strong>, <strong>Username</strong>, and <strong>Password</strong>.</li>
+            <li> - Select the appropriate <strong>encryption type</strong> (<strong>TLS</strong> / <strong>SSL</strong> / <strong>None</strong>).</li>
+			<li> - Verify the details. - click on Test IMAP Details button</li>
+			<li> - Click Save to apply the SMTP configuration.</li>
+			<li> - Ensure all SMTP configuration fields are completed accurately, then save the settings to enable email functionality.</li>
+        </ul>
+    </li>
+	
+	<li class="tw-my-2">
+        <h5 class="text-danger">If the IMAP test fails, please contact your SMTP provider. This may be due to permission or access restrictions.</h5>
+        
+    </li>
+
+</ol>
+				</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
 <?php init_tail(); ?>
 <script>
 $(function() {
     initDataTable('.table-custom-fields', window.location.href);
 });
+</script>
+<script>
+$('#crm_instruction').on('click', function(e) {
+      e.preventDefault();
+      $('#no_of_staff').val('');
+      $('#crm_instruction_modal').modal('show');
+    });
 </script>
 <script>
 var $entryModal = $('#entryModal');

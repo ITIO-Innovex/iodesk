@@ -9,6 +9,24 @@
             <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Interview'); ?>
           </a>
         </div>
+		<?php if (!empty($interview_process_count)) { ?>
+        <div class="alert alert-success">
+            Total Interview Process: <?php echo (int) $interview_process_count; ?>
+        </div>
+        <?php } else { ?>
+		<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_process">Add Interview Process</a></span></div>
+                  </div>
+        <?php } ?>
+        <?php if (!empty($interview_source_count)) { ?>
+        <div class="alert alert-success">
+            Total Interview Source: <?php echo (int) $interview_source_count; ?>
+        </div>
+        <?php } else { ?>
+				  <div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_source">Add Interview Source</a></span></div>
+                  </div>
+        <?php } ?>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
 		  <div class="row">
@@ -237,6 +255,52 @@
   </div>
 </div>
 
+<div class="modal fade" id="interview_process_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('hrd/interviewprocess'), ['id' => 'interview-process-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Interview Process</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="process_title" class="control-label">Process Title</label>
+          <input type="text" class="form-control" id="process_title" name="name" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="interview_source_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('hrd/interviewsource'), ['id' => 'interview-source-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Interview Source</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="source_title" class="control-label">Source Title</label>
+          <input type="text" class="form-control" id="source_title" name="name" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
 <script>
   window.addEventListener('load', function () {
     appValidateForm($("body").find('#interviews-form'), {full_name:'required',phone_number:'required'}, manage_interview);
@@ -295,6 +359,46 @@
 $(document).ready(function(){
     $('#toggleBtn').click(function(){
         $('.togglesearch').slideToggle(); // smoothly show/hide form
+    });
+
+    $('body').on('click', '#interview_process', function(e) {
+        e.preventDefault();
+        $('#process_title').val('');
+        $('#interview_process_modal').appendTo('body').modal('show');
+    });
+
+    $('#interview-process-form').on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        $.post($form.attr('action'), $form.serialize())
+          .done(function() {
+            alert_float('success', 'Interview process added successfully');
+            $('#interview_process_modal').modal('hide');
+            window.location.reload();
+          })
+          .fail(function() {
+            alert_float('danger', 'Failed to save interview process');
+          });
+    });
+
+    $('body').on('click', '#interview_source', function(e) {
+        e.preventDefault();
+        $('#source_title').val('');
+        $('#interview_source_modal').appendTo('body').modal('show');
+    });
+
+    $('#interview-source-form').on('submit', function(e) {
+        e.preventDefault();
+        var $form = $(this);
+        $.post($form.attr('action'), $form.serialize())
+          .done(function() {
+            alert_float('success', 'Interview source added successfully');
+            $('#interview_source_modal').modal('hide');
+            window.location.reload();
+          })
+          .fail(function() {
+            alert_float('danger', 'Failed to save interview source');
+          });
     });
 });
 

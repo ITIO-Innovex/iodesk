@@ -724,7 +724,7 @@
                 <div class="d-none d-md-flex align-items-center gap-4">
                     <a href="#features" class="nav-link">Features</a>
                     <a href="#pricing" class="nav-link">Pricing</a>
-                    <a href="<?php echo base_url('login'); ?>" class="nav-link">Login</a>
+                    <a href="<?php echo base_url('admin/authentication'); ?>" class="nav-link">Login</a>
                     <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn btn-hero-primary" style="padding: 0.75rem 1.5rem;">Get Started</a>
                 </div>
             </div>
@@ -1019,7 +1019,7 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="footer-brand">
-                        <img src="https://itio.in/assets/img/logo/Logo_dark.png" alt="HRM" class="img-responsive" style="max-width: 150px; margin: 0 auto;">
+                        <img src="https://itio.in/assets/img/logo/Logo_light.png" alt="HRM" class="img-responsive" style="max-width: 150px;">
                     </div>
                     <p class="footer-desc">Empowering businesses with modern HR solutions. Simplify your people management and focus on what matters most.</p>
                 </div>

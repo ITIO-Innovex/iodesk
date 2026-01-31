@@ -8,6 +8,15 @@
 Dropzone.options.clientAttachmentsUpload = false;
 var customer_id = $('input[name="userid"]').val();
 $(function() {
+    if (!customer_id) {
+        var match = window.location.pathname.match(/\/clients\/client\/(\d+)/);
+        if (match && match[1]) {
+            customer_id = match[1];
+        }
+    }
+    if (!customer_id) {
+        return;
+    }
 
     if ($('#client-attachments-upload').length > 0) {
         new Dropzone('#client-attachments-upload', appCreateDropzoneOptions({
@@ -334,7 +343,14 @@ function contactFormHandler(form) {
         processData: false,
         url: formURL
     }).done(function(response) {
-        response = JSON.parse(response);
+        try {
+            response = JSON.parse(response);
+        } catch (e) {
+            // If server output contains warnings, fallback to full page reload
+            console.error('Contact response parse failed:', e, response);
+            window.location.reload();
+            return;
+        }
         if (response.success) {
             alert_float('success', response.message);
             if (typeof(response.is_individual) != 'undefined' && response.is_individual) {
@@ -362,7 +378,11 @@ function contactFormHandler(form) {
             $('#contact').modal('hide');
         }
     }).fail(function(error) {
-        alert_float('danger', JSON.parse(error.responseText));
+        try {
+            alert_float('danger', JSON.parse(error.responseText));
+        } catch (e) {
+            alert_float('danger', 'Failed to save contact. Please try again.');
+        }
     });
     return false;
 }

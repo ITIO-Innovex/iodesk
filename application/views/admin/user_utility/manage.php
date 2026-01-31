@@ -10,6 +10,7 @@
                             <div class="col-md-12">
                                 <h4 class="no-margin">
                                     <?php echo $title; ?>
+									<a href="javascript:void(0);" class="pull-right" id="crm_instruction" title="Manage Team Document Forms : User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning tw-mx-2"></i></a>
                                     <a href="<?php echo admin_url('user_utility/create'); ?>" class="btn btn-info pull-right">
                                         <i class="fa fa-plus"></i> <?php echo _l('new'); ?>
                                     </a>
@@ -101,4 +102,81 @@
         </div>
     </div>
 </div>
+<!-- End CRM Instruction Modal -->
+<div class="modal fade" id="crm_instruction_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Instruction: Team Document Forms Instructions</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+
+<h3>Step 1: Create a Dynamic Form</h3>
+<ul>
+    <li>Click on <strong>Create Dynamic Form</strong>.</li>
+    <li>Add a <strong>Form Name</strong>.</li>
+    <li>Assign the form to staff members using <strong>multiple select</strong>.</li>
+    <li>Click the <strong>Add Field</strong> button to add form fields.</li>
+    <li>Select the required <strong>Field Type</strong>:
+        <ul>
+            <li><strong>Text</strong> – For short text (e.g., Name)</li>
+            <li><strong>Textarea</strong> – For detailed input (e.g., Address)</li>
+            <li><strong>Editor</strong> – For rich text content</li>
+            <li><strong>Listbox</strong> – For dropdown selection</li>
+            <li><strong>Radio</strong> – For single-choice options</li>
+            <li><strong>Checkbox</strong> – For multiple-choice options</li>
+            <li><strong>Date/Time</strong> – For date or time input</li>
+            <li><strong>File</strong> – For file uploads</li>
+        </ul>
+    </li>
+    <li>If the field is mandatory, check the <strong>Required</strong> option.</li>
+    <li>Ensure the <strong>Field Name</strong> contains <strong>no spaces or special characters</strong>.</li>
+    <li>After adding all required fields, click <strong>Submit</strong> to create the form.</li>
+</ul>
+
+<h3>Step 2: Submit Form Data</h3>
+<ul>
+    <li>After submission, the form will appear in the <strong>Form Listing Box</strong>.</li>
+    <li>Click <strong>Add Form</strong> to open the form.</li>
+    <li>Enter the required values.</li>
+    <li>Click <strong>Submit</strong> to save the form data.</li>
+</ul>
+
+<h3>Step 3: View Assigned Staff & Comments</h3>
+<ul>
+    <li>After form submission, all <strong>assigned staff members</strong> will be displayed.</li>
+    <li>Assigned staff members can view the submitted data.</li>
+    <li>Staff members can add <strong>comments</strong> on the assigned form data.</li>
+</ul>
+
+<div class="note">
+    <strong>Important Notes:</strong>
+    <ul>
+        <li>All required fields must be completed before submission.</li>
+        <li>Invalid field names may prevent the form from being saved.</li>
+        <li>Only assigned staff members can view and comment on the form data.</li>
+    </ul>
+</div>
+
+
+
+				</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+    </div>
+  </div>
+</div>
 <?php init_tail(); ?>
+<script>
+  $(function() {
+    $('#crm_instruction').on('click', function(e) {
+      e.preventDefault();
+      $('#crm_instruction_modal').modal('show');
+    });
+  });
+</script>

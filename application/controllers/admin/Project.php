@@ -31,6 +31,9 @@ class Project extends AdminController
         $data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
         $data['project_groups'] = $this->project_model->get_project_groups();
         $data['project_statuses'] = $this->project_model->get_project_statuses();
+        $data['project_group_count'] = (int) $this->db->where('company_id', get_staff_company_id())
+            ->where('status', 1)
+            ->count_all_results(db_prefix() . 'project_group');
         $data['title']    = 'Project List';
         $this->load->view('admin/project/list', $data);
     } 
@@ -56,6 +59,9 @@ class Project extends AdminController
 		$data['project_list'] = $this->project_model->get_projectlist();
 		$data['project_statuses'] = $this->project_model->get_project_statuses();
 		$data['project_priority'] = $this->project_model->project_priority();
+        $data['project_count'] = (int) $this->db->where('company_id', get_staff_company_id())
+            ->where('is_deleted', 0)
+            ->count_all_results(db_prefix() . 'project_master');
 		
         //$data['project_groups'] = $this->project_model->get_project_groups();
         $data['title']    = 'Task List';

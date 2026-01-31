@@ -25,7 +25,7 @@ class Clients_model extends App_Model
      */
     public function get($id = '', $where = [])
     {
-        $this->db->select(implode(',', prefixed_table_fields_array(db_prefix() . 'clients')) . ',' . get_sql_select_client_company(). ',' . db_prefix() . 'contacts.*');
+        $this->db->select(implode(',', prefixed_table_fields_array(db_prefix() . 'clients')) . ',' . get_sql_select_client_company() . ',' . db_prefix() . 'contacts.*' . ',' . db_prefix() . 'clients.company as company_name' . ',' . db_prefix() . 'clients.phonenumber as company_phonenumber');
 
         $this->db->join(db_prefix() . 'countries', '' . db_prefix() . 'countries.country_id = ' . db_prefix() . 'clients.country', 'left');
         $this->db->join(db_prefix() . 'contacts', '' . db_prefix() . 'contacts.userid = ' . db_prefix() . 'clients.userid AND is_primary = 1', 'left');
@@ -37,9 +37,17 @@ class Clients_model extends App_Model
         if (is_numeric($id)) {
             $this->db->where(db_prefix() . 'clients.userid', $id);
             $client = $this->db->get(db_prefix() . 'clients')->row();
-
+			//echo $this->db->last_query();exit;
+			
+			$client->userid=$id;
+			
+			
+			if(empty($client->phonenumber)){
+			$client->phonenumber = $client->company_phonenumber ?? 0;
+			}
+            
             if ($client && get_option('company_requires_vat_number_field') == 0) {
-                $client->vat = null;
+                //$client->vat = null;
             }
 
             $GLOBALS['client'] = $client;

@@ -44,7 +44,7 @@ return $txt;
 	    
 
 <?php }else{ ?>
-<div  class="alert " role="alert"><a href="#" onclick="edit_key(); return false;">Set Chatgtp API Key</a></div>
+<div  class="alert " role="alert"><a href="#" onclick="edit_key(); return false;">Set Chatgtp API Key @@</a></div>
 <?php } ?>
  </div>
                 </div>

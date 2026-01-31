@@ -29,6 +29,8 @@ $nda_url = $company_details['nda_url'] ?? '';
 $settings = $company_details['settings'] ?? '';
 $nda_smtp = $company_details['nda_smtp'] ?? '';
 $direct_mail_smtp = $company_details['direct_mail_smtp'] ?? '';
+$direct_smtp_config = $direct_mail_smtp ? json_decode($direct_mail_smtp, true) : [];
+$nda_smtp_config = $nda_smtp ? json_decode($nda_smtp, true) : [];
 ?>
 
 
@@ -108,17 +110,7 @@ if (isset($company_logo)&&$company_logo&&isset($company_website)&&$company_websi
 </div>
 <?php } ?>
 
-<?php if (!empty($nda_url)) { ?>
-<div class="alert alert-success">
-<a href="<?php echo e($nda_url); ?>" target="_blank" rel="noopener">
-                            <?php echo e($nda_url); ?>
-                        </a>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure your NDA URL used for sending NDA emails from Leads and Deals.  <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2" target="_blank">NDA URL</a></span></div>
-</div>
-<?php } ?>
+
                                         
 										
 										
@@ -152,7 +144,7 @@ Added Direct Email SMTP Details
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending direct emails. <span style="float:right"><a href="<?php echo admin_url('customize/smtp_setting');?>" class="btn btn-warning btn-sm ms-2">Direct Email</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending direct emails. <span style="float:right"><a href="javascript:void(0);" id="smtp_setup" class="btn btn-warning btn-sm ms-2">Add Direct Email SMTP details</a></span></div>
 </div>
 				  
 <?php } ?>				  
@@ -164,7 +156,7 @@ Added NDA Email SMTP Details
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending NDA emails from Leads and Deals. <span style="float:right"><a href="<?php echo admin_url('customize/smtp_setting');?>" class="btn btn-warning btn-sm ms-2">NDA Email</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending NDA emails from Leads and Deals. <span style="float:right"><a href="javascript:void(0);" id="nda_smtp_setup" class="btn btn-warning btn-sm ms-2">Add NDA Email SMTP details</a></span></div>
                   </div>
 <?php } ?>				  
                                             
@@ -372,7 +364,7 @@ Active project group count: <?php echo $project_group_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to organize and manage your projects effectively. <span style="float:right"><a href="<?php echo admin_url('project/project_group');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Project Group</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to organize and manage your projects effectively. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="project_group">Add Project Group</a></span></div>
 </div>
 <?php } ?>
                                         </div>
@@ -394,7 +386,7 @@ Active interview process count: <?php echo $interview_process_count; ?>
 </div>
 <?php } else{ ?>
  <div class="alert alert-danger tw-bg-danger-500">
- <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_process');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Interview Process</a></span></div>
+ <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_process">Add Interview Process</a></span></div>
  </div>
 <?php } ?>
                                         
@@ -406,7 +398,7 @@ Active interview source count: <?php echo $interview_source_count; ?>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_source');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Interview Source</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="interview_source">Add Interview Source</a></span></div>
 </div>
 <?php } ?>
                                         </div>
@@ -443,6 +435,325 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="direct_smtp_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('direct_email/save_direct_smtp'), ['id' => 'direct-smtp-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Direct SMTP Details</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="control-label">SMTP Encryption</label>
+          <div>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="ssl" checked> SSL
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="tls"> TLS
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="none"> No Encryption
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="smtp_host" class="control-label">SMTP Host</label>
+          <input type="text" class="form-control" id="smtp_host" name="smtp_host" placeholder="smtp.example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="smtp_port" class="control-label">SMTP Port</label>
+          <input type="number" class="form-control" id="smtp_port" name="smtp_port" placeholder="587" required>
+        </div>
+        <div class="form-group">
+          <label for="smtp_email" class="control-label">SMTP Email</label>
+          <input type="email" class="form-control" id="smtp_email" name="smtp_email" placeholder="no-reply@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="smtp_username" class="control-label">SMTP Username</label>
+          <input type="text" class="form-control" id="smtp_username" name="smtp_username" placeholder="SMTP Username">
+        </div>
+        <div class="form-group">
+          <label for="smtp_password" class="control-label">SMTP Password</label>
+          <input type="password" class="form-control" id="smtp_password" name="smtp_password" placeholder="SMTP Password">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="nda_smtp_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('direct_email/save_nda_smtp'), ['id' => 'nda-smtp-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">NDA SMTP Details</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="control-label">SMTP Encryption</label>
+          <div>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="ssl" checked> SSL
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="tls"> TLS
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="none"> No Encryption
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="nda_smtp_host" class="control-label">SMTP Host</label>
+          <input type="text" class="form-control" id="nda_smtp_host" name="smtp_host" placeholder="smtp.example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="nda_smtp_port" class="control-label">SMTP Port</label>
+          <input type="number" class="form-control" id="nda_smtp_port" name="smtp_port" placeholder="587" required>
+        </div>
+        <div class="form-group">
+          <label for="nda_smtp_email" class="control-label">SMTP Email</label>
+          <input type="email" class="form-control" id="nda_smtp_email" name="smtp_email" placeholder="no-reply@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="nda_smtp_username" class="control-label">SMTP Username</label>
+          <input type="text" class="form-control" id="nda_smtp_username" name="smtp_username" placeholder="SMTP Username">
+        </div>
+        <div class="form-group">
+          <label for="nda_smtp_password" class="control-label">SMTP Password</label>
+          <input type="password" class="form-control" id="nda_smtp_password" name="smtp_password" placeholder="SMTP Password">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="interview_source_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('hrd/interviewsource'), ['id' => 'interview-source-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Interview Source</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="source_title" class="control-label">Source Title</label>
+          <input type="text" class="form-control" id="source_title" name="name" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="interview_process_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('hrd/interviewprocess'), ['id' => 'interview-process-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Interview Process</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="process_title" class="control-label">Process Title</label>
+          <input type="text" class="form-control" id="process_title" name="name" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="project_group_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('project/projectgroup'), ['id' => 'project-group-form']); ?>
+      <input type="hidden" name="inline" value="1">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Add Project Group</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="group_title" class="control-label">Group Title</label>
+          <input type="text" class="form-control" id="group_title" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="group_color" class="control-label">Group Color</label>
+          <input type="color" class="form-control" id="group_color" name="color" value="#757575">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
 <?php init_tail(); ?>
+<script>
+  $(function() {
+    var smtpConfig = <?php echo json_encode($direct_smtp_config ?? []); ?>;
+    var ndaConfig = <?php echo json_encode($nda_smtp_config ?? []); ?>;
+
+    $('#smtp_setup').on('click', function(e) {
+      e.preventDefault();
+      var enc = (smtpConfig.smtp_encryption || 'ssl').toLowerCase();
+      if (enc !== 'ssl' && enc !== 'tls' && enc !== 'none') {
+        enc = 'ssl';
+      }
+      $('input[name="smtp_encryption"][value="' + enc + '"]').prop('checked', true);
+      $('#smtp_host').val(smtpConfig.smtp_host || '');
+      $('#smtp_port').val(smtpConfig.smtp_port || '');
+      $('#smtp_email').val(smtpConfig.smtp_email || '');
+      $('#smtp_username').val(smtpConfig.smtp_username || '');
+      $('#smtp_password').val(smtpConfig.smtp_password || '');
+      $('#direct_smtp_modal').modal('show');
+    });
+
+    $('#direct-smtp-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize()).done(function(resp) {
+        var r = {};
+        try { r = JSON.parse(resp); } catch (e) {}
+        if (r.success) {
+          alert_float('success', r.message || 'SMTP saved.');
+          $('#direct_smtp_modal').modal('hide');
+          location.reload();
+        } else {
+          alert_float('warning', r.message || 'Failed to save SMTP.');
+        }
+      }).fail(function() {
+        alert_float('danger', 'Request failed.');
+      });
+    });
+
+    $('#nda_smtp_setup').on('click', function(e) {
+      e.preventDefault();
+      var enc = (ndaConfig.smtp_encryption || 'ssl').toLowerCase();
+      if (enc !== 'ssl' && enc !== 'tls' && enc !== 'none') {
+        enc = 'ssl';
+      }
+      $('#nda_smtp_modal').find('input[name="smtp_encryption"][value="' + enc + '"]').prop('checked', true);
+      $('#nda_smtp_host').val(ndaConfig.smtp_host || '');
+      $('#nda_smtp_port').val(ndaConfig.smtp_port || '');
+      $('#nda_smtp_email').val(ndaConfig.smtp_email || '');
+      $('#nda_smtp_username').val(ndaConfig.smtp_username || '');
+      $('#nda_smtp_password').val(ndaConfig.smtp_password || '');
+      $('#nda_smtp_modal').modal('show');
+    });
+
+    $('#nda-smtp-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize()).done(function(resp) {
+        var r = {};
+        try { r = JSON.parse(resp); } catch (e) {}
+        if (r.success) {
+          alert_float('success', r.message || 'NDA SMTP saved.');
+          $('#nda_smtp_modal').modal('hide');
+          location.reload();
+        } else {
+          alert_float('warning', r.message || 'Failed to save NDA SMTP.');
+        }
+      }).fail(function() {
+        alert_float('danger', 'Request failed.');
+      });
+    });
+
+    $('body').on('click', '#interview_process', function(e) {
+      e.preventDefault();
+      $('#process_title').val('');
+      $('#interview_process_modal').appendTo('body').modal('show');
+    });
+
+    $('#interview-process-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Interview process added successfully');
+          $('#interview_process_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save interview process');
+        });
+    });
+
+    $('body').on('click', '#project_group', function(e) {
+      e.preventDefault();
+      $('#group_title').val('');
+      $('#group_color').val('#757575');
+      $('#project_group_modal').appendTo('body').modal('show');
+    });
+
+    $('#project-group-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function(resp) {
+          var r = {};
+          try { r = JSON.parse(resp); } catch (e) {}
+          if (r.success) {
+            alert_float('success', 'Project group added successfully');
+            $('#project_group_modal').modal('hide');
+            window.location.reload();
+          } else {
+            alert_float('warning', 'Failed to save project group');
+          }
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save project group');
+        });
+    });
+
+    $('body').on('click', '#interview_source', function(e) {
+      e.preventDefault();
+      $('#source_title').val('');
+      $('#interview_source_modal').appendTo('body').modal('show');
+    });
+
+    $('#interview-source-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize())
+        .done(function() {
+          alert_float('success', 'Interview source added successfully');
+          $('#interview_source_modal').modal('hide');
+          window.location.reload();
+        })
+        .fail(function() {
+          alert_float('danger', 'Failed to save interview source');
+        });
+    });
+  });
+</script>
 </body>
 </html>

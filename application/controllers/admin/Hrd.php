@@ -3048,17 +3048,20 @@ class Hrd extends AdminController
         $data['interview_sources'] = $this->hrd_model->get_interview_source();
 
         // Load interview processes for dropdown
-        if (is_super()) {
-            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
-                $this->db->where('company_id', $_SESSION['super_view_company_id']);
-            } else {
-                $this->db->where('company_id', get_staff_company_id());
-            }
-        } else {
-            $this->db->where('company_id', get_staff_company_id());
+        $processCompanyId = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $processCompanyId = $_SESSION['super_view_company_id'];
         }
+        $this->db->where('company_id', $processCompanyId);
         $this->db->where('status', 1);
         $data['interview_processes'] = $this->hrd_model->get_interview_process();
+
+        $data['interview_process_count'] = (int) $this->db->where('company_id', $processCompanyId)
+            ->where('status', 1)
+            ->count_all_results(db_prefix() . 'hrd_interview_process');
+        $data['interview_source_count'] = (int) $this->db->where('company_id', $processCompanyId)
+            ->where('status', 1)
+            ->count_all_results(db_prefix() . 'hrd_interview_source');
 
         $data['title'] = 'Interviews';
         $this->load->view('admin/hrd/interviews', $data);
