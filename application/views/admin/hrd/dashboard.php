@@ -9,6 +9,9 @@ $fullday=$attendance_stats['fullday'] ?? 0;
 $half=$attendance_stats['half'] ?? 0;
 $absent=$attendance_stats['absent'] ?? 0;
 $totaldays=($fullday +($half / 2)) ?? 0;
+
+// for display attendance checkin / checkout button
+$attendance_display_status=attendance_display_status();
 ?>
 <style>
 <?php /*?>.box-gradient-bg1{background-image: radial-gradient(circle, #eaedb4 0%, #daeaed 100%);}
@@ -54,13 +57,18 @@ $totaldays=($fullday +($half / 2)) ?? 0;
         </div>
 <div class="pb-[10px]">
   <div class="tw-flex tw-justify-end tw-gap-2">
+  
+ <?php if($attendance_display_status==1){ ?> 
  <?php if(isset($in_time)&&$in_time){ ?>
  <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
   <?php }else{ ?>
    <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
   <?php } ?>
- </div></div> 
-  
+ 
+ <?php }else{ ?>
+ 
+  <?php } ?>
+  </div></div> 
         <!-- Statistics Cards -->
         <div class="row">
             <div class="col-md-3">

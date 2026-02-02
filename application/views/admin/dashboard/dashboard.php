@@ -33,7 +33,8 @@ $display_setup=1;
 if(isset($company_details['company_logo'])&&$company_details['company_logo']&&isset($company_details['settings'])&&$company_details['settings']&&isset($company_details['company_logo'])&&$company_details['direct_mail_smtp']&&isset($active_department_count)&&$active_department_count&&$active_designation_count&&$active_designation_count){
 $display_setup=0;
 }
-
+// for display attendance checkin / checkout button
+$attendance_display_status=attendance_display_status();
 ?>
 
 <?php init_head(); ?>
@@ -87,10 +88,15 @@ $display_setup=0;
     <div class="dc-seconds" id="dc-seconds">:00</div>
     <div class="dc-ampm" id="dc-ampm">AM</div>
   </div>
+  <?php if($attendance_display_status==1){ ?>
   <?php if(isset($in_time)&&$in_time){ ?>
  <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
   <?php }else{ ?>
    <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
+  <?php } ?>
+  
+  <?php }else{ ?>
+ 
   <?php } ?>
     </div>
     <div class="content">

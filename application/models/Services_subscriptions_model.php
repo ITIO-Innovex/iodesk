@@ -207,7 +207,7 @@ $email=$result['email'] ?? '';
 	 
 //$recipientEmail="vikashg@itio.in";	 
 //$name="Vimalesh";
-$mailSub="Payment Confirmation – Invoice No - ".$invoice_no;
+$mailSub="Payment Confirmation # Invoice No - ".$invoice_no;
 $mailbody='<!DOCTYPE html>
 <html>
 <head>

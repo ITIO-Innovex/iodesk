@@ -1433,6 +1433,19 @@ function get_remaining_days_in_month($include_today = true)
     return $include_today ? $days + 1 : $days;
 }
 
+function attendance_display_status()
+{
+		$department_id=$GLOBALS['current_user']->department_id ?? '';
+		$designation_id=$GLOBALS['current_user']->designation_id ?? '';
+		$branch=$GLOBALS['current_user']->branch ?? '';
+		$attendance_display=0;
+		if(isset($department_id)&&$department_id&&isset($department_id)&&$department_id&&isset($department_id)&&$department_id){
+		$attendance_display=1;
+		}
+
+    return $attendance_display;
+}
+
 
 function calculateExtraStaffPrice(
     float $planPrice,
