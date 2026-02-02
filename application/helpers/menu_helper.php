@@ -779,13 +779,13 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);*/
 		
-		$CI->app_menu->add_setup_children_item('support', [
+		/*$CI->app_menu->add_setup_children_item('support', [
             'slug'     => 'tickets-predefined-replies',
             'name'     => _l('acs_ticket_predefined_replies_submenu'),
             'href'     => admin_url('tickets/predefined_replies'),
             'position' => 10,
             'badge'    => [],
-        ]);
+        ]);*/
 		
 		$CI->app_menu->add_setup_menu_item('leads', [
             'collapse' => true,

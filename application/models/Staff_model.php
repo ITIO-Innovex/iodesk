@@ -1049,6 +1049,17 @@ class Staff_model extends App_Model
 	   if(isset($data['customize_company_domain'])&&$data['customize_company_domain']){
 	   unset($data['customize_company_domain']);
 	   }
+	   if(isset($data['customize_firstname'])&&$data['customize_firstname']){
+	   unset($data['customize_firstname']);
+	   }
+	   if(isset($data['customize_lastname'])&&$data['customize_lastname']){
+	   unset($data['customize_lastname']);
+	   }
+	   if(isset($data['customize_email'])&&$data['customize_email']){
+	   unset($data['customize_email']);
+	   }
+	   
+	   //print_r($data);exit;
 	    $this->db->where('company_id', $id);
         $this->db->update(db_prefix() . 'company_master', $data);
 		

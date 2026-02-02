@@ -289,9 +289,210 @@
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>User Documentation</h1>
-                <p class="lead">Get started quickly with step-by-step guidance and answers to common questions.</p>
-                <div class="content-card">
+              <?php /*?>  <h1>User Documentation</h1>
+                <p class="lead">Get started quickly with step-by-step guidance and answers to common questions.</p><?php */?>
+				<div class="content-card">
+				<div class="section-title">CRM Modules – User Guide</div>
+
+<div class="accordion" id="crmDocsAccordion">
+
+    <!-- Staff Management -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#staff">
+                <i class="fa-solid fa-users me-2"></i> Staff Management
+            </button>
+        </h2>
+        <div id="staff" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <ul>
+                    <li>Add new staff members</li>
+                    <li>Edit staff details</li>
+                    <li>Change password</li>
+                    <li>Set roles & permissions</li>
+                    <li>Enable / Disable staff accounts</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- HRMS -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#hrms">
+                <i class="fa-solid fa-id-badge me-2"></i> HRMS
+            </button>
+        </h2>
+        <div id="hrms" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Attendance management</li>
+                    <li>Leave application & approval</li>
+                    <li>Add Leave Rules before applying leave</li>
+                    <li>Add Shift Types before assigning Shift Manager</li>
+                    <li>Configure Interview Rules for interviews</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#projects">
+                <i class="fa-solid fa-diagram-project me-2"></i> Projects
+            </button>
+        </h2>
+        <div id="projects" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Dashboard summary with charts</li>
+                    <li>Add / Edit projects</li>
+                    <li>Add / Edit project tasks</li>
+                    <li>Project group collaboration</li>
+                    <li>Chat within project groups</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Document -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#documents">
+                <i class="fa-solid fa-file-lines me-2"></i> Team Document
+            </button>
+        </h2>
+        <div id="documents" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Create dynamic forms</li>
+                    <li>Add custom fields and values</li>
+                    <li>Assign documents to multiple staff</li>
+                    <li>Comment and reply on documents</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Email -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#directEmail">
+                <i class="fa-solid fa-envelope me-2"></i> Direct Email
+            </button>
+        </h2>
+        <div id="directEmail" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Send emails directly from CRM</li>
+                    <li>Works only after SMTP setup</li>
+                    <li>AI support for email content (if enabled)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Webmail -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#webmail">
+                <i class="fa-solid fa-inbox me-2"></i> Webmail
+            </button>
+        </h2>
+        <div id="webmail" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Send & receive emails</li>
+                    <li>Manage multiple email accounts</li>
+                    <li>SMTP configuration required</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Support -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#ai">
+                <i class="fa-solid fa-robot me-2"></i> AI Support
+            </button>
+        </h2>
+        <div id="ai" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>ChatGPT-powered AI assistance</li>
+                    <li>Works after adding API key</li>
+                    <li>
+                        API Key Guide:
+                        <a href="https://platform.openai.com/api-keys" target="_blank">
+                            Get ChatGPT API Key
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscriptions -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#subscription">
+                <i class="fa-solid fa-credit-card me-2"></i> Subscriptions
+            </button>
+        </h2>
+        <div id="subscription" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>View current plan</li>
+                    <li>Invoice history</li>
+                    <li>Increase staff limit</li>
+                    <li>Upgrade subscription plan</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads / Deals -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#leads">
+                <i class="fa-solid fa-handshake me-2"></i> Leads & Deals
+            </button>
+        </h2>
+        <div id="leads" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Add and manage leads</li>
+                    <li>Configure task status before use</li>
+                    <li>Convert leads to deals</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#sales">
+                <i class="fa-solid fa-chart-line me-2"></i> Sales
+            </button>
+        </h2>
+        <div id="sales" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <ul>
+                    <li>Manage invoices</li>
+                    <li>Products & pricing</li>
+                    <li>Payments & reports</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+				</div>
+                <?php /*?><div class="content-card">
                     <div class="section-title">How to Use Guide</div>
                     <ol class="mb-4">
                         <li>Sign in using your admin credentials from the Login page.</li>
@@ -314,7 +515,7 @@
                         <strong>Where can I update SMTP settings?</strong>
                         <div>Go to Customize &gt; SMTP Settings and save the details.</div>
                     </div>
-                </div>
+                </div><?php */?>
             </div>
         </div>
     </section>

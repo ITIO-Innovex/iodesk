@@ -259,6 +259,11 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 
         $data['title'] = 'Payment Status';
         $data['payment'] = $payment;
+		
+		// Send Email
+		if(isset($invoiceNo)&&$invoiceNo){
+		$this->services_subscriptions_model->send_invoice_email($invoiceNo);
+		}
         $this->load->view('admin/services/payment_status/manage', $data);
     }
 
@@ -1037,4 +1042,13 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 	}
 	exit;
 	}
+	
+	// Toggle Deal Stage Status (AJAX)
+    public function send_invoice_email()
+    {
+	$invoice_no = "1000820260130154434";
+	$this->services_subscriptions_model->send_invoice_email($invoice_no);
+    }
+	
+	
 }
