@@ -29,6 +29,7 @@ $nda_url = $company_details['nda_url'] ?? '';
 $settings = $company_details['settings'] ?? '';
 $nda_smtp = $company_details['nda_smtp'] ?? '';
 $direct_mail_smtp = $company_details['direct_mail_smtp'] ?? '';
+$global_smtp_config = $settings ? json_decode($settings, true) : [];
 $direct_smtp_config = $direct_mail_smtp ? json_decode($direct_mail_smtp, true) : [];
 $nda_smtp_config = $nda_smtp ? json_decode($nda_smtp, true) : [];
 ?>
@@ -106,9 +107,44 @@ if (isset($company_logo)&&$company_logo&&isset($company_website)&&$company_websi
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Manage your company name, domain, logo, favicon, and other branding details. etc <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Company Profile</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Manage your company name, domain, logo, favicon, and other branding details. etc <span style="float:right"><a href="javascript:void(0);" id="company_profile" class="btn btn-warning btn-sm ms-2" target="_blank">Add Company Profile</a></span></div>
 </div>
 <?php } ?>
+
+<div class="modal fade" id="company_profile_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open_multipart(admin_url('crm_setup/save_company_profile'), ['id' => 'company-profile-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Company Profile</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="companyname" class="control-label">Company Name</label>
+          <input type="text" class="form-control" id="companyname" name="companyname" value="<?php echo e($companyname); ?>" required>
+        </div>
+        <div class="form-group">
+          <label for="company_website" class="control-label">Website</label>
+          <input type="text" class="form-control" id="company_website" name="website" value="<?php echo e($company_website); ?>">
+        </div>
+        <div class="form-group">
+          <label for="company_logo" class="control-label">Company Logo</label>
+          <input type="file" class="form-control" id="company_logo" name="company_logo" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label for="company_favicon" class="control-label">Favicon</label>
+          <input type="file" class="form-control" id="company_favicon" name="favicon" accept="image/x-icon,image/png">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
 
 
                                         
@@ -133,7 +169,7 @@ Added Global Email SMTP Details
 </div>
 <?php } else { ?>										
 										<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending all internal system emails. <span style="float:right"><a href="<?php echo admin_url('customize');?>" class="btn btn-warning btn-sm ms-2">Global Email</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure SMTP details for sending all internal system emails. <span style="float:right"><a href="javascript:void(0);" id="global_smtp_setup" class="btn btn-warning btn-sm ms-2">Add Global Email</a></span></div>
                   </div>
 <?php } ?>				  
 
@@ -424,6 +460,59 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal fade" id="global_smtp_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('direct_email/save_global_smtp'), ['id' => 'global-smtp-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Global SMTP Details</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="control-label">SMTP Encryption</label>
+          <div>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="ssl" checked> SSL
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="tls"> TLS
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="smtp_encryption" value="none"> No Encryption
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="global_smtp_host" class="control-label">SMTP Host</label>
+          <input type="text" class="form-control" id="global_smtp_host" name="smtp_host" placeholder="smtp.example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="global_smtp_port" class="control-label">SMTP Port</label>
+          <input type="number" class="form-control" id="global_smtp_port" name="smtp_port" placeholder="587" required>
+        </div>
+        <div class="form-group">
+          <label for="global_smtp_email" class="control-label">SMTP Email</label>
+          <input type="email" class="form-control" id="global_smtp_email" name="smtp_email" placeholder="no-reply@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="global_smtp_username" class="control-label">SMTP Username</label>
+          <input type="text" class="form-control" id="global_smtp_username" name="smtp_username" placeholder="SMTP Username">
+        </div>
+        <div class="form-group">
+          <label for="global_smtp_password" class="control-label">SMTP Password</label>
+          <input type="password" class="form-control" id="global_smtp_password" name="smtp_password" placeholder="SMTP Password">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
 </div>
 
 <div class="modal fade" id="direct_smtp_modal" tabindex="-1" role="dialog">
@@ -1047,9 +1136,15 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
   $(function() {
     var smtpConfig = <?php echo json_encode($direct_smtp_config ?? []); ?>;
     var ndaConfig = <?php echo json_encode($nda_smtp_config ?? []); ?>;
+    var globalConfig = <?php echo json_encode($global_smtp_config ?? []); ?>;
     if ($.fn.jqte) {
       $('.editor').jqte();
     }
+
+    $('#company_profile').on('click', function(e) {
+      e.preventDefault();
+      $('#company_profile_modal').appendTo('body').modal('show');
+    });
 
     $('#smtp_setup').on('click', function(e) {
       e.preventDefault();
@@ -1064,6 +1159,39 @@ Chatgtp API Key count: <?php echo $ai_details_count; ?>
       $('#smtp_username').val(smtpConfig.smtp_username || '');
       $('#smtp_password').val(smtpConfig.smtp_password || '');
       $('#direct_smtp_modal').modal('show');
+    });
+
+    $('#global_smtp_setup').on('click', function(e) {
+      e.preventDefault();
+      var enc = (globalConfig.smtp_encryption || 'ssl').toLowerCase();
+      if (enc !== 'ssl' && enc !== 'tls' && enc !== 'none') {
+        enc = 'ssl';
+      }
+      $('#global_smtp_modal').find('input[name="smtp_encryption"][value="' + enc + '"]').prop('checked', true);
+      $('#global_smtp_host').val(globalConfig.smtp_host || '');
+      $('#global_smtp_port').val(globalConfig.smtp_port || '');
+      $('#global_smtp_email').val(globalConfig.smtp_email || '');
+      $('#global_smtp_username').val(globalConfig.smtp_username || '');
+      $('#global_smtp_password').val(globalConfig.smtp_password || '');
+      $('#global_smtp_modal').modal('show');
+    });
+
+    $('#global-smtp-form').on('submit', function(e) {
+      e.preventDefault();
+      var $form = $(this);
+      $.post($form.attr('action'), $form.serialize()).done(function(resp) {
+        var r = {};
+        try { r = JSON.parse(resp); } catch (e) {}
+        if (r.success) {
+          alert_float('success', r.message || 'Global SMTP saved.');
+          $('#global_smtp_modal').modal('hide');
+          location.reload();
+        } else {
+          alert_float('warning', r.message || 'Failed to save Global SMTP.');
+        }
+      }).fail(function() {
+        alert_float('danger', 'Request failed.');
+      });
     });
 
     $('#direct-smtp-form').on('submit', function(e) {

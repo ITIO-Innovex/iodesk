@@ -120,4 +120,66 @@ class Crm_setup extends AdminController
             ->result_array();
         $this->load->view('admin/crm_setup/manage', $data);
     }
+
+    public function save_company_profile()
+    {
+        if (staff_cant('edit', 'settings')) {
+            access_denied('settings');
+        }
+
+        $company_id = get_staff_company_id();
+        if (!$company_id) {
+            set_alert('danger', 'Company not found.');
+            redirect(admin_url('crm_setup'));
+        }
+
+        $data = [
+            'companyname' => $this->input->post('companyname', true),
+            'website'     => $this->input->post('website', true),
+        ];
+
+        $upload_path = './uploads/company/';
+        if (!is_dir($upload_path)) {
+            mkdir($upload_path, 0755, true);
+        }
+
+        if (isset($_FILES['company_logo']) && $_FILES['company_logo']['error'] == 0) {
+            $config = [
+                'upload_path'   => $upload_path,
+                'allowed_types' => 'gif|jpg|jpeg|png|pdf|svg',
+                'max_size'      => 2048,
+                'file_name'     => 'company_logo_' . time(),
+            ];
+            $this->load->library('upload', $config);
+            if ($this->upload->do_upload('company_logo')) {
+                $upload_data = $this->upload->data();
+                $data['company_logo'] = $upload_data['file_name'];
+            } else {
+                set_alert('danger', $this->upload->display_errors());
+                redirect(admin_url('crm_setup'));
+            }
+        }
+
+        if (isset($_FILES['favicon']) && $_FILES['favicon']['error'] == 0) {
+            $config = [
+                'upload_path'   => $upload_path,
+                'allowed_types' => 'ico|png',
+                'max_size'      => 1024,
+                'file_name'     => 'favicon_' . time(),
+            ];
+            $this->load->library('upload', $config);
+            if ($this->upload->do_upload('favicon')) {
+                $upload_data = $this->upload->data();
+                $data['favicon'] = $upload_data['file_name'];
+            } else {
+                set_alert('danger', $this->upload->display_errors());
+                redirect(admin_url('crm_setup'));
+            }
+        }
+
+        $this->db->where('company_id', $company_id);
+        $this->db->update(db_prefix() . 'company_master', $data);
+        set_alert('success', 'Company profile updated.');
+        redirect(admin_url('crm_setup'));
+    }
 }

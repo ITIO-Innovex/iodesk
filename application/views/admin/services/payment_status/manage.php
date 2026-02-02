@@ -39,11 +39,12 @@ init_head(); ?>
                   <div class="col-md-4"><strong>Payment Method:</strong> <?php echo e($payment['payment_method'] ?? ''); ?></div>
                 </div>
                 <div class="mtop20">
-                  <a href="<?php echo admin_url('services/my_subscriptions'); ?>" class="btn btn-warning">Back to My Subscription</a>
-				  
-				  <a class="btn btn-danger" href="<?php echo admin_url('services/subscriptions_invoice_pdf/' . $payment['id']); ?>">
-                              <i class="fa-solid fa-download"></i> Download
-                            </a>
+<a href="<?php echo admin_url('services/my_subscriptions'); ?>" class="btn btn-warning"><i class="fa-solid fa-file-invoice-dollar menu-icon"></i> Back to My Subscription</a>
+<a class="btn btn-danger" href="<?php echo admin_url('services/subscriptions_invoice_pdf/' . $payment['id']); ?>">
+<i class="fa-solid fa-download"></i> Download
+</a>
+<a class="btn btn-info" href="<?php echo admin_url('dashboard'); ?>"><i class="fa fa-home menu-icon"></i> Home </a>
+<a class="btn btn-success" href="<?php echo admin_url('crm_setup'); ?>"><i class="fa-solid fa-gears menu-icon"></i> CRM Setup Guide</a>
                 </div>
               </div>
             </div>
