@@ -1608,9 +1608,9 @@ class Leads_model extends App_Model
 	    if(isset($id)&&$id){
         $this->db->where('rel_id', $id);
 		}
-		if (!is_admin()) {
+		//if (!is_admin()) {
 		$this->db->where('staff', get_staff_user_id());
-		}
+		//}
 
         $this->db->order_by('date', 'asc');
         return $this->db->get(db_prefix() . 'deal_task')->result_array();

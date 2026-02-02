@@ -1,5 +1,46 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+<style>
+  #crm-setup-accordion .panel-title > a {
+    display: block;
+    position: relative;
+    padding-right: 28px;
+  }
+  #crm-setup-accordion .panel-title > a::after {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f106";
+    position: absolute;
+    right: 0;
+    top: 2px;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+  }
+  #crm-setup-accordion .panel-title > a.collapsed::after {
+    content: "\f107";
+  }
+  .box99 { box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+  }
+  .panel-heading {
+  padding:25px !important;
+  background-image: linear-gradient(to right, #BA8B02 0%, #899348  51%, #BA8B02  100%) !important;
+  }
+  .panel-heading {
+            text-transform: uppercase;
+            transition: 0.5s;
+            background-size: 200% auto;
+            color: white;            
+            box-shadow: 0 0 20px #eee;
+            border-radius: 10px;
+            display: block;
+          }
+ .panel-heading:hover {
+            background-position: right center; /* change the direction of the change here */
+            color: #fff;
+            text-decoration: none;
+          }
+         
+</style>
 <div id="wrapper">
     <div class="content">
         <div class="row">
@@ -12,13 +53,19 @@
                         </div>
                        
                         <div class="row">
-                            
+                                <!--// For Company Profile-->
+								
                                 <div class="col-md-12">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <strong>Company</strong>
+                                            <strong><i class="fa-solid fa-building"></i> Company</strong>
                                         </div>
                                         <div class="panel-body">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Here you can add or update the Company Name, Website URL, Logo, and Favicon.
+	
+</div>
+
 <?php
 $company_details = $company_details ?? [];
 $company_logo = $company_details['company_logo'] ?? '';
@@ -155,12 +202,66 @@ if (isset($company_logo)&&$company_logo&&isset($company_website)&&$company_websi
                                     </div>
                                 </div>
 								
+								<!--// For Email Setup -->
+								
 								<div class="col-md-12">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <strong>Email SMTP Setup</strong>
+                                            <strong><i class="fa-solid fa-at"></i> Email SMTP Setup</strong>
                                         </div>
                                         <div class="panel-body">
+										
+<div class="smtp-instructions">
+    <h4>SMTP Configuration Instructions</h4>
+
+    <h5>1. SMTP Types</h5>
+    <ul>
+        <li><strong>Global SMTP Details:</strong> Used for all system-generated emails (notifications, alerts, system emails).</li>
+        <li><strong>Direct Email SMTP Details:</strong> Used for sending emails directly from the CRM.</li>
+        <li><strong>NDA Email SMTP Details:</strong> Used specifically for sending NDA emails from Leads / Deals.</li>
+    </ul>
+
+    <h5>2. Required SMTP Field Names</h5>
+    <ul>
+        <li>SMTP Host (e.g., smtp.gmail.com, smtp.zoho.com)</li>
+        <li>SMTP Port (e.g., 587, 465)</li>
+        <li>SMTP Username (Email address)</li>
+        <li>SMTP Password (Email password or App Password)</li>
+        <li>Encryption Type (SSL / TLS)</li>
+        <li>From Email Address</li>
+        <li>From Name</li>
+    </ul>
+
+    <h5>3. How to Get SMTP Details</h5>
+    <ul>
+        <li><strong>Gmail:</strong> Enable 2-Step Verification and generate an App Password.</li>
+        <li><strong>Zoho Mail:</strong> Mail Settings <i class="fa-solid fa-arrow-right-long"></i> Mail Accounts <i class="fa-solid fa-arrow-right-long"></i> IMAP/POP <i class="fa-solid fa-arrow-right-long"></i> Generate App Password.</li>
+        <li><strong>Outlook / Office 365:</strong> Enable SMTP Authentication and use App Password if MFA is enabled.</li>
+    </ul>
+
+    <h5>4. Permission & Access Check</h5>
+    <ul>
+        <li>Administrator permission is required.</li>
+        <li>SMTP access must be enabled for the email account.</li>
+        <li>Hosting/server must allow outbound SMTP ports (587 or 465).</li>
+    </ul>
+
+    <h5>5. Test SMTP Configuration</h5>
+    <ul>
+        <li>Save SMTP details.</li>
+        <li>Use the <strong>Test Email</strong> option.</li>
+        <li>Confirm successful email delivery.</li>
+    </ul>
+
+    <h5>6. Common Issues</h5>
+    <ul>
+        <li>Incorrect credentials or missing App Password</li>
+        <li>Wrong SMTP port or encryption type</li>
+        <li>SMTP blocked by hosting provider</li>
+        <li>Email provider SMTP access disabled</li>
+    </ul>
+</div>
+
 										
 <?php
 if (isset($settings)&&$settings) { ?>
@@ -200,12 +301,22 @@ Added NDA Email SMTP Details
                                     </div>
                                 </div>
 								
+								<!--// For Staff Management-->
+								
 								<div class="col-md-12">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <strong>Staff Module</strong>
+                                            <strong><i class="fa-solid fa-users me-2"></i> Staff Module</strong>
                                         </div>
                                         <div class="panel-body">
+										
+<div class="alert alert-info">
+    Here you can add, update, activate, or deactivate, change password and set permission.
+	<p><a href="<?php echo admin_url('staff');?>" target="_blank"><?php echo admin_url('staff');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+<div class="alert alert-danger">
+    <strong>Instruction:</strong> Before adding a staff member, please ensure that Department, Designation, and Staff Type are created.
+</div>
 <?php
 $department_count = (int) ($active_department_count ?? 0);
 if ($department_count > 0) { ?>
@@ -239,17 +350,354 @@ Active staff type count: <?php echo $staff_type_count; ?>
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add staff type to activate staff-related features. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_staff_type">Add New Staff Type</a></span></div>
                   </div>
 <?php } ?>
+
+<div class="form-group">
+
+
+<ol>
+    <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> To Add Staff</h4>
+        <ul>
+            <li> - Click on <strong>Add Staff Member</strong>.</li>
+            <li> - Fill in all <strong>required fields</strong> and click <strong>Submit</strong>.</li>
+			<li> - The <strong>email address must be unique</strong> for each staff member.</li>
+			<li> - Send welcome email : When Checked a mail sent on registered email with login details</li>
+			<?php /*?><li> <img src="<?php echo base_url('uploads/screenshot/add-staff-profile.png'); ?>" 
+                         alt="screenshot" style="max-width: 90%; padding:10px;" />
+                    </li><?php */?>
+        </ul>
+    </li>
+	
+	<li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Send Welcome Email</h4>
+        <ul>
+            <li> - If <strong>Send Welcome Email</strong> is checked,a welcome email with login credentials will be sent to the registered email address.</li>
+            
+        </ul>
+    </li>
+
+    <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Staff Role &amp; Permissions</h4>
+        <ul>
+            <li><strong> - Normal Staff : </strong> : 
+No default permissions are assigned.</li>
+            <li><strong> - Department Admin : </strong> : 
+Can manage staff within their own department.</li>
+            <li><strong>Administrator : </strong> : 
+Has full system access based on assigned permissions.</li>
+        </ul>
+    </li>
+
+        <li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> Permission Settings</h4>
+        <ul>
+            <li> - After submitting staff details, the Permissions tab will appear.</li>
+            <li> - Selecting a Role will automatically assign predefined permissions.</li>
+            <li> - Manually checked permissions will be available to the staff after login.</li>
+			<li> - Only selected permissions will be visible in the staff account.</li>
+			<?php /*?><li> <img src="<?php echo base_url('uploads/screenshot/staff-permission.png'); ?>" 
+                         alt="screenshot" style="max-width: 90%; padding:10px;" /></li><?php */?>
+            
+        </ul>
+        
+    </li>
+	
+	<li class="tw-my-2">
+        <h4><i class="fa-solid fa-circle-right"></i> To Change Password</h4>
+        <ul>
+            <li> - Admin must Edit the staff profile.</li>
+            <li> - Enter the new password.</li>
+            <li> - Click Save to update the password.</li>
+        </ul>
+        
+    </li>
+</ol>
+				</div>
                                             
                                         </div>
                                     </div>
                                 </div>
 								
+								<!--// For HRMS Management-->
+								
 								<div class="col-md-12">
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <strong>Leads / Deals</strong>
+                                            <strong><i class="fa-solid fa-id-badge me-2"></i> HRMS Setup</strong>
+                                        </div>
+                                        
+ <div class="panel-body">										
+	<div class="alert alert-info">
+    <strong>Instruction:</strong> Here you can Manage Staff Types, Shifts, Branches & Assignments.
+	<p><a href="<?php echo admin_url('hrd/setting/self_service');?>" target="_blank"><?php echo admin_url('hrd/setting/self_service');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+<div class="alert alert-danger">
+    <strong>Instruction:</strong> Before adding a staff member, please ensure that Department, Designation, and Staff Type are created.
+</div>									
+<?php
+$shift_type_count = (int) ($active_shift_type_count ?? 0);
+if ($shift_type_count > 0) { ?>
+<div class="alert alert-success">
+Active shift type count: <?php echo $shift_type_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift types to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="shift-type" >Add Shift Type</a></span></div>
+</div>
+<?php } ?>
+                         
+										
+<?php
+$shift_manager_count = (int) ($active_shift_manager_count ?? 0);
+if ($shift_manager_count > 0) { ?>
+<div class="alert alert-success">
+Active shift manager count: <?php echo $shift_manager_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift managers to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_shift_manager">Add Shift Manager</a></span></div>
+</div>
+<?php } ?>
+                                   
+
+<?php
+$branch_manager_count = (int) ($active_branch_manager_count ?? 0);
+if ($branch_manager_count > 0) { ?>
+<div class="alert alert-success">
+Active branch manager count: <?php echo $branch_manager_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add branch managers to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_branch_manager">Add Branch Manager</a></span></div>
+</div>
+<?php } ?>
+
+										
+<div class="alert alert-warning">
+    <strong>Once Staff Types, Shifts, Branches, Departments, and Designations are added, the Manage Staff page will be updated accordingly.
+Attendance Check-In / Check-Out will then be displayed on the dashboard and function properly.</strong> 
+<p><a href="<?php echo admin_url('hrd/staff_manager');?>" target="_blank"><?php echo admin_url('hrd/staff_manager');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+
+
+<?php
+$employee_type_count = (int) ($active_employee_type_count ?? 0);
+if ($employee_type_count > 0) { ?>
+<div class="alert alert-success">
+Active employee type count: <?php echo $employee_type_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add employee types to manage staff records. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_employee_type">Add Employee Type</a></span></div>
+</div>
+<?php } ?>
+
+<?php
+$leave_rule_count = (int) ($active_leave_rule_count ?? 0);
+if ($leave_rule_count > 0) { ?>
+<div class="alert alert-success">
+Active leave rule count: <?php echo $leave_rule_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Leave rules must be added to manage leave applications. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" id="leave-rule">Add Leave Rule</a></span></div>
+</div>
+<?php } ?>
+
+  </div>										
+                                    </div>
+                                </div>
+								
+								<!--// For Project Management-->
+								
+								<div class="col-md-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <strong><i class="fa-solid fa-diagram-project me-2"></i> Project</strong>
                                         </div>
                                         <div class="panel-body">
+
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Here you can add, Update, Comment, and Chat on Projects & Tasks
+	<p><a href="<?php echo admin_url('project/dashboard');?>" target="_blank"><?php echo admin_url('project/dashboard');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+<div class="alert alert-danger">
+    <strong>Instruction:</strong> Before adding a project, please ensure that project groups are created.
+</div>
+<div class="project-instructions">
+    <h4>Project Management</h4>
+
+    <h5>1. Project Group Setup</h5>
+    <ul>
+        <li>Before adding a new project, you must first create a <strong>Project Group</strong>.</li>
+    </ul>
+
+    <h5>2. Add New Project</h5>
+    <ul>
+        <li>Click on <strong>Add New Project</strong>.</li>
+        <li>Fill in the required details:</li>
+        <ul>
+            <li>Project Title, Project Owner, Project Group, Start Date, End Date, Project Details</li>
+        </ul>
+        <li>All fields are mandatory.</li>
+        <li>Click <strong>Submit</strong> to create the project.</li>
+    </ul>
+
+    <h5>3. Project Actions</h5>
+    <ul>
+        <li>Use the <strong>three-dot (<i class="fa-solid fa-ellipsis-vertical"></i>) icon</strong> in the project listing to:</li>
+        <ul>
+            <li>View, Edit, Delete</li>
+        </ul>
+    </ul>
+
+    <h5>4. Task Management</h5>
+    <ul>
+        <li>After creating a project, you can add tasks.</li>
+        <li>For each task, you can:</li>
+        <ul>
+            <li>View, Edit, Delete, Add comments for collaboration</li>
+
+        </ul>
+    </ul>
+
+    <h5>5. Collaboration & Activity Tracking</h5>
+    <ul>
+        <li>All project collaboration and updates appear in the <strong>Activity Feed</strong>.</li>
+        <li>Projects and tasks are also visible in the <strong>Calendar View</strong>.</li>
+    </ul>
+
+    <h5>6. Project Chat</h5>
+    <ul>
+        <li>Chat and collaborate with members of the created <strong>Project Group</strong>.</li>
+    </ul>
+</div>
+
+
+<?php
+$project_group_count = (int) ($active_project_group_count ?? 0);
+if ($project_group_count > 0) { ?>
+<div class="alert alert-success">
+Active project group count: <?php echo $project_group_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to organize and manage your projects effectively. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="project_group">Add Project Group</a></span></div>
+</div>
+<?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+								
+								<!--// For Interview Management-->
+								
+								<div class="col-md-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <strong><i class="fa-solid fa-person-booth menu-icon"></i> Interview</strong>
+                                        </div>
+
+<div class="panel-body">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Here you can add, update, view, and manage interview records.
+	<p><a href="<?php echo admin_url('hrd/interviews');?>" target="_blank"><?php echo admin_url('hrd/interviews');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+
+<div class="interview-instructions">
+    <ul>
+        <li>Add interview details by filling in all required fields.</li>
+        <li>View interview details at any time.</li>
+        <li>Update interview information and change the interview <strong>processing stage</strong> or <strong>status</strong>.</li>
+        <li>Send interview emails with the scheduled date, time, and other relevant details.</li>
+    </ul>
+</div>
+<div class="alert alert-danger">
+    <strong>Instruction:</strong> Before adding  interview, please ensure that interview processes and interview sources are created.
+</div>
+<?php 
+$interview_process_count = (int) ($active_interview_process_count ?? 0);
+if($interview_process_count > 0){ ?>
+<div class="alert alert-success">
+Active interview process count: <?php echo $interview_process_count; ?>
+</div>
+<?php } else{ ?>
+ <div class="alert alert-danger tw-bg-danger-500">
+ <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_process">Add Interview Process</a></span></div>
+ </div>
+<?php } ?>
+                                        
+<?php
+$interview_source_count = (int) ($active_interview_source_count ?? 0);
+if ($interview_source_count > 0) { ?>
+<div class="alert alert-success">
+Active interview source count: <?php echo $interview_source_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="interview_source">Add Interview Source</a></span></div>
+</div>
+<?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+								
+								<!--// For Chat GTP API KEY-->
+								
+								<div class="col-md-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <strong><i class="fa-solid fa-robot me-2"></i> API Keys</strong>
+                                        </div>
+<div class="panel-body">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Get instant help and smart suggestions using AI support.
+	<p><a href="<?php echo admin_url('ai_content_generator');?>" target="_blank"><?php echo admin_url('ai_content_generator');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+
+                    <ul>
+                    <li>ChatGPT-powered AI assistance</li>
+                    <li>Works after adding API key</li>
+                    <li>
+                        API Key Guide:
+                        <a href="https://platform.openai.com/api-keys" target="_blank">
+                            Get ChatGPT API Key
+                        </a>
+                    </li>
+                </ul>
+				
+<div class="alert alert-danger">
+    <strong>Instruction:</strong> Before using AI support, please ensure that the ChatGPT API key is added.
+</div>
+<?php
+$ai_details_count = (int) ($active_ai_details_count ?? 0);
+if ($ai_details_count > 0) { ?>
+<div class="alert alert-success">
+Chatgtp API Key count: <?php echo $ai_details_count; ?>
+</div>
+<?php } else { ?>
+<div class="alert alert-danger tw-bg-danger-500">
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure your ChatGPT API key to enable AI-powered support. <span style="float:right"><a href="<?php echo admin_url('ai_content_generator');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Chatgtp API Key</a></span></div>
+</div>
+<?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+								
+								<!--// Leads / Deals Management-->
+								
+								<div class="col-md-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <strong><i class="fa-solid fa-handshake me-2"></i> Leads / Deals</strong>
+                                        </div>
+                                        <div class="panel-body">
+<div class="alert alert-info">
+    <strong>Instruction:</strong> Here you can add / Update/ manage your leads.
+	<p><a href="<?php echo admin_url('leads');?>" target="_blank"><?php echo admin_url('leads');?> <i class="fa-solid fa-square-arrow-up-right"></i></a></p>
+</div>
+<div class="alert alert-danger">
+    <strong>Instruction:</strong> Before using the Leads module, please ensure that task statuses are configured.
+</div>
 <?php /*?><?php
 $lead_source_count = (int) ($active_lead_source_count ?? 0);
 if ($lead_source_count > 0) { ?>
@@ -288,166 +736,6 @@ Active deal stage count: <?php echo $deal_stage_count; ?>
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Please add lead form before using lead module. <span style="float:right"><a href="<?php echo admin_url('leads/forms');?>" class="btn btn-warning btn-sm ms-2">Add New Leads Forms</a></span></div>
                   </div><?php */?>
                                             
-                                        </div>
-                                    </div>
-                                </div>
-								
-								
-								
-								
-								<div class="col-md-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <strong>HRMS Setup</strong>
-                                        </div>
-                                        
- <div class="panel-body">										
-										
-<?php
-$shift_type_count = (int) ($active_shift_type_count ?? 0);
-if ($shift_type_count > 0) { ?>
-<div class="alert alert-success">
-Active shift type count: <?php echo $shift_type_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift types to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="shift-type" >Add Shift Type</a></span></div>
-</div>
-<?php } ?>
-                         
-										
-<?php
-$shift_manager_count = (int) ($active_shift_manager_count ?? 0);
-if ($shift_manager_count > 0) { ?>
-<div class="alert alert-success">
-Active shift manager count: <?php echo $shift_manager_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add shift managers to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_shift_manager">Add Shift Manager</a></span></div>
-</div>
-<?php } ?>
-                                   
-										
-										
-<?php
-$employee_type_count = (int) ($active_employee_type_count ?? 0);
-if ($employee_type_count > 0) { ?>
-<div class="alert alert-success">
-Active employee type count: <?php echo $employee_type_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add employee types to manage staff records. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_employee_type">Add Employee Type</a></span></div>
-</div>
-<?php } ?>
-                                      
-
-<?php
-$branch_manager_count = (int) ($active_branch_manager_count ?? 0);
-if ($branch_manager_count > 0) { ?>
-<div class="alert alert-success">
-Active branch manager count: <?php echo $branch_manager_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add branch managers to manage attendance. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="add_branch_manager">Add Branch Manager</a></span></div>
-</div>
-<?php } ?>
-
-										
-
-
-
-
-<?php
-$leave_rule_count = (int) ($active_leave_rule_count ?? 0);
-if ($leave_rule_count > 0) { ?>
-<div class="alert alert-success">
-Active leave rule count: <?php echo $leave_rule_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Leave rules must be added to manage leave applications. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" id="leave-rule">Add Leave Rule</a></span></div>
-</div>
-<?php } ?>
-
-  </div>										
-                                    </div>
-                                </div>
-								
-								<div class="col-md-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <strong>Project</strong>
-                                        </div>
-                                        <div class="panel-body">
-<?php
-$project_group_count = (int) ($active_project_group_count ?? 0);
-if ($project_group_count > 0) { ?>
-<div class="alert alert-success">
-Active project group count: <?php echo $project_group_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add project groups to organize and manage your projects effectively. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="project_group">Add Project Group</a></span></div>
-</div>
-<?php } ?>
-                                        </div>
-                                    </div>
-                                </div>
-								
-								<div class="col-md-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <strong>Interview</strong>
-                                        </div>
-
-                                        <div class="panel-body">
-<?php 
-$interview_process_count = (int) ($active_interview_process_count ?? 0);
-if($interview_process_count > 0){ ?>
-<div class="alert alert-success">
-Active interview process count: <?php echo $interview_process_count; ?>
-</div>
-<?php } else{ ?>
- <div class="alert alert-danger tw-bg-danger-500">
- <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview processes to manage interviews. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="interview_process">Add Interview Process</a></span></div>
- </div>
-<?php } ?>
-                                        
-<?php
-$interview_source_count = (int) ($active_interview_source_count ?? 0);
-if ($interview_source_count > 0) { ?>
-<div class="alert alert-success">
-Active interview source count: <?php echo $interview_source_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Add interview sources to track interview origins. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2"  id="interview_source">Add Interview Source</a></span></div>
-</div>
-<?php } ?>
-                                        </div>
-                                    </div>
-                                </div>
-								
-								<div class="col-md-12">
-                                    <div class="panel panel-default">
-                                        <div class="panel-heading">
-                                            <strong>API Keys</strong>
-                                        </div>
-                                        <div class="panel-body">
-<?php
-$ai_details_count = (int) ($active_ai_details_count ?? 0);
-if ($ai_details_count > 0) { ?>
-<div class="alert alert-success">
-Chatgtp API Key count: <?php echo $ai_details_count; ?>
-</div>
-<?php } else { ?>
-<div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Configure your ChatGPT API key to enable AI-powered support. <span style="float:right"><a href="<?php echo admin_url('ai_content_generator');?>" class="btn btn-warning btn-sm ms-2" target="_blank">Add Chatgtp API Key</a></span></div>
-</div>
-<?php } ?>
                                         </div>
                                     </div>
                                 </div>

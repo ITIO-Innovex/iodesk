@@ -359,6 +359,7 @@ class Misc_model extends App_Model
 		$this->db->where('company_id',get_staff_company_id()); 		  
 		}else{
 		$this->db->where('staffid',get_staff_full_name()); 
+		$this->db->where('company_id',get_staff_company_id()); 	
 		}
 		
         return $this->db->get(db_prefix() . 'activity_log')->result_array();
