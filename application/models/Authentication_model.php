@@ -739,7 +739,7 @@ class Authentication_model extends App_Model
 	//log_message('error', 'Display data - ' . print_r($data, true));
 	
 	$companyname=get_option('companyname');
-	$support_email="info@itio.in";	
+	$support_email=get_option('support_email');
 	$website=get_option('main_domain');
 	$msg="";
 	

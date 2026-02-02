@@ -92,6 +92,50 @@ class Direct_email extends AdminController
 
         echo json_encode(['success' => (bool) $success, 'message' => $success ? 'NDA SMTP details saved.' : 'Failed to save NDA SMTP details.']);
     }
+
+    public function save_global_smtp()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $companyId = get_staff_company_id();
+        if (!$companyId) {
+            echo json_encode(['success' => false, 'message' => 'Company not found.']);
+            return;
+        }
+
+        $payload = [
+            'smtp_encryption' => trim((string) $this->input->post('smtp_encryption')),
+            'smtp_host'       => trim((string) $this->input->post('smtp_host')),
+            'smtp_port'       => trim((string) $this->input->post('smtp_port')),
+            'smtp_email'      => trim((string) $this->input->post('smtp_email')),
+            'smtp_username'   => trim((string) $this->input->post('smtp_username')),
+            'smtp_password'   => trim((string) $this->input->post('smtp_password')),
+        ];
+
+        if ($payload['smtp_host'] === '' || $payload['smtp_port'] === '' || $payload['smtp_email'] === '') {
+            echo json_encode(['success' => false, 'message' => 'SMTP Host, Port, and Email are required.']);
+            return;
+        }
+
+        $current = $this->db->select('settings')
+            ->where('company_id', $companyId)
+            ->get(db_prefix() . 'company_master')
+            ->row_array();
+        $existing = [];
+        if (!empty($current['settings'])) {
+            $existing = json_decode($current['settings'], true) ?: [];
+        }
+        $settings = array_merge($existing, $payload);
+
+        $this->db->where('company_id', $companyId);
+        $success = $this->db->update(db_prefix() . 'company_master', [
+            'settings' => json_encode($settings),
+        ]);
+
+        echo json_encode(['success' => (bool) $success, 'message' => $success ? 'Global SMTP details saved.' : 'Failed to save SMTP details.']);
+    }
     public function sendMail(){
         $email_to=$_POST['email'];
 		$email_subject=$_POST['subject'];

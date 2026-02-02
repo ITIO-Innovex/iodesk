@@ -186,7 +186,7 @@ $email=$result['email'] ?? '';
     $recipientEmail = $email ?? 'vikashg@itio.in';
 	$supercompanyname=get_option('companyname') ?? "Support CRM";
 	$supersupportemail=get_option('support_email') ?? "support@itio.in";
-	$supernotificationemail=get_option('notification_email') ?? "vikashg@itio.in";
+	$supernotificationemail = get_option('notification_email') ?: 'vikashg@itio.in';
 
 	
 	
@@ -284,7 +284,7 @@ Best regards,<br>
 	}
     $mail->Port = $mailer_smtp_port;
     // Enable SMTP debugging (testing only)
-    //$mail->SMTPDebug  = 1; // 1 = commands, 2 = full debug
+    //$mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
     //$mail->Debugoutput = 'html';
     // Email settings
 	$mail->isHTML(true); // Set email format to plain text

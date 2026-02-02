@@ -74,6 +74,7 @@
 		<?php echo render_input('settings[companyname]','settings_general_company_name',get_option('companyname'),'text',$attrs); ?>
 		<hr />
 		<?php echo render_input('settings[main_domain]','settings_general_company_main_domain',get_option('main_domain')); ?>
+		<?php echo render_input('settings[notification_email]','Notification Email',get_option('notification_email')); ?>
 		<hr />
 		<?php echo render_input('settings[support_email]','Support Email',get_option('support_email')); ?>
 		<?php echo render_input('settings[support_phone]','Support Phone',get_option('support_phone')); ?>
