@@ -24,6 +24,10 @@ class Authentication extends ClientsController
 
     public function login()
     {
+	
+	   //echo "Login";
+	   redirect(site_url('admin/authentication'));exit;
+	   
         if (is_client_logged_in()) {
             redirect(site_url());
         }
