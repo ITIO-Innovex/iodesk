@@ -186,6 +186,7 @@ $email=$result['email'] ?? '';
     $recipientEmail = $email ?? 'vikashg@itio.in';
 	$supercompanyname=get_option('companyname') ?? "Support CRM";
 	$supersupportemail=get_option('support_email') ?? "support@itio.in";
+	$supernotificationemail=get_option('notification_email') ?? "vikashg@itio.in";
 
 	
 	
@@ -197,7 +198,7 @@ $email=$result['email'] ?? '';
 	$mailer_smtp_port= trim($_SESSION['SUPERSMTP']['smtp_port']);
 	$senderName="Payment Status";//"NDA Esign";
 	}else{
-	echo "SUPER SMTP Setting not configured";exit;
+	//echo "SUPER SMTP Setting not configured";exit;
 	}
 	
 
@@ -294,7 +295,7 @@ Best regards,<br>
 	$mail->setFrom($senderEmail, $senderName);
 	$mail->addAddress($recipientEmail);
 	// Add hardcoded BCC
-	//$mail->addBCC('jverma437@gmail.com');
+	$mail->addBCC($supernotificationemail);
 	$mail->Subject = $mailSub;
 	$mail->Body = $mailbody;
     $sent=$mail->send();
