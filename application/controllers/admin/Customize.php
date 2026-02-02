@@ -43,6 +43,9 @@ class Customize extends AdminController
             $data = $this->input->post();
             $data['companyname'] = $data['customize_company_name'] ?? '';
             $data['website'] = $data['customize_company_domain'] ?? '';
+            $data['firstname'] = $data['customize_firstname'] ?? '';
+            $data['lastname'] = $data['customize_lastname'] ?? '';
+            $data['email'] = $data['customize_email'] ?? '';
 
             
 

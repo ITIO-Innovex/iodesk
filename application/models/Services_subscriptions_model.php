@@ -1,4 +1,8 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer; // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\Exception;  // Added on 22122025 for NDA Esign Email
+use PHPMailer\PHPMailer\SMTP;
+header('Content-Type: text/html; charset=utf-8');
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -125,5 +129,188 @@ class Services_subscriptions_model extends App_Model
         $this->db->insert(db_prefix() . 'service_log', $log);
 
         return $this->db->insert_id();
+    }
+	
+	// Toggle Deal Stage Status (AJAX)
+    public function send_invoice_email($invoice_no)
+    {
+	
+	//$invoice_no = "1000820260130154434";
+
+$this->db->select('
+    i.amount,
+    i.currency,
+    i.tax,
+    i.total_amount,
+    i.payment_status,
+    i.payment_method,
+    i.payment_id,
+    i.created_at,
+    c.companyname,
+    c.firstname,
+    c.lastname,
+    c.email
+');
+
+$this->db->from('it_crm_services_subscriptions_invoices i');
+$this->db->join(
+    'it_crm_company_master c',
+    'c.company_id = i.company_id',
+    'left'
+);
+
+$this->db->where('i.invoice_no', $invoice_no);
+
+$query = $this->db->get();
+$result = $query->result_array(); // or result()
+
+if(isset($result)&&$result){
+$result=$result[0];
+$amount=$result['amount'] ?? '';
+$currency=$result['currency'] ?? '';
+$tax=$result['tax'] ?? '';
+$total_amount=$result['total_amount'] ?? '';
+$payment_status=$result['payment_status'] ?? '';
+$payment_method=$result['payment_method'] ?? '';
+$payment_id=$result['payment_id'] ?? '';
+$created_at=$result['created_at'] ?? '';
+$companyname=$result['companyname'] ?? '';
+$firstname=$result['firstname'] ?? '';
+$lastname=$result['lastname'] ?? '';
+$email=$result['email'] ?? '';
+}
+
+     //print_r($result);exit;
+	//print_r($_SESSION['SUPERSMTP']);
+	$name  = $firstname." ".$lastname;
+    $recipientEmail = $email ?? 'vikashg@itio.in';
+	$supercompanyname=get_option('companyname') ?? "Support CRM";
+	$supersupportemail=get_option('support_email') ?? "support@itio.in";
+
+	
+	
+	if(isset($_SESSION['SUPERSMTP'])&&$_SESSION['SUPERSMTP']){	
+    $mailer_smtp_host = trim($_SESSION['SUPERSMTP']['smtp_host']);
+	$senderEmail= trim($_SESSION['SUPERSMTP']['smtp_user']);
+	$mailer_username= trim($_SESSION['SUPERSMTP']['smtp_user']);
+	$mailer_password= base64_decode(trim($_SESSION['SUPERSMTP']['smtp_pass']));
+	$mailer_smtp_port= trim($_SESSION['SUPERSMTP']['smtp_port']);
+	$senderName="Payment Status";//"NDA Esign";
+	}else{
+	echo "SUPER SMTP Setting not configured";exit;
+	}
+	
+
+
+	 
+	 ////////////Sent EMAIL////////////
+	 
+//$recipientEmail="vikashg@itio.in";	 
+//$name="Vimalesh";
+$mailSub="Payment Confirmation – Invoice No - ".$invoice_no;
+$mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA E-Signing</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6; padding:20px;">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+            <p style="margin:0 0 16px;">Dear <strong>'.$name.'</strong>,</p>
+<p>We hope you are doing well. This email is to confirm the payment status for the following invoice:</p>
+            <p style="margin:0 0 16px;">
+              Please find the NDA e-signing link below:
+            </p>
+
+            <p style="margin:0 0 20px; text-align:left;">
+<strong>Customer Details</strong>
+<br>Name: '.$firstname.' '.$lastname.'
+<br>Company Name: '.$companyname.'
+
+<br><br><strong>Payment Details</strong>
+<br>Invoice Number: '.$invoice_no.'
+<br>Amount: '.$currency.' '.$amount.'
+<br>Payment Status: '.$payment_status.'
+<br>Payment Date: '.$created_at.' 
+<br>Transaction ID: '.$payment_id.'
+<br></p>
+
+<p style="margin:0 0 20px;">
+If you have any questions or notice any discrepancy, please feel free to reply to this email. We appreciate your business and look forward to serving you again.
+</p>
+
+<p style="margin:0;">
+Best regards,<br>
+'.$supercompanyname.'<br>
+'.$supersupportemail.'<br>
+</p>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
+//exit;
+//=============================
+  $mail = new PHPMailer(true);
+		
+		
+	try {
+	//echo "==============";
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+	if($mailer_smtp_port==587){
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	}else{
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+	}
+    $mail->Port = $mailer_smtp_port;
+    // Enable SMTP debugging (testing only)
+    //$mail->SMTPDebug  = 1; // 1 = commands, 2 = full debug
+    //$mail->Debugoutput = 'html';
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	//$mail->Priority = 1; 
+	$mail->setFrom($senderEmail, $senderName);
+	$mail->addAddress($recipientEmail);
+	// Add hardcoded BCC
+	//$mail->addBCC('jverma437@gmail.com');
+	$mail->Subject = $mailSub;
+	$mail->Body = $mailbody;
+    $sent=$mail->send();
+	 if ($sent) {
+	 log_activity('Invoice Not sent successfully -  [ Name: ' . $name . ']');
+	 }else{
+	 log_activity('Invoice Not sent successfully -  [ Name: ' . $name . ']');
+	 }
+    return true;
+	} catch (Exception $e) {
+		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
+		return false;
+	}
+	 
+	 /////////////////////////////////
+	
+        
     }
 }

@@ -21,6 +21,28 @@
                    placeholder="<?php echo _l('customize_company_domain_placeholder'); ?>" />
             <small class="text-muted"><?php echo _l('customize_company_domain_help'); ?></small>
         </div>
+
+        <div class="form-group">
+            <label for="customize_firstname">Admin First Name</label>
+            <input type="text" name="customize_firstname" class="form-control"
+                   value="<?php echo isset($company->firstname) ? e($company->firstname) : ''; ?>"
+                   placeholder="First Name" />
+        </div>
+
+        <div class="form-group">
+            <label for="customize_lastname">Last Name</label>
+            <input type="text" name="customize_lastname" class="form-control"
+                   value="<?php echo isset($company->lastname) ? e($company->lastname) : ''; ?>"
+                   placeholder="Last Name" />
+        </div>
+
+        <div class="form-group">
+            <label for="customize_email">Admin Email</label>
+            <input type="email" name="customize_email" class="form-control"
+                   value="<?php echo isset($company->email) ? e($company->email) : ''; ?>"
+                   placeholder="Email" />
+				   <small class="text-muted">This email receives all important emails such as invoices, subscriptions, and related notifications.</small>
+        </div>
     </div>
 
     <div class="col-md-12">

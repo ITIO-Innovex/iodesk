@@ -78,6 +78,12 @@ $config['dkim_private_string'] = '';                    // DKIM private key, set
 $config['dkim_selector']       = '';                       // DKIM selector.
 $config['dkim_passphrase']     = '';                       // DKIM passphrase, used if your key is encrypted.
 $config['dkim_identity']       = '';                       // DKIM Identity, usually the email address used as the source of the email.
+
+$_SESSION['SUPERSMTP']['smtp_user']=$config['smtp_user'];
+$_SESSION['SUPERSMTP']['smtp_host']=$config['smtp_host'];
+$_SESSION['SUPERSMTP']['smtp_port']=$config['smtp_port'];
+$_SESSION['SUPERSMTP']['smtp_crypto']=$config['smtp_crypto'];
+$_SESSION['SUPERSMTP']['smtp_pass']=base64_encode($config['smtp_pass']); // password Encrypt
 $smtp_fetch_type="SuperSMTP";
 $smtp_fetch_type_status=2;
 
