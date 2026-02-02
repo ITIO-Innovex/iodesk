@@ -7,9 +7,9 @@ init_head(); ?>
         <div class="panel_s">
           <div class="panel-body">
 <?php if(e($payment['payment_method'])=='Online'){ ?>
-<div class="alert alert-danger tw-bg-danger-500">
+<?php /*?><div class="alert alert-danger tw-bg-danger-500">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-credit-card"></i> <?php echo "PG Comming Soon";?> <span style="float:right"></span></div>
-                  </div>
+                  </div><?php */?>
 <?php } ?>
             <h4 class="tw-mb-4 tw-font-semibold tw-text-lg">Payment Details</h4>
             <div class="panel_s">
