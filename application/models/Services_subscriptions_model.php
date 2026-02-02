@@ -227,9 +227,6 @@ $mailbody='<!DOCTYPE html>
 
             <p style="margin:0 0 16px;">Dear <strong>'.$name.'</strong>,</p>
 <p>We hope you are doing well. This email is to confirm the payment status for the following invoice:</p>
-            <p style="margin:0 0 16px;">
-              Please find the NDA e-signing link below:
-            </p>
 
             <p style="margin:0 0 20px; text-align:left;">
 <strong>Customer Details</strong>
