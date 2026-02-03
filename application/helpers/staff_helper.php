@@ -711,6 +711,7 @@ function get_services_subscriptions_no_of_staff($company_id = '')
 		$CI = & get_instance();
 		
 		$CI->db->where('company_id', $company_id);
+		$CI->db->where('status', 'active');
 		$row = $CI->db->select('staff_limit')->from(db_prefix() . 'services_user_subscriptions')->get()->row();
 		//echo $CI->db->last_query();exit;
 		if(isset($row)&&$row->staff_limit){

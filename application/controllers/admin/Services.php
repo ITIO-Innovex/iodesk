@@ -83,6 +83,7 @@ class Services extends AdminController
         $this->db->from(db_prefix() . 'services_user_subscriptions sus');
         $this->db->join(db_prefix() . 'services_subscriptions s', 's.id = sus.subscription_id', 'left');
         $this->db->where('sus.company_id', $companyId);
+		$this->db->where('sus.status', 'active');
         $this->db->order_by('sus.id', 'desc');
         $plan = $this->db->get()->row_array();
 
@@ -178,12 +179,30 @@ class Services extends AdminController
 						FALSE
 					);
 					$this->db->where('company_id', $companyId);
+					$this->db->where('status', 'active');
 					$this->db->update('it_crm_services_user_subscriptions');
                     
 					$log_desc="Staff Expansion Completed (".$no_off_staff.") with Invoice No ".$invoiceNo;
                     log_activity($log_desc);
 		            $this->services_subscriptions_model->log_service_activity($payment['subscription_id'],'Activate',$log_desc);
-		
+		            }elseif($invoiceType=="renewal"){
+					
+					$this->db->where('company_id', $companyId);
+                    $this->db->update(db_prefix() . 'services_user_subscriptions', ['status' => 'expired']);
+					 
+					 $insert_data = [
+    				'company_id' 	  => $companyId,
+					'subscription_id' => $_SESSION['Renewal']['subscriptionID'],
+    				'staff_limit'     => $_SESSION['Renewal']['staffLimit'],
+    				'start_date'      => $_SESSION['Renewal']['startDate'],   
+    				'end_date'        => $_SESSION['Renewal']['endDate'],
+					'status'          => 'active',   
+					];
+					$_SESSION['cms_subscription_end_date']=$_SESSION['Renewal']['endDate'];
+					$this->db->insert('it_crm_services_user_subscriptions', $insert_data);
+					unset($_SESSION['Renewal']);
+					
+					
 					}elseif($invoiceType=="upgrade"){
 					
 					$pid=$payment['subscription_id'];
@@ -231,6 +250,7 @@ $this->services_subscriptions_model->log_service_activity($pid,'Invoice',$log_de
 					
 					// Set Session ///////
                     $this->db->where('subscription_id', $payment['subscription_id']);
+					$this->db->where('status', 'active');
                     $subs = $this->db->get(db_prefix() . 'services_user_subscriptions')->row_array();
 					
 $log_desc="New Plan Activated with Invoice No ".$invoiceNo." subscription_id: " . $payment['subscription_id'];
@@ -331,6 +351,7 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
         $this->db->from(db_prefix() . 'services_user_subscriptions sus');
         $this->db->join(db_prefix() . 'services_subscriptions s', 's.id = sus.subscription_id', 'left');
         $this->db->where('sus.company_id', $companyId);
+		$this->db->where('sus.status', 'active');
         $this->db->order_by('sus.id', 'desc');
         $plan = $this->db->get()->row_array();
 
@@ -655,7 +676,7 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
     'due_date'        => $todayDate->format('Y-m-d'),
     'payment_method'  => $payment_method,
     'created_at'      => $todayDate->format('Y-m-d'),
-	'invoice_type'    => $plan->plan_name.' - '.$plan->id,
+	'invoice_type'    => $plan->plan_name,
 	'staff_added'     => $plan->no_of_staff,
     ];
 	
@@ -682,6 +703,7 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 	
 	// Check if company subscription exists
     $this->db->where('company_id', $company_id);
+	$this->db->where('status', 'active');
     $query = $this->db->get(db_prefix().'services_user_subscriptions');
 
     if ($query->num_rows() > 0) {
@@ -837,7 +859,7 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
     'due_date'        => $todayDate->format('Y-m-d'),
     'payment_method'  => $payment_method,
     'created_at'      => $todayDate->format('Y-m-d'),
-	'invoice_type'    => 'Staff Expansion - '.$staff_added,
+	'invoice_type'    => 'Staff Expansion',
 	'staff_added'     => $staff_added,
     ];
 	
@@ -1060,5 +1082,208 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 	$this->services_subscriptions_model->send_invoice_email($invoice_no);
     }
 	
+	
+	// Toggle Deal Stage Status (AJAX)
+    public function renew_plan()
+    {
+	    $companyId = get_staff_company_id();
+
+        $this->db->select('sus.*, s.plan_name, s.price, s.currency, s.billing_cycle, s.no_of_staff, s.duration, s.features, s.tax');
+        $this->db->from(db_prefix() . 'services_user_subscriptions sus');
+        $this->db->join(db_prefix() . 'services_subscriptions s', 's.id = sus.subscription_id', 'left');
+        $this->db->where('sus.company_id', $companyId);
+		$this->db->where('sus.status', 'active');
+        $this->db->order_by('sus.id', 'desc');
+        $plan = $this->db->get()->row_array();
+
+        /*$this->db->where('company_id', $companyId);
+        $this->db->order_by('id', 'desc');
+        $payments = $this->db->get(db_prefix() . 'services_subscriptions_invoices')->result_array();*/
+
+        $activeStaffCount = (int) $this->db->where('company_id', $companyId)
+            ->where('active', 1)
+            ->count_all_results(db_prefix() . 'staff');
+			
+        $requestedStaff = (int) $this->input->post('no_of_staff');
+        $data['title'] = 'Renew Plan';
+        $data['requested_staff'] = $requestedStaff;
+		$data['plan'] = $plan;
+        //$data['payments'] = $payments;
+        $data['active_staff_count'] = $activeStaffCount;
+        $this->load->view('admin/services/renew_plan/manage', $data);
+    }
+	
+	public function subscriptions_renew_plan()
+    {
+	 $postdata=$this->input->post();
+	 
+	 
+
+	
+	   $user_subscription_id = $this->input->post('user_subscription_id');
+	   $id = $this->input->post('subscription_id');
+	    if (!is_numeric($id)) {
+            show_404();
+        }else{
+		$subscription_id = $id;
+		}
+
+        $plan = $this->services_subscriptions_model->get((int) $id);
+        if (!$plan) {
+            show_404();
+        }
+		
+//print_r($plan);
+$price 		    = number_format((float) $plan->price, 2);
+$duration 		= isset($plan->duration) ? (int) $plan->duration : 0;
+$currency 		= isset($plan->currency) ? $plan->currency : 'INR';
+$no_of_staff 	= isset($plan->no_of_staff) ? (int) $plan->no_of_staff : 0;
+$extraStaff = $this->input->post('extraStaff');
+
+// Count Total staff plan _ Added staff
+$staffLimit = $no_of_staff + $extraStaff;
+if ($extraStaff=="") { show_404(); }
+$end_date = $this->input->post('endDate');	
+if (!$end_date) { show_404(); }	
+
+
+// Fetch New Start Date and End Date
+$today = date('Y-m-d');
+
+if ($end_date && strtotime($today) <= strtotime($end_date)) {
+    // Renew before expiry
+    $new_start_date = date('Y-m-d', strtotime($end_date.' +1 day'));
+} else {
+    // Renew after expiry
+    $new_start_date = $today;
+}
+$new_end_date = date("Y-m-d", strtotime($new_start_date." +$duration days"));
+
+
+// Calculate Amount
+$extraAmount=0;
+if($extraStaff > 0){
+$extraAmount= $extraStaff * ($price / $duration );
+}
+$baseAmount= $price + $extraAmount;
+
+$taxRate = number_format((float) $plan->tax, 2);
+$taxAmount = ($baseAmount * $taxRate) / 100;
+$totalAmount=($baseAmount + $taxAmount);	
+		
+		
+		
+	$amount=$baseAmount;
+	$total_amount=$totalAmount;
+	$staff_added=$extraStaff;
+	$todayDate = new DateTime();
+	$days=$plan->duration ?? 0;
+    $endDate   = (clone $todayDate)->modify("+$days days")->modify('-1 day');
+	
+	
+	$payment_status="unpaid";	
+	$payment_method="Online";
+	$status="new";
+	
+	$invoice_no=(10000+get_staff_company_id()).date("YmdHis"); // Generate Invoice Number
+	$company_id=get_staff_company_id(); // Get Company ID
+	$data = [
+    'invoice_no'      => $invoice_no,
+	'company_id'      => $company_id,
+    'subscription_id' => $id,
+    'amount'          => $amount,
+    'currency'        => $plan->currency, // corrected (was price)
+    'tax'             => $plan->tax,
+    'total_amount'    => $total_amount,
+    'invoice_date'    => $todayDate->format('Y-m-d'),
+    'due_date'        => $todayDate->format('Y-m-d'),
+    'payment_method'  => $payment_method,
+    'created_at'      => $todayDate->format('Y-m-d'),
+	'invoice_type'    => 'Renewal',
+	'staff_added'     => $extraStaff,
+    ];
+	
+	
+	
+	   $pay_type=1;	
+	
+//print_r($data);exit;
+		$this->db->insert(db_prefix() . 'services_subscriptions_invoices', $data);
+        $insert_id = $this->db->insert_id();
+        if ($insert_id) {
+		$log_desc="Request for Staff Expansion (".$staff_added.") with Invoice No ".$invoice_no;
+        log_activity($log_desc);
+		$this->services_subscriptions_model->log_service_activity($id,'Invoice',$log_desc);
+		}
+	if($pay_type==1){
+        try {
+            $strp=$this->load->library('stripe_core');
+
+            if (!$this->stripe_core->has_api_key() || !$this->stripe_core->get_publishable_key()) {
+                set_alert('warning', 'Stripe keys are not configured.');
+                redirect(admin_url('services/payment_status?invoice_type=staff&invoice_no=' . $invoice_no));
+            }
+
+            $currency = strtolower($plan->currency ?? 'inr');
+            if ($currency !== 'inr') {
+                set_alert('warning', 'International payments are restricted to registered Indian businesses. Please use INR.');
+                redirect(admin_url('services/payment_status?invoice_no=' . $invoice_no));
+            }
+			
+			$_SESSION['Renewal']['startDate']		=$new_start_date;
+			$_SESSION['Renewal']['endDate']			=$new_end_date;
+			$_SESSION['Renewal']['subscriptionID']	=$id;
+			$_SESSION['Renewal']['staffLimit']		=$staffLimit;
+			
+            $amountCents = (int) round($total_amount * 100);
+            $successUrl = admin_url('services/payment_status?invoice_type=renewal&invoice_no=' . $invoice_no . '&session_id={CHECKOUT_SESSION_ID}');
+            $cancelUrl = admin_url('services/payment_status?invoice_type=renewal&invoice_no=' . $invoice_no);
+
+            $sessionData = [
+                'payment_method_types' => ['card'],
+                'mode'                 => 'payment',
+                'billing_address_collection' => 'required',
+                'line_items'           => [
+                    [
+                        'price_data' => [
+                            'currency'     => $currency,
+                            'unit_amount'  => $amountCents,
+                            'product_data' => [
+                                'name'        => $plan->plan_name,
+                                'description' => 'Subscription ' . ($plan->billing_cycle ?? ''),
+                            ],
+                        ],
+                        'quantity' => 1,
+                    ],
+                ],
+                'success_url' => $successUrl,
+                'cancel_url'  => $cancelUrl,
+                'metadata'    => [
+                    'invoice_no'      => $invoice_no,
+                    'company_id'      => $company_id,
+                    'subscription_id' => $subscription_id,
+                ],
+            ];
+            //print_r($sessionData);exit;
+            $staffEmail = $this->db->select('email')->where('staffid', get_staff_user_id())->get(db_prefix().'staff')->row();
+            if ($staffEmail && $staffEmail->email) {
+                $sessionData['customer_email'] = $staffEmail->email;
+            }
+
+            $session = $this->stripe_core->create_session($sessionData);
+            redirect_to_stripe_checkout($session->id);
+        } catch (Exception $e) {
+            log_message('error', 'Stripe checkout failed: ' . $e->getMessage());
+            set_alert('warning', $e->getMessage());
+            redirect(admin_url('services/payment_status?invoice_type=renewal&invoice_no=' . $invoice_no));
+        }
+	
+	}else{
+	echo "Wrong path";exit;
+	set_alert('success', 'Account Activate');
+    redirect(admin_url('services/payment_status?invoice_no='.$invoice_no));
+	}
+	exit;
+	}
 	
 }
