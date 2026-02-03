@@ -317,12 +317,22 @@ function app_init_admin_sidebar_menu_items()
             'position' => 10,
             'badge'    => [],
         ]);
+		
+		
 
         $CI->app_menu->add_sidebar_children_item('subscriptions_menu', [
             'slug'     => 'subscriptions',
             'name'     => 'Subscriptions',
             'href'     => admin_url('services/subscriptions'),
             'position' => 15,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('subscriptions_menu', [
+            'slug'     => 'services/sent_renewal_reminder',
+            'name'     => 'Renewal Reminder',
+            'href'     => admin_url('services/sent_renewal_reminder'),
+            'position' => 10,
             'badge'    => [],
         ]);
 

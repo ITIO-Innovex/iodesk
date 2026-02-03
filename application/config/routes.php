@@ -261,6 +261,7 @@ $route['admin/services/user_subscriptions/delete/(:num)'] = 'admin/services/user
 $route['admin/services/subscriptions_invoices'] = 'admin/services/subscriptions_invoices';
 $route['admin/services/subscriptions_invoices/manage'] = 'admin/services/subscriptions_invoices_manage';
 $route['admin/services/subscriptions_invoices/delete/(:num)'] = 'admin/services/subscriptions_invoices_delete/$1';
+$route['admin/services/sent_renewal_reminder'] = 'admin/services/sent_renewal_reminder';
 
 // HRD - Manage Attendance by Date
 $route['admin/hrd/manage_attendance_by_date'] = 'admin/hrd/manage_attendance_by_date';

@@ -97,5 +97,129 @@ class Cronjob extends ClientsController
             $this->load->view('cronjob/download_email_from_cron', $data);
         }
     }
+	
+	// Send Reminder Email
+	public function send_renewal_reminder()
+	{
+	
+	
+	$supercompanyname=get_option('companyname') ?? "Support CRM";
+	$supersupportemail=get_option('support_email') ?? "support@itio.in";
+	$supernotificationemail = get_option('notification_email') ?: 'vikashg@itio.in';
+	
+	
+	
+	
+	$this->db->select('sus.*, s.plan_name, s.price, s.currency, s.billing_cycle, s.no_of_staff, s.duration, s.features, s.tax');
+	$this->db->from(db_prefix() . 'services_user_subscriptions sus');
+	$this->db->join(db_prefix() . 'services_subscriptions s', 's.id = sus.subscription_id', 'left');
+	$this->db->where('sus.status', 'active');
+	$this->db->where_in('DATEDIFF(sus.end_date, CURDATE())', [7, 3, 1, 0], false);
+	$this->db->order_by('sus.id', 'asc');
+	$plans = $this->db->get()->result_array(); // ALL records
+	//print_r($plans);
+	
+		foreach ($plans as $index => $plan) {
+			//if ($index === 0) {
+				// display only first record
+				$company_id= $plan['company_id'];
+				if(isset($company_id)&&$company_id){
+				$this->db->where('company_id', $company_id);
+			    $rs = $this->db->select('companyname,firstname,lastname,email')->from(db_prefix() . 'company_master')->get()->row();              //print_r($rs);
+				$name=$rs->firstname.' '.$rs->lastname;	
+                $email=$rs->email;
+                $companyname=$rs->companyname;
+				}
+				
+				
+				$subscription_id = $plan['subscription_id'];
+				$staff_limit= $plan['staff_limit'];
+				$pending_staff_limit= $plan['pending_staff_limit'];
+				$start_date= $plan['start_date'];
+				$end_date = $plan['end_date'];
+				$status = $plan['status'];
+				$plan_name = $plan['plan_name'];
+				$price = $plan['price'];
+				$currency = $plan['currency'];
+				$billing_cycle = $plan['billing_cycle'];
+				$no_of_staff = $plan['no_of_staff'];
+				$duration = $plan['duration'];
+				$features = $plan['features'];
+				$tax = $plan['tax'];
+
+	
+$name=$name ?? 'Subscriber';	
+$email=$email ?? 'vikashg@itio.in';
+$companyname=$companyname ?? 'CRM';		
+$mailSub="CRM Subscription Renewal Reminder - ".$plan_name;
+$mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Subscription Renewal Reminder</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6; padding:20px;">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+<p style="margin:0 0 16px;">Dear <strong>'.$name.'</strong>,</p>
+<p>Hi, <br><br> This is a friendly reminder that your Growth Plan subscription is nearing its expiry.</p>
+
+<p style="margin:0 0 20px; text-align:left;">
+<br><strong>Subscription Details</strong>
+<br>Plan Name: '.$plan_name.'
+<br>Billing Cycle: '.$billing_cycle.'
+<br>Price: '.$currency.' '.$price.' (excluding applicable taxes)
+<br>Staff Limit: '.$no_of_staff.' 
+<br>Features: '.$features.'
+<br>Start Date: '.$start_date.'
+<br>End Date: '.$end_date.'
+<br>Status: '.$status.'
+<br></p>
+
+<p style="margin:0 0 20px;">
+To avoid any interruption in services, we recommend renewing your subscription before the expiry date.<br />
+<br />
+If you have any questions regarding your plan, renewal process, or would like to upgrade your subscription, please feel free to contact our support team.<br />
+<br />
+Thank you for choosing our services. We look forward to continuing to support your business.<br />
+
+</p>
+
+<p style="margin:0;">
+Warm regards,<br>
+'.$supercompanyname.'<br>
+'.$supersupportemail.'<br>
+Support Team
+</p>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
+$this->load->model('services_subscriptions_model');
+// Save for History /////////
+$insert['company_id']=$company_id;
+$insert['mail_to']=$email;
+$insert['renewal_date']=$end_date;
+$this->db->insert('it_crm_services_subscriptions_reminder_email', $insert);
+// ENDSave for History //
+// Send Email By Function//
+$result = $this->services_subscriptions_model->send_renewal_email($email, $mailSub, $mailbody, $company_id );			
+		}
+	
+	}
 
 }

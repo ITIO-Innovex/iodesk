@@ -504,6 +504,16 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
         redirect(admin_url('services/user_subscriptions'));
     }
 
+    public function sent_renewal_reminder()
+    {
+        if ($this->input->is_ajax_request()) {
+            $this->app->get_table_data('services_subscriptions_reminder_email');
+        }
+
+        $data['title'] = 'Sent Renewal Reminder';
+        $this->load->view('admin/services/sent_renewal_reminder/manage', $data);
+    }
+
     public function subscriptions_invoices()
     {
 	
