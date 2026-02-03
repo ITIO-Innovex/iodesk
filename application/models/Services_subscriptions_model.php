@@ -213,7 +213,7 @@ $mailbody='<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NDA E-Signing</title>
+<title>Invoice</title>
 </head>
 <body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
 
@@ -311,4 +311,75 @@ Best regards,<br>
 	
         
     }
+	
+	// Toggle Deal Stage Status (AJAX)
+    public function send_renewal_email($recipientEmail, $mailSub, $mailbody ,$company_id  )
+    {
+	
+	if(isset($_SESSION['SUPERSMTP'])&&$_SESSION['SUPERSMTP']){	
+    $mailer_smtp_host = trim($_SESSION['SUPERSMTP']['smtp_host']);
+	$senderEmail= trim($_SESSION['SUPERSMTP']['smtp_user']);
+	$mailer_username= trim($_SESSION['SUPERSMTP']['smtp_user']);
+	$mailer_password= base64_decode(trim($_SESSION['SUPERSMTP']['smtp_pass']));
+	$mailer_smtp_port= trim($_SESSION['SUPERSMTP']['smtp_port']);
+	$senderName="Renewal Reminder";//"NDA Esign";
+	}else{
+	//echo "SUPER SMTP Setting not configured";exit;
+	}
+	
+	$supernotificationemail = get_option('notification_email') ?: 'vikashg@itio.in';
+	$company_name=get_staff_company_name($company_id);
+	//echo $mailSub;
+	//echo $recipientEmail;
+	//echo $supernotificationemail;
+	//echo $mailbody;
+	//$recipientEmail="vikashg@irio.in";
+	//=============================
+    $mail = new PHPMailer(true);
+		
+		
+	try {
+	//echo "==============";
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+	if($mailer_smtp_port==587){
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	}else{
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+	}
+    $mail->Port = $mailer_smtp_port;
+    // Enable SMTP debugging (testing only)
+    //$mail->SMTPDebug  = 2; // 1 = commands, 2 = full debug
+    //$mail->Debugoutput = 'html';
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	//$mail->Priority = 1; 
+	$mail->setFrom($senderEmail, $senderName);
+	$mail->addAddress($recipientEmail);
+	$mail->addBCC($supernotificationemail);
+	$mail->Subject = $mailSub;
+	$mail->Body = $mailbody;
+    $sent=$mail->send();
+	 if ($sent) {
+	 log_activity('Subscription Renewal Reminder sent successfully on ['.$company_name.'] -  [ Email: ' . $recipientEmail . ']');
+	 }else{
+	 log_activity('Subscription Renewal Reminder Not sent successfully ['.$company_name.'] -  [ Email: ' . $recipientEmail . ']');
+	 }
+	 
+	 echo '<strong>Subscription Renewal Reminder sent on '.$company_name.' - '. $recipientEmail .'</strong>';
+
+    return true;
+	} catch (Exception $e) {
+		return false;
+	}
+	
+	}
+	
 }
