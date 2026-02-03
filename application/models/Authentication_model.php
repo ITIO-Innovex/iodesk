@@ -90,6 +90,7 @@ class Authentication_model extends App_Model
 					
 					$tables = db_prefix() . 'services_user_subscriptions';
 					$this->db->where('company_id', $user->company_id);
+					$this->db->where('status', 'active');
                     $subscriptions_data = $this->db->get($tables)->row();
 					
 					

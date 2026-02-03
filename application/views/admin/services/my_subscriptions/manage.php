@@ -26,6 +26,17 @@ $staffLimit=(int)($plan['staff_limit'] ?? 0);
 			if(isset($plan['price'])&&$plan['price'] > 0){	?>
 			<a  id="upgrade_staff" class="btn btn-warning btn-sm tw-mx-2 pull-right"><i class="fa-regular fa-user"></i> Upgrade Staff</a>
 			<?php } ?>
+			
+<?php //if ($activeStaff >= $staffLimit) { 
+echo $enddate=e($plan['end_date'] ?? '');
+$today = new DateTime(); 
+$end = new DateTime($enddate);
+$renewalStart = (clone $end)->modify('-7 days');
+
+if ($today >= $renewalStart && $today <= $end) {	?>
+<a  href="<?php echo admin_url('services/renew_plan');?>" id="renew_plan" class="btn btn-success btn-sm tw-mx-2 pull-right" title="Renew Plan"><i class="fa-regular fa-user"></i> Renew Now</a>
+<?php } ?>
+			
 			</h4>
 
             <?php if (!empty($plan)) { ?>
