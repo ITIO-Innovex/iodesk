@@ -90,7 +90,7 @@
 	  </div>                      
       </div>
       <div class="mb-3">
-        <label for="recipientEmail" class="form-label">Attach Files:</label>
+        <label for="recipientEmail" class="form-label text-info">Attach Files: You can select multiple files by holding the Shift key and clicking on the files while browsing.</label>
         <input type="file" id="emailAttachments" name="attachments[]" class="form-control" multiple>
         <small id="attachmentStatus" class="text-success hide">File is attached.</small>
       </div>
