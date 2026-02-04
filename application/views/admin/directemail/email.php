@@ -307,6 +307,11 @@ $('#directEmail').on('submit', function(event){
     $("#sendMail").prop("disabled", true); // Disable submit button
     event.preventDefault();
     var formData = new FormData(this);
+    var filesStore = window.directEmailFilesStore || [];
+    formData.delete('attachments[]');
+    filesStore.forEach(function(file) {
+      formData.append('attachments[]', file);
+    });
     $.ajax({
         url: $(this).attr('action'),
         method:'POST',
@@ -356,13 +361,7 @@ $('#directEmail').on('submit', function(event){
       return;
     }
     var filesStore = [];
-    function syncInput() {
-      var dt = new DataTransfer();
-      filesStore.forEach(function(file) {
-        dt.items.add(file);
-      });
-      $input[0].files = dt.files;
-    }
+    window.directEmailFilesStore = filesStore;
     function renderList() {
       $list.empty();
       if (filesStore.length === 0) {
@@ -375,7 +374,6 @@ $('#directEmail').on('submit', function(event){
         var $btn = $('<button type="button" class="btn btn-xs btn-danger ml-2">Remove</button>');
         $btn.on('click', function() {
           filesStore.splice(index, 1);
-          syncInput();
           renderList();
         });
         $li.append($name).append($btn);
@@ -388,7 +386,6 @@ $('#directEmail').on('submit', function(event){
       newFiles.forEach(function(file) {
         filesStore.push(file);
       });
-      syncInput();
       renderList();
       $input.val('');
     });
