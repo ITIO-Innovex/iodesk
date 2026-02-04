@@ -196,22 +196,45 @@ class User_utility extends AdminController
 
                 if ($field_type === 'file') {
                     // Handle file upload
-                    if (isset($_FILES[$field_name]) && $_FILES[$field_name]['error'] === 0 &&!empty($_FILES[$field_name]['name'])) {
+                    if (isset($_FILES[$field_name]) && !empty($_FILES[$field_name]['name'])) {
                         $upload_path = './uploads/user_utility/';
                         if (!is_dir($upload_path)) {
                             mkdir($upload_path, 0755, true);
                         }
 
-                        $file_name = time() . '_' . $_FILES[$field_name]['name'];
-                        if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $upload_path . $file_name)) {
-                            $form_data[$field_name] = $file_name;
+                        $uploaded_files = [];
+                        if (is_array($_FILES[$field_name]['name'])) {
+                            foreach ($_FILES[$field_name]['name'] as $idx => $name) {
+                                if ($name === '') {
+                                    continue;
+                                }
+                                if (!empty($_FILES[$field_name]['error'][$idx])) {
+                                    continue;
+                                }
+                                $file_name = time() . '_' . $name;
+                                if (move_uploaded_file($_FILES[$field_name]['tmp_name'][$idx], $upload_path . $file_name)) {
+                                    $uploaded_files[] = $file_name;
+                                }
+                            }
+                        } else {
+                            if ($_FILES[$field_name]['error'] === 0) {
+                                $file_name = time() . '_' . $_FILES[$field_name]['name'];
+                                if (move_uploaded_file($_FILES[$field_name]['tmp_name'], $upload_path . $file_name)) {
+                                    $uploaded_files[] = $file_name;
+                                }
+                            }
                         }
-                    }else{
-					$files = json_decode($formdata, true); // true = associative array
-					//print_r($field_name);
-					$form_data[$field_name] = $files[$field_name];
-					
-					}
+
+                        if (!empty($uploaded_files)) {
+                            $form_data[$field_name] = $uploaded_files;
+                        } else {
+                            $files = json_decode($formdata, true);
+                            $form_data[$field_name] = $files[$field_name] ?? '';
+                        }
+                    } else {
+                        $files = json_decode($formdata, true);
+                        $form_data[$field_name] = $files[$field_name] ?? '';
+                    }
                 } elseif ($field_type === 'checkbox') {
                     $form_data[$field_name] = $this->input->post($field_name) ? $this->input->post($field_name) : [];
                 } else {

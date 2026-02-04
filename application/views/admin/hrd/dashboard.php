@@ -131,7 +131,11 @@ $attendance_display_status=attendance_display_status();
             <div class="col-md-4">
                 <div class="panel_s">
                     <div class="panel-body">
-                        <h4 class="panel-title"><i class="fa-solid fa-circle-question  text-warning"></i> Today's Thought</h4>
+                        <h4 class="panel-title"><i class="fa-solid fa-circle-question  text-warning"></i> Today's Thought
+<?php if(is_admin()){ ?>
+<a href="<?php echo admin_url('hrd/setting/todays_thought');?>" target="_blank" title="Manage Today's Thought"><i class="fa-solid fa-gear pull-right text-success"></i></a>
+<?php } ?>						
+						</h4>
                         <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
                             <i class="fas fa-quote-left fa-2x text-info"></i>
 <div class="h4 tw-px-2"><?php echo $todays_thought[0]['details'] ?? ''; ?></div>
@@ -181,6 +185,9 @@ $attendance_display_status=attendance_display_status();
 <div class="panel-body box-gradient-bg11">
                         <h4 class="panel-title">
                             <i class="fa-solid fa-tasks tw-mr-2"></i><?php echo $company_policies['title'] ?? 'Company Policies'; ?>
+<?php if(is_admin()){ ?>
+<a href="<?php echo admin_url('hrd/setting/company_policies');?>" target="_blank" title="Manage Company Policies"><i class="fa-solid fa-gear pull-right text-success"></i></a>
+<?php } ?>
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
                           <div class="tw-px-2">
@@ -207,7 +214,10 @@ $attendance_display_status=attendance_display_status();
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
                     <div class="panel-body box-gradient-bg12">
                         <h4 class="panel-title">
-                            <i class="fa-solid fa-tasks tw-mr-2"></i>Leave Rule
+                            <i class="fa-solid fa-tasks tw-mr-2"></i>Leave Rule 
+<?php if(is_admin()){ ?>
+<a href="<?php echo admin_url('hrd/setting/leave_rule');?>" target="_blank" title="Manage Leave Rule"><i class="fa-solid fa-gear pull-right text-success"></i></a>
+<?php } ?>
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
                           <div class="tw-px-2"><?php echo $leave_rule[0]['details'] ?? ''; ?></div>
@@ -229,6 +239,9 @@ $attendance_display_status=attendance_display_status();
                     <div class="panel-body box-gradient-bg13">
                         <h4 class="panel-title ">
                             <i class="fa-solid fa-tasks tw-mr-2"></i>Event & Announcement
+<?php if(is_admin()){ ?>
+<a href="<?php echo admin_url('hrd/setting/events_announcements');?>" target="_blank" title="Manage Event & Announcement"><i class="fa-solid fa-gear pull-right text-success"></i></a>
+<?php } ?>
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
                           <div class="tw-px-2"><?php echo $events_announcements[0]['details'] ?? ''; ?></div>
@@ -242,6 +255,9 @@ $attendance_display_status=attendance_display_status();
                     <div class="panel-body box-gradient-bg14">
                         <h4 class="panel-title ">
                             <i class="fa-solid fa-tasks tw-mr-2"></i>Corporate Guide
+<?php if(is_admin()){ ?>
+<a href="<?php echo admin_url('hrd/setting/corporate_guidelines');?>" target="_blank" title="Manage Corporate Guide"><i class="fa-solid fa-gear pull-right text-success"></i></a>
+<?php } ?>
                         </h4>
                         <div class="table-responsive" style="height: 430px; overflow-y: auto; padding-right:5px;">
                           <div class="tw-px-2"><?php echo $corporate_guidelines[0]['details'] ?? ''; ?></div>

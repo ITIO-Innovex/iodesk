@@ -322,6 +322,9 @@ $department_count = (int) ($active_department_count ?? 0);
 if ($department_count > 0) { ?>
 <div class="alert alert-success">
 Active department count: <?php echo $department_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('departments');?>" class="btn btn-info btn-sm" >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="add_department">Add New Departments</a></span>
+
 </div>
 <?php } else { ?>
 										<div class="alert alert-danger tw-bg-danger-500 msgbox_department">
@@ -333,6 +336,9 @@ $designation_count = (int) ($active_designation_count ?? 0);
 if ($designation_count > 0) { ?>
 <div class="alert alert-success">
 Active designation count: <?php echo $designation_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('designation');?>" class="btn btn-info btn-sm" >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="add_designation">Add New Designation</a></span>
+
 </div>
 <?php } else { ?>
 				  						<div class="alert alert-danger tw-bg-danger-500 msgbox_designation">
@@ -344,6 +350,9 @@ $staff_type_count = (int) ($active_staff_type_count ?? 0);
 if ($staff_type_count > 0) { ?>
 <div class="alert alert-success">
 Active staff type count: <?php echo $staff_type_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/staff_type');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="add_staff_type">Add New Staff Type</a></span>
+
 </div>
 <?php } else { ?>
 				 						<div class="alert alert-danger tw-bg-danger-500 msgbox_staff_type">
@@ -439,6 +448,9 @@ $shift_type_count = (int) ($active_shift_type_count ?? 0);
 if ($shift_type_count > 0) { ?>
 <div class="alert alert-success">
 Active shift type count: <?php echo $shift_type_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_type');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="shift-type" >Add Shift Type</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -452,6 +464,9 @@ $shift_manager_count = (int) ($active_shift_manager_count ?? 0);
 if ($shift_manager_count > 0) { ?>
 <div class="alert alert-success">
 Active shift manager count: <?php echo $shift_manager_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/shift_manager');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="add_shift_manager">Add Shift Manager</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -465,6 +480,9 @@ $branch_manager_count = (int) ($active_branch_manager_count ?? 0);
 if ($branch_manager_count > 0) { ?>
 <div class="alert alert-success">
 Active branch manager count: <?php echo $branch_manager_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/branch_manager');?>" class="btn btn-info btn-sm" >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="add_branch_manager">Add Branch Manager</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -485,6 +503,9 @@ $employee_type_count = (int) ($active_employee_type_count ?? 0);
 if ($employee_type_count > 0) { ?>
 <div class="alert alert-success">
 Active employee type count: <?php echo $employee_type_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/employee_type');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="add_employee_type">Add Employee Type</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -497,10 +518,13 @@ $leave_rule_count = (int) ($active_leave_rule_count ?? 0);
 if ($leave_rule_count > 0) { ?>
 <div class="alert alert-success">
 Active leave rule count: <?php echo $leave_rule_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="leave-rule">Manage Leave Rule</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Leave rules must be added to manage leave applications. <span style="float:right"><a href="<?php echo admin_url('hrd/setting/leave_rule');?>" class="btn btn-warning btn-sm ms-2" id="leave-rule">Add Leave Rule</a></span></div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> Leave rules must be added to manage leave applications. <span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm ms-2" id="leave-rule">Add Leave Rule</a></span></div>
 </div>
 <?php } ?>
 
@@ -579,6 +603,10 @@ $project_group_count = (int) ($active_project_group_count ?? 0);
 if ($project_group_count > 0) { ?>
 <div class="alert alert-success">
 Active project group count: <?php echo $project_group_count; ?>
+
+<span style="float:right"><a href="<?php echo admin_url('project/project_group');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="project_group">Add Project Group</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -619,6 +647,9 @@ $interview_process_count = (int) ($active_interview_process_count ?? 0);
 if($interview_process_count > 0){ ?>
 <div class="alert alert-success">
 Active interview process count: <?php echo $interview_process_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_process');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2" id="interview_process">Add Interview Process</a></span>
+
 </div>
 <?php } else{ ?>
  <div class="alert alert-danger tw-bg-danger-500">
@@ -631,6 +662,9 @@ $interview_source_count = (int) ($active_interview_source_count ?? 0);
 if ($interview_source_count > 0) { ?>
 <div class="alert alert-success">
 Active interview source count: <?php echo $interview_source_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('hrd/setting/interview_source');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2"  id="interview_source">Add Interview Source</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -673,6 +707,7 @@ $ai_details_count = (int) ($active_ai_details_count ?? 0);
 if ($ai_details_count > 0) { ?>
 <div class="alert alert-success">
 Chatgtp API Key count: <?php echo $ai_details_count; ?>
+<span style="float:right"><a href="<?php echo admin_url('ai_content_generator');?>" class="btn btn-warning btn-sm ms-2" target="_blank">View Added</a></span>
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500">
@@ -714,6 +749,10 @@ $task_status_count = (int) ($active_task_status_count ?? 0);
 if ($task_status_count > 0) { ?>
 <div class="alert alert-success">
 Active task status count: <?php echo $task_status_count; ?>
+
+<span style="float:right"><a href="<?php echo admin_url('leads/task_status');?>" class="btn btn-info btn-sm " >View Added</a></span>
+<span style="float:right"><a href="javascript:void(0);" class="btn btn-warning btn-sm tw-mx-2"  id="task_status">Add Task Status</a></span>
+
 </div>
 <?php } else { ?>
 <div class="alert alert-danger tw-bg-danger-500 msgbox_designation">
