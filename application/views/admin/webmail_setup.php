@@ -12,7 +12,7 @@
                 <div class="tw-mb-21 sm:tw-mb-41">
                     <button class="btn btn-primary mbot15" data-toggle="modal" data-target="#entryModal">
     <i class="fa-regular fa-plus tw-mr-1"></i> <?php echo _l('New Webmail Setup'); ?> 
-</button> <a href="javascript:void(0);" class="pull-right" id="crm_instruction" title="Manage Webmail Setup – User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning"></i></a>
+</button> <a href="javascript:void(0);" class="pull-right" id="crm_instruction" title="Manage Webmail Setup ï¿½ User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning"></i></a>
                 </div>
                 <div class="panel_s">
                     <div class="panel-body panel-table-full">

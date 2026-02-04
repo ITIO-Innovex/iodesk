@@ -98,6 +98,7 @@ class Authentication_model extends App_Model
 					$start_date      = !empty($subscriptions_data->start_date) ? $subscriptions_data->start_date : '';
 					$end_date        = !empty($subscriptions_data->end_date) ? $subscriptions_data->end_date : '';
 					$status          = !empty($subscriptions_data->status) ? $subscriptions_data->status : '';
+					$staff_limit     = !empty($subscriptions_data->staff_limit) ? $subscriptions_data->staff_limit : '';
 					$created_at      = !empty($subscriptions_data->created_at) ? $subscriptions_data->created_at : '';
 					
 					//echo "XXXXXXXXX";exit;
@@ -106,6 +107,7 @@ class Authentication_model extends App_Model
                     'cms_subscription_start_date'  => $start_date,
                     'cms_subscription_end_date' => $end_date,
 					'cms_subscription_status' => $status,
+					'cms_subscription_staff_limit' => $staff_limit,
 					'cms_subscription_created_at' => $created_at,
                    ];
 				   $this->session->set_userdata($subscription_data);
