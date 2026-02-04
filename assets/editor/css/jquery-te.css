@@ -374,11 +374,30 @@ if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
 }
 
 .jqte_editor b, strong {
-    font-weight: 600 !important;
+    font-weight: 800 !important;
 }
 .jqte_editor i {
   font-style: italic !important;
 }
+
+/* jQuery TE list fix */
+.jqte_editor ul {
+    list-style-type: disc !important;
+    padding-left: 40px !important;
+    margin: 10px 0;
+}
+
+.jqte_editor ol {
+    list-style-type: decimal !important;
+    padding-left: 40px !important;
+    margin: 10px 0;
+}
+
+.jqte_editor li {
+    list-style-position: outside !important;
+    margin-bottom: 5px;
+}
+
 .jqte_editor a:link, .jqte_editor a:link * {
 	color:#0066FF !important;
 	text-decoration:underline;
