@@ -137,23 +137,62 @@ class Direct_email extends AdminController
         echo json_encode(['success' => (bool) $success, 'message' => $success ? 'Global SMTP details saved.' : 'Failed to save SMTP details.']);
     }
     public function sendMail(){
-        $email_to=$_POST['email'];
-		$email_subject=$_POST['subject'];
-		$email_message="<html>".$_POST['message']."</html>";
+        $this->output->set_content_type('application/json');
+        $email_to = $this->input->post('email', true);
+		$email_subject = $this->input->post('subject', true);
+		$email_message = "<html>".$this->input->post('message', false)."</html>";
+        if (empty($email_to) || empty($email_subject) || trim(strip_tags($email_message)) === '') {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Email, subject and message are required.',
+            ]);
+            return;
+        }
+        $attachments = [];
+        if (!empty($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
+            $count = count($_FILES['attachments']['name']);
+            for ($i = 0; $i < $count; $i++) {
+                if (!isset($_FILES['attachments']['error'][$i])) {
+                    continue;
+                }
+                if ($_FILES['attachments']['error'][$i] !== UPLOAD_ERR_OK) {
+                    $errorCode = (int) $_FILES['attachments']['error'][$i];
+                    $errorMessage = 'Attachment upload failed.';
+                    if ($errorCode === UPLOAD_ERR_INI_SIZE || $errorCode === UPLOAD_ERR_FORM_SIZE) {
+                        $errorMessage = 'Attachment is too large.';
+                    } elseif ($errorCode === UPLOAD_ERR_PARTIAL) {
+                        $errorMessage = 'Attachment was only partially uploaded.';
+                    } elseif ($errorCode === UPLOAD_ERR_NO_FILE) {
+                        $errorMessage = 'Attachment file missing.';
+                    }
+                    echo json_encode([
+                        'success' => false,
+                        'message' => $errorMessage,
+                    ]);
+                    return;
+                }
+                $tmpName = $_FILES['attachments']['tmp_name'][$i] ?? '';
+                $origName = $_FILES['attachments']['name'][$i] ?? '';
+                if ($tmpName && is_uploaded_file($tmpName)) {
+                    $attachments[] = [
+                        'path' => $tmpName,
+                        'name' => $origName,
+                    ];
+                }
+            }
+        }
 		//$emailArray = explode(";",$email_to);
 		//$bulkEmails = array_map(function($email) {
 			//return ['Email' => $email];
 		//}, $emailArray);
 		//$response=$this->send_attchment_message1($bulkEmails,$email_subject,$email_message); 
 		//log_message('error', 'sendMail' . $email_subject);
-		$response=$this->send_attchment_message_by_smtp($email_to,$email_subject,$email_message); 
-	   $pst['msg'] = "Your message has been successfully sent to " . $email_to;
-	   $pst['response'] = $response;
-	   echo json_encode($pst);
+		$response=$this->send_attchment_message_by_smtp($email_to,$email_subject,$email_message,$attachments);
+        echo json_encode($response);
     }
     
 	
-	function send_attchment_message_by_smtp($bulkEmails, $email_subject, $email_message) {
+	function send_attchment_message_by_smtp($bulkEmails, $email_subject, $email_message, $attachments = []) {
     $subject = $email_subject;
     $body = $email_message;
 	
@@ -170,7 +209,10 @@ class Direct_email extends AdminController
 	$mailer_smtp_port= trim($config['smtp_port']);
 	
 	}else{
-	echo "Direct EMAIL SMTP Setting not configured";exit;
+        return [
+            'success' => false,
+            'message' => 'Direct EMAIL SMTP Setting not configured',
+        ];
 	}
 	
 
@@ -212,19 +254,26 @@ class Direct_email extends AdminController
 		//log_message('error', '!!!'.$email_subject);
         $mail->Subject = $subject;
         $mail->Body    = $body;
+        if (!empty($attachments)) {
+            foreach ($attachments as $file) {
+                if (!empty($file['path']) && is_file($file['path'])) {
+                    $mail->addAttachment($file['path'], $file['name'] ?? '');
+                }
+            }
+        }
         //$mail->SMTPDebug = 2; 
         //$mail->Debugoutput = 'error_log';
         $mail->send();
-        //log_message('error', 'Email Sent');
-        //return true;
-		$http_code=200;
-		$response='Success';
-		return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
+        return [
+            'success' => true,
+            'message' => 'Mail sent successfully.',
+        ];
     } catch (Exception $e) {
         log_message('error', 'Email could not be sent. Error: ' . $mail->ErrorInfo .''.$mail->SMTPDebug);
-        $http_code=400;
-		$response='Failed';
-		return 'HTTP Code: ' . $http_code . ' Response: ' . $response;
+        return [
+            'success' => false,
+            'message' => 'Failed to send mail: ' . $mail->ErrorInfo,
+        ];
     }
 }
 }
