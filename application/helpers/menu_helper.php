@@ -1110,6 +1110,16 @@ function app_init_admin_sidebar_menu_items()
         ]);
 		}
 		
+		if (staff_can('view_interviews',  'hr_department')) {
+		$CI->app_menu->add_setup_children_item('hr_department', [
+            'slug'     => 'important_document',
+            'name'     => 'Important Document',
+            'href'     => admin_url('important_document'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		}
+		
 		
 		
 		
