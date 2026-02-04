@@ -157,13 +157,14 @@ class Direct_email extends AdminController
                 }
                 if ($_FILES['attachments']['error'][$i] !== UPLOAD_ERR_OK) {
                     $errorCode = (int) $_FILES['attachments']['error'][$i];
+                    if ($errorCode === UPLOAD_ERR_NO_FILE) {
+                        continue;
+                    }
                     $errorMessage = 'Attachment upload failed.';
                     if ($errorCode === UPLOAD_ERR_INI_SIZE || $errorCode === UPLOAD_ERR_FORM_SIZE) {
                         $errorMessage = 'Attachment is too large.';
                     } elseif ($errorCode === UPLOAD_ERR_PARTIAL) {
                         $errorMessage = 'Attachment was only partially uploaded.';
-                    } elseif ($errorCode === UPLOAD_ERR_NO_FILE) {
-                        $errorMessage = 'Attachment file missing.';
                     }
                     echo json_encode([
                         'success' => false,
