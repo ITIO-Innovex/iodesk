@@ -72,7 +72,7 @@
                                 <hr class="hr-panel-heading" />
                             </div>
                     <div class="card-body">
-                        <form id="directEmail">
+                        <?php echo form_open(admin_url('direct_email/sendMail'), ['id' => 'directEmail', 'enctype' => 'multipart/form-data']); ?>
                             <div class="row" style="padding:20px">
                                 <div class="col">
                                     <div class="form-group">
@@ -94,13 +94,21 @@
 
                                 <div class="col">
                                     <div class="form-group">
-                                     
                                         <textarea name="message" id="message" class="form-control editor"  placeholder="Message..."></textarea>
 <div class="checkbox checkbox-primary">
 <input type="checkbox" id="toggleSignature" name="toggleSignature" value="1">
 <label for="SignatureX">Add Signature</label>
 </div>
 										
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="label">
+                                           <span class="text-dark">Attachments</span>
+                                        </div>
+                                        <input type="file" id="attachments" name="attachments[]" class="form-control" multiple>
+                                        <div id="attachments-list" class="mt-2"></div>
                                     </div>
                                 </div>
 																<div class="col">
@@ -117,7 +125,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        <?php echo form_close(); ?>
                     </div>
                 </div>
             </div>
@@ -298,34 +306,35 @@ $('#directEmail').on('submit', function(event){
 		
     $("#sendMail").prop("disabled", true); // Disable submit button
     event.preventDefault();
-    var formData = {
-        email:$('#email').val(),
-        subject:$('#subject').val(),
-        message:$('#message').val()
-    };
+    var formData = new FormData(this);
     $.ajax({
-        url:'Direct_email/sendMail',
+        url: $(this).attr('action'),
         method:'POST',
         data:formData,
+        processData: false,
+        contentType: false,
         success: function(response){
-            const data = JSON.parse(response);
-            const httpCode = data.response.match(/\d{3}/)[0];
+            var data = {};
+            try { data = typeof response === 'string' ? JSON.parse(response) : response; } catch (e) {
+                data = { success: false, message: response };
+            }
             $("#sendMail").prop("disabled", false); // Enable submit button
-            if(httpCode==200){
+            if(data.success){
 			    $("#sendMail").html("Submit");
                 // Success Message
-                alert_float('success', "Mail sent succesfully!");
+                alert_float('success', data.message || "Mail sent succesfully!");
             }else{
 			   $("#sendMail").html("Submit");
                 // Failure Message
-                alert_float('danger', "Failed to send mail. Please try again.");
+                alert_float('danger', data.message || "Failed to send mail. Please try again.");
             }
         },
         error: function (xhr, status, error){
             $("#sendMail").prop("disabled", false); // Enable submit button
             console.error('Error:',error);
             // Failure Message
-            alert_float('danger', "Failed to send mail. Please try again.");
+            var msg = (xhr && xhr.responseText) ? xhr.responseText : "Failed to send mail. Please try again.";
+            alert_float('danger', msg);
         }
     })    
 });
@@ -338,6 +347,52 @@ $('#directEmail').on('submit', function(event){
 });<?php */?>
 
 
+</script>
+<script>
+  (function() {
+    var $input = $('#attachments');
+    var $list = $('#attachments-list');
+    if ($input.length === 0 || $list.length === 0) {
+      return;
+    }
+    var filesStore = [];
+    function syncInput() {
+      var dt = new DataTransfer();
+      filesStore.forEach(function(file) {
+        dt.items.add(file);
+      });
+      $input[0].files = dt.files;
+    }
+    function renderList() {
+      $list.empty();
+      if (filesStore.length === 0) {
+        return;
+      }
+      var $ul = $('<ul class="list-unstyled mb-0"></ul>');
+      filesStore.forEach(function(file, index) {
+        var $li = $('<li class="tw-my-2"></li>');
+        var $name = $('<span></span>').text(file.name + ' (' + Math.round(file.size / 1024) + ' KB)');
+        var $btn = $('<button type="button" class="btn btn-xs btn-danger ml-2">Remove</button>');
+        $btn.on('click', function() {
+          filesStore.splice(index, 1);
+          syncInput();
+          renderList();
+        });
+        $li.append($name).append($btn);
+        $ul.append($li);
+      });
+      $list.append($ul);
+    }
+    $input.on('change', function() {
+      var newFiles = Array.from($input[0].files);
+      newFiles.forEach(function(file) {
+        filesStore.push(file);
+      });
+      syncInput();
+      renderList();
+      $input.val('');
+    });
+  })();
 </script>
 <script>
   //For Add /  Remove Signature
