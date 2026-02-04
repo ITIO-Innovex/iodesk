@@ -79,7 +79,7 @@ class User_utility extends AdminController
                 set_alert('danger', 'Failed to create form');
             }
         }
-        $data['staff_members'] = $this->staff_model->get_staff_by_department('');
+        $data['staff_members'] = $this->staff_model->get_staff_by_department_with_reporting_manager('');
         $data['title'] = 'Create New Form';
         $this->load->view('admin/user_utility/form', $data);
     }
