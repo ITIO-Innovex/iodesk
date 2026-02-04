@@ -1116,6 +1116,32 @@ class Staff_model extends App_Model
 		//echo $this->db->last_query();exit;//return
     }
 	
+		public function get_staff_by_department_with_reporting_manager($id = '')
+    {
+	
+	
+		$select_str = 's.*, CONCAT(s.firstname, " ", s.lastname) as full_name';
+		$companyid = (int) get_staff_companyid();
+		$departmentid = (int) get_departments_id();
+		$staff_id     = (int) get_staff_user_id();
+		$this->db->select($select_str);
+		$this->db->from(db_prefix() . 'staff as s');
+		$this->db->join('it_crm_staff_departments as d', 'd.staffid = s.staffid', 'inner');
+		$this->db->where('s.company_id', $companyid);
+		if (!is_admin()) {
+    	$this->db->group_start()
+        ->where('d.departmentid', $departmentid)
+        ->or_where('s.reporting_manager', $staff_id)
+    	->group_end();
+		}
+		$this->db->order_by('s.firstname', 'desc');
+		$res = $this->db->get()->result_array();
+		//echo $this->db->last_query();exit;
+		//echo $this->db->get_compiled_select();exit;
+		return $res;//exit;
+		//echo $this->db->last_query();exit;//return
+    }
+	
 	public function get_designation($id = '')
     {
 	

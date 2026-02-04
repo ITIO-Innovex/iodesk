@@ -119,7 +119,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
             </select>
           </div></div>
         </div>
-        <div class="row"><?php print_r($branches);?>
+        <div class="row"><?php //print_r($branches);?>
           <div class="col-md-4"><div class="form-group"><label>Branch</label>
             <select name="branch" class="form-control">
               <option value="">-- Select Branch --</option>
