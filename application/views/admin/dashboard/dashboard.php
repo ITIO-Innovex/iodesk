@@ -205,7 +205,14 @@ $attendance_display_status=attendance_display_status();
                 
                 <div class="form-group">
                     <label for="mailer_password" class="control-label">Password (Zoho Email)</label>
-                    <?php echo render_input('mailer_password', '', '', 'password', ['required' => 'true', 'id' => 'mailer_password']); ?>
+                    <div class="input-group">
+                        <input type="password" id="mailer_password" name="mailer_password" class="form-control" required>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default toggle-password" data-target="#mailer_password" title="Show/Hide Password">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </span>
+                    </div>
                 </div>
 				
 <div class="form-group">
@@ -262,6 +269,19 @@ $attendance_display_status=attendance_display_status();
 app.calendarIDs = '<?php echo json_encode($google_ids_calendars); ?>';
 </script>
 <?php init_tail(); ?>
+<script>
+$(document).on('click', '.toggle-password', function () {
+    var $btn = $(this);
+    var target = $btn.data('target');
+    var $input = $(target);
+    if ($input.length === 0) {
+        return;
+    }
+    var isPassword = $input.attr('type') === 'password';
+    $input.attr('type', isPassword ? 'text' : 'password');
+    $btn.find('i').toggleClass('fa-eye fa-eye-slash');
+});
+</script>
 <?php $this->load->view('admin/utilities/calendar_template'); ?>
 <?php //$this->load->view('admin/dashboard/google_js'); ?>
 <?php if($_SESSION['smtp_fetch_type']=="CompanySMTP"){ 
