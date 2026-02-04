@@ -320,7 +320,7 @@ class Project extends AdminController
         $this->load->model('staff_model');
         
         // Get activity logs for feed
-        $data['activity_logs'] = $this->project_model->get_activity_logs();
+        $data['activity_logs'] = $this->project_model->get_activity_logs(20);
         
         // Get activity logs for calendar (formatted as events)
         $data['calendar_events'] = $this->project_model->get_calendar_events();

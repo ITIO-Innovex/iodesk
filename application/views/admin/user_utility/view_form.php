@@ -137,17 +137,37 @@
                                                <?php echo $field_required ? 'required' : ''; ?>>
                                                
                                     <?php } elseif ($field_type === 'file') { ?>
-                                        <input type="file" 
-                                               name="<?php echo $field_name; ?>" 
-                                               id="<?php echo $field_name; ?>"
-                                               class="form-control" 
-                                               >
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                
+                                                <input type="file"
+                                                       name="<?php echo $field_name; ?>[]"
+                                                       id="<?php echo $field_name; ?>"
+                                                       class="form-control"
+                                                       multiple>
 											   <?php //echo $field_required ? 'required' : ''; ?>
-                                        <?php if ($field_value) { ?>
-                                            <small class="text-muted">
-                                                Current file: <a href="<?php echo base_url('uploads/user_utility/' . $field_value); ?>" target="_blank"><?php echo $field_value; ?></a>
-                                            </small>
-                                        <?php } ?>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <?php if ($field_value) { ?>
+                                                    <label class="control-label">Current Saved Data</label>
+                                                    <div class="text-muted">
+                                                        <?php if (is_array($field_value)) { ?>
+                                                            <?php foreach ($field_value as $file) { ?>
+                                                                <div>
+                                                                    <a href="<?php echo base_url('uploads/user_utility/' . $file); ?>" target="_blank">
+                                                                        <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $file; ?>
+                                                                    </a>
+                                                                </div>
+                                                            <?php } ?>
+                                                        <?php } else { ?>
+                                                            <a href="<?php echo base_url('uploads/user_utility/' . $field_value); ?>" target="_blank">
+                                                                <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $field_value; ?>
+                                                            </a>
+                                                        <?php } ?>
+                                                    </div>
+                                                <?php } ?>
+                                            </div>
+                                        </div>
                                     <?php } ?>
                                 </div>
                                 
@@ -220,7 +240,9 @@
                                             <strong><?php echo ucfirst(str_replace('_', ' ', $key)); ?>:</strong><br>
                                             <?php 
                                             if (is_array($value)) {
+											
                                                 echo implode(', ', $value);
+												
                                             } elseif (!empty($value) && strpos((string)$value, '.') !== false && file_exists('./uploads/user_utility/' . $value)) {
                                                 echo '<a href="' . base_url('uploads/user_utility/' . $value) . '" target="_blank">' . $value . '</a>';
                                             } else {

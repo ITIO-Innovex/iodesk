@@ -89,9 +89,10 @@
 
 	  </div>                      
       </div>
-	  <div class="mb-3">
+      <div class="mb-3">
         <label for="recipientEmail" class="form-label">Attach Files:</label>
-        <input type="file" name="attachments[]"  class="form-control" multiple>
+        <input type="file" id="emailAttachments" name="attachments[]" class="form-control" multiple>
+        <small id="attachmentStatus" class="text-success hide">File is attached.</small>
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemail">Send Email</button>
     </form>
@@ -156,6 +157,15 @@ $('.submitemail').click(function(){
 		}
 
 
+});
+
+$('#emailAttachments').on('change', function() {
+  var hasFiles = $(this).get(0).files && $(this).get(0).files.length > 0;
+  if (hasFiles) {
+    $('#attachmentStatus').removeClass('hide').text('File is attached.');
+  } else {
+    $('#attachmentStatus').addClass('hide').text('');
+  }
 });
 
 

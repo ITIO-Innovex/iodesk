@@ -224,7 +224,7 @@ Active project group count: <?php echo $project_group_count; ?>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="start_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('Start Date'); ?></label>
-                  <input type="date" class="form-control" id="start_date" name="start_date" title="Select start date" required>
+                  <input type="date" class="form-control" id="start_date" name="start_date" title="Select start date" required min="<?php echo date('Y-m-d'); ?>">
                 </div>
               </div>
               <div class="col-md-6">
@@ -428,6 +428,9 @@ function initializeProjectModal() {
         // Add project button click event
         $('#addProjectBtn').on('click', function(e) {
             e.preventDefault();
+            var today = new Date().toISOString().split('T')[0];
+            $('#start_date').attr('min', today);
+            $('#deadline').attr('min', today);
             $('#addProjectModal').modal('show');
         });
 
@@ -711,6 +714,18 @@ function manage_project_form(form) {
 $('#start_date').on('change', function() {
     var startDate = $(this).val();
     $('#deadline').attr('min', startDate);
+    if ($('#deadline').val() && $('#deadline').val() < startDate) {
+        $('#deadline').val('');
+    }
+});
+
+$('#deadline').on('change', function() {
+    var startDate = $('#start_date').val();
+    var endDate = $(this).val();
+    if (startDate && endDate && endDate < startDate) {
+        alert('End Date cannot be earlier than Start Date.');
+        $(this).val('');
+    }
 });
 
 
