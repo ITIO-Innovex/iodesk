@@ -375,7 +375,7 @@ $(function() {
     });
     
     setTimeout(function() {
-        $($webmailModal.find('form')).trigger('reinitialize.areYouSure');
+        //$($webmailModal.find('form')).trigger('reinitialize.areYouSure');
     }, 1000);
     
     $webmailModal.on('hidden.bs.modal', function() {
