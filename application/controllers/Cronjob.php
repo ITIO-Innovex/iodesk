@@ -245,6 +245,8 @@ $result = $this->services_subscriptions_model->send_renewal_email($email, $mailS
                 'status'  => 'sent',
                 'sent_at'=> date('Y-m-d H:i:s')
             ]);
+			
+			$this->db->where('uniqid', $email['id'])->update('emails', ['uniqid' => 0]);
 
         } catch (Exception $e) {
             $this->db->where('id', $email['id'])->update('email_queue', [
