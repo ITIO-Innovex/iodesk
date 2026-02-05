@@ -1826,6 +1826,11 @@ $("body").on("click", ".new-task-to-short", function (e) {
         "#single-ticket-form,#calendar-event-form,#proposal-form, #department-form"
       )
       .areYouSure();
+  } else {
+    // Force disable any beforeunload warnings globally
+    $(window).off("beforeunload");
+    $(window).off("beforeunload.areYouSure");
+    window.onbeforeunload = null;
   }
 
   // For inline tinymce editors when content is blank a message is shown, on click this message should be hidden.
