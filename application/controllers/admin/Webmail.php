@@ -132,12 +132,77 @@ class Webmail extends AdminController
 	{
 	    
 		$data = $this->input->post();
-		//print_r($data);exit;
 		$entry_id=get_staff_user_id();
         $this->webmail_model->reply($data, $entry_id);
         set_alert('success', _l('Email Sent Successfully', _l('Email Sent')));
         redirect(previous_url() ?: $_SERVER['HTTP_REFERER']);
 	} 
+
+	public function schedule_send()
+	{
+		$data = $this->input->post();
+
+		$scheduleAt = trim($data['schedule_at'] ?? '');
+		if ($scheduleAt === '') {
+			echo json_encode(['success' => false, 'message' => 'Scheduled time is required']);
+			return;
+		}
+
+		$companyId = get_staff_company_id();
+		$attachments = [];
+		if (!empty($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
+			$uploadDir = FCPATH . 'uploads/email_queue/';
+			if (!is_dir($uploadDir)) {
+				@mkdir($uploadDir, 0755, true);
+			}
+			foreach ($_FILES['attachments']['name'] as $index => $name) {
+				if ($name === '') {
+					continue;
+				}
+				$tmpName = $_FILES['attachments']['tmp_name'][$index] ?? '';
+				if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+					continue;
+				}
+				$ext = pathinfo($name, PATHINFO_EXTENSION);
+				$storedName = uniqid('queue_', true) . ($ext ? '.' . $ext : '');
+				$targetPath = $uploadDir . $storedName;
+				if (move_uploaded_file($tmpName, $targetPath)) {
+					$attachments[] = $storedName;
+				}
+			}
+		}
+
+		$smtpDetails = [
+			'mailer_email'      => $_SESSION['webmail']['mailer_email'] ?? '',
+			'mailer_username'   => $_SESSION['webmail']['mailer_username'] ?? '',
+			'mailer_password'   => $_SESSION['webmail']['mailer_password'] ?? '',
+			'mailer_smtp_host'  => $_SESSION['webmail']['mailer_smtp_host'] ?? '',
+			'mailer_smtp_port'  => $_SESSION['webmail']['mailer_smtp_port'] ?? '',
+			'encryption'        => $_SESSION['webmail']['encryption'] ?? '',
+		];
+
+		$insert = [
+			'company_id'   => $companyId ?: null,
+			'to_email'     => trim($data['recipientEmail'] ?? ''),
+			'cc_emails'    => trim($data['recipientCC'] ?? ''),
+			'bcc_emails'   => trim($data['recipientBCC'] ?? ''),
+			'subject'      => trim($data['emailSubject'] ?? ''),
+			'body'         => $data['emailBody'] ?? '',
+			'attachments'  => $attachments ? json_encode($attachments) : null,
+			'smtp_details' => json_encode($smtpDetails),
+			'scheduled_at' => date('Y-m-d H:i:s', strtotime($scheduleAt)),
+			'status'       => 'pending',
+			'created_at'   => date('Y-m-d H:i:s'),
+		];
+
+		$this->db->insert(db_prefix() . 'email_queue', $insert);
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['success' => true, 'message' => 'Email scheduled successfully']);
+			return;
+		}
+
+		echo json_encode(['success' => false, 'message' => 'Failed to schedule email']);
+	}
 	
 
 	

@@ -360,7 +360,83 @@ class Webmail_model extends App_Model
 	
 	
 	}
-	 
+	
+	
+	public function send_email_via_smtp($email)
+    {
+	
+	
+	//print_r($email);
+	if(isset($email['smtp_details'])&&$email['smtp_details']){
+	$smtp_details = json_decode($email['smtp_details'], true);
+	$mailer_email=$smtp_details['mailer_email'];
+	$mailer_username=$smtp_details['mailer_username'];
+	$mailer_password=$smtp_details['mailer_password'];
+	$mailer_smtp_host=$smtp_details['mailer_smtp_host'];
+	$mailer_smtp_port=$smtp_details['mailer_smtp_port'];
+	$encryption=$smtp_details['encryption'];
+	}
+	
+	
+	//print_r($smtp_details);
+	//exit;
+	
+	
+    $mail = new PHPMailer(true);
+
+    $mail->isSMTP();
+    $mail->Host       = $mailer_smtp_host;
+    $mail->SMTPAuth   = true;
+    $mail->Username   = $mailer_username;
+    $mail->Password   = $mailer_password;
+    $mail->SMTPSecure = $encryption;
+    $mail->Port       = $mailer_smtp_port;
+
+    $mail->setFrom($mailer_email, $mailer_username);
+    $mail->addAddress($email['to_email']);
+	
+	if (isset($email['cc_emails']) && $email['cc_emails'] != "") {
+	     // Add CC addresses from comma-separated string
+        $ccEmails = explode(',', trim($email['cc_emails']));
+        foreach ($ccEmails as $ccEmail) {
+            $ccEmail = trim($ccEmail);
+            if (filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addCC($ccEmail);
+            }
+        }
+	}
+	
+	if (isset($email['bcc_emails']) && $email['bcc_emails'] != "") {
+	
+	       // Add CC addresses from comma-separated string
+        $bccEmails = explode(',', trim($email['bcc_emails']));
+        foreach ($bccEmails as $bccEmail) {
+            $bccEmail = trim($bccEmail);
+            if (filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addBCC($bccEmail);
+            }
+        }
+		
+		
+	}
+
+    $mail->isHTML(true);
+    $mail->Subject = $email['subject'];
+    $mail->Body    = $email['body'];
+	
+	
+    if (!empty($email['attachments'])) {
+    $attachments = json_decode($email['attachments'], true);
+    if (!empty($attachments)) {
+        foreach ($attachments as $file) {
+		$file=$uploadDir = FCPATH . 'uploads/email_queue/'.$file;
+            $mail->addAttachment($file);
+        }
+    }
+	}
+
+    $mail->send();
+}
    
    
        // function for get inbox mail list

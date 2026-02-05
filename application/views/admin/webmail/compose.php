@@ -3,7 +3,7 @@
 <?php //print_r($webmaillist);?>
 <style>
 @media (min-width: 768px) {
-    .modal-dialog {
+    .modal-dialogx {
         width: unset !important;
     }
 }
@@ -51,7 +51,7 @@
 <div class="panel_s">
 <div class="panel-body panel-table-full mail-bg">
 
-<form action="<?=  admin_url('webmail/reply') ?>" method="post" enctype="multipart/form-data">
+<form action="<?=  admin_url('webmail/reply') ?>" method="post" enctype="multipart/form-data" id="compose-form-data">
 	<!-- CSRF Token -->
         <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
                value="<?= $this->security->get_csrf_hash(); ?>">
@@ -94,7 +94,8 @@
         <input type="file" id="emailAttachments" name="attachments[]" class="form-control" multiple>
         <small id="attachmentStatus" class="text-success hide">File is attached.</small>
       </div>
-      <button type="submit" name="send" class="btn btn-primary mtop20 submitemail">Send Email</button>
+      <button type="submit" name="send" class="btn btn-primary mtop20 submitemail"><i class="fa-solid fa-envelope-circle-check"></i> Send Email</button>
+	  <button type="button" id="openScheduleModal" class="btn btn-primary mtop20"><i class="fa-regular fa-clock"></i> Send Later</button>
     </form>
 
 </div>
@@ -107,6 +108,27 @@
         <?php echo _l('No Webmail Setup Entries'); ?>
         </div>
 		<?php } ?>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="emailScheduleModal" tabindex="-1" role="dialog" aria-labelledby="emailScheduleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="emailScheduleModalLabel">Email Scheduling</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="scheduleAtInput">Scheduled At</label>
+                    <input type="datetime-local" name="schedule_at" id="scheduleAtInput" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" id="scheduleSendBtn" class="btn btn-primary">Schedule and Send</button>
+            </div>
         </div>
     </div>
 </div>
@@ -134,29 +156,106 @@
   }
   
   // Toggle AI BOX	
-$('.submitemail').click(function(){ 
+function validateComposeForm() {
 	var recipientEmailIT=$.trim($('#recipientEmailIT').val());
 	var emailSubjectIT=$.trim($('#emailSubjectIT').val());
 	var emailBody=$.trim($('#emailBody').val());
-        
-		
-		 if(recipientEmailIT==''){
-			alert('Please enter to email');
-			$('#recipientEmailIT').focus();
+	
+	// Attachment keyword check
+	const body = emailBody.toLowerCase();
+	const files = document.getElementById('emailAttachments').files;
+	const attachmentKeywords = ['attach', 'attached', 'attachment', 'enclosed', 'file', 'document'];
+	const keywordFound = attachmentKeywords.some(word => body.includes(word));
+    //for Attachment Validation //
+	
+	
+	if(recipientEmailIT===''){
+		alert('Please enter to email');
+		$('#recipientEmailIT').focus();
+		return false;
+	}else if(emailSubjectIT===''){
+		alert('Please enter email subject');
+		$('#emailSubjectIT').focus();
+		return false;
+	}else if(emailBody=='' || emailBody.length < 6 ){
+		alert('Please check Email body before submit / Min content length 5 character');
+		$('.jqte_editor').focus();
+		return false;
+	 }else if (keywordFound && files.length === 0) {
+
+		const confirmSend = confirm(
+			"Did you mean to attach files?\n\n" +
+			"You mentioned attachments in your message, but no files are attached.\n\n" +
+			"Click OK to send anyway or Cancel to attach files."
+		);
+
+		if (!confirmSend) {
+			// User clicked Cancel - STOP submit
 			return false;
-		}else if(emailSubjectIT==''){
-		    alert('Please enter email subject');
-			$('#emailSubjectIT').focus();
-			return false;
-		}else if(emailBody=='' || emailBody.length < 6 ){
-		    alert('Please check Email body before submit / Min content length 5 character');
-			$('.jqte_editor').focus();
-			return false;
-		}else{
-		$(".submitemail").html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
 		}
+	
+	}
+	
+	return true;
+}
 
+$('.submitemail').click(function(){ 
+	if(!validateComposeForm()){
+		return false;
+	}
+	$(".submitemail").html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+});
 
+$('#openScheduleModal').on('click', function(){
+	if(!validateComposeForm()){
+		return;
+	}
+	$('#emailScheduleModal').modal('show');
+});
+
+$('#scheduleSendBtn').on('click', function(){
+	if(!validateComposeForm()){
+		return;
+	}
+	var scheduleAt = $.trim($('#scheduleAtInput').val());
+	if(scheduleAt === ''){
+		alert('Please select scheduled date and time');
+		$('#scheduleAtInput').focus();
+		return;
+	}
+
+	var form = document.getElementById('compose-form-data');
+	var formData = new FormData(form);
+	formData.append('schedule_at', scheduleAt);
+
+	$('#scheduleSendBtn').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+
+	$.ajax({
+		url: admin_url + 'webmail/schedule_send',
+		type: 'POST',
+		data: formData,
+		contentType: false,
+		processData: false,
+		success: function(response){
+			var res;
+			try {
+				res = JSON.parse(response);
+			} catch (e) {
+				res = {success:false, message:'Unexpected response'};
+			}
+			if(res.success){
+				alert(res.message || 'Email scheduled successfully');
+				window.location.href = admin_url + 'webmail/inbox';
+			}else{
+				alert(res.message || 'Failed to schedule email');
+				$('#scheduleSendBtn').prop('disabled', false).html('Schedule and Send');
+			}
+		},
+		error: function(){
+			alert('Failed to schedule email');
+			$('#scheduleSendBtn').prop('disabled', false).html('Schedule and Send');
+		}
+	});
 });
 
 $('#emailAttachments').on('change', function() {

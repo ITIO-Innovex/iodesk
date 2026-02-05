@@ -221,5 +221,39 @@ $result = $this->services_subscriptions_model->send_renewal_email($email, $mailS
 		}
 	
 	}
+	
+	public function send_scheduled_emails()
+   {
+   $this->load->model('webmail_model');
+    $now = date('Y-m-d H:i:s');
+
+    $emails = $this->db
+        ->where('status', 'pending')
+        ->where('scheduled_at <=', $now)
+        ->limit(10)
+        ->get('email_queue')
+        ->result_array();
+	    //echo $this->db->last_query();exit;	
+		//print_r($emails);exit;
+
+    foreach ($emails as $email) {
+        try {
+            //$this->send_email_via_smtp($email);
+			$result = $this->webmail_model->send_email_via_smtp($email);
+
+            $this->db->where('id', $email['id'])->update('email_queue', [
+                'status'  => 'sent',
+                'sent_at'=> date('Y-m-d H:i:s')
+            ]);
+
+        } catch (Exception $e) {
+            $this->db->where('id', $email['id'])->update('email_queue', [
+                'status' => 'failed',
+                'error'  => $e->getMessage()
+            ]);
+        }
+    }
+   
+   }
 
 }
