@@ -194,8 +194,37 @@ class Webmail extends AdminController
 			'status'       => 'pending',
 			'created_at'   => date('Y-m-d H:i:s'),
 		];
+		
+
+		
+		
 
 		$this->db->insert(db_prefix() . 'email_queue', $insert);
+		$last_insert_id = $this->db->insert_id();
+		$attachments_json = $attachments ? json_encode($attachments) : null;
+if (!empty($attachments_json)) {
+    $attachments_array = json_decode($attachments_json, true);
+    $attachments_string = implode(',', $attachments_array);
+} else {
+    $attachments_string = '';
+}
+		
+		$insert_email = [
+		    'subject'      => trim($data['emailSubject'] ?? ''),
+			'from_email'   => $_SESSION['webmail']['mailer_email'],
+			'from_name'    => $_SESSION['webmail']['mailer_email'],
+			'to_emails'    => trim($data['recipientEmail'] ?? ''),
+			'cc_emails'    => trim($data['recipientCC'] ?? ''),
+			'bcc_emails'   => trim($data['recipientBCC'] ?? ''),
+			'body'         => $data['emailBody'] ?? '',
+			'attachments'  => $attachments_string,
+			'folder'       => 'Outbox',
+			'email'   	   => $_SESSION['webmail']['mailer_email'],
+			'date' 		   => date('Y-m-d H:i:s', strtotime($scheduleAt)),
+			'uniqid' 	   => $last_insert_id,
+		];
+		
+		$this->db->insert(db_prefix() . 'emails', $insert_email);
 		if ($this->db->affected_rows() > 0) {
 			echo json_encode(['success' => true, 'message' => 'Email scheduled successfully']);
 			return;
@@ -244,7 +273,7 @@ class Webmail extends AdminController
 		//$data['content_description']=$data['ai_content']['error'];
 		echo json_encode([
                 'alert_type' => "success",
-                'message'    => "Flaged",
+                'message'    => "Un Flagged",
             ]);
 		
 		}else{
