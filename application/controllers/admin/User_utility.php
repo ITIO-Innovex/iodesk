@@ -195,14 +195,34 @@ class User_utility extends AdminController
                 $field_type = $field['type'];
 
                 if ($field_type === 'file') {
-                    // Handle file upload
-                    if (isset($_FILES[$field_name]) && !empty($_FILES[$field_name]['name'])) {
-                        $upload_path = './uploads/user_utility/';
-                        if (!is_dir($upload_path)) {
-                            mkdir($upload_path, 0755, true);
-                        }
+                    $upload_path = './uploads/user_utility/';
+                    if (!is_dir($upload_path)) {
+                        mkdir($upload_path, 0755, true);
+                    }
 
-                        $uploaded_files = [];
+                    $existing_files = [];
+                    $files = json_decode($formdata, true);
+                    if (isset($files[$field_name]) && !empty($files[$field_name])) {
+                        $existing_files = is_array($files[$field_name]) ? $files[$field_name] : [$files[$field_name]];
+                    }
+
+                    $delete_files = $this->input->post('delete_files');
+                    if (isset($delete_files[$field_name]) && is_array($delete_files[$field_name])) {
+                        foreach ($delete_files[$field_name] as $delFile) {
+                            $index = array_search($delFile, $existing_files, true);
+                            if ($index !== false) {
+                                unset($existing_files[$index]);
+                            }
+                            $filePath = $upload_path . $delFile;
+                            if (is_file($filePath)) {
+                                @unlink($filePath);
+                            }
+                        }
+                        $existing_files = array_values($existing_files);
+                    }
+
+                    $uploaded_files = [];
+                    if (isset($_FILES[$field_name]) && !empty($_FILES[$field_name]['name'])) {
                         if (is_array($_FILES[$field_name]['name'])) {
                             foreach ($_FILES[$field_name]['name'] as $idx => $name) {
                                 if ($name === '') {
@@ -224,17 +244,10 @@ class User_utility extends AdminController
                                 }
                             }
                         }
-
-                        if (!empty($uploaded_files)) {
-                            $form_data[$field_name] = $uploaded_files;
-                        } else {
-                            $files = json_decode($formdata, true);
-                            $form_data[$field_name] = $files[$field_name] ?? '';
-                        }
-                    } else {
-                        $files = json_decode($formdata, true);
-                        $form_data[$field_name] = $files[$field_name] ?? '';
                     }
+
+                    $merged_files = array_values(array_unique(array_merge($existing_files, $uploaded_files)));
+                    $form_data[$field_name] = !empty($merged_files) ? $merged_files : '';
                 } elseif ($field_type === 'checkbox') {
                     $form_data[$field_name] = $this->input->post($field_name) ? $this->input->post($field_name) : [];
                 } else {

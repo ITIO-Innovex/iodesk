@@ -909,6 +909,26 @@ $('.refreshemail').click(function(){
   //need add css editor in jq editor textarea
   const signature = `<br><br><br><br><?php echo $email_signature;?>`;
 </script>
+<script>
+  (function suppressBeforeUnloadOnInbox(){
+    function clearBeforeUnload() {
+      $(window).off('beforeunload');
+      $(window).off('beforeunload.areYouSure');
+      window.onbeforeunload = null;
+    }
+    $(function(){
+      clearBeforeUnload();
+      // Capture phase stopper to block late handlers
+      window.addEventListener('beforeunload', function(e){
+        e.stopImmediatePropagation();
+      }, true);
+      // Extra clears in case handlers are attached after ready
+      setTimeout(clearBeforeUnload, 100);
+      setTimeout(clearBeforeUnload, 500);
+      setTimeout(clearBeforeUnload, 1500);
+    });
+  })();
+</script>
 </body>
 
 </html>

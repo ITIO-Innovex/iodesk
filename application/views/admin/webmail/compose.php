@@ -91,8 +91,12 @@
       </div>
       <div class="mb-3">
         <label for="recipientEmail" class="form-label text-info">Attach Files: You can select multiple files by holding the Shift key and clicking on the files while browsing.</label>
-        <input type="file" id="emailAttachments" name="attachments[]" class="form-control" multiple>
+        <div class="tw-flex tw-items-center tw-gap-2">
+          <input type="file" id="emailAttachments" name="attachments[]" class="form-control" multiple>
+          <button type="button" id="addMoreAttachments" class="btn btn-default">Add another</button>
+        </div>
         <small id="attachmentStatus" class="text-success hide">File is attached.</small>
+        <div id="attachmentList" class="mtop10"></div>
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemail"><i class="fa-solid fa-envelope-circle-check"></i> Send Email</button>
 	  <button type="button" id="openScheduleModal" class="btn btn-primary mtop20"><i class="fa-regular fa-clock"></i> Send Later</button>
@@ -163,7 +167,7 @@ function validateComposeForm() {
 	
 	// Attachment keyword check
 	const body = emailBody.toLowerCase();
-	const files = document.getElementById('emailAttachments').files;
+	const filesCount = (window.emailFilesStore && window.emailFilesStore.length) ? window.emailFilesStore.length : document.getElementById('emailAttachments').files.length;
 	const attachmentKeywords = ['attach', 'attached', 'attachment', 'enclosed', 'file', 'document'];
 	const keywordFound = attachmentKeywords.some(word => body.includes(word));
     //for Attachment Validation //
@@ -181,7 +185,7 @@ function validateComposeForm() {
 		alert('Please check Email body before submit / Min content length 5 character');
 		$('.jqte_editor').focus();
 		return false;
-	 }else if (keywordFound && files.length === 0) {
+	 }else if (keywordFound && filesCount === 0) {
 
 		const confirmSend = confirm(
 			"Did you mean to attach files?\n\n" +
@@ -198,6 +202,63 @@ function validateComposeForm() {
 	
 	return true;
 }
+
+// Attachments list handling
+window.emailFilesStore = window.emailFilesStore || [];
+
+function renderAttachmentList() {
+	var list = $('#attachmentList');
+	list.empty();
+	if (window.emailFilesStore.length === 0) {
+		$('#attachmentStatus').addClass('hide').text('');
+		return;
+	}
+	$('#attachmentStatus').removeClass('hide').text('File is attached.');
+	window.emailFilesStore.forEach(function(file, idx){
+		var row = $('<div class="tw-flex tw-items-center tw-justify-between tw-border tw-border-solid tw-border-neutral-200 tw-rounded tw-px-3 tw-py-2 tw-mb-2"></div>');
+		var name = $('<span class="tw-text-sm tw-text-neutral-700"></span>').text(file.name);
+		var removeBtn = $('<button type="button" class="btn btn-danger btn-xs">Delete</button>');
+		removeBtn.attr('data-index', idx);
+		row.append(name).append(removeBtn);
+		list.append(row);
+	});
+}
+
+function rebuildAttachmentInput() {
+	var input = document.getElementById('emailAttachments');
+	var dt = new DataTransfer();
+	window.emailFilesStore.forEach(function(file){
+		dt.items.add(file);
+	});
+	input.files = dt.files;
+}
+
+function addFilesToStore(files) {
+	for (var i = 0; i < files.length; i++) {
+		var f = files[i];
+		var exists = window.emailFilesStore.some(function(existing){
+			return existing.name === f.name && existing.size === f.size && existing.lastModified === f.lastModified;
+		});
+		if (!exists) {
+			window.emailFilesStore.push(f);
+		}
+	}
+	rebuildAttachmentInput();
+	renderAttachmentList();
+}
+
+$('#addMoreAttachments').on('click', function(){
+	$('#emailAttachments').click();
+});
+
+$('#attachmentList').on('click', 'button[data-index]', function(){
+	var idx = parseInt($(this).attr('data-index'), 10);
+	if (!isNaN(idx)) {
+		window.emailFilesStore.splice(idx, 1);
+		rebuildAttachmentInput();
+		renderAttachmentList();
+	}
+});
 
 $('.submitemail').click(function(){ 
 	if(!validateComposeForm()){
@@ -259,11 +320,11 @@ $('#scheduleSendBtn').on('click', function(){
 });
 
 $('#emailAttachments').on('change', function() {
-  var hasFiles = $(this).get(0).files && $(this).get(0).files.length > 0;
-  if (hasFiles) {
-    $('#attachmentStatus').removeClass('hide').text('File is attached.');
+  var files = $(this).get(0).files;
+  if (files && files.length > 0) {
+    addFilesToStore(files);
   } else {
-    $('#attachmentStatus').addClass('hide').text('');
+    renderAttachmentList();
   }
 });
 

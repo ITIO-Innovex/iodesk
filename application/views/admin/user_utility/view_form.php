@@ -139,13 +139,17 @@
                                     <?php } elseif ($field_type === 'file') { ?>
                                         <div class="row">
                                             <div class="col-md-6">
-                                                
-                                                <input type="file"
-                                                       name="<?php echo $field_name; ?>[]"
-                                                       id="<?php echo $field_name; ?>"
-                                                       class="form-control"
-                                                       multiple>
-											   <?php //echo $field_required ? 'required' : ''; ?>
+                                                <div class="tw-flex tw-items-center tw-gap-2">
+                                                    <input type="file"
+                                                           name="<?php echo $field_name; ?>[]"
+                                                           id="<?php echo $field_name; ?>"
+                                                           class="form-control user-utility-file-input"
+                                                           data-field="<?php echo $field_name; ?>"
+                                                           multiple>
+                                                    <button type="button" class="btn btn-default add-more-files" data-target="<?php echo $field_name; ?>">Add another</button>
+                                                </div>
+                                                <div class="selected-files mtop10" data-field="<?php echo $field_name; ?>"></div>
+                                                <?php //echo $field_required ? 'required' : ''; ?>
                                             </div>
                                             <div class="col-md-6">
                                                 <?php if ($field_value) { ?>
@@ -153,18 +157,23 @@
                                                     <div class="text-muted">
                                                         <?php if (is_array($field_value)) { ?>
                                                             <?php foreach ($field_value as $file) { ?>
-                                                                <div>
+                                                                <div class="tw-flex tw-items-center tw-justify-between tw-border tw-border-solid tw-border-neutral-200 tw-rounded tw-px-3 tw-py-2 tw-mb-2">
                                                                     <a href="<?php echo base_url('uploads/user_utility/' . $file); ?>" target="_blank">
                                                                         <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $file; ?>
                                                                     </a>
+                                                                    <!-- <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $file; ?>">Delete !!</button> -->
                                                                 </div>
                                                             <?php } ?>
                                                         <?php } else { ?>
-                                                            <a href="<?php echo base_url('uploads/user_utility/' . $field_value); ?>" target="_blank">
-                                                                <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $field_value; ?>
-                                                            </a>
+                                                            <div class="tw-flex tw-items-center tw-justify-between tw-border tw-border-solid tw-border-neutral-200 tw-rounded tw-px-3 tw-py-2 tw-mb-2">
+                                                                <a href="<?php echo base_url('uploads/user_utility/' . $field_value); ?>" target="_blank">
+                                                                    <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $field_value; ?>
+                                                                </a>
+                                                                <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $field_value; ?>">Delete ##</button>
+                                                            </div>
                                                         <?php } ?>
                                                     </div>
+                                                    <div class="deleted-files" data-field="<?php echo $field_name; ?>"></div>
                                                 <?php } ?>
                                             </div>
                                         </div>
@@ -350,6 +359,88 @@ $(document).ready(function() {
         $(this).closest('.form-group').removeClass('has-error');
     });
 });
+</script>
+<script>
+  window.userUtilityFileStore = window.userUtilityFileStore || {};
+
+  function uuRenderSelectedFiles(field) {
+    var list = $('.selected-files[data-field="' + field + '"]');
+    list.empty();
+    var files = window.userUtilityFileStore[field] || [];
+    files.forEach(function(file, idx) {
+      var row = $('<div class="tw-flex tw-items-center tw-justify-between tw-border tw-border-solid tw-border-neutral-200 tw-rounded tw-px-3 tw-py-2 tw-mb-2"></div>');
+      var name = $('<span class="tw-text-sm tw-text-neutral-700"></span>').text(file.name);
+      var removeBtn = $('<button type="button" class="btn btn-danger btn-xs">Delete</button>');
+      removeBtn.attr('data-field', field).attr('data-index', idx);
+      row.append(name).append(removeBtn);
+      list.append(row);
+    });
+  }
+
+  function uuRebuildInput(field) {
+    var input = document.getElementById(field);
+    if (!input) {
+      return;
+    }
+    var dt = new DataTransfer();
+    (window.userUtilityFileStore[field] || []).forEach(function(file){
+      dt.items.add(file);
+    });
+    input.files = dt.files;
+  }
+
+  function uuAddFiles(field, files) {
+    if (!window.userUtilityFileStore[field]) {
+      window.userUtilityFileStore[field] = [];
+    }
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      var exists = window.userUtilityFileStore[field].some(function(existing){
+        return existing.name === f.name && existing.size === f.size && existing.lastModified === f.lastModified;
+      });
+      if (!exists) {
+        window.userUtilityFileStore[field].push(f);
+      }
+    }
+    uuRebuildInput(field);
+    uuRenderSelectedFiles(field);
+  }
+
+  $('.add-more-files').on('click', function(){
+    var target = $(this).data('target');
+    $('#' + target).click();
+  });
+
+  $('body').on('change', '.user-utility-file-input', function(){
+    var field = $(this).data('field');
+    var files = this.files;
+    if (files && files.length > 0) {
+      uuAddFiles(field, files);
+    } else {
+      uuRenderSelectedFiles(field);
+    }
+  });
+
+  $('body').on('click', '.selected-files button[data-index]', function(){
+    var field = $(this).data('field');
+    var idx = parseInt($(this).data('index'), 10);
+    if (!isNaN(idx) && window.userUtilityFileStore[field]) {
+      window.userUtilityFileStore[field].splice(idx, 1);
+      uuRebuildInput(field);
+      uuRenderSelectedFiles(field);
+    }
+  });
+
+  $('body').on('click', '.remove-existing-file', function(){
+    var field = $(this).data('field');
+    var file = $(this).data('file');
+    var container = $('.deleted-files[data-field="' + field + '"]');
+    if (container.length) {
+      var input = $('<input type="hidden" name="delete_files[' + field + '][]">').val(file);
+      container.append(input);
+    }
+    $(this).closest('div').remove();
+  });
 </script>
 <!-- Script -->
 <script>

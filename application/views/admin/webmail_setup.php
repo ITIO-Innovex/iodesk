@@ -275,7 +275,7 @@ $(function() {
         password: 'required',
     });
     setTimeout(function() {
-        $($entryModal.find('form')).trigger('reinitialize.areYouSure');
+        //$($entryModal.find('form')).trigger('reinitialize.areYouSure');
     }, 1000)
     $entryModal.on('hidden.bs.modal', function() {
         var $form = $entryModal.find('form');
