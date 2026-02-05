@@ -38,7 +38,7 @@
 <a href="<?php echo site_url('admin/webmail/compose'); ?>" class="btn btn-primary mtop10" style="width: 180px !important;">
         <i class="fa-regular fa-paper-plane tw-mr-1"></i>
         <?php echo _l('New Mail'); ?>
-    </a>
+</a>
 </div>
                 <ul class="nav navbar-pills navbar-pills-flat nav-tabs nav-stacked mtop10" id="theme_styling_areas">
 				
@@ -48,8 +48,14 @@
                     <li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=<?php echo $val['folder'];?>" class="mail-loader <?php if($_SESSION['webmail']['folder']==$val['folder']){ echo 'folder-active';} ?>"><?php echo ucwords(strtolower($val['folder']));?></a>
                     </li>
-					<?php } ?>  
+					<?php } $folderNames = array_column($_SESSION['folderlist'], 'folder'); ?>  
 					<li role="presentation" class="menu-item-leads ">
+					<?php if (!in_array('Outbox', $folderNames)) { ?>
+                        <a href="inbox?fd=Outbox" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Outbox'){ echo 'folder-active';} ?>">Outbox</a>
+						<?php } ?>
+						<li role="presentation" class="menu-item-leads ">
+                        <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a>
+						<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Deleted" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Deleted'){ echo 'folder-active';} ?>">Deleted</a>
                     </li><?php if(count($_SESSION['folderlist']) <= 3 ){?>
 					<li class="tw-p-1" style="display: flex;justify-content: right;"> <a href="<?php echo admin_url('webmail/getfolderlist'); ?>" class="text-danger _delete"><i class="fa-solid fa-folder-plus text-warning fa-2x" title="Fetch all folder"></i></a> </li><?php } ?>
@@ -161,8 +167,14 @@ $attachments = implode(",", $uniqueArray);
 
 ////////////////////////
 $attachments = explode(',', $attachments);
+
 foreach($attachments as $attach){
+
+if($_SESSION['webmail']['folder']=="Outbox"){
+$filePath = site_url() . 'uploads/email_queue/' . $attach;
+}else{
 $filePath = site_url() . '/' . $attach;
+}
 ?>
 <i class="fa-solid fa-paperclip"></i> <a href="<?=$filePath;?>" target="_blank" title="Click to view"><?=$filePath;?></a><br>
 <?php }} ?>
@@ -793,6 +805,7 @@ $('.isflag').click(function(){
          var mid=$(this).attr('data-mid');
 		 var fid=$(this).attr('data-fid');
 		 var resultid='.isflag'+mid;
+		 var folderx="<?php echo $_SESSION['webmail']['folder'];?>";
 		 //alert(mid);
 		 //alert(fid);
 		 
@@ -816,8 +829,13 @@ $('.isflag').click(function(){
 			if(response.alert_type=="success"){
 			
 			if(fid==1){
-			 alert_float(response.alert_type, 'Un Flagged');
+			 alert_float(response.alert_type, 'Flagged');
 			 }else{
+			
+			 if(folderx=='Flagged'){ //alert('Redirect');
+			 location.reload(true);
+			 }
+			 
 			 alert_float(response.alert_type, response.message);
 			 }
 			 //$(resultid).removeClass('tw-text-info-300').addClass('tw-text-info-800');
