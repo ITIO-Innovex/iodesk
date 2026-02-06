@@ -1523,6 +1523,21 @@ function calculateUnusedPlanBalance(
     return round($perDayPrice * $remainingDays, 2);
 }
 
+function convertToIST($date, $fromTimezone = 'UTC')
+{
+    if (empty($date)) {
+        return null;
+    }
+
+    try {
+        $dt = new DateTime($date, new DateTimeZone($fromTimezone));
+        $dt->setTimezone(new DateTimeZone('Asia/Kolkata'));
+        return $dt->format('Y-m-d H:i:s');
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 
 	
 function amountInWords($number)
