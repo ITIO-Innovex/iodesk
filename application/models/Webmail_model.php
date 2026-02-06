@@ -445,7 +445,6 @@ class Webmail_model extends App_Model
        // function for get inbox mail list
         public function downloadmail($id)
         { 
-		
 		if(isset($id)&&$id){
 		$mailers=$this->webmail_model->get_imap_details($id);
 		}
@@ -454,164 +453,127 @@ class Webmail_model extends App_Model
 		$downloadMessages="Email SMTP Details Not Found !!";
 		return $downloadMessages;
 		exit;
-		
 		}
-		
-	
-		
-		
-		//print_r($_SESSION['webmail']);exit;
 		
 		$mailer_imap_host=trim($mailers[0]['mailer_imap_host']);
         $mailer_imap_port=trim($mailers[0]['mailer_imap_port']);
         $mailer_username=trim($mailers[0]['mailer_username']);
-		$data['email']=trim($mailers[0]['mailer_username']);
+		$data['email']=trim($mailer_username);
         $mailer_password=trim($mailers[0]['mailer_password']);
 		$encryption=trim($mailers[0]['encryption']);
 		
-		
-		
-		
-		
-		try {
-		 
 		 $cm = new ClientManager();
-
-    // Define the IMAP connection settings
-    $client = $cm->make([
-        'host'          => $mailer_imap_host,
-        'port'          => $mailer_imap_port,
-        'encryption'    => $encryption,
-        'validate_cert' => true,
-        'username'      => $mailer_username,
-        'password'      => $mailer_password,
-        'protocol'      => 'imap', 
-		'timeout'       => 300            
-    ]);
-	
-	
-	if ($client->connect()) {
-	
-	
-	
-$folders = $client->getFolders();
-
-
-$cnt=0;
-foreach ($folders as $folder) { 
-
-      $folder=$folder->name;
-	  $data['folder'] = $folder; // for submit to db
-      $mailbox = $client->getFolder($folder);
-	 // print_r($mailbox);
-      if ($mailbox === null) {
-      die("The ".$folder." folder could not be found.");
-      }
-	  
-	 
-     
-	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
-	  $last_email_id = $last_email_id[0]['uniqid'] ?? 0;
-	  
-	  try {
-	  $messages = $mailbox->query()->limit(10)->getByUidGreater($last_email_id);
-      } catch (\Exception $e) {
-      // Skip this message and continue with next one
-      continue;
-      }
-	// Insert Email into DB
-	foreach ($messages as $message) {
-
-    $data['subject'] = $message->getSubject();
-    $data['date'] = $message->getDate(); //->format('Y-m-d H:i:s')
-    $data['body'] = $message->getHtmlBody() ?? '';
-	if($data['body']==""){$data['body'] = $message->getTextBody() ?? ''; }
-	$data['uniqid'] = $message->uid;
-	$data['messageid'] = $message->getMessageId();
-	
-	
-	 // From
-    $from = $message->getFrom(); // Returns array of Address objects
-    $data['from_email'] = $from[0]->mail ?? '';
-    $data['from_name']  = $from[0]->personal ?? '';
-	//print_r($from);
-	//echo "<br><br>";
-	// To
-  
-	
-    $to_list = $message->getTo(); // Returns array of Address objects
-    $data['to_emails'] = $to_list[0]->mail ?? '';
-   
-	
-	
-   
-    $cc_list = $message->getCc(); // Returns array of Address objects
-    $data['cc_emails'] = $cc_list[0]->mail ?? '';
-	
-	
-  
-    // BCC
-	$bcc_list = $message->getBcc(); // Returns array of Address objects
-    $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
-
-
-    // Handle attachments
-    $attachments_paths = [];
-    $data['isattachments']=0;
-	$uid=uniqid();
-	$attachmentDir = 'attachments';
-	$filePath = $attachmentDir . '/' . $uid;
-    foreach ($message->getAttachments() as $attachment) {
-    $attachments = $message->getAttachments();
+		 $client = $cm->make([
+			'host'          => $mailer_imap_host,
+			'port'          => $mailer_imap_port,
+			'encryption'    => $encryption,
+			'validate_cert' => true,
+			'username'      => $mailer_username,
+			'password'      => $mailer_password,
+			'protocol'      => 'imap', 
+			'timeout'       => 300            
+		 ]);
 		
-		// Create directory if it doesn't exist
-					
-		foreach ($attachments as $attachment) {
-		
-		if (!file_exists($filePath)) {
-		mkdir($filePath, 0777, true);
-		}	
-				
-		$fileName = $attachment->name;
-		// Save the attachment
-		$attachment->save($filePath);
-		$data['isattachments']=1;
-		$attachments_paths[] = $filePath."/".$fileName;
+		if (!$client->connect()) {
+			return "IMAP connection failed";
 		}
-		$data['attachments'] = implode(',', $attachments_paths);//exit;
- }
- $cnt++;
-        $data['isfalg']=0;
-		$data['status']=1;
-		$data['is_deleted']=0;
-       // $this->db->reconnect();
-		$this->db->insert(db_prefix() . 'emails', $data);
-		//echo $this->db->last_query();exit;
- 
-}
+		
+		$folders = $client->getFolders();
+		$cnt=0;
+		foreach ($folders as $folder) { 
+		  $folder=$folder->name;
+		  $data['folder'] = $folder; // for submit to db
+		  $mailbox = $client->getFolder($folder);
+		  if ($mailbox === null) {
+			continue;
+		  }
+		  
+		  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
+		  $last_email_id = $last_email_id[0]['uniqid'] ?? 0;
+		  
+		  try {
+			$messages = $mailbox->query()->limit(10)->getByUidGreater($last_email_id);
+		  } catch (\Exception $e) {
+			continue;
+		  }
 
-}
-    
-$client->disconnect();	   
-	    // Get the inbox folder
-      
+		  foreach ($messages as $message) {
+			$data['subject'] = $message->getSubject();
+			    $dateAttribute = $message->getDate();
+				$carbonDate = $dateAttribute->first(); // Carbon\Carbon
+				$carbonDate->setTimezone('Asia/Kolkata');
+				$data['date'] = $carbonDate->format('Y-m-d H:i:s');
+				$timezoneOffset = $carbonDate->format('P');
+				$data['timezone']      = $timezoneOffset;
+			$data['body'] = $message->getHtmlBody() ?? '';
+			if($data['body']==""){$data['body'] = $message->getTextBody() ?? ''; }
+			$data['uniqid'] = $message->uid;
+			$data['messageid'] = $message->getMessageId();
+			
+			$from = $message->getFrom();
+			$data['from_email'] = $from[0]->mail ?? '';
+			$data['from_name']  = $from[0]->personal ?? '';
+			//////////////To LISt //////////////
+                $to_list            = $message->getTo();
+                $data['to_emails']  = $to_list[0]->mail ?? '';
+				if(isset($to_list[1]->mail)&&$to_list[1]->mail){
+				$data['to_emails']=$data['to_emails'].', '.$to_list[1]->mail;
+				}
+				if(isset($to_list[2]->mail)&&$to_list[2]->mail){
+				$data['to_emails']=$data['to_emails'].', '.$to_list[2]->mail;
+				}
+				//////////////CC LISt //////////////
+                $cc_list            = $message->getCc();
+                $data['cc_emails']  = $cc_list[0]->mail ?? '';
+				if(isset($cc_list[1]->mail)&&$cc_list[1]->mail){
+				$data['cc_emails']=$data['cc_emails'].', '.$cc_list[1]->mail;
+				}
+				if(isset($cc_list[2]->mail)&&$cc_list[2]->mail){
+				$data['cc_emails']=$data['cc_emails'].', '.$cc_list[2]->mail;
+				}
+				//////////////BCC LISt //////////////
+                $bcc_list           = $message->getBcc();
+                $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+				if(isset($bcc_list[1]->mail)&&$bcc_list[1]->mail){
+				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[1]->mail;
+				}
+				if(isset($bcc_list[2]->mail)&&$bcc_list[2]->mail){
+				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[2]->mail;
+				}
 
-	        $sortedMessages="Total Added :- ".$cnt;
-			return $sortedMessages;
-	  
-	  }
-	
-   
-	
-		} catch (Exception $e) {
-		//echo "ERROR 102";exit;
-			echo "Error: " . $e->getMessage()."FFFFFF";exit;
+			$attachments_paths = [];
+			$data['isattachments']=0;
+			$uid=uniqid();
+			$attachmentDir = 'attachments';
+			$filePath = $attachmentDir . '/' . $uid;
+			foreach ($message->getAttachments() as $attachment) {
+				$attachments = $message->getAttachments();
+				foreach ($attachments as $attachment) {
+					if (!file_exists($filePath)) {
+						mkdir($filePath, 0777, true);
+					}	
+					$fileName = $attachment->name;
+					$attachment->save($filePath);
+					$data['isattachments']=1;
+					$attachments_paths[] = $filePath."/".$fileName;
+				}
+				$data['attachments'] = implode(',', $attachments_paths);
 			}
-		exit;
-	
-       //echo "ERROR 103";exit;
-        //return $this->db->get(db_prefix().'webmail_setup')->result_array();
-      }
+			$cnt++;
+			$data['isfalg']=0;
+			$data['status']=1;
+			$data['is_deleted']=0;
+			$this->db->insert(db_prefix() . 'emails', $data);
+		  }
+		}
+		
+		$client->disconnect();	   
+		$sortedMessages="Total Added :- ".$cnt;
+		return $sortedMessages;
+		
+		////////////////////End Received EMAIL ///////
+		
+		}
 	  
 		public function downloadmailbbbbb($id)
 		{
@@ -1374,6 +1336,163 @@ $client->disconnect();
     }
 	
 	
-    
-    
+	// function for get inbox mail list
+        public function downloadmailalluser()
+        { 
+		$this->db->select('mailer_name,mailer_email,mailer_username,mailer_password,mailer_imap_host,mailer_imap_port,encryption,');
+        $this->db->where('mailer_status', 1);
+		/* NOT NULL conditions */
+		$this->db->where('mailer_name IS NOT NULL', null, false);
+		$this->db->where('mailer_email IS NOT NULL', null, false);
+		$this->db->where('mailer_username IS NOT NULL', null, false);
+		$this->db->where('mailer_password IS NOT NULL', null, false);
+		$this->db->where('mailer_imap_host IS NOT NULL', null, false);
+		$this->db->where('mailer_imap_port IS NOT NULL', null, false);
+		$this->db->where('encryption IS NOT NULL', null, false);
+		
+		/* NOT EMPTY conditions */
+		$this->db->where('mailer_name !=', '');
+		$this->db->where('mailer_email !=', '');
+		$this->db->where('mailer_username !=', '');
+		$this->db->where('mailer_password !=', '');
+		$this->db->where('mailer_imap_host !=', '');
+		$this->db->where('mailer_imap_port !=', '');
+		$this->db->where('encryption !=', '');
+		$this->db->order_by('id', 'asc');
+		$this->db->group_by('mailer_email');
+        $mailers=$this->db->get(db_prefix() . 'webmail_setup')->result_array();
+		
+		if(empty($mailers)){ 
+			return "Email SMTP Details Not Found !!";
+		}
+		
+		
+		foreach ($mailers as $mailer) {
+			$mailer_imap_host = trim($mailer['mailer_imap_host']);
+			$mailer_imap_port = trim($mailer['mailer_imap_port']);
+			$data['email']     = trim($mailer['mailer_email']);
+			$mailer_username   = trim($mailer['mailer_username']);
+			$mailer_password   = trim($mailer['mailer_password']);
+			$encryption        = trim($mailer['encryption']);
+			
+			$cm = new ClientManager();
+
+				try {
+				
+					$client = $cm->make([
+						'host'          => $mailer_imap_host,
+						'port'          => $mailer_imap_port,
+						'encryption'    => $encryption, // ssl / tls / null
+						'validate_cert' => true,
+						'username'      => $mailer_username,
+						'password'      => $mailer_password,
+						'protocol'      => 'imap',
+						'timeout'       => 300
+					]);
+				
+					$client->connect();
+				
+					$folders = $client->getFolders();
+		$cnt=0;
+		foreach ($folders as $folder) { 
+		  $folder=$folder->name;
+		  $data['folder'] = $folder; // for submit to db
+		  $mailbox = $client->getFolder($folder);
+		  if ($mailbox === null) {
+			continue;
+		  }
+		  
+		  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
+		  $last_email_id = $last_email_id[0]['uniqid'] ?? 0;
+		  
+		  try {
+			$messages = $mailbox->query()->limit(5)->getByUidGreater($last_email_id);
+		  } catch (\Exception $e) {
+			continue;
+		  }
+
+		  foreach ($messages as $message) {
+			$data['subject'] = $message->getSubject();
+			    $dateAttribute = $message->getDate();
+				$carbonDate = $dateAttribute->first(); // Carbon\Carbon
+				$carbonDate->setTimezone('Asia/Kolkata');
+				$data['date'] = $carbonDate->format('Y-m-d H:i:s');
+				$timezoneOffset = $carbonDate->format('P');
+				$data['timezone']      = $timezoneOffset;
+				
+			$data['body'] = $message->getHtmlBody() ?? '';
+			if($data['body']==""){$data['body'] = $message->getTextBody() ?? ''; }
+			$data['uniqid'] = $message->uid;
+			$data['messageid'] = $message->getMessageId();
+			
+			$from = $message->getFrom();
+			$data['from_email'] = $from[0]->mail ?? '';
+			$data['from_name']  = $from[0]->personal ?? '';
+			
+			    //////////////To LISt //////////////
+                $to_list            = $message->getTo();
+                $data['to_emails']  = $to_list[0]->mail ?? '';
+				if(isset($to_list[1]->mail)&&$to_list[1]->mail){
+				$data['to_emails']=$data['to_emails'].', '.$to_list[1]->mail;
+				}
+				if(isset($to_list[2]->mail)&&$to_list[2]->mail){
+				$data['to_emails']=$data['to_emails'].', '.$to_list[2]->mail;
+				}
+				//////////////CC LISt //////////////
+                $cc_list            = $message->getCc();
+                $data['cc_emails']  = $cc_list[0]->mail ?? '';
+				if(isset($cc_list[1]->mail)&&$cc_list[1]->mail){
+				$data['cc_emails']=$data['cc_emails'].', '.$cc_list[1]->mail;
+				}
+				if(isset($cc_list[2]->mail)&&$cc_list[2]->mail){
+				$data['cc_emails']=$data['cc_emails'].', '.$cc_list[2]->mail;
+				}
+				//////////////BCC LISt //////////////
+                $bcc_list           = $message->getBcc();
+                $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
+				if(isset($bcc_list[1]->mail)&&$bcc_list[1]->mail){
+				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[1]->mail;
+				}
+				if(isset($bcc_list[2]->mail)&&$bcc_list[2]->mail){
+				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[2]->mail;
+				}
+
+			$attachments_paths = [];
+			$data['isattachments']=0;
+			$uid=uniqid();
+			$attachmentDir = 'attachments';
+			$filePath = $attachmentDir . '/' . $uid;
+			foreach ($message->getAttachments() as $attachment) {
+				$attachments = $message->getAttachments();
+				foreach ($attachments as $attachment) {
+					if (!file_exists($filePath)) {
+						mkdir($filePath, 0777, true);
+					}	
+					$fileName = $attachment->name;
+					$attachment->save($filePath);
+					$data['isattachments']=1;
+					$attachments_paths[] = $filePath."/".$fileName;
+				}
+				$data['attachments'] = implode(',', $attachments_paths);
+			}
+			$cnt++;
+			$data['isfalg']=0;
+			$data['status']=1;
+			$data['is_deleted']=0;
+			$this->db->insert(db_prefix() . 'emails', $data);
+		  }
+		}
+		
+		$client->disconnect();
+				
+				} catch (\Throwable $e) {
+				
+					
+					continue;
+				}
+		}
+		
+		echo  "Email Downloaded";exit;
+        }
+
 }
