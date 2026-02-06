@@ -649,7 +649,7 @@ foreach ($folders as $folder) {
 	foreach ($messages as $message) {
 
     $data['subject'] = $message->getSubject();
-    $dateAttribute = $message->getDate();
+                 $dateAttribute = $message->getDate();
                 //$data['date']      = $dateAttribute;
 				// Set Time Zone
 				$carbonDate = $dateAttribute->first(); // Carbon\Carbon
