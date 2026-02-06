@@ -209,7 +209,7 @@ return App_table::find('leads')
 		}else{
 		$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . get_staff_company_id() . ')';
 		}
-	}elseif(is_admin()){	
+	}elseif(is_admin() || is_department_admin()){	
 	$where[] = 'AND ' . db_prefix() . 'leads.company_id  IN (' . get_staff_company_id() . ')';
 	}else{
 	//$where[] = 'AND ' . db_prefix() . 'leads.assigned  IN (' . get_staff_user_id() . ')';

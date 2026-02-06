@@ -18,7 +18,10 @@
                         <i class="fa-regular fa-plus tw-mr-1"></i>
                         <?php echo _l('new_staff'); ?>
                     </a>
+					<?php if(is_admin() || is_department_admin()){ ?>
                     <span class="label label-info" style="margin-left: 8px;">Total Staff: <?php echo $total_staff; ?> / <?php echo $assign_no_of_staff;?></span>
+					<?php } ?>
+					
 <a href="#" class="pull-right" id="crm_instruction" title="Manage Staff – User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning"></i></a>
 					
                 </div>

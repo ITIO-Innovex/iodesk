@@ -12,6 +12,7 @@ use PHPMailer\PHPMailer\Exception;
 
 
 
+
 require_once APPPATH.'/vendor/vendor/autoload.php';
 
 class Webmail_model extends App_Model
@@ -86,9 +87,7 @@ class Webmail_model extends App_Model
         
 		
 		if($folder=="Deleted"){
-		$this->db->where('is_deleted', 1);
-		}elseif($folder=="Flagged"){
-		$this->db->where('isfalg', 1);
+		$this->db->where('is_deleted', 1);}elseif($search==1){
 		}elseif($search==1){
 		
 		$this->db->or_like($_SESSION['stype'], $_SESSION['skey']);
@@ -119,8 +118,6 @@ class Webmail_model extends App_Model
 		//$this->db->group_by('uniqid');
 		if($folder=="Deleted"){
 		$this->db->where('is_deleted', 1);
-		}elseif($folder=="Flagged"){
-		$this->db->where('isfalg', 1);
 		}elseif($search==1){
 		$this->db->or_like($_SESSION['stype'], $_SESSION['skey']);
 		$this->db->where('is_deleted', 0);
@@ -1207,7 +1204,15 @@ $client->disconnect();
 
             foreach ($messages as $message) {
                 $data['subject']   = $message->getSubject();
-                $data['date']      = $message->getDate();
+				$dateAttribute = $message->getDate();
+                //$data['date']      = $dateAttribute;
+				// Set Time Zone
+				$carbonDate = $dateAttribute->first(); // Carbon\Carbon
+				$carbonDate->setTimezone('Asia/Kolkata');
+				$data['date'] = $carbonDate->format('Y-m-d H:i:s');
+				$timezoneOffset = $carbonDate->format('P');
+				$data['timezone']      = $timezoneOffset;
+								
                 $data['body']      = $message->getHtmlBody() ?? '';
                 if ($data['body'] === '') {
                     $data['body'] = $message->getTextBody() ?? '';
@@ -1217,13 +1222,35 @@ $client->disconnect();
                 $from               = $message->getFrom();
                 $data['from_email'] = $from[0]->mail ?? '';
                 $data['from_name']  = $from[0]->personal ?? '';
+				
+				//////////////To LISt //////////////
                 $to_list            = $message->getTo();
                 $data['to_emails']  = $to_list[0]->mail ?? '';
+				if(isset($to_list[1]->mail)&&$to_list[1]->mail){
+				$data['to_emails']=$data['to_emails'].', '.$to_list[1]->mail;
+				}
+				if(isset($to_list[2]->mail)&&$to_list[2]->mail){
+				$data['to_emails']=$data['to_emails'].', '.$to_list[2]->mail;
+				}
+				//////////////CC LISt //////////////
                 $cc_list            = $message->getCc();
                 $data['cc_emails']  = $cc_list[0]->mail ?? '';
+				if(isset($cc_list[1]->mail)&&$cc_list[1]->mail){
+				$data['cc_emails']=$data['cc_emails'].', '.$cc_list[1]->mail;
+				}
+				if(isset($cc_list[2]->mail)&&$cc_list[2]->mail){
+				$data['cc_emails']=$data['cc_emails'].', '.$cc_list[2]->mail;
+				}
+				//////////////BCC LISt //////////////
                 $bcc_list           = $message->getBcc();
                 $data['bcc_emails'] = $bcc_list[0]->mail ?? '';
-
+				if(isset($bcc_list[1]->mail)&&$bcc_list[1]->mail){
+				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[1]->mail;
+				}
+				if(isset($bcc_list[2]->mail)&&$bcc_list[2]->mail){
+				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[2]->mail;
+				}
+				
                 $attachments_paths   = [];
                 $data['isattachments'] = 0;
                 $uid                = uniqid();

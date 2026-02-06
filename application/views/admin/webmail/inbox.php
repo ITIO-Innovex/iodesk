@@ -682,7 +682,7 @@ $('.isread').click(function(){
 		 $('#myModal12').modal('show');
 		  $('#myModal12 .modal-dialog').css({"max-width":"80%", "margin-top": "20px"});
 		 //$('#myModal12').modal('show').find('.modal-body').load(urls);
-	     $('#myModal12 .modal-title').html('<span class="h4"><b>' + tid + '</b></span><br>' + '<span class="h6 text-primary"> From : ' + escapeHtml(mailto) +'<br> To : ' + escapeHtml(mailtox) +'<br> CC :' + escapeHtml(mailcc) +' BCC :' + escapeHtml(mailbcc) +'<br>' + formattedDate +'</span>');
+	     $('#myModal12 .modal-title').html('<span class="h4"><b>' + tid + '</b></span><br>' + '<span class="h6 text-primary"> From : <span id="mailto_copy">' + escapeHtml(mailto) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailto) + '"><i class="fa-solid fa-copy"></i></a><span><br> To : ' + escapeHtml(mailtox) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailtox) + '"><i class="fa-solid fa-copy"></i></a><br> CC : ' + escapeHtml(mailcc) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailcc) + '"><i class="fa-solid fa-copy"></i></a><br> BCC : ' + escapeHtml(mailbcc) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailbcc) + '"><i class="fa-solid fa-copy"></i></a><br>' + formattedDate +'</span>');
 		// $('#emailSubject').val(tid);
 		 
 		 // Set values for Reply form
@@ -778,6 +778,29 @@ $('#emailBody_ifr').contents().find('#tinymce').html(content);
     }, 50);
 });
   </script>
+<script>
+  $('body').on('click', '.copy-email', function(e){
+    e.preventDefault();
+    var email = $(this).data('email') || '';
+    if (!email) {
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(function(){
+        alert_float('success', 'Copied: ' + email);
+      }).catch(function(){
+        alert('Copied: ' + email);
+      });
+      return;
+    }
+    var temp = $('<input>');
+    $('body').append(temp);
+    temp.val(email).select();
+    document.execCommand('copy');
+    temp.remove();
+    alert_float('success', 'Copied: ' + email);
+  });
+</script>
   
 <script>
 $(function() {
