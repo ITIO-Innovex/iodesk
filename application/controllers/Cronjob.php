@@ -2,6 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+
 class Cronjob extends ClientsController
 {
     public function index()
@@ -120,7 +121,7 @@ class Cronjob extends ClientsController
 	//print_r($plans);
 	
 		foreach ($plans as $index => $plan) {
-			//if ($index === 0) {
+			
 				// display only first record
 				$company_id= $plan['company_id'];
 				if(isset($company_id)&&$company_id){
@@ -222,8 +223,9 @@ $result = $this->services_subscriptions_model->send_renewal_email($email, $mailS
 	
 	}
 	
+	// Send Scheduled Email
 	public function send_scheduled_emails()
-   {
+    {
    $this->load->model('webmail_model');
     $now = date('Y-m-d H:i:s');
 
@@ -257,5 +259,37 @@ $result = $this->services_subscriptions_model->send_renewal_email($email, $mailS
     }
    
    }
-
+   
+   // Download All Users Email
+    public function download_email_from_cron_all()
+    {
+        
+            // Increase execution time limit for email download
+            set_time_limit(300); // 5 minutes
+            ini_set('max_execution_time', 300);
+            
+            $data['title'] = _l('Download Email From Cron');
+            
+            // Load webmail model
+            $this->load->model('webmail_model');
+			
+            
+            // Check if model was loaded successfully
+            if (!isset($this->webmail_model) || !is_object($this->webmail_model)) {
+                $data['message'] = '<div class="alert alert-danger">Error: Failed to load webmail model! Model object not found.</div>';
+                $this->load->view('cronjob/download_email_from_cron', $data);
+                return;
+            }
+            
+            // Check if method exists
+            if (!method_exists($this->webmail_model, 'downloadmail')) {
+                $data['message'] = '<div class="alert alert-danger">Error: downloadmail method not found in webmail_model!</div>';
+                $this->load->view('cronjob/download_email_from_cron', $data);
+                return;
+            }
+            
+            $result = $this->webmail_model->downloadmailalluser();
+            
+           
+    }
 }
