@@ -12,7 +12,6 @@ use PHPMailer\PHPMailer\Exception;
 
 
 
-
 require_once APPPATH.'/vendor/vendor/autoload.php';
 
 class Webmail_model extends App_Model
@@ -87,7 +86,9 @@ class Webmail_model extends App_Model
         
 		
 		if($folder=="Deleted"){
-		$this->db->where('is_deleted', 1);}elseif($search==1){
+		$this->db->where('is_deleted', 1);
+		}elseif($folder=="Flagged"){
+		$this->db->where('isfalg', 1);
 		}elseif($search==1){
 		
 		$this->db->or_like($_SESSION['stype'], $_SESSION['skey']);
@@ -118,6 +119,8 @@ class Webmail_model extends App_Model
 		//$this->db->group_by('uniqid');
 		if($folder=="Deleted"){
 		$this->db->where('is_deleted', 1);
+		}elseif($folder=="Flagged"){
+		$this->db->where('isfalg', 1);
 		}elseif($search==1){
 		$this->db->or_like($_SESSION['stype'], $_SESSION['skey']);
 		$this->db->where('is_deleted', 0);
