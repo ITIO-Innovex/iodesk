@@ -129,6 +129,24 @@ class Services_subscriptions_model extends App_Model
         $this->db->insert(db_prefix() . 'service_log', $log);
 
         return $this->db->insert_id();
+    }	
+	
+	
+	
+	public function get_staff_expansion($extrastaffcount)
+    {
+       
+		$this->db->select('amount');
+		$this->db->from('it_crm_services_subscriptions_invoices');
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('invoice_type', 'Staff Expansion');   // empty string
+		$this->db->where('staff_added', $extrastaffcount);
+		$query = $this->db->get();
+		$result = $query->row(); // single row
+		
+		return $amount = $result ? $result->amount : 0;
+
+        
     }
 	
 	// Toggle Deal Stage Status (AJAX)
