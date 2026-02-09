@@ -651,6 +651,37 @@ function custom_fields_hyperlink() {
         });
     }
 }
+
+
+</script>
+<script>
+(function disableAllBeforeUnload() {
+
+  function clearAll() {
+    // Native handler
+    window.onbeforeunload = null;
+
+    // jQuery handlers
+    if (window.jQuery) {
+      jQuery(window).off('beforeunload');
+      jQuery(window).off('beforeunload.areYouSure');
+    }
+  }
+
+  // Initial clear
+  clearAll();
+
+  // Capture phase blocker (blocks late bindings)
+  window.addEventListener('beforeunload', function (e) {
+    e.stopImmediatePropagation();
+  }, true);
+
+  // Kill handlers added after load (AJAX / plugins)
+  [50, 200, 500, 1000, 2000].forEach(function (t) {
+    setTimeout(clearAll, t);
+  });
+
+})();
 </script>
 <?php
     $contents = ob_get_contents();

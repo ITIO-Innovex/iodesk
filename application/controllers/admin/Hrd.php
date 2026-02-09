@@ -5311,12 +5311,29 @@ class Hrd extends AdminController
             return;
         }
         $staffid = get_staff_user_id();
+        $mobile = preg_replace('/\D+/', '', (string) $this->input->post('mobile'));
+        $aadhar = preg_replace('/\D+/', '', (string) $this->input->post('aadhar'));
+        $pan = strtoupper(trim((string) $this->input->post('pan')));
+
+        if ($mobile !== '' && !preg_match('/^\d{10}$/', $mobile)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid mobile number']);
+            return;
+        }
+        if ($aadhar !== '' && !preg_match('/^\d{12}$/', $aadhar)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid Aadhar number']);
+            return;
+        }
+        if ($pan !== '' && !preg_match('/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/', $pan)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid PAN number']);
+            return;
+        }
+
         $upd = [
             'father_name' => $this->input->post('father_name'),
             'email_personal' => $this->input->post('email_personal'),
-            'mobile' => $this->input->post('mobile'),
-            'aadhar' => $this->input->post('aadhar'),
-            'pan' => $this->input->post('pan'),
+            'mobile' => $mobile,
+            'aadhar' => $aadhar,
+            'pan' => $pan,
         ];
         $this->db->where('staffid', $staffid);
         $this->db->update(db_prefix().'staff', $upd);
@@ -5358,11 +5375,41 @@ class Hrd extends AdminController
                     $this->db->where('staffid', $staffid);
                     $this->db->update(db_prefix().'staff', ['profile_image' => 'uploads/staff_profile/'.$filename]);
                 }
+				set_alert('success','Profile images updated');
                 echo json_encode(['success' => true]);
                 return;
             }
         }
+		set_alert('success','Profile images updated');
         echo json_encode(['success' => false]);
+    }
+
+    public function profile_image_delete()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+
+        $staffid = get_staff_user_id();
+        $row = $this->db->select('profile_image')
+            ->where('staffid', $staffid)
+            ->get(db_prefix() . 'staff')
+            ->row_array();
+
+        $profileImage = $row['profile_image'] ?? '';
+        if ($profileImage) {
+            $baseDir = realpath(FCPATH . 'uploads/staff_profile');
+            $filePath = realpath(FCPATH . ltrim($profileImage, '/'));
+            if ($baseDir && $filePath && strpos($filePath, $baseDir) === 0 && is_file($filePath)) {
+                @unlink($filePath);
+            }
+        }
+
+        $this->db->where('staffid', $staffid);
+        $this->db->update(db_prefix() . 'staff', ['profile_image' => null]);
+        set_alert('success','Profile images deleted');
+        echo json_encode(['success' => true]);
     }
 
     public function awards_update($id)

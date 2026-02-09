@@ -387,6 +387,14 @@ $(document).ready(function() {
   //need add css editor in jq editor textarea
   const signature = `<br><br><br><br><?php echo $email_signature;?>`;
 </script>
+<script>
+window.addEventListener('beforeunload', function (e) {
+  if (window.tinymce && tinymce.activeEditor && tinymce.activeEditor.isDirty()) {
+    return;
+  }
+  e.stopImmediatePropagation();
+}, true);
+</script>
 
 
 </body>
