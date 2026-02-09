@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 init_head(); 
 
-//print_r($_SESSION);
+print_r($_SESSION);
 $subscription_status=subscription_status();
 
 //echo $datediff=get_remaining_days_in_month();

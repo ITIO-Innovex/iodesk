@@ -264,8 +264,13 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 						$_SESSION['cms_subscription_start_date']=$subs['start_date'];
 						$_SESSION['cms_subscription_end_date']=$subs['end_date'];
 						$_SESSION['cms_subscription_status']=$subs['status'];
-						//$_SESSION['cms_subscription_staff_limit']=8;
-						$_SESSION['cms_subscription_created_at']=$subs['created_at'];
+						
+// Add no Staff
+$this->db->select('no_of_staff');
+$this->db->where('id', $payment['subscription_id']);
+$no_of_staff = $this->db->get(db_prefix() . 'services_subscriptions')->row('no_of_staff');
+$_SESSION['cms_subscription_staff_limit']=$no_of_staff;
+$_SESSION['cms_subscription_created_at']=$subs['created_at'];
 						}
 					}
 
