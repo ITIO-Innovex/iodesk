@@ -265,9 +265,10 @@ $result = $this->services_subscriptions_model->send_renewal_email($email, $mailS
     {
         
             // Increase execution time limit for email download
-            set_time_limit(300); // 5 minutes
-            ini_set('max_execution_time', 300);
-            
+            set_time_limit(600); // 5 minutes
+            ini_set('max_execution_time', 600);
+		    ini_set('memory_limit', '1024M');
+		
             $data['title'] = _l('Download Email From Cron');
             
             // Load webmail model
