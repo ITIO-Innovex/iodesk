@@ -3815,7 +3815,7 @@ class Hrd extends AdminController
         $data['all_branches'] = $this->db->get(db_prefix() . 'hrd_branch_manager')->result_array();
 
         // Load attendance statuses for display
-        if (is_super()) {
+        /*if (is_super()) {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
                 $this->db->where('company_id', $_SESSION['super_view_company_id']);
             } else {
@@ -3823,7 +3823,7 @@ class Hrd extends AdminController
             }
         } else {
             $this->db->where('company_id', get_staff_company_id());
-        }
+        }*/
         $this->db->where('status', 1);
         $data['attendance_statuses'] = $this->hrd_model->get_attendance_status();
 

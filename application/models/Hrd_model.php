@@ -688,7 +688,7 @@ class Hrd_model extends App_Model
 			$this->db->limit(1);
 						
 			$query = $this->db->get();
-            log_message('error', 'Query - '.$this->db->last_query() );
+            //log_message('error', 'Query - '.$this->db->last_query() );
 
 			return $query->result_array();
         
