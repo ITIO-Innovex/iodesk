@@ -178,6 +178,7 @@ class Services extends AdminController
 						'staff_limit + ' . $no_off_staff,
 						FALSE
 					);
+					$_SESSION['cms_subscription_staff_limit']=$_SESSION['cms_subscription_staff_limit'] + $no_off_staff;
 					$this->db->where('company_id', $companyId);
 					$this->db->where('status', 'active');
 					$this->db->update('it_crm_services_user_subscriptions');
@@ -230,6 +231,7 @@ $subs = $this->db->update('it_crm_services_user_subscriptions', $data);
 						$_SESSION['cms_subscription_start_date']=$todayDate->format('Y-m-d');
 						$_SESSION['cms_subscription_end_date']=$endDate->format('Y-m-d');
 						$_SESSION['cms_subscription_status']='active';
+						$_SESSION['cms_subscription_staff_limit']=$newplan->no_of_staff;
 						$_SESSION['cms_subscription_created_at']=$todayDate->format('Y-m-d');
 						}
 $log_desc="Plan Upgrated (".$newplan->no_of_staff.") with Invoice No ".$invoiceNo."Plan: " . $newplan->plan_name;
@@ -262,6 +264,7 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 						$_SESSION['cms_subscription_start_date']=$subs['start_date'];
 						$_SESSION['cms_subscription_end_date']=$subs['end_date'];
 						$_SESSION['cms_subscription_status']=$subs['status'];
+						//$_SESSION['cms_subscription_staff_limit']=8;
 						$_SESSION['cms_subscription_created_at']=$subs['created_at'];
 						}
 					}
@@ -799,6 +802,7 @@ $this->services_subscriptions_model->log_service_activity($payment['subscription
 	$_SESSION['cms_subscription_start_date']=$todayDate->format('Y-m-d');
 	$_SESSION['cms_subscription_end_date']=$endDate->format('Y-m-d');
 	$_SESSION['cms_subscription_status']=$status;
+	$_SESSION['cms_subscription_staff_limit']=$plan->no_of_staff;
 	$_SESSION['cms_subscription_created_at']=$todayDate->format('Y-m-d');
 	set_alert('success', 'Account Activate');
     redirect(admin_url('services/payment_status?invoice_no='.$invoice_no));

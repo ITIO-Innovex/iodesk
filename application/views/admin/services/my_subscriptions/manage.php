@@ -1,5 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 init_head(); 
+
+//print_r($_SESSION);
 $subscription_status=subscription_status();
 
 //echo $datediff=get_remaining_days_in_month();
@@ -28,14 +30,16 @@ $staffLimit=(int)($plan['staff_limit'] ?? 0);
 			<?php } ?>
 			
 <?php //if ($activeStaff >= $staffLimit) { 
-echo $enddate=e($plan['end_date'] ?? '');
-$today = new DateTime(); 
-$end = new DateTime($enddate);
-$renewalStart = (clone $end)->modify('-7 days');
-
-if ($today >= $renewalStart && $today <= $end) {	?>
+$enddate = $plan['end_date'] ?? '';
+$price = $plan['price'] ?? null;
+if (!empty($enddate) && $price !== null) {
+  $today = new DateTime();
+  $end = new DateTime($enddate);
+  $renewalStart = (clone $end)->modify('-7 days');
+  //echo $plan['price']."====>";
+  if (($today >= $renewalStart && $today <= $end) && $price <> "0.00") {	?>
 <a  href="<?php echo admin_url('services/renew_plan');?>" id="renew_plan" class="btn btn-success btn-sm tw-mx-2 pull-right" title="Renew Plan"><i class="fa-regular fa-user"></i> Renew Now</a>
-<?php } ?>
+<?php } } ?>
 			
 			</h4>
 

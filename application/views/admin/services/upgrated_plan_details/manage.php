@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 init_head();
+//print_r($_SESSION);
 
 $price = number_format((float) $plan['price'], 2);
 $duration = isset($plan['duration']) ? (int) $plan['duration'] : 0;
@@ -9,6 +10,19 @@ $endDate   = (clone $startDate)->modify("+$days days");
 
 $start_date = $startDate->format('F d, Y');
 $end_date   = $endDate->format('F d, Y');
+//echo $_SESSION['cms_subscription_staff_limit'];
+
+$additionalAmount=0;
+// for Extra Staff Amount Return Amount
+if($_SESSION['cms_subscription_staff_limit'] > $old_plan['no_of_staff']){
+$extrastaffcount=($_SESSION['cms_subscription_staff_limit'] - $old_plan['no_of_staff']) ?? 0;
+$additionalAmount=$this->services_subscriptions_model->get_staff_expansion($extrastaffcount);
+}
+//checkextrastaffamount();
+//echo "XXXXXXXX";
+//echo $old_plan['price'];
+//echo $old_plan['duration'];
+//echo $_SESSION['cms_subscription_end_date'];
 
 //echo "===========>>";echo $old_plan['price'];echo $old_plan['duration'];echo $_SESSION['cms_subscription_end_date'];
     $unusedBalance = calculateUnusedPlanBalance(
@@ -16,6 +30,14 @@ $end_date   = $endDate->format('F d, Y');
     $old_plan['duration'],     // duration (days)
     $_SESSION['cms_subscription_end_date']      // subscription end date
 );
+
+if($additionalAmount > 0){
+$unusedBalance =$unusedBalance + calculateUnusedPlanBalance(
+    $additionalAmount,        // price
+    $old_plan['duration'],     // duration (days)
+    $_SESSION['cms_subscription_end_date']      // subscription end date
+);
+}
 
 ?>
 <div id="wrapper">
