@@ -443,6 +443,32 @@ function get_branch_id($staffid='')
 		return $branch_id;
 }
 
+
+function get_shift_id($staffid='')
+{   
+        // Fetch company Name from company id
+		// check company id is found or not
+		if($staffid==""){
+				$staffid = get_staff_user_id();
+				if(isset($GLOBALS['current_user'])) {
+				$branch_id=$GLOBALS['current_user']->branch;
+				}
+		 }
+	
+		
+		if(isset($staffid)&&$staffid){
+			$CI = & get_instance();
+			$CI->db->where('id', $branch_id);
+			$com = $CI->db->select('shift')->from(db_prefix() . 'hrd_branch_manager')->get()->row();
+			if(isset($com)&&$com->shift){
+			return $com->shift;
+			}
+		}
+		
+		return $shift_id;
+}
+
+
 function get_departments_id($staffid='')
 {   
         // Fetch company Name from company id

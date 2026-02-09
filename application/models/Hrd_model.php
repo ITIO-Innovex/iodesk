@@ -673,7 +673,9 @@ class Hrd_model extends App_Model
 	
 	public function get_shift_details($id = '', $where = [])
     {
-	        //log_message('error', 'ID= '.get_branch_id() );
+	
+	        $shiftid=get_shift_id();
+	        //log_message('error', 'ID= '.$shiftid );
             $this->db->select('s.*, b.*');
 			$this->db->from(db_prefix() . 'hrd_shift_manager s');
 			$this->db->join(db_prefix() . 'hrd_branch_manager b', 's.shift_id = b.shift');
@@ -681,12 +683,12 @@ class Hrd_model extends App_Model
 			if(isset($id)&&$id){
 			$this->db->where('b.shift', $id);
 			}else{
-			$this->db->where('b.shift', get_branch_id());
+			$this->db->where('b.shift', $shiftid); //////// Make dynamic
 			}
 			$this->db->limit(1);
 						
 			$query = $this->db->get();
-
+            log_message('error', 'Query - '.$this->db->last_query() );
 
 			return $query->result_array();
         
