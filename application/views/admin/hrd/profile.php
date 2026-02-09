@@ -92,8 +92,24 @@
         <div class="row">
           <div class="col-md-6"><div class="form-group"><label>Father Name</label><input type="text" name="father_name" class="form-control" value="<?php echo e($me['father_name']??''); ?>"></div></div>
           <div class="col-md-6"><div class="form-group"><label>Personal Email</label><input type="email" name="email_personal" class="form-control" value="<?php echo e($me['email_personal']??''); ?>"></div></div>
-          <div class="col-md-6"><div class="form-group"><label>Mobile</label><input type="number" name="mobile" class="form-control" value="<?php echo e($me['mobile']??''); ?>" maxlength="10" pattern="\d{10}" inputmode="numeric" title="Enter 10 digit mobile number"></div></div>
-          <div class="col-md-6"><div class="form-group"><label>Aadhar</label><input type="number" name="aadhar" class="form-control" value="<?php echo e($me['aadhar']??''); ?>" maxlength="12" pattern="\d{12}" inputmode="numeric" title="Enter 12 digit Aadhar number"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Mobile</label><input type="tel"
+       name="mobile"
+       class="form-control"
+       maxlength="10"
+       inputmode="numeric"
+       pattern="[0-9]{10}"
+       title="Enter 10 digit mobile number"
+       oninput="this.value = this.value.replace(/\D/g, '')" required></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Aadhar</label><input type="tel"
+       name="aadhar"
+       class="form-control"
+       value="<?php echo e($me['aadhar'] ?? ''); ?>"
+       maxlength="12"
+       inputmode="numeric"
+       pattern="[0-9]{12}"
+       title="Enter 12 digit Aadhaar number"
+       autocomplete="off"
+       oninput="this.value = this.value.replace(/\D/g,'').slice(0,12)"></div></div>
           <div class="col-md-6"><div class="form-group"><label>PAN</label><input type="text" name="pan" class="form-control" value="<?php echo e($me['pan']??''); ?>" maxlength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}" title="Format: ABCDE1234F"></div></div>
         </div>
       </div>
