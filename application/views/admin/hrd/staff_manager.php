@@ -124,7 +124,7 @@ $class='warning'; if($employee_status=="Active"){ echo '<i title="'.$employee_st
             <select name="branch" class="form-control">
               <option value="">-- Select Branch --</option>
               <?php if (!empty($branches)) { foreach ($branches as $b) { ?>
-                <option value="<?php echo (int)$b['shift']; ?>"><?php echo e($b['branch_name']); ?></option>
+                <option value="<?php echo (int)$b['id']; ?>"><?php echo e($b['branch_name']); ?></option>
               <?php } } ?>
             </select>
           </div></div>
