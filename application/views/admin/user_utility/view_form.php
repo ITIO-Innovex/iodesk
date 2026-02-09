@@ -159,7 +159,7 @@
                                                             <?php foreach ($field_value as $file) { ?>
                                                                 <div class="tw-flex tw-items-center tw-justify-between tw-border tw-border-solid tw-border-neutral-200 tw-rounded tw-px-3 tw-py-2 tw-mb-2">
                                                                     <a href="<?php echo base_url('uploads/user_utility/' . $file); ?>" target="_blank">
-                                                                        <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $file; ?>
+                                                                        <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo substr($file,11); ?>
                                                                     </a>
                                                                     <!-- <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $file; ?>">Delete !!</button> -->
                                                                 </div>
@@ -250,10 +250,19 @@
                                             <?php 
                                             if (is_array($value)) {
 											
-                                                echo implode(', ', $value);
+											
+foreach ($value as $file) {
+if(strpos((string)$file, '.') !== false && file_exists('./uploads/user_utility/' . $file)){
+echo '<a href="' . base_url('uploads/user_utility/' . $file) . '" target="_blank">' . substr($file,11) . '</a><br>';
+}else{
+echo $file . "<br>";
+}
+}
+											
+                                                //echo implode(', ', $value)."XXX";
 												
                                             } elseif (!empty($value) && strpos((string)$value, '.') !== false && file_exists('./uploads/user_utility/' . $value)) {
-                                                echo '<a href="' . base_url('uploads/user_utility/' . $value) . '" target="_blank">' . $value . '</a>';
+                                                echo '<a href="' . base_url('uploads/user_utility/' . $value) . '" target="_blank">' . substr($value,11) . '</a>';
                                             } else {
                                                 echo $value;
                                             }
