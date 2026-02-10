@@ -47,7 +47,7 @@ foreach ($providers as $provider) {
 
 if(isset($provider['viewon'])&&$provider['viewon']==2) {
 ?>
-<a href="<?php echo $provider['provider_url'];?>"  name="submit" class="btn btn-success mtop20" target="_blank" title="Redirect to <?php echo $provider['provider_url'];?>" ><?php echo $provider['provider_name'];?> <i class="fa-solid fa-up-right-from-square"></i></a>
+<a href="<?php echo $provider['provider_url'];?>"  name="submit" class="btn btn-success mtop20" target="_blank" title="Redirect to <?php echo $provider['provider_url'];?>" ><?php echo ucwords(strtolower($provider['provider_name']));?> <i class="fa-solid fa-up-right-from-square"></i></a>
 <?php
 }else{
 ?>

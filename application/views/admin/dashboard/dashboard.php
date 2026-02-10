@@ -109,10 +109,16 @@ $attendance_display_status=attendance_display_status();
 		<div class="col-md-12 mtop20">
 		
 			
-<?php if($subscription_status<>'active'){ ?>
+<?php if($subscription_status<>'active'){ echo $subscription_status; ?>
 <div class="alert alert-danger tw-bg-danger-500">
-<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> <?php echo _l($subscription_status);?> <span style="float:right"><a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Subscribe Now</a></span></div>
-                  </div>
+<div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> <?php echo _l($subscription_status);?> <span style="float:right">
+<?php if($subscription_status=='expired_subscription'){ ?>
+<a href="<?php echo admin_url('services/my_subscriptions');?>" class="btn btn-warning btn-sm ms-2">My Subscriptions</a>
+<?php }else{ ?>
+<a href="<?php echo admin_url('services/choose_subscriptions');?>" class="btn btn-warning btn-sm ms-2">Subscribe Now</a>
+<?php } ?>
+</span></div>
+</div>
 <?php }else{ ?>
 <a href="<?php echo admin_url('staff');?>" class="fancy-btn"><i class="fa-solid fa-users menu-icon"></i> Add New Staff</a>
 <?php } ?>	

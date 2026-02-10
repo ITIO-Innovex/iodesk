@@ -51,6 +51,9 @@ class Services extends AdminController
 
     public function upgrade_plan()
     {
+	    if(empty($_SESSION['cms_subscription_id'])){
+		redirect(admin_url('services/choose_subscriptions'));exit;
+		}
 	
 	    $subscription_id=$_SESSION['cms_subscription_id'];
 		if(!$subscription_id) { show_404();}
