@@ -36,12 +36,12 @@ function get_available_staff_permissions($data = [])
                 'view' => $viewGlobalName,
             ],
         ],
-        'bulk_pdf_exporter' => [
+        /*'bulk_pdf_exporter' => [
             'name'         => _l('bulk_pdf_exporter'),
             'capabilities' => [
                 'view' => $viewGlobalName,
             ],
-        ],
+        ],*/
 		
         'contracts' => [
             'name'         => _l('contracts'),
@@ -49,10 +49,10 @@ function get_available_staff_permissions($data = [])
                 'view_all_templates' => _l('permission_view_all_templates'),
             ]),
         ],
-        'credit_notes' => [
+        /*'credit_notes' => [
             'name'         => _l('credit_notes'),
             'capabilities' => $allPermissionsArray,
-        ],
+        ],*/
 		'conversation' => [
             'name'         => _l('Conversation'),
             'capabilities' => [
@@ -79,14 +79,14 @@ function get_available_staff_permissions($data = [])
                 'edit' => _l('permission_edit'),
             ],
         ],
-        'estimates' => [
+        /*'estimates' => [
             'name'         => _l('estimates'),
             'capabilities' => $allPermissionsArray,
         ],
         'expenses' => [
             'name'         => _l('expenses'),
             'capabilities' => $allPermissionsArray,
-        ],
+        ],*/
         'invoices' => [
             'name'         => _l('invoices'),
             'capabilities' => $allPermissionsArray,
@@ -174,7 +174,7 @@ function get_available_staff_permissions($data = [])
             'capabilities' => $allPermissionsArray,
         ],
 		*/
-        'tasks' => [
+        /*'tasks' => [
             'name'         => _l('tasks'),
             'capabilities' => array_merge($withNotApplicableViewOwn, [
                 'edit_timesheet'       => _l('permission_edit_timesheets'),
@@ -192,7 +192,7 @@ function get_available_staff_permissions($data = [])
             'capabilities' => [
                 'view' => $viewGlobalName,
             ],
-        ],
+        ],*/
 		'webmail' => [
             'name'         => _l('Webmail'),
             'capabilities' => [
@@ -206,7 +206,7 @@ function get_available_staff_permissions($data = [])
                 'view' => $viewGlobalName,
             ],
         ],
-        'checklist_templates' => [
+        /*'checklist_templates' => [
             'name'         => _l('checklist_templates'),
             'capabilities' => [
                 'create' => _l('permission_create'),
@@ -216,7 +216,7 @@ function get_available_staff_permissions($data = [])
         'estimate_request' => [
             'name'         => _l('estimate_request'),
             'capabilities' => $allPermissionsArray,
-        ],
+        ],*/
 		'finance' => [
             'name'         => _l('Finance'),
             'capabilities' => $allPermissionsArray,
