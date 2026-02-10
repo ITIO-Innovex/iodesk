@@ -5,7 +5,48 @@
     <div class="row mb-2">
       <div class="panel_s">
         <div class="panel-body panel-table-full">
-		
+		<?php
+		function get_folder_size($path) {
+    $size = 0;
+
+    if (!is_dir($path)) {
+        return 0;
+    }
+
+    foreach (new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)
+    ) as $file) {
+        $size += $file->getSize();
+    }
+
+    return $size;
+}
+
+function format_bytes($bytes, $precision = 2) {
+    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+    return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
+}
+		$base = FCPATH;
+
+$folders = scandir($base);
+$result = [];
+
+foreach ($folders as $folder) {
+    if ($folder === '.' || $folder === '..') continue;
+
+    $path = $base . $folder;
+    if (is_dir($path)) {
+        $result[$folder] = format_bytes(get_folder_size($path));
+    }
+}
+
+arsort($result);
+//print_r($result);
+
+		?>
           <div class="row ">
             <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Name : <?php echo e(get_staff_full_name()); ?></span> </div>
             <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Email : <?php echo $GLOBALS['current_user']->email; ?></span> </div>
@@ -20,6 +61,27 @@
             <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Last Login : <?php echo $GLOBALS['current_user']->last_login; ?></span> </div>
             </span> </div>
 		  <div class="row ">
+
+
+<h4>Disk Space</h4>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php foreach ($result as $key => $value): ?>
+      <?php if (!is_array($value)): ?>
+        <tr>
+          <td><?= htmlspecialchars($key) ?></td>
+          <td><?= htmlspecialchars((string)$value) ?></td>
+        </tr>
+      <?php endif; ?>
+    <?php endforeach; ?>
+  </tbody>
+</table>
 
 <h4>Global Variable</h4>
 <table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
