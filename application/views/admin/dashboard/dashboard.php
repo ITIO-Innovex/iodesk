@@ -109,7 +109,7 @@ $attendance_display_status=attendance_display_status();
 		<div class="col-md-12 mtop20">
 		
 			
-<?php if($subscription_status<>'active'){ echo $subscription_status; ?>
+<?php if($subscription_status<>'active'){ ?>
 <div class="alert alert-danger tw-bg-danger-500">
 <div class="tw-text-white tw-font-bold tw-my-2"><i class="fa-solid fa-triangle-exclamation"></i> <?php echo _l($subscription_status);?> <span style="float:right">
 <?php if($subscription_status=='expired_subscription'){ ?>
