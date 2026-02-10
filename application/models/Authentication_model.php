@@ -38,7 +38,6 @@ class Authentication_model extends App_Model
 			//echo $company_id=$user -> company_id;
 			//echo get_company_status($company_id);
 			
-		    //print_r($user);exit;
 			
             if ($user) {
                 // Email is okey lets check the password now
@@ -93,6 +92,15 @@ class Authentication_model extends App_Model
 					$this->db->where('status', 'active');
                     $subscriptions_data = $this->db->get($tables)->row();
 					
+					// if subscription Expired Only Admin Login
+					$admin_check = $user->admin ?? 0;
+					$expireddate = $subscriptions_data->end_date ?? '';
+					
+					if ( $admin_check != 1 && !empty($expireddate) && strtotime($expireddate) < strtotime(date('Y-m-d'))) {
+					return ['memberinactive' => true, ];
+					}
+					
+					// if subscription Expired Only Admin Login
 					
 					$subscription_id = !empty($subscriptions_data->subscription_id) ? $subscriptions_data->subscription_id : '';
 					$start_date      = !empty($subscriptions_data->start_date) ? $subscriptions_data->start_date : '';
