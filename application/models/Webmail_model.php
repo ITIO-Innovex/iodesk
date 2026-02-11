@@ -834,7 +834,7 @@ $client->disconnect();
 
             try {
                 $messages = $mailbox->query()
-                    ->limit(20)
+                    ->limit(10)
                     ->getByUidGreater($last_uid);
             } catch (\Exception $e) {
                 log_message('error', 'IMAP Error: ' . $e->getMessage());
