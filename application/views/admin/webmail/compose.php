@@ -64,10 +64,10 @@
         <label for="recipientEmail" class="form-label mtop10">CC</label>
         <input type="text" class="form-control" id="recipientCCIT" name="recipientCC" value="" placeholder="Enter CC email -  Add multiple with comma seperated " >
       </div>
-	  <div class="mb-3">
+	  <?php /*?><div class="mb-3">
         <label for="recipientBCCEmail" class="form-label mtop10">BCC</label>
         <input type="text" class="form-control" id="recipientBCCIT" name="recipientBCC" value="" placeholder="Enter BCC email" >
-      </div>
+      </div><?php */?>
       <div class="mb-3">
 	  <label for="emailSubject" class="form-label mtop10">Subject</label>
 	  <input type="text" class="form-control" id="emailSubjectIT" name="emailSubject" value="" placeholder="Enter email subject"  required>
