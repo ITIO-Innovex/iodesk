@@ -135,6 +135,7 @@ class Webmail extends AdminController
 		$entry_id=get_staff_user_id();
         $this->webmail_model->reply($data, $entry_id);
         set_alert('success', _l('Email Sent Successfully', _l('Email Sent')));
+		log_message('error', 'Redirect : ' . previous_url() ?: $_SERVER['HTTP_REFERER']);
         redirect(previous_url() ?: $_SERVER['HTTP_REFERER']);
 	} 
 
@@ -231,6 +232,258 @@ if (!empty($attachments_json)) {
 		}
 
 		echo json_encode(['success' => false, 'message' => 'Failed to schedule email']);
+	}
+
+	public function add_contact()
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$data = [
+			'staffid' => get_staff_user_id(),
+			'first_name' => trim((string) $this->input->post('first_name')),
+			'last_name' => trim((string) $this->input->post('last_name')),
+			'email_id' => trim((string) $this->input->post('email_id')),
+			'company_name' => trim((string) $this->input->post('company_name')),
+			'phonenumber' => trim((string) $this->input->post('phonenumber')),
+		];
+
+		if ($data['email_id'] !== '' && !filter_var($data['email_id'], FILTER_VALIDATE_EMAIL)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid email']);
+			return;
+		}
+
+		if ($data['email_id'] === '') {
+			echo json_encode(['success' => false, 'message' => 'Email is required']);
+			return;
+		}
+		if ($data['first_name'] === '') {
+			echo json_encode(['success' => false, 'message' => 'First name is required']);
+			return;
+		}
+
+		$exists = $this->db->where('staffid', $data['staffid'])
+			->where('email_id', $data['email_id'])
+			->get('it_crm_email_contact')
+			->row_array();
+		if (!empty($exists)) {
+			echo json_encode(['success' => false, 'message' => 'Already added']);
+			return;
+		}
+
+		$this->db->insert('it_crm_email_contact', $data);
+		echo json_encode(['success' => true, 'message' => 'Contact saved successfully']);
+	}
+
+	public function update_contact($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$id = (int) $id;
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid contact']);
+			return;
+		}
+
+		$data = [
+			'first_name' => trim((string) $this->input->post('first_name')),
+			'last_name' => trim((string) $this->input->post('last_name')),
+			'email_id' => trim((string) $this->input->post('email_id')),
+			'company_name' => trim((string) $this->input->post('company_name')),
+			'phonenumber' => trim((string) $this->input->post('phonenumber')),
+		];
+
+		if ($data['email_id'] === '' || !filter_var($data['email_id'], FILTER_VALIDATE_EMAIL)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid email']);
+			return;
+		}
+		if ($data['first_name'] === '') {
+			echo json_encode(['success' => false, 'message' => 'First name is required']);
+			return;
+		}
+
+		$exists = $this->db->where('staffid', get_staff_user_id())
+			->where('email_id', $data['email_id'])
+			->where('id !=', $id)
+			->get('it_crm_email_contact')
+			->row_array();
+		if (!empty($exists)) {
+			echo json_encode(['success' => false, 'message' => 'Already added']);
+			return;
+		}
+
+		$this->db->where('id', $id);
+		$this->db->where('staffid', get_staff_user_id());
+		$this->db->update('it_crm_email_contact', $data);
+		echo json_encode(['success' => true, 'message' => 'Contact updated successfully']);
+	}
+
+	public function delete_contact($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+		$id = (int) $id;
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid contact']);
+			return;
+		}
+		$this->db->where('id', $id);
+		$this->db->where('staffid', get_staff_user_id());
+		$this->db->delete('it_crm_email_contact');
+		echo json_encode(['success' => true, 'message' => 'Contact deleted successfully']);
+	}
+
+	public function scrub_email()
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$email = trim((string) $this->input->post('email'));
+		$action = trim((string) $this->input->post('action'));
+		if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid email']);
+			return;
+		}
+
+		if ($action === 'archive') {
+			$this->db->where('from_email', $email);
+			$this->db->update('it_crm_emails', ['folder' => 'Archive']);
+			echo json_encode(['success' => true, 'message' => 'Archived']);
+			return;
+		}
+
+		if ($action === 'delete') {
+			$this->db->where('from_email', $email);
+			$this->db->update('it_crm_emails', ['is_deleted' => 1]);
+			echo json_encode(['success' => true, 'message' => 'Deleted']);
+			return;
+		}
+
+		echo json_encode(['success' => false, 'message' => 'Invalid action']);
+	}
+
+	public function add_appointment()
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$consultations = (int) $this->input->post('consultations');
+		$dateTime = trim((string) $this->input->post('date_time'));
+		$consultant = trim((string) $this->input->post('consultant'));
+		$customer = trim((string) $this->input->post('customer'));
+		$notes = $this->input->post('notes', false);
+		$notification = (int) $this->input->post('notification');
+
+		if (!in_array($consultations, [15, 30, 45, 60], true)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid consultation time']);
+			return;
+		}
+		if ($dateTime === '') {
+			echo json_encode(['success' => false, 'message' => 'Date and time is required']);
+			return;
+		}
+		if ($consultant === '' || $customer === '') {
+			echo json_encode(['success' => false, 'message' => 'Consultant and customer are required']);
+			return;
+		}
+
+		$data = [
+			'staffid' => get_staff_user_id(),
+			'company_id' => get_staff_company_id(),
+			'consultations' => $consultations,
+			'date_time' => date('Y-m-d H:i:s', strtotime($dateTime)),
+			'consultant' => $consultant,
+			'customer' => $customer,
+			'notes' => $notes,
+			'notification' => $notification ? 1 : 0,
+			'status' => 1,
+		];
+
+		$this->db->insert('it_crm_email_appoinment', $data);
+		echo json_encode(['success' => true, 'message' => 'Appointment saved successfully']);
+	}
+
+	public function appoinment()
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Appointments');
+		}
+
+		$companyId = get_staff_company_id();
+		$staffId = get_staff_user_id();
+		$now = date('Y-m-d H:i:s');
+
+		$this->db->where('company_id', $companyId);
+		if (!is_admin()) {
+			$this->db->where('staffid', $staffId);
+		}
+		$this->db->where('date_time >=', $now);
+		$this->db->order_by('date_time', 'asc');
+		$data['upcoming'] = $this->db->get('it_crm_email_appoinment')->result_array();
+
+		$this->db->where('company_id', $companyId);
+		if (!is_admin()) {
+			$this->db->where('staffid', $staffId);
+		}
+		$this->db->where('date_time <', $now);
+		$this->db->order_by('date_time', 'desc');
+		$data['past'] = $this->db->get('it_crm_email_appoinment')->result_array();
+
+		$this->db->where('staffid', $staffId);
+		$data['contacts'] = $this->db->get('it_crm_email_contact')->result_array();
+
+		$data['title'] = 'Appointments';
+		$this->load->view('admin/webmail/appoinment', $data);
+	}
+
+	public function update_appointment_status($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+		$id = (int) $id;
+		$status = (int) $this->input->post('status');
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid appointment']);
+			return;
+		}
+		if (!in_array($status, [0, 1, 2], true)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid status']);
+			return;
+		}
+
+		$this->db->where('id', $id);
+		if (!is_admin()) {
+			$this->db->where('staffid', get_staff_user_id());
+		}
+		$this->db->update('it_crm_email_appoinment', ['status' => $status]);
+		echo json_encode(['success' => true, 'message' => 'Status updated']);
+	}
+
+	public function contacts()
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Contacts');
+		}
+
+		$staffId = get_staff_user_id();
+		$this->db->where('staffid', $staffId);
+		$this->db->order_by('addedon', 'desc');
+		$data['contacts'] = $this->db->get('it_crm_email_contact')->result_array();
+		$data['title'] = 'Email Contacts';
+		$this->load->view('admin/webmail/contacts', $data);
 	}
 	
 

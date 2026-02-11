@@ -5412,6 +5412,183 @@ class Hrd extends AdminController
         echo json_encode(['success' => true]);
     }
 
+    public function dar()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('DAR');
+        }
+
+        $today = date('Y-m-d');
+        $staffId = get_staff_user_id();
+        $companyId = get_staff_company_id();
+        $existingDar = $this->db->where('company_id', $companyId)
+            ->where('staffid', $staffId)
+             ->where('date', $today) // $today = '2026-02-11'
+            ->get('it_crm_dar')
+            ->row_array();
+			//echo $this->db->last_query();exit;
+
+        if ($this->input->method() === 'post') {
+            $description = $this->input->post('description', false);
+            $status = (int) $this->input->post('status');
+            if (!in_array($status, [1, 2], true)) {
+                $status = 2;
+            }
+
+            if (trim(strip_tags((string) $description)) === '') {
+                set_alert('warning', 'Description is required');
+                redirect(admin_url('hrd/dar'));
+            }
+
+            $data = [
+                'company_id' => $companyId,
+                'staffid' => $staffId,
+                'descriptions' => $description,
+                'status' => $status,
+            ];
+            if (!empty($existingDar)) {
+                $this->db->where('id', (int) $existingDar['id']);
+                $this->db->update('it_crm_dar', $data);
+                $darId = (int) $existingDar['id'];
+            } else {
+                $this->db->insert('it_crm_dar', $data);
+                $darId = $this->db->insert_id();
+            }
+
+            $savedFiles = [];
+            if ($darId && isset($_FILES['dar_files']['name'])) {
+                $files = $_FILES['dar_files'];
+                if (!is_array($files['name'])) {
+                    $files = [
+                        'name' => [$files['name']],
+                        'type' => [$files['type']],
+                        'tmp_name' => [$files['tmp_name']],
+                        'error' => [$files['error']],
+                        'size' => [$files['size']],
+                    ];
+                }
+
+                $uploadDir = FCPATH . 'uploads/dar/' . $darId . '/';
+                if (!is_dir($uploadDir)) {
+                    @mkdir($uploadDir, 0755, true);
+                }
+
+                for ($i = 0; $i < count($files['name']); $i++) {
+                    if (empty($files['name'][$i])) {
+                        continue;
+                    }
+                    if (_perfex_upload_error($files['error'][$i])) {
+                        continue;
+                    }
+                    $tmpFilePath = $files['tmp_name'][$i];
+                    if (empty($tmpFilePath)) {
+                        continue;
+                    }
+
+                    $originalName = $files['name'][$i];
+                    if (!_upload_extension_allowed($originalName)) {
+                        continue;
+                    }
+
+                    $safeName = unique_filename($uploadDir, $originalName);
+                    $newFilePath = $uploadDir . $safeName;
+                    if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                        $savedFiles[] = 'uploads/dar/' . $darId . '/' . $safeName;
+                    }
+                }
+            }
+
+            if (!empty($savedFiles)) {
+                if (!empty($existingDar) && !empty($existingDar['file'])) {
+                    $existingFiles = array_filter(array_map('trim', explode(',', $existingDar['file'])));
+                    $savedFiles = array_values(array_filter(array_merge($existingFiles, $savedFiles)));
+                }
+                $this->db->where('id', $darId);
+                $this->db->update('it_crm_dar', [
+                    'file' => implode(',', $savedFiles),
+                ]);
+            }
+
+            set_alert('success', 'DAR saved successfully');
+            redirect(admin_url('hrd/dar'));
+        }
+
+        $data['title'] = 'Daily Activity Report';
+        $data['dar'] = $existingDar;
+        $this->load->view('admin/hrd/dar', $data);
+    }
+
+    public function dar_list()
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            access_denied('DAR');
+        }
+
+        $companyId = get_staff_company_id();
+        $this->db->where('company_id', $companyId);
+        if (!is_admin()) {
+            $this->db->where('staffid', get_staff_user_id());
+        }
+        $this->db->order_by('addedon', 'desc');
+        $data['dars'] = $this->db->get('it_crm_dar')->result_array();
+        $data['title'] = 'DAR List';
+        $this->load->view('admin/hrd/dar_list', $data);
+    }
+
+    public function dar_delete_file($id = 0)
+    {
+        if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+
+        $id = (int) $id;
+        $file = $this->input->post('file');
+        if (!$id || !$file) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+
+        $dar = $this->db->where('id', $id)
+            ->where('company_id', get_staff_company_id())
+            ->where('staffid', get_staff_user_id())
+            ->get('it_crm_dar')
+            ->row_array();
+
+        if (empty($dar)) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+
+        $file = basename($file);
+        $files = array_filter(array_map('trim', explode(',', (string) ($dar['file'] ?? ''))));
+        $remaining = [];
+        $toDelete = '';
+
+        foreach ($files as $f) {
+            if (basename($f) === $file) {
+                $toDelete = $f;
+                continue;
+            }
+            $remaining[] = $f;
+        }
+
+        if ($toDelete) {
+            $baseDir = realpath(FCPATH . 'uploads/dar/' . $id);
+            $filePath = realpath(FCPATH . ltrim($toDelete, '/'));
+            if ($baseDir && $filePath && strpos($filePath, $baseDir) === 0 && is_file($filePath)) {
+                @unlink($filePath);
+            }
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_dar', [
+            'file' => !empty($remaining) ? implode(',', $remaining) : null,
+        ]);
+
+        echo json_encode(['success' => true]);
+    }
+
     public function awards_update($id)
     {
         if (!staff_can('view_setting',  'hr_department')) {

@@ -13,6 +13,8 @@
 	input.form-control, input[type=text] { border-radius: 0px !important; }
 	.input-sm { border-radius : 0px !important; }
 }
+.dropdown-menu { width:275px !important;}
+.copy-email.pull-right{ width:38px !important;margin-top: -5px;}
 </style>
 
 <div id="wrapper">
@@ -71,18 +73,21 @@
 			  <?php } ?><button class="btn btn-default btn-sm btn-default-dt-options bg-info refreshemail" 
 			  type="button" title="Refresh <?php echo $_SESSION['webmail']['folder'];?> Box Online"><span><i class="fa-solid fa-retweet" id="refresh-loader"></i></span></button>
 			  <span id="mail-loader"></span>
-			  
+<a href="<?php echo admin_url('webmail/contacts') ?>"  target="_blank" class="btn btn-default btn-sm btn-default-dt-options bg-info" 
+			  type="button" title="Manage Contacts"><i class="fa-solid fa-user-plus"></i></a>
+<a href="<?php echo admin_url('webmail/appoinment') ?>" target="_blank" class="btn btn-default btn-sm btn-default-dt-options bg-info" 
+			  type="button" title="Manage Appoinment"><i class="fa-solid fa-calendar-plus"></i></a>
 			  </div></div>
 			  <div class="col-md-5 mbot10">
 			  <div class="dt-buttons btn-group55 tw-text-right">
 			  <div class="w-full tw-inline-flex sm:max-w-xs">
 <select name="stype" class="form-control input-group-addon" id="search_code" style="width:auto;border-top-left-radius: .375rem;border-bottom-left-radius: .375rem;" required>
 <option value="">Select type</option>
-<option value="from_email" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="from_email"){ ?> selected="selected"<?php }?>>From Email</option>
-<option value="from_name" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="from_name"){ ?> selected="selected"<?php }?>>From Name</option>
-<option value="to_emails" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="to_emails"){ ?> selected="selected"<?php }?>>To Email</option>
-<option value="cc_emails" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="cc_emails"){ ?> selected="selected"<?php }?>>CC Email</option>
-<option value="bcc_emails" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="bcc_emails"){ ?> selected="selected"<?php }?>>BCC Email</option>
+<!--<option value="from_email" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="from_email"){ ?> selected="selected"<?php }?>>From Email</option>
+<option value="from_name" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="from_name"){ ?> selected="selected"<?php }?>>From Name</option>-->
+<!--<option value="to_emails" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="to_emails"){ ?> selected="selected"<?php }?>>To Email</option>
+<option value="cc_emails" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="cc_emails"){ ?> selected="selected"<?php }?>>CC Email</option>-->
+<!--<option value="bcc_emails" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="bcc_emails"){ ?> selected="selected"<?php }?>>BCC Email</option>-->
 <option value="subject" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="subject"){ ?> selected="selected"<?php }?>>Subject</option>
 <option value="body" <?php if(isset($_SESSION['stype'])&&$_SESSION['stype']=="body"){ ?> selected="selected"<?php }?>>Mail Body</option>
 </select>
@@ -108,7 +113,29 @@
 <div class="table-responsive">
  <table class="table table-clients number-index-2 dataTable no-footer">
 
-<?php $cnt=101; foreach ($inboxemail as $message) { $cnt++; 
+<?php
+$cnt = 101;
+$lastGroup = '';
+$todayDate = date('Y-m-d');
+$yesterdayDate = date('Y-m-d', strtotime('-1 day'));
+$last7Date = date('Y-m-d', strtotime('-7 days'));
+foreach ($inboxemail as $message) { 
+    $cnt++;
+    $msgDateRaw = $message['date'] ?? '';
+    $msgDate = $msgDateRaw ? date('Y-m-d', strtotime($msgDateRaw)) : '';
+    if ($msgDate === $todayDate) {
+        $groupLabel = 'Today';
+    } elseif ($msgDate === $yesterdayDate) {
+        $groupLabel = 'Yesterday';
+    } elseif ($msgDate !== '' && $msgDate >= $last7Date) {
+        $groupLabel = 'Last 7 days';
+    } else {
+        $groupLabel = 'Older';
+    }
+    if ($groupLabel !== $lastGroup) {
+        $lastGroup = $groupLabel;
+        echo '<tr class="mail-separator"><td colspan="4" style="background:#f5ecc8;font-weight:600;">' . $groupLabel . '</td></tr>';
+    }
 //print_r($message);//exit;
 $string = "tw-bg-warning-600 tw-bg-primary-600 tw-bg-danger-600 tw-bg-danger-600 tw-bg-neutral-600 tw-bg-success-600 tw-bg-warning-800 tw-bg-primary-800 tw-bg-danger-800 tw-bg-danger-800 tw-bg-neutral-800 tw-bg-success-800";
 // Step 1: Convert string to array of words
@@ -390,6 +417,132 @@ if ($nextPage) {
   </div>
 </div>
 
+<div class="modal fade" id="emailContactModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" style="max-width:500px;min-width:400px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Add to Contacts</h4>
+      </div>
+      <div class="modal-body">
+        <form id="email-contact-form">
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" name="first_name" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" name="last_name" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email_id" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" name="company_name" class="form-control">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Contact Number</label>
+                <input type="text" name="phonenumber" class="form-control">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="save-email-contact">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="scrubEmailModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" style="max-width:360px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Scrub – All Folder</h4>
+      </div>
+      <div class="modal-body">
+        <p id="scrub-email-message" class="no-margin"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-warning" id="scrub-archive">Archive All</button>
+        <button type="button" class="btn btn-danger" id="scrub-delete">Delete All</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="appointmentModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" style="max-width:420px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">New Appointment</h4>
+      </div>
+      <div class="modal-body">
+        <form id="appointment-form">
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+          <div class="form-group">
+            <label>Consultations</label>
+            <select name="consultations" class="form-control" required>
+              <option value="15">15 Minut</option>
+              <option value="30">30 Minut</option>
+              <option value="45">45 Minut</option>
+              <option value="60">60 Minut</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date and Time</label>
+            <input type="datetime-local" name="date_time" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Consultant</label>
+            <input type="text" name="consultant" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label>Customer</label>
+            <input type="text" name="customer" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea name="notes" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="checkbox checkbox-primary">
+            <input type="checkbox" id="appointment-notify" name="notification" value="1">
+            <label for="appointment-notify">Send notifications for Customer</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="save-appointment">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 
@@ -658,6 +811,41 @@ $('.isread').click(function(){
 		 
 });
   
+  function buildEmailLinks(list, scrubbed) {
+     
+	 var displaylist="tw-hidden";
+	 if(scrubbed){
+	 var displaylist="vikash";
+	 }
+    if (!list) { return '<span>-</span>'; }
+    var items = list.split(/[;,]/).map(function(item){ return item.trim(); }).filter(Boolean);
+    if (!items.length) { return '<span>-</span>'; }
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var email = items[i];
+      html += '<span class="dropdown email-action-dropdown">' +
+        ' <i class="fa-regular fa-paper-plane"></i> <a href="#" class="dropdown-toggle email-action-toggle" data-toggle="dropdown" data-email="' + escapeHtml(email) + '">' +
+          escapeHtml(email) +
+        '</a>' +
+        '<ul class="dropdown-menu mail-bg">' +
+          '<li class="email-action-header" style="padding:6px 12px;">' +
+            '<span>' + escapeHtml(email) + '</span> ' +
+            '<a href="javascript:void(0)" class="copy-email pull-right" data-email="' + escapeHtml(email) + '"><i class="fa-solid fa-copy"></i></a>' +
+          '</li>' +
+          '<li class="divider"></li>' +
+          '<li><a href="javascript:void(0)" class="email-action-item" data-action="add_contact" data-email="' + escapeHtml(email) + '">Add to contacts</a></li>' +
+          '<li><a href="javascript:void(0)" class="email-action-item" data-action="send_email" data-email="' + escapeHtml(email) + '">Send email</a></li>' +
+          '<li><a href="javascript:void(0)" class="email-action-item" data-action="view_history" data-email="' + escapeHtml(email) + '">View email history from the contact</a></li>' +
+          '<li><a href="javascript:void(0)" class="email-action-item" data-action="view_attachments" data-email="' + escapeHtml(email) + '">View attachments from the contact</a></li>' +
+          '<li class="' + displaylist + '"><a href="javascript:void(0)" class="email-action-item" data-action="scrub_email" data-email="' + escapeHtml(email) + '">Scrub email from the contact</a></li>' +
+          '<li><a href="javascript:void(0)" class="email-action-item" data-action="book_appointment" data-email="' + escapeHtml(email) + '">Book an appointment</a></li>' +
+        '</ul>' +
+      '</span>';
+      if (i < items.length - 1) { html += ' '; }
+    }
+    return html;
+  }
+
   $('.hrefmodal').click(function(){ 
 
          //alert(11111);
@@ -682,7 +870,54 @@ $('.isread').click(function(){
 		 $('#myModal12').modal('show');
 		  $('#myModal12 .modal-dialog').css({"max-width":"80%", "margin-top": "20px"});
 		 //$('#myModal12').modal('show').find('.modal-body').load(urls);
-	     $('#myModal12 .modal-title').html('<span class="h4"><b>' + tid + '</b></span><br>' + '<span class="h6 text-primary"> From : <span id="mailto_copy">' + escapeHtml(mailto) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailto) + '"><i class="fa-solid fa-copy"></i></a><span><br> To : ' + escapeHtml(mailtox) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailtox) + '"><i class="fa-solid fa-copy"></i></a><br> CC : ' + escapeHtml(mailcc) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailcc) + '"><i class="fa-solid fa-copy"></i></a><br> BCC : ' + escapeHtml(mailbcc) +' <a href="#" class="copy-email" data-email="' + escapeHtml(mailbcc) + '"><i class="fa-solid fa-copy"></i></a><br>' + formattedDate +'</span>');
+      $('#myModal12 .modal-title').html(
+        '<span class="h4"><b>' + tid + '</b></span><br>' +
+        '<span class="h6 text-primary">' +
+          ' From : ' + buildEmailLinks(mailto,'scrubbed') + '<br>' +
+          ' To&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ' + buildEmailLinks(mailtox,'') + '<br>' +
+          ' CC&nbsp;&nbsp;&nbsp;&nbsp;: ' + buildEmailLinks(mailcc,'') + '<br>' +
+          /*' BCC : ' + buildEmailLinks(mailbcc) + '<br>' +*/
+          formattedDate +
+        '</span>'
+      );
+     $('#myModal12 .email-action-item').off('click').on('click', function(e) {
+        e.preventDefault();
+        var action = $(this).data('action');
+        var email = $(this).data('email');
+        // Hook for future actions
+        if (action === 'send_email') {
+          window.location.href = '<?php echo admin_url('webmail/compose'); ?>?id=' + encodeURIComponent(email);
+          return;
+        }
+        if (action === 'view_history') {
+          window.location.href = '<?php echo admin_url('webmail/inbox'); ?>?stype=from_email&skey=' + encodeURIComponent(email);
+          return;
+        }
+        if (action === 'view_attachments') {
+          window.location.href = '<?php echo admin_url('webmail/inbox'); ?>?stype=from_email&mode=attached&skey=' + encodeURIComponent(email);
+          return;
+        }
+        if (action === 'add_contact') {
+          $('#email-contact-form')[0].reset();
+          $('#email-contact-form [name="email_id"]').val(email);
+          $('#emailContactModal').modal('show');
+          return;
+        }
+        if (action === 'scrub_email') {
+          $('#scrub-email-message').text('Email in all folder, from ' + email + ' will be affected');
+          $('#scrubEmailModal').data('email', email).modal('show');
+          return;
+        }
+        if (action === 'book_appointment') {
+          var consultant = '<?php echo e($_SESSION['webmail']['mailer_email'] ?? ''); ?>';
+          $('#appointment-form')[0].reset();
+          $('#appointment-form [name="consultant"]').val(consultant);
+          $('#appointment-form [name="customer"]').val(email);
+          $('#appointmentModal').modal('show');
+          return;
+        }
+        // Default: no-op for now
+      });
 		// $('#emailSubject').val(tid);
 		 
 		 // Set values for Reply form
@@ -799,6 +1034,70 @@ $('#emailBody_ifr').contents().find('#tinymce').html(content);
     document.execCommand('copy');
     temp.remove();
     alert_float('success', 'Copied: ' + email);
+  });
+
+  $('#save-email-contact').on('click', function() {
+    var $form = $('#email-contact-form');
+    $.post('<?php echo admin_url('webmail/add_contact'); ?>', $form.serialize(), function(resp) {
+      if (resp && resp.success) {
+        $('#emailContactModal').modal('hide');
+        if (resp.message) {
+          alert_float('success', resp.message);
+        }
+      } else {
+        alert_float('warning', resp && resp.message ? resp.message : 'Failed to save contact');
+      }
+    }, 'json');
+  });
+
+  $('#scrub-archive').on('click', function() {
+    var email = $('#scrubEmailModal').data('email');
+    if (!email) { return; }
+    if (!confirm('Archive all emails from this contact?')) { return; }
+    $.post('<?php echo admin_url('webmail/scrub_email'); ?>', {
+      email: email,
+      action: 'archive',
+      <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+    }, function(resp) {
+      if (resp && resp.success) {
+        $('#scrubEmailModal').modal('hide');
+        alert_float('success', resp.message || 'Archived');
+        location.reload();
+      } else {
+        alert_float('warning', resp && resp.message ? resp.message : 'Failed to archive');
+      }
+    }, 'json');
+  });
+
+  $('#scrub-delete').on('click', function() {
+    var email = $('#scrubEmailModal').data('email');
+    if (!email) { return; }
+    if (!confirm('Delete all emails from this contact?')) { return; }
+    $.post('<?php echo admin_url('webmail/scrub_email'); ?>', {
+      email: email,
+      action: 'delete',
+      <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+    }, function(resp) {
+      if (resp && resp.success) {
+        $('#scrubEmailModal').modal('hide');
+        alert_float('success', resp.message || 'Deleted');
+        location.reload();
+      } else {
+        alert_float('warning', resp && resp.message ? resp.message : 'Failed to delete');
+      }
+    }, 'json');
+  });
+
+  $('#save-appointment').on('click', function() {
+    var $form = $('#appointment-form');
+    $.post('<?php echo admin_url('webmail/add_appointment'); ?>', $form.serialize(), function(resp) {
+      if (resp && resp.success) {
+        $('#appointmentModal').modal('hide');
+        alert_float('success', resp.message || 'Appointment saved');
+      } else {
+        alert_float('warning', resp && resp.message ? resp.message : 'Failed to save appointment');
+      }
+    }, 'json');
   });
 </script>
   
