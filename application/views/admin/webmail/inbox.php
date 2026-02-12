@@ -15,6 +15,46 @@
 }
 .dropdown-menu { width:275px !important;}
 .copy-email.pull-right{ width:38px !important;margin-top: -5px;}
+.attachment-card {
+    width: 130px;
+    border: 1px solid #e4e6eb;
+    border-radius: 10px;
+    padding: 8px;
+    margin: 8px;
+    display: inline-block;
+    text-align: center;
+    background: #fff;
+    transition: 0.2s;
+}
+
+.attachment-card:hover {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.thumb-img {
+    width: 100%;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.file-icon {
+    font-size: 50px;
+    padding: 15px 0;
+}
+
+.file-name {
+    font-size: 12px;
+    margin-top: 6px;
+    word-break: break-word;
+}
+.file-name {
+    font-size: 12px;
+    margin-top: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 </style>
 
 <div id="wrapper">
@@ -114,6 +154,76 @@
  <table class="table table-clients number-index-2 dataTable no-footer">
 
 <?php
+
+
+if(isset($_GET['mode'])&&$_GET['mode']=="attached"){
+$searchemail=$_GET['skey'];
+
+        $this->db->select('attachments,');
+        $this->db->where('from_email', $searchemail);
+		$this->db->where('status', 1);
+		$this->db->where('attachments !=', '');
+        $attachmentslist=$this->db->get(db_prefix() . 'emails')->result_array();
+		//print_r($attachmentslist);
+        //echo $this->db->last_query();
+
+
+foreach ($attachmentslist as $row) {
+
+    if (!empty($row['attachments'])) {
+
+        $files = explode(',', $row['attachments']);
+
+        foreach ($files as $file) {
+
+            $file = trim($file);
+            $ext  = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            $url  = base_url($file);
+            $name = basename($file);
+
+            ?>
+            
+            <div class="attachment-card">
+                
+                <?php if (in_array($ext, ['jpg','jpeg','png','gif','webp'])) { ?>
+                    
+                    <!-- Image Thumbnail -->
+                    <a href="<?= $url ?>" target="_blank">
+                        <img src="<?= $url ?>" class="thumb-img">
+                    </a>
+
+                <?php } else { ?>
+
+                    <!-- File Icon Preview -->
+                    <div class="file-icon">
+                        <?php
+                        if ($ext == 'pdf') echo '<i class="fa fa-file-pdf text-danger"></i>';
+                        elseif (in_array($ext,['doc','docx'])) echo '<i class="fa fa-file-word text-primary"></i>';
+                        elseif (in_array($ext,['xls','xlsx','csv','ods'])) echo '<i class="fa fa-file-excel text-success"></i>';
+                        else echo '<i class="fa fa-file text-secondary"></i>';
+                        ?>
+                    </div>
+
+                <?php } ?>
+
+                <div class="file-name">
+                    <a href="<?= $url ?>" target="_blank"><?= $name ?></a>
+                </div>
+
+            </div>
+
+            <?php
+        }
+    }
+}
+
+
+
+
+		exit;
+		
+		
+}else{
 $cnt = 101;
 $lastGroup = '';
 $todayDate = date('Y-m-d');
@@ -144,6 +254,9 @@ $words = preg_split('/\s+/', $string); // Split by spaces or multiple spaces
 $randomWord = $words[array_rand($words)];
 $mailcss="";
 if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
+
+
+
 ?>
 <tr class="table<?=$message['id'];?>">
 <td style="width:35px;"><div class="tw-rounded-full <?php echo $randomWord;?> tw-text-white tw-inline-flex tw-items-center tw-justify-center tw-h-8 tw-w-8 -tw-mt-1 group-hover:!tw-bg-primary-700"><?=strtoupper(substr($message['from_email'] ?? '',0,2));?></div></td>
@@ -209,7 +322,7 @@ $filePath = site_url() . '/' . $attach;
 
 
 </td></tr>
-<?php } ?>
+<?php } } ?>
 
   </tbody>
   </table>
@@ -1089,12 +1202,15 @@ $('#emailBody_ifr').contents().find('#tinymce').html(content);
   });
 
   $('#save-appointment').on('click', function() {
+  $("#save-appointment").html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
     var $form = $('#appointment-form');
     $.post('<?php echo admin_url('webmail/add_appointment'); ?>', $form.serialize(), function(resp) {
       if (resp && resp.success) {
         $('#appointmentModal').modal('hide');
+		$("#save-appointment").html("Save");
         alert_float('success', resp.message || 'Appointment saved');
       } else {
+	    $("#save-appointment").html("Save");
         alert_float('warning', resp && resp.message ? resp.message : 'Failed to save appointment');
       }
     }, 'json');

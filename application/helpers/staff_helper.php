@@ -1564,6 +1564,10 @@ function convertToIST($date, $fromTimezone = 'UTC')
     }
 }
 
+function formatEmailName($email) {
+    $email = trim($email);
+    return strstr($email, '@', true);
+}
 
 	
 function amountInWords($number)
