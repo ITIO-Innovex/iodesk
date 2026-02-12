@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); //print_r($dar); ?>
+<?php init_head(); ?>
 <style>
   .jqte_tool.jqte_tool_1 .jqte_tool_label { height: 20px !important; }
   .jqte { margin: 10px 0 !important; }
@@ -12,11 +12,11 @@
         <div class="panel_s">
           <div class="panel-body">
             <div>
-               <h4 class="tw-mt-0 tw-font-semibold tw-text-lg"> Daily Activity Report (DAR) 
-			   <a href="<?php echo admin_url('hrd/dar_list');?>" id="upgrade_plan" class="btn btn-info btn-sm pull-right"><i class="fa-regular fa-eye"></i> View Send DAR</a>
-			   </h4>
-                <hr class="hr-panel-heading">
-                </div>
+              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg"> Daily Activity Report (DAR)
+                <a href="<?php echo admin_url('hrd/dar_list');?>" id="upgrade_plan" class="btn btn-info btn-sm pull-right"><i class="fa-regular fa-eye"></i> View Send DAR</a>
+              </h4>
+              <hr class="hr-panel-heading">
+            </div>
             <?php echo form_open_multipart(admin_url('hrd/dar'), ['id' => 'dar-form']); ?>
               <input type="hidden" name="status" id="dar-status" value="2">
               <div class="form-group">
@@ -24,47 +24,45 @@
                 <textarea id="dar-description" name="description" class="form-control editor" rows="6" required><?php echo isset($dar['descriptions']) ? $dar['descriptions'] : ''; ?></textarea>
               </div>
               <div class="form-group">
-			  <div class="row">
-      <div class="col-md-6">
-	  <label for="dar-files">Attach File (Optional)</label>
-      <input type="file" name="dar_files[]" id="dar-files" class="form-control" multiple>
-      <p class="text-muted mtop5">You can select multiple files.</p>
-      <div id="dar-selected-files" class="mtop10"></div>
-	  </div>
-	   <div class="col-md-68">
-	   <?php if (!empty($dar['file'])) { ?>
-                  <?php $darFiles = array_filter(array_map('trim', explode(',', $dar['file']))); ?>
-                  <?php if (!empty($darFiles)) { ?>
-                    <div class="mtop10">
-                      <strong>Existing Attachments:</strong>
-                      <ul class="list-unstyled">
-                        <?php foreach ($darFiles as $file) { ?>
-                          <li class="tw-flex tw-items-center tw-gap-2">
-                            <a href="<?php echo base_url($file); ?>" target="_blank"><?php echo e(basename($file)); ?></a>
-                            <button type="button" class="btn btn-xs btn-danger dar-delete-file" data-id="<?php echo (int) ($dar['id'] ?? 0); ?>" data-file="<?php echo e(basename($file)); ?>">Delete</button>
-                          </li>
-                        <?php } ?>
-                      </ul>
-                    </div>
-                  <?php } ?>
-                <?php } ?>
-	  </div>
-	  </div>
-			  
-                
-				
-				
-                
-				
-				
+                <div class="row">
+                  <div class="col-md-6">
+                    <label for="dar-files">Attach File (Optional)</label>
+                    <input type="file" name="dar_files[]" id="dar-files" class="form-control" multiple>
+                    <p class="text-muted mtop5">You can select multiple files.</p>
+                    <div id="dar-selected-files" class="mtop10"></div>
+                  </div>
+                  <div class="col-md-68">
+                    <?php if (!empty($dar['file'])) { ?>
+                      <?php $darFiles = array_filter(array_map('trim', explode(',', $dar['file']))); ?>
+                      <?php if (!empty($darFiles)) { ?>
+                        <div class="mtop10">
+                          <strong>Existing Attachments:</strong>
+                          <ul class="list-unstyled">
+                            <?php foreach ($darFiles as $file) { ?>
+                              <li class="tw-flex tw-items-center tw-gap-2">
+                                <a href="<?php echo base_url($file); ?>" target="_blank"><?php echo e(basename($file)); ?></a>
+                                <?php if (empty($dar) || (int)$dar['status'] !== 1) { ?>
+                                  <button type="button" class="btn btn-xs btn-danger dar-delete-file" data-id="<?php echo (int) ($dar['id'] ?? 0); ?>" data-file="<?php echo e(basename($file)); ?>">Delete</button>
+                                <?php }else{ ?>
+                                <button type="button" class="btn btn-xs btn-success dar-copy-link" data-link="<?php echo e(base_url($file)); ?>">Copy</button>
+                                <?php } ?>
+                              </li>
+                            <?php } ?>
+                          </ul>
+                        </div>
+                      <?php } ?>
+                    <?php } ?>
+                    
+                  </div>
+                </div>
               </div>
               <div class="tw-flex tw-gap-2">
-			  <?php if (!isset($dar['status']) || (int)$dar['status'] !== 1) { ?>
-                <button type="button" class="btn btn-default" data-status="2" id="dar-save-later" onclick="return confirm('Data can be saved as draft. Once submitted, editing is disabled.')">Save as Draft & Submit Later</button>
-                <button type="button" class="btn btn-primary" data-status="1" id="dar-save-submit" onclick="return confirm('Once submitted, you won?t be able to edit this data. Do you want to continue?')">Submit</button>
-				<?php }else{?>
-				<span class="btn btn-success">DAR Submitted </span>
-				<?php }?>
+                <?php if (!isset($dar['status']) || (int)$dar['status'] !== 1) { ?>
+                  <button type="button" class="btn btn-default" data-status="2" id="dar-save-later" onclick="return confirm('Data can be saved as draft. Once submitted, editing is disabled.')">Save as Draft & Submit Later</button>
+                  <button type="button" class="btn btn-primary" data-status="1" id="dar-save-submit" onclick="return confirm('Once submitted, you won\'t be able to edit this data. Do you want to continue?')">Submit</button>
+                <?php } else { ?>
+                  <span class="btn btn-success">DAR Submitted </span>
+                <?php } ?>
               </div>
             <?php echo form_close(); ?>
           </div>
@@ -148,6 +146,44 @@
           alert('Failed to delete file');
         }
       }, 'json');
+    });
+
+    $('.dar-copy-link').on('click', function() {
+      var link = $(this).data('link');
+      if (!link) { return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function() {
+          alert_float('success', 'Link copied');
+        }).catch(function() {
+          alert('Link copied');
+        });
+        return;
+      }
+      var $temp = $('<input>');
+      $('body').append($temp);
+      $temp.val(link).select();
+      document.execCommand('copy');
+      $temp.remove();
+      alert_float('success', 'Link copied');
+    });
+
+    $('#copy-dar-link').on('click', function() {
+      var link = $('#dar-share-link').val();
+      if (!link) { return; }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(function() {
+          alert_float('success', 'Link copied');
+        }).catch(function() {
+          alert('Link copied');
+        });
+        return;
+      }
+      var $temp = $('<input>');
+      $('body').append($temp);
+      $temp.val(link).select();
+      document.execCommand('copy');
+      $temp.remove();
+      alert_float('success', 'Link copied');
     });
   });
 </script>

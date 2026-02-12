@@ -94,7 +94,7 @@ $attendance_display_status=attendance_display_status();
   <?php }else{ ?>
    <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
   <?php } ?>
-  
+  <a  href="<?php echo admin_url('hrd/dar');?>" class="digital-btn btn-info" title="Add your Daily Activity Report (DAR)"> DAR <i class="fa-solid fa-file-pen"></i></a>
   <?php }else{ ?>
  
   <?php } ?>

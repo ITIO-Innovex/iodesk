@@ -15,6 +15,7 @@ class Important_document extends AdminController
         }
 
         $this->ensure_soft_delete_column();
+        $this->ensure_share_columns();
         $companyId = get_staff_company_id();
         $this->db->select('d.*, CONCAT(s.firstname, " ", s.lastname) as staff_name');
         $this->db->from(db_prefix() . 'important_documents as d');
@@ -40,6 +41,7 @@ class Important_document extends AdminController
         }
 
         $this->ensure_soft_delete_column();
+        $this->ensure_share_columns();
         $companyId = get_staff_company_id();
         $staffId = get_staff_user_id();
         $id = (int) $this->input->post('id');
@@ -159,6 +161,121 @@ class Important_document extends AdminController
         redirect(admin_url('important_document'));
     }
 
+    public function share($id)
+    {
+        if (!(is_admin() || staff_can('view', 'hr_department') || staff_can('view_own', 'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $this->ensure_share_columns();
+        $companyId = get_staff_company_id();
+        $doc = $this->db->get_where(db_prefix() . 'important_documents', [
+            'id' => (int) $id,
+            'company_id' => $companyId,
+        ])->row_array();
+        if (!$doc) {
+            echo json_encode(['success' => false, 'message' => 'Record not found']);
+            return;
+        }
+
+        $token = $doc['share_token'] ?? '';
+        if ($token === '') {
+            $token = bin2hex(random_bytes(16));
+            $this->db->where('id', (int) $id)->where('company_id', $companyId)->update(db_prefix() . 'important_documents', [
+                'share_token' => $token,
+                'share_enabled' => 1,
+                'updatedon' => date('Y-m-d H:i:s'),
+            ]);
+        } else {
+            $this->db->where('id', (int) $id)->where('company_id', $companyId)->update(db_prefix() . 'important_documents', [
+                'share_enabled' => 1,
+                'updatedon' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        $link = site_url('important_document_public/edit/' . $token);
+        echo json_encode(['success' => true, 'link' => $link]);
+    }
+
+    public function edit_excel($id)
+    {
+        if (!(is_admin() || staff_can('view', 'hr_department') || staff_can('view_own', 'hr_department'))) {
+            access_denied('Important Documents');
+        }
+
+        $companyId = get_staff_company_id();
+        $doc = $this->db->get_where(db_prefix() . 'important_documents', [
+            'id' => (int) $id,
+            'company_id' => $companyId,
+        ])->row_array();
+        if (!$doc || empty($doc['document_path'])) {
+            set_alert('warning', 'Record not found');
+            redirect(admin_url('important_document'));
+        }
+
+        $ext = strtolower(pathinfo($doc['document_path'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['xls', 'xlsx'], true)) {
+            set_alert('warning', 'Only Excel files can be edited');
+            redirect(admin_url('important_document'));
+        }
+
+        $data = [];
+        $data['title'] = 'Edit Excel';
+        $data['document'] = $doc;
+        $this->load->view('admin/important_document/edit_excel', $data);
+    }
+
+    public function save_excel($id)
+    {
+        if (!(is_admin() || staff_can('view', 'hr_department') || staff_can('view_own', 'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $companyId = get_staff_company_id();
+        $doc = $this->db->get_where(db_prefix() . 'important_documents', [
+            'id' => (int) $id,
+            'company_id' => $companyId,
+        ])->row_array();
+        if (!$doc || empty($doc['document_path'])) {
+            echo json_encode(['success' => false, 'message' => 'Record not found']);
+            return;
+        }
+
+        $ext = strtolower(pathinfo($doc['document_path'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['xls', 'xlsx'], true)) {
+            echo json_encode(['success' => false, 'message' => 'Only Excel files can be edited']);
+            return;
+        }
+
+        $base64 = $this->input->post('file_base64');
+        if (!$base64) {
+            echo json_encode(['success' => false, 'message' => 'Missing file data']);
+            return;
+        }
+
+        $decoded = base64_decode($base64);
+        if ($decoded === false) {
+            echo json_encode(['success' => false, 'message' => 'Invalid file data']);
+            return;
+        }
+
+        $filePath = FCPATH . $doc['document_path'];
+        if (file_put_contents($filePath, $decoded) === false) {
+            echo json_encode(['success' => false, 'message' => 'Failed to save file']);
+            return;
+        }
+
+        $this->db->where('id', (int) $id)
+            ->where('company_id', $companyId)
+            ->update(db_prefix() . 'important_documents', [
+                'updatedon' => date('Y-m-d H:i:s'),
+            ]);
+
+        echo json_encode(['success' => true, 'message' => 'File saved']);
+    }
+
     private function ensure_soft_delete_column()
     {
         $table = 'important_documents';
@@ -179,5 +296,34 @@ class Important_document extends AdminController
             ],
         ];
         $this->dbforge->add_column($table, $fields);
+    }
+
+    private function ensure_share_columns()
+    {
+        $table = 'important_documents';
+        $prefixedTable = $this->db->dbprefix($table);
+        $tables = $this->db->list_tables();
+        if (!in_array($prefixedTable, $tables)) {
+            return;
+        }
+        $this->load->dbforge();
+        if (!$this->db->field_exists('share_token', $table)) {
+            $this->dbforge->add_column($table, [
+                'share_token' => [
+                    'type' => 'VARCHAR',
+                    'constraint' => 64,
+                    'null' => true,
+                ],
+            ]);
+        }
+        if (!$this->db->field_exists('share_enabled', $table)) {
+            $this->dbforge->add_column($table, [
+                'share_enabled' => [
+                    'type' => 'TINYINT',
+                    'constraint' => 1,
+                    'default' => 0,
+                ],
+            ]);
+        }
     }
 }

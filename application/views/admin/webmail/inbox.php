@@ -618,10 +618,10 @@ if ($nextPage) {
           <div class="form-group">
             <label>Consultations</label>
             <select name="consultations" class="form-control" required>
-              <option value="15">15 Minut</option>
-              <option value="30">30 Minut</option>
-              <option value="45">45 Minut</option>
-              <option value="60">60 Minut</option>
+              <option value="15">15 Minute</option>
+              <option value="30">30 Minute</option>
+              <option value="45">45 Minute</option>
+              <option value="60">60 Minute</option>
             </select>
           </div>
           <div class="form-group">
@@ -629,11 +629,11 @@ if ($nextPage) {
             <input type="datetime-local" name="date_time" class="form-control" required>
           </div>
           <div class="form-group">
-            <label>Consultant</label>
+            <label>Host</label>
             <input type="text" name="consultant" class="form-control" readonly>
           </div>
           <div class="form-group">
-            <label>Customer</label>
+            <label>Participant</label>
             <input type="text" name="customer" class="form-control" readonly>
           </div>
           <div class="form-group">
@@ -642,7 +642,7 @@ if ($nextPage) {
           </div>
           <div class="checkbox checkbox-primary">
             <input type="checkbox" id="appointment-notify" name="notification" value="1">
-            <label for="appointment-notify">Send notifications for Customer</label>
+            <label for="appointment-notify">Send notifications</label>
           </div>
         </form>
       </div>
