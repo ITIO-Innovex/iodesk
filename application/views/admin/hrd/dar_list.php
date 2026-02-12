@@ -4,7 +4,9 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Daily Activity Report - List</h4>
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Daily Activity Report - List
+		<a href="<?php echo admin_url('hrd/dar');?>" class="btn btn-primary pull-right" ><i class="fa-regular fa-plus"></i> Add New DAR</a>
+		</h4>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (!empty($dars)) { ?>

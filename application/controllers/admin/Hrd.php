@@ -5451,6 +5451,7 @@ class Hrd extends AdminController
                 $this->db->update('it_crm_dar', $data);
                 $darId = (int) $existingDar['id'];
             } else {
+			    $data['date']=date("Y-m-d");
                 $this->db->insert('it_crm_dar', $data);
                 $darId = $this->db->insert_id();
             }
