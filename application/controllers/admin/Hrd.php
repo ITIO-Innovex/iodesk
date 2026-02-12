@@ -5459,6 +5459,13 @@ class Hrd extends AdminController
             }
 
             $savedFiles = [];
+            $existingNames = [];
+            if (!empty($existingDar) && !empty($existingDar['file'])) {
+                $existingPaths = array_filter(array_map('trim', explode(',', $existingDar['file'])));
+                foreach ($existingPaths as $p) {
+                    $existingNames[] = basename($p);
+                }
+            }
             if ($darId && isset($_FILES['dar_files']['name'])) {
                 $files = $_FILES['dar_files'];
                 if (!is_array($files['name'])) {
@@ -5489,6 +5496,9 @@ class Hrd extends AdminController
                     }
 
                     $originalName = $files['name'][$i];
+                    if (in_array($originalName, $existingNames, true)) {
+                        continue;
+                    }
                     if (!_upload_extension_allowed($originalName)) {
                         continue;
                     }
@@ -5504,7 +5514,9 @@ class Hrd extends AdminController
             if (!empty($savedFiles)) {
                 if (!empty($existingDar) && !empty($existingDar['file'])) {
                     $existingFiles = array_filter(array_map('trim', explode(',', $existingDar['file'])));
-                    $savedFiles = array_values(array_filter(array_merge($existingFiles, $savedFiles)));
+                    $savedFiles = array_values(array_unique(array_filter(array_merge($existingFiles, $savedFiles))));
+                } else {
+                    $savedFiles = array_values(array_unique(array_filter($savedFiles)));
                 }
                 $this->db->where('id', $darId);
                 $this->db->update('it_crm_dar', [

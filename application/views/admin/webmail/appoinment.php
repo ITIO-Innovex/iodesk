@@ -26,8 +26,8 @@
 					  <th>Appoinment ID</th>
                       <th>Date & Time</th>
                       <th>Consultations</th>
-                      <th>Consultant</th>
-                      <th>Customer</th>
+                      <th>Host</th>
+                      <th>Participant</th>
 					  <th>Notes</th>
                       <th>Status</th>
                     </tr>
@@ -67,8 +67,8 @@
 					  <th>Appoinment ID</th>
                       <th>Date & Time</th>
                       <th>Consultations</th>
-                      <th>Consultant</th>
-                      <th>Customer</th>
+                      <th>Host</th>
+                      <th>Participant</th>
 					  <th>Notes</th>
                       <th>Status</th>
                     </tr>

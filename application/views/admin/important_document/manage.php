@@ -32,6 +32,8 @@
                     $updated = isset($d['updatedon']) ? $d['updatedon'] : '';
                     $staffName = isset($d['staff_name']) ? $d['staff_name'] : '';
                     $link = $path ? base_url($path) : '';
+                    $ext = $path ? strtolower(pathinfo($path, PATHINFO_EXTENSION)) : '';
+                    $isExcel = in_array($ext, ['xls', 'xlsx'], true);
                   ?>
                   <tr>
                     <td><?php echo e($name); ?></td>
@@ -40,6 +42,10 @@
                         <a href="<?php echo $link; ?>" target="_blank" class="btn btn-default btn-sm">View</a>
                         <a href="<?php echo $link; ?>" class="btn btn-primary btn-sm" download>Download</a>
                         <button type="button" class="btn btn-info btn-sm copy-document-link" data-link="<?php echo e($link); ?>">Copy Link</button>
+                        <?php if ($isExcel) { ?>
+                          <a href="<?php echo admin_url('important_document/edit_excel/' . $d['id']); ?>" class="btn btn-warning btn-sm">Edit Excel</a>
+                          <button type="button" class="btn btn-success btn-sm share-excel" data-id="<?php echo (int) $d['id']; ?>">Share</button>
+                        <?php } ?>
                       <?php } ?>
                     </td>
                     <td><?php echo e($remarks); ?></td>
@@ -105,6 +111,27 @@
   </div>
 </div>
 
+<div class="modal fade" id="share_excel_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" style="max-width:420px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Share Excel Link</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Public Link</label>
+          <input type="text" id="share_excel_link" class="form-control" readonly>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="copy-share-link">Copy Link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php init_tail(); ?>
 <script>
   function openDocModal() {
@@ -130,6 +157,38 @@
     if (!link) {
       return;
     }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(link).then(function() {
+        alert_float('success', 'Link copied');
+      });
+      return;
+    }
+    var $temp = $('<input>');
+    $('body').append($temp);
+    $temp.val(link).select();
+    document.execCommand('copy');
+    $temp.remove();
+    alert_float('success', 'Link copied');
+  });
+
+  $(document).on('click', '.share-excel', function() {
+    var id = $(this).data('id');
+    if (!id) { return; }
+    $.post('<?php echo admin_url('important_document/share'); ?>/' + id, {
+      <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+    }, function(resp) {
+      if (resp && resp.success) {
+        $('#share_excel_link').val(resp.link);
+        $('#share_excel_modal').modal('show');
+      } else {
+        alert_float('warning', resp && resp.message ? resp.message : 'Failed to generate link');
+      }
+    }, 'json');
+  });
+
+  $('#copy-share-link').on('click', function() {
+    var link = $('#share_excel_link').val();
+    if (!link) { return; }
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard.writeText(link).then(function() {
         alert_float('success', 'Link copied');
