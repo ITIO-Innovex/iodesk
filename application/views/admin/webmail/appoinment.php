@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); //print_r($upcoming); ?>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -23,20 +23,24 @@
                 <table class="table table-bordered">
                   <thead>
                     <tr>
+					  <th>Appoinment ID</th>
                       <th>Date & Time</th>
                       <th>Consultations</th>
                       <th>Consultant</th>
                       <th>Customer</th>
+					  <th>Notes</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php foreach ($upcoming as $row) { ?>
                       <tr>
+					    <td># 000<?php echo e($row['id'] ?? ''); ?></td>
                         <td><?php echo e($row['date_time'] ?? ''); ?></td>
                         <td><?php echo e($row['consultations'] ?? ''); ?> Min</td>
                         <td><?php echo e($row['consultant'] ?? ''); ?></td>
-                        <td><?php echo e($row['customer'] ?? ''); ?></td>
+                        <td><i class="fa-solid fa-reply reply-email" data-email="<?php echo e($row['customer'] ?? ''); ?>"></i> <?php echo e($row['customer'] ?? ''); ?></td>
+						<td><span title="<?php echo e($row['notes'] ?? ''); ?>"><?php echo substr($row['notes'],0,15) ?? ''; ?></span></td>
                         <td>
                           <select class="form-control input-sm appointment-status" data-id="<?php echo (int) $row['id']; ?>">
                             <option value="1" <?php echo (int) ($row['status'] ?? 1) === 1 ? 'selected' : ''; ?>>Active</option>
@@ -60,20 +64,24 @@
                 <table class="table table-bordered">
                   <thead>
                     <tr>
+					  <th>Appoinment ID</th>
                       <th>Date & Time</th>
                       <th>Consultations</th>
                       <th>Consultant</th>
                       <th>Customer</th>
+					  <th>Notes</th>
                       <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php foreach ($past as $row) { ?>
                       <tr>
+					    <td># 000<?php echo e($row['id'] ?? ''); ?></td>
                         <td><?php echo e($row['date_time'] ?? ''); ?></td>
                         <td><?php echo e($row['consultations'] ?? ''); ?> Min</td>
                         <td><?php echo e($row['consultant'] ?? ''); ?></td>
-                        <td><?php echo e($row['customer'] ?? ''); ?></td>
+                        <td><i class="fa-solid fa-reply reply-email" data-email="<?php echo e($row['customer'] ?? ''); ?>"></i> <?php echo e($row['customer'] ?? ''); ?></td>
+						<td><span title="<?php echo e($row['notes'] ?? ''); ?>"><?php echo substr($row['notes'],0,15) ?? ''; ?></span></td>
                         <td>
                           <select class="form-control input-sm appointment-status" data-id="<?php echo (int) $row['id']; ?>">
                             <option value="1" <?php echo (int) ($row['status'] ?? 1) === 1 ? 'selected' : ''; ?>>Active</option>
@@ -153,9 +161,49 @@
   </div>
 </div>
 
+<div class="modal fade" id="replyEmailModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" style="max-width:520px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Reply Email</h4>
+      </div>
+      <div class="modal-body">
+        <form action="<?php echo admin_url('webmail/Reply'); ?>" method="post" enctype="multipart/form-data" id="reply-email-form">
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+          <input type="hidden" name="redirect" value="webmail/appoinment">
+          <input type="hidden" name="recipientEmail" id="recipientEmailIT" value="">
+          <input type="hidden" name="messagetype" value="Reply">
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" name="emailSubject" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea name="emailBody" id="replyEmailBody" class="form-control editor" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Attach Files:</label>
+            <input type="file" name="attachments[]" class="form-control" multiple>
+          </div>
+          <button type="submit" name="send" class="btn btn-primary">Send Email</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
 <script>
   $(function() {
+    $('.editor').jqte();
     $('#save-appointment').on('click', function() {
       var $form = $('#appointment-form');
       $.post('<?php echo admin_url('webmail/add_appointment'); ?>', $form.serialize(), function(resp) {
@@ -182,6 +230,15 @@
           alert_float('warning', resp && resp.message ? resp.message : 'Failed to update status');
         }
       }, 'json');
+    });
+
+    $('.reply-email').on('click', function() {
+      var email = $(this).data('email') || '';
+      if (!email) { return; }
+      $('#recipientEmailIT').val(email);
+      $('#reply-email-form')[0].reset();
+      $('#recipientEmailIT').val(email);
+      $('#replyEmailModal').modal('show');
     });
   });
 </script>

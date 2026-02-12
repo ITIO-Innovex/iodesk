@@ -373,6 +373,8 @@ if (!empty($attachments_json)) {
 
 	public function add_appointment()
 	{
+	
+	date_default_timezone_set('Asia/Kolkata');
 		if (!is_staff_logged_in()) {
 			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
 			return;
@@ -410,7 +412,63 @@ if (!empty($attachments_json)) {
 			'status' => 1,
 		];
 
+		
+		
+		
+
+		
+		
 		$this->db->insert('it_crm_email_appoinment', $data);
+		$last_id = $this->db->insert_id();
+		if($notification==1){
+		
+$mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invoice</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6; padding:20px;">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+            <p style="margin:0 0 16px;">Hi there, <strong>'.formatEmailName($customer).'! </strong></p>
+<p>You`ve scheduled an appointment with <strong>'.formatEmailName($consultant).'</strong> for <strong>'.$consultations.' Mins meetings <br> on '.date('d M Y \a\t h:i A', strtotime($dateTime)).' (Asia/Kolkata GMT +)</strong></p>
+<p style="margin:0 0 20px; text-align:left;">Something amiss? You can always reschedule or cancel your appointment.</p>
+<p style="margin:0 0 16px;">Appoinment Number is : <strong># 000'.$last_id.'</strong></p>
+
+<p style="margin:0;">
+See you soon,<br>
+<strong>'.formatEmailName($consultant).'<br>
+'.get_staff_company_name().'</strong><br>
+</p>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
+
+		
+		$msgdata['redirect']="inbox.php";
+		$msgdata['recipientEmail']=$customer;
+		//$msgdata['recipientCC']=$customer;
+		$msgdata['emailSubject']=get_staff_company_name()." : Appointment scheduled. # 000".$last_id;
+		$msgdata['emailBody']=$mailbody;
+		$this->webmail_model->compose_email($msgdata);
+		}
+		
 		echo json_encode(['success' => true, 'message' => 'Appointment saved successfully']);
 	}
 

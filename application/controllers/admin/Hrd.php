@@ -57,6 +57,8 @@ class Hrd extends AdminController
             $this->attendance_status();
         } elseif ($type == 'attendance_request') {
             $this->attendance_request();
+        } elseif ($type == 'dar_master') {
+            $this->dar_master();
         } elseif ($type == 'shift_manager') {
             $this->shift_manager();
         } elseif ($type == 'awards') {
@@ -5893,6 +5895,41 @@ class Hrd extends AdminController
                 redirect(admin_url('hrd/interviews'));
             }
         }
+    }
+
+    public function dar_master()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Master');
+        }
+
+        $date = $this->input->get('date');
+        $staffId = $this->input->get('staffid');
+        $date = $date ? $date : date('Y-m-d');
+
+        $this->db->select('d.*, s.firstname, s.lastname');
+        $this->db->from('it_crm_dar d');
+        $this->db->join(db_prefix().'staff s', 's.staffid = d.staffid', 'left');
+        $this->db->where('d.date=', $date);
+        if (!empty($staffId)) {
+            $this->db->where('d.staffid', (int) $staffId);
+        }
+        $this->db->order_by('d.date', 'desc');
+        $data['dars'] = $this->db->get()->result_array();
+
+        $data['staffs'] = $this->db->select('staffid, firstname, lastname')
+            ->where('active', 1)
+			->where('company_id', get_staff_company_id())
+            ->order_by('firstname', 'asc')
+            ->get(db_prefix().'staff')
+            ->result_array();
+        //echo $this->db->last_query();exit;
+        $data['filters'] = [
+            'date' => $date,
+            'staffid' => $staffId,
+        ];
+        $data['title'] = 'DAR Master';
+        $this->load->view('admin/hrd/setting/dar_master', $data);
     }
 	
 	
