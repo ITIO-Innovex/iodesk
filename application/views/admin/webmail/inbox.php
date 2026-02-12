@@ -219,8 +219,6 @@ foreach ($attachmentslist as $row) {
 
 
 
-
-		exit;
 		
 		
 }else{
