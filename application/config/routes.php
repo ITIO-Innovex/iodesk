@@ -328,3 +328,4 @@ $route['admin/database_backups/download/(.+)'] = 'admin/database_backups/downloa
 $route['admin/database_backups/delete'] = 'admin/database_backups/delete';
 
 $route['admin/hrd/gallery/latest'] = 'admin/hrd/gallery_latest';
+$route['admin/hrd/employee_details_form'] = 'admin/hrd/employee_details_form';
