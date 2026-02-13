@@ -15,7 +15,7 @@
                   <tr>
                     <th>Date</th>
                     <th>Status</th>
-                    <th>Description</th>
+                    
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -38,7 +38,6 @@
                           <span class="label label-default">Draft</span>
                         <?php } ?>
                       </td>
-                      <td><?php echo e(wordwrap(strip_tags($dar['descriptions'] ?? ''), 60, "\n", true)); ?></td>
                       <td>
                         <button type="button"
                                 class="btn btn-info btn-xs dar-view"
