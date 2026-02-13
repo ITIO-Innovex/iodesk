@@ -6327,6 +6327,116 @@ class Hrd extends AdminController
         $data['form'] = $existing;
         $this->load->view('admin/hrd/employee_details_form', $data);
     }
+
+    public function job_application_form()
+    {
+        if (!(is_admin() || staff_can('view_own', 'hr_department'))) {
+            access_denied('Job Application Form');
+        }
+
+        $staffId = get_staff_user_id();
+        $companyId = get_staff_company_id();
+        $existing = $this->db->where('staffid', $staffId)
+            ->where('company_id', $companyId)
+            ->get('it_crm_staff_job_application_form')
+            ->row_array();
+
+        if ($this->input->method() === 'post') {
+            $fullName = trim((string) $this->input->post('full_name'));
+            $mobile = preg_replace('/\D+/', '', (string) $this->input->post('mobile_no'));
+            $alternative = preg_replace('/\D+/', '', (string) $this->input->post('alternative_no'));
+            $email = trim((string) $this->input->post('email'));
+
+            // Validation
+            if ($fullName === '') {
+                set_alert('warning', 'Full name is required');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                set_alert('warning', 'Invalid email');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+            if ($mobile !== '' && !preg_match('/^\d{10}$/', $mobile)) {
+                set_alert('warning', 'Invalid mobile number');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+            if ($alternative !== '' && !preg_match('/^\d{10}$/', $alternative)) {
+                set_alert('warning', 'Invalid alternative number');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+
+            $data = [
+                'staffid' => $staffId,
+                'company_id' => $companyId,
+                'full_name' => $fullName,
+                'sex' => $this->input->post('sex'),
+                'applied_post' => $this->input->post('applied_post'),
+                'mobile_no' => $mobile,
+                'alternative_no' => $alternative,
+                'address_with_pincode' => $this->input->post('address_with_pincode'),
+                'email' => $email,
+                'marital_status' => $this->input->post('marital_status'),
+                'has_linkedin' => $this->input->post('has_linkedin'),
+                'linkedin_connections' => $this->input->post('linkedin_connections'),
+                'major_skill_1' => $this->input->post('major_skill_1'),
+                'major_skill_2' => $this->input->post('major_skill_2'),
+                'candidate_signature' => $this->input->post('candidate_signature'),
+                'coordinating_person_name' => $this->input->post('coordinating_person_name'),
+                'interviewed_by_1' => $this->input->post('interviewed_by_1'),
+                'interviewed_by_2' => $this->input->post('interviewed_by_2'),
+                'doj_datetime' => $this->input->post('doj_datetime'),
+                'offered_salary' => $this->input->post('offered_salary'),
+                'offered_designation' => $this->input->post('offered_designation'),
+                'interview_remarks_1' => $this->input->post('interview_remarks_1'),
+                'interview_remarks_2' => $this->input->post('interview_remarks_2'),
+                'status' => $this->input->post('status'),
+            ];
+
+            // Add educational qualifications
+            for ($i = 1; $i <= 5; $i++) {
+                $data['edu' . $i . '_degree'] = $this->input->post('edu' . $i . '_degree');
+                $data['edu' . $i . '_university'] = $this->input->post('edu' . $i . '_university');
+                $data['edu' . $i . '_major_subject'] = $this->input->post('edu' . $i . '_major_subject');
+                $data['edu' . $i . '_year'] = $this->input->post('edu' . $i . '_year');
+            }
+
+            // Add family details
+            for ($i = 1; $i <= 6; $i++) {
+                $data['fam' . $i . '_name'] = $this->input->post('fam' . $i . '_name');
+                $data['fam' . $i . '_age'] = $this->input->post('fam' . $i . '_age');
+                $data['fam' . $i . '_relationship'] = $this->input->post('fam' . $i . '_relationship');
+                $data['fam' . $i . '_occupation'] = $this->input->post('fam' . $i . '_occupation');
+            }
+
+            // Add job experience
+            for ($i = 1; $i <= 2; $i++) {
+                $data['job' . $i . '_title'] = $this->input->post('job' . $i . '_title');
+                $data['job' . $i . '_start_date'] = $this->input->post('job' . $i . '_start_date');
+                $data['job' . $i . '_end_date'] = $this->input->post('job' . $i . '_end_date');
+                $data['job' . $i . '_company'] = $this->input->post('job' . $i . '_company');
+                $data['job' . $i . '_designation'] = $this->input->post('job' . $i . '_designation');
+                $data['job' . $i . '_reason_for_leaving'] = $this->input->post('job' . $i . '_reason_for_leaving');
+                $data['job' . $i . '_start_salary'] = $this->input->post('job' . $i . '_start_salary');
+                $data['job' . $i . '_end_salary'] = $this->input->post('job' . $i . '_end_salary');
+            }
+
+            if ($existing) {
+                $data['updated_at'] = date('Y-m-d H:i:s');
+                $this->db->where('id', (int) $existing['id']);
+                $this->db->update('it_crm_staff_job_application_form', $data);
+                set_alert('success', 'Job application form updated');
+            } else {
+                $data['created_at'] = date('Y-m-d H:i:s');
+                $this->db->insert('it_crm_staff_job_application_form', $data);
+                set_alert('success', 'Job application form submitted');
+            }
+            redirect(admin_url('hrd/job_application_form'));
+        }
+
+        $data['title'] = 'Job Application Form';
+        $data['form'] = $existing;
+        $this->load->view('admin/hrd/job_application_form', $data);
+    }
 	
 	
 }
