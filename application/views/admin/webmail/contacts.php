@@ -32,7 +32,7 @@
                     <tr>
                         <td><?php echo e($c['first_name'] ?? ''); ?></td>
                         <td><?php echo e($c['last_name'] ?? ''); ?></td>
-                        <td><?php echo e($c['email_id'] ?? ''); ?></td>
+                        <td><i class="fa-solid fa-reply reply-email" data-email="<?php echo e($c['email_id'] ?? ''); ?>"></i> <?php echo e($c['email_id'] ?? ''); ?></td>
                         <td><?php echo e($c['company_name'] ?? ''); ?></td>
                         <td><?php echo e($c['phonenumber'] ?? ''); ?></td>
                         <td><?php echo e($c['addedon'] ?? ''); ?></td>
@@ -109,9 +109,49 @@
   </div>
 </div>
 
+<div class="modal fade" id="replyEmailModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" style="max-width:520px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Reply Email</h4>
+      </div>
+      <div class="modal-body">
+        <form action="<?php echo admin_url('webmail/Reply'); ?>" method="post" enctype="multipart/form-data" id="reply-email-form">
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+          <input type="hidden" name="redirect" value="webmail/contacts">
+          <input type="hidden" name="recipientEmail" id="recipientEmailIT" value="">
+          <input type="hidden" name="messagetype" value="Reply">
+          <div class="form-group">
+            <label>Subject</label>
+            <input type="text" name="emailSubject" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea name="emailBody" id="replyEmailBody" class="form-control editor" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Attach Files:</label>
+            <input type="file" name="attachments[]" class="form-control" multiple>
+          </div>
+          <button type="submit" name="send" class="btn btn-primary">Send Email</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
 <script>
   $(function() {
+    $('.editor').jqte();
     $('#save-contact').on('click', function() {
       var $form = $('#contact-form');
       var id = $('#contact-id').val();
@@ -159,6 +199,14 @@
       $('#contact-form')[0].reset();
       $('#contact-id').val('');
       $('#contactModal .modal-title').text('New Contact');
+    });
+
+    $('.reply-email').on('click', function() {
+      var email = $(this).data('email') || '';
+      if (!email) { return; }
+      $('#reply-email-form')[0].reset();
+      $('#recipientEmailIT').val(email);
+      $('#replyEmailModal').modal('show');
     });
   });
 </script>
