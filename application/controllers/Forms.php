@@ -888,5 +888,195 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
         $this->load->view('forms/ticket', $data);
     }
 	
+	public function job_application_form()
+    {
+	echo "Job Application Form comming soon";exit;
+	}
+	
+	public function joining_form()
+    {
+	$_SESSION['joining-form']="";
+	$_SESSION['rid']="";
+	$data['title'] = "Joining Form";
+    $this->load->view('forms/joining_form', $data);
+	}
+	
+	public function joining_form_submit()
+    {
+	
+	$_SESSION['joining-form'] = $_SESSION['joining-form'] ?? '';
+	
+	if ($this->input->method() === 'post') {
+            $status = $this->input->post('status');
+            $status = in_array($status, ['Draft', 'Submitted', 'Approved', 'Rejected'], true) ? $status : 'Draft';
+
+            $name = trim((string) $this->input->post('name'));
+            $email = trim((string) $this->input->post('email'));
+            $contact = preg_replace('/\D+/', '', (string) $this->input->post('contact_number'));
+            $emergency = preg_replace('/\D+/', '', (string) $this->input->post('emergency_contact_number'));
+            $pan = strtoupper(trim((string) $this->input->post('pan_number')));
+            $aadhaar = preg_replace('/\D+/', '', (string) $this->input->post('aadhaar_number'));
+
+          
+            $data = [
+                'name' => $name,
+                'father_husband_name' => $this->input->post('father_husband_name'),
+                'contact_number' => $contact,
+                'emergency_contact_number' => $emergency,
+                'email' => $email,
+                'pan_number' => $pan,
+                'aadhaar_number' => $aadhaar,
+                'date_of_birth' => $this->input->post('date_of_birth'),
+                'assigned_designation' => $this->input->post('assigned_designation'),
+                'department' => $this->input->post('department'),
+                'date_of_joining' => $this->input->post('date_of_joining'),
+                'current_address_line1' => $this->input->post('current_address_line1'),
+                'current_address_line2' => $this->input->post('current_address_line2'),
+                'current_address_line3' => $this->input->post('current_address_line3'),
+                'permanent_address_line1' => $this->input->post('permanent_address_line1'),
+                'permanent_address_line2' => $this->input->post('permanent_address_line2'),
+                'permanent_address_line3' => $this->input->post('permanent_address_line3'),
+                'status' => $status,
+            ];
+
+            
+                $data['created_at'] = date('Y-m-d H:i:s');
+                
+				if($_SESSION['joining-form']==""){
+				$this->db->insert('it_crm_staff_joining_form', $data);
+				$last_id = $this->db->insert_id();
+				$_SESSION['joining-form']=$last_id;
+				$_SESSION['rid']=10000 + $last_id;
+				}else{
+				$rid=$_SESSION['rid'];
+				}
+                $data['title'] = "Joining Form";
+				$data['reference_number'] = "JF-".$_SESSION['rid'];
+				
+                $this->load->view('forms/form_submitted', $data);
+        }
+	$data['title'] = "Joining Form";
+    $this->load->view('forms/joining_form', $data);
+	}
+	
+	public function kyc_form()
+    {
+	echo "kyc form comming soon";exit;
+	}
+	public function employee_details_form()
+    {
+	$_SESSION['employee_details_form']="";
+	$_SESSION['rid']="";
+	$data['title'] = "Employee Details Form";
+    $this->load->view('forms/employee_details_form', $data);
+	}
+	
+	public function employee_details_form_submit()
+    {
+	$_SESSION['employee_details_form'] = $_SESSION['employee_details_form'] ?? '';
+	
+		if ($this->input->method() === 'post') {
+		$name = trim((string) $this->input->post('name'));
+            $email = trim((string) $this->input->post('email'));
+            $contact = preg_replace('/\D+/', '', (string) $this->input->post('contact_number'));
+            $emergency = preg_replace('/\D+/', '', (string) $this->input->post('emergency_contact_number'));
+            $aadhaar = preg_replace('/\D+/', '', (string) $this->input->post('aadhaar_number'));
+            $pan = strtoupper(trim((string) $this->input->post('pan_number')));
+
+            // Validation
+            
+
+            $data = [
+                'name' => $name,
+                'contact_number' => $contact,
+                'emergency_contact_number' => $emergency,
+                'email' => $email,
+                'pan_number' => $pan,
+                'aadhaar_number' => $aadhaar,
+                'date_of_birth' => $this->input->post('date_of_birth'),
+                'assigned_designation' => $this->input->post('assigned_designation'),
+                'department' => $this->input->post('department'),
+                'date_of_joining' => $this->input->post('date_of_joining'),
+                'current_address' => $this->input->post('current_address'),
+                'permanent_address' => $this->input->post('permanent_address'),
+                'profile_pic' => $this->input->post('profile_pic'),
+				'educational_testimonials' => $this->input->post('educational_testimonials'),
+                'id_proof' => $this->input->post('id_proof'),
+                'address_proof' => $this->input->post('address_proof'),
+                'previous_company_documents' => $this->input->post('previous_company_documents'),
+                'status' => $this->input->post('status'),
+            ];
+
+            // Handle file uploads
+            $uploadDir = FCPATH . 'uploads/employee_documents/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+
+            $docFields = [
+                'profile_pic',
+				'educational_testimonials',
+                'id_proof',
+                'address_proof',
+                'previous_company_documents',
+            ];
+
+            foreach ($docFields as $field) {
+                if (!empty($_FILES[$field]['name'])) {
+                    $name = $_FILES[$field]['name'];
+                    $tmp = $_FILES[$field]['tmp_name'];
+                    if (!is_uploaded_file($tmp)) {
+                        continue;
+                    }
+                    if (!_upload_extension_allowed($name)) {
+                        continue;
+                    }
+                    $safeName = 'emp_doc_' . time() . '_' . mt_rand(1000, 9999) . '.' . pathinfo($name, PATHINFO_EXTENSION);
+                    $dest = $uploadDir . $safeName;
+                    if (@move_uploaded_file($tmp, $dest)) {
+                        $dbField = str_replace('_file', '', $field);
+                        $data[$dbField . ''] = 'uploads/employee_documents/' . $safeName;
+                        
+                    }
+                } else {
+                    
+                }
+            }
+
+            // Add references
+            for ($i = 1; $i <= 8; $i++) {
+                $data['ref' . $i . '_name'] = $this->input->post('ref' . $i . '_name');
+                $data['ref' . $i . '_relation'] = $this->input->post('ref' . $i . '_relation');
+                $data['ref' . $i . '_contact'] = $this->input->post('ref' . $i . '_contact');
+            }
+
+            
+                $data['created_at'] = date('Y-m-d H:i:s');
+				
+				if($_SESSION['employee_details_form']==""){
+				$this->db->insert('it_crm_staff_joining_details', $data);
+				$last_id = $this->db->insert_id();
+				$_SESSION['employee_details_form']=$last_id;
+				$_SESSION['rid']=10000 + $last_id;
+				}else{
+				$rid=$_SESSION['rid'];
+				}
+                $data['title'] = "Employee Details Form";
+				$data['reference_number'] = "EDF-".$_SESSION['rid'];
+				
+                $this->load->view('forms/form_submitted', $data);
+				
+                
+                
+            
+		}
+	}
+	
+	public function form_submitted()
+    {
+	$data['title'] = "Joining Form";
+    $this->load->view('forms/form_submitted', $data);
+	}
+	
 	
 }
