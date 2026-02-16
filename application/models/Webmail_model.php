@@ -1258,5 +1258,93 @@ $client->disconnect();
 	
 	
 	}
+	
+	    public function compose_email_super($emaildata, $id = '' )
+        {
+		
+		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
+		if(preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $recipientEmail, $matches)){
+		$recipientEmail = $matches[0] ?? 'Email not found';
+		}
+		
+		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
+		
+		// Form Post Data
+		//echo $recipientEmail;
+		$subject=$emaildata['emailSubject'] ? $emaildata['emailSubject'] : " No Subject";
+		$body=$emaildata['emailBody'] ? $emaildata['emailBody'] : " Test Email";
+		
+		
+		//exit;
+		// SMTP Details from session
+		$mailer_smtp_host=$_SESSION['STAFFSMTP']['smtp_host'];
+        $mailer_smtp_port=$_SESSION['STAFFSMTP']['smtp_port'];
+        $mailer_username=$_SESSION['STAFFSMTP']['smtp_user'];
+        $mailer_password=base64_decode($_SESSION['STAFFSMTP']['smtp_pass']);
+		$senderEmail=$_SESSION['STAFFSMTP']['smtp_user'];
+		$senderName=$_SESSION['STAFFSMTP']['smtp_user'];
+		$encryption=$_SESSION['STAFFSMTP']['smtp_crypto'];
+		$mail = new PHPMailer(true);
+		
+		
+	try {
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+    
+	
+	
+	if($encryption=="tls"){
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	}else{
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+	}
+	
+    $mail->Port = $mailer_smtp_port;
+
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	//$mail->Priority = 1; 
+	$senderName = trim($senderName);
+    $senderName = strip_tags($senderName);
+    $senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
+	//$mail->setFrom($senderEmail, $senderName);
+	$mail->setFrom($senderEmail, $senderName, false);
+	$mail->addAddress($recipientEmail);
+	if (isset($recipientCC) && $recipientCC != "") {
+	
+	      // Add CC addresses from comma-separated string
+        $ccEmails = explode(',', trim($recipientCC));
+        foreach ($ccEmails as $ccEmail) {
+            $ccEmail = trim($ccEmail);
+            if (filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addCC($ccEmail);
+            }
+        }
+		
+	}
+	
+	$mail->Subject = $subject;
+	$mail->Body = $body;
+    $mail->send();
+    //echo "Email sent successfully!";
+	log_activity('Email Book an Appoinment With Subject Line -  [ Subject: ' . $subject . ']');
+    return true;
+	} catch (Exception $e) {
+		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
+		return false;
+	}
+	
+	
+	
+	
+	
+	}
 
 }
