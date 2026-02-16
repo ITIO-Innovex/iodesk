@@ -2,6 +2,7 @@
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
+
 class Forms extends ClientsController
 {
     public function index()
@@ -904,6 +905,7 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 	public function joining_form_submit()
     {
 	
+	
 	$_SESSION['joining-form'] = $_SESSION['joining-form'] ?? '';
 	
 	if ($this->input->method() === 'post') {
@@ -947,6 +949,16 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 				$last_id = $this->db->insert_id();
 				$_SESSION['joining-form']=$last_id;
 				$_SESSION['rid']=10000 + $last_id;
+				
+				// For Send Email
+		        $msgdata['recipientEmail']="vikashg@itio.in";
+		        //$msgdata['recipientCC']=$customer;
+				$ref="JF-".$_SESSION['rid'];
+		        $msgdata['emailSubject']="Joining Form submitted. ".$ref;
+		        $msgdata['emailBody']=$this->form_submitted_mail_format($ref, $name, 'Joining Form');
+				// Load webmail model
+                $this->load->model('webmail_model');
+		        $this->webmail_model->compose_email_super($msgdata);
 				}else{
 				$rid=$_SESSION['rid'];
 				}
@@ -1237,6 +1249,47 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
                 
             
 		}
+	}
+	
+	public function form_submitted_mail_format($ref, $name, $form )
+    {
+	
+	$ref 	=	$ref  ?? "100100100";
+	$name 	=	$name ?? "Vikash Gupta";
+	$form	=	$form ?? "KYC Form";
+	return $mailbody='<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Invoice</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6; padding:20px;">
+  <tr>
+    <td align="center">
+
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+
+<p style="margin:0 0 16px;">Hi, <strong>'.$name.'! </strong></p>
+<p style="margin:0 0 20px; text-align:left;">Thank you for submitting your '.$form.'.</p>
+<p style="margin:0 0 16px;">Your reference number is : <strong>'.$ref.'</strong></p>
+<p style="margin:0 0 16px;">Our HR team will contact you soon regarding the next steps.</strong></p>
+
+<p style="margin:0;">See you soon,<br><strong>HR Manager</strong></p>
+
+          </td>
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>';
 	}
 	
 	public function form_submitted()
