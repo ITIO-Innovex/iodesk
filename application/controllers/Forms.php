@@ -961,8 +961,175 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 	
 	public function kyc_form()
     {
-	echo "kyc form comming soon";exit;
+	$_SESSION['kyc_form']="";
+	$_SESSION['rid']="";
+	$data['title'] = "Kyc Form";
+    $this->load->view('forms/kyc_form', $data);
 	}
+	
+	public function kyc_form_submit()
+    {
+	$_SESSION['kyc_form'] = $_SESSION['kyc_form'] ?? '';
+	
+		if ($this->input->method() === 'post') {
+		 //print_r($this->input->post());exit;
+		 
+		 
+            $candidateName = trim((string) $this->input->post('candidate_name'));
+            $email = trim((string) $this->input->post('email'));
+            $contact = preg_replace('/\D+/', '', (string) $this->input->post('contact_number'));
+            $altContact = preg_replace('/\D+/', '', (string) $this->input->post('alternate_contact_number'));
+            $aadhaar = preg_replace('/\D+/', '', (string) $this->input->post('aadhaar_number'));
+            $pan = strtoupper(trim((string) $this->input->post('pan_number')));
+
+            if ($candidateName === '') {
+                set_alert('warning', 'Candidate name is required');
+                redirect(admin_url('hrd/kyc_form'));
+            }
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                set_alert('warning', 'Invalid email');
+                redirect(admin_url('hrd/kyc_form'));
+            }
+            if ($contact !== '' && !preg_match('/^\d{10}$/', $contact)) {
+                set_alert('warning', 'Invalid contact number');
+                redirect(admin_url('hrd/kyc_form'));
+            }
+            if ($altContact !== '' && !preg_match('/^\d{10}$/', $altContact)) {
+                set_alert('warning', 'Invalid alternate contact number');
+                redirect(admin_url('hrd/kyc_form'));
+            }
+            if ($pan !== '' && !preg_match('/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/', $pan)) {
+                set_alert('warning', 'Invalid PAN number');
+                redirect(admin_url('hrd/kyc_form'));
+            }
+            if ($aadhaar !== '' && !preg_match('/^\d{12}$/', $aadhaar)) {
+                set_alert('warning', 'Invalid Aadhaar number');
+                redirect(admin_url('hrd/kyc_form'));
+            }
+
+            $data = [
+                'candidate_name' => $candidateName,
+                'father_name' => $this->input->post('father_name'),
+                'mother_name' => $this->input->post('mother_name'),
+                'date_of_birth' => $this->input->post('date_of_birth'),
+                'marital_status' => $this->input->post('marital_status'),
+                'email' => $email,
+                'contact_number' => $contact,
+                'alternate_contact_number' => $altContact,
+                'aadhaar_number' => $aadhaar,
+                'pan_number' => $pan,
+                'present_complete_address' => $this->input->post('present_complete_address'),
+                'present_landmark' => $this->input->post('present_landmark'),
+                'present_city' => $this->input->post('present_city'),
+                'present_state' => $this->input->post('present_state'),
+                'present_pin_code' => $this->input->post('present_pin_code'),
+                'present_police_station' => $this->input->post('present_police_station'),
+                'present_stay_from' => $this->input->post('present_stay_from'),
+                'present_stay_to' => $this->input->post('present_stay_to'),
+                'permanent_complete_address' => $this->input->post('permanent_complete_address'),
+                'permanent_landmark' => $this->input->post('permanent_landmark'),
+                'permanent_city' => $this->input->post('permanent_city'),
+                'permanent_state' => $this->input->post('permanent_state'),
+                'permanent_pin_code' => $this->input->post('permanent_pin_code'),
+                'permanent_police_station' => $this->input->post('permanent_police_station'),
+                'permanent_stay_from' => $this->input->post('permanent_stay_from'),
+                'permanent_stay_to' => $this->input->post('permanent_stay_to'),
+                'edu1_institute_name' => $this->input->post('edu1_institute_name'),
+                'edu1_course_name' => $this->input->post('edu1_course_name'),
+                'edu1_passing_year' => $this->input->post('edu1_passing_year'),
+                'edu1_registration_number' => $this->input->post('edu1_registration_number'),
+                'edu1_mode' => $this->input->post('edu1_mode'),
+                'edu2_institute_name' => $this->input->post('edu2_institute_name'),
+                'edu2_course_name' => $this->input->post('edu2_course_name'),
+                'edu2_passing_year' => $this->input->post('edu2_passing_year'),
+                'edu2_registration_number' => $this->input->post('edu2_registration_number'),
+                'edu2_mode' => $this->input->post('edu2_mode'),
+                'edu3_institute_name' => $this->input->post('edu3_institute_name'),
+                'edu3_course_name' => $this->input->post('edu3_course_name'),
+                'edu3_passing_year' => $this->input->post('edu3_passing_year'),
+                'edu3_registration_number' => $this->input->post('edu3_registration_number'),
+                'edu3_mode' => $this->input->post('edu3_mode'),
+                'org1_name' => $this->input->post('org1_name'),
+                'org1_address' => $this->input->post('org1_address'),
+                'org1_designation' => $this->input->post('org1_designation'),
+                'org1_employee_code' => $this->input->post('org1_employee_code'),
+                'org1_date_of_joining' => $this->input->post('org1_date_of_joining'),
+                'org1_last_working_day' => $this->input->post('org1_last_working_day'),
+                'org1_salary_ctc' => $this->input->post('org1_salary_ctc'),
+                'org1_reason_for_leaving' => $this->input->post('org1_reason_for_leaving'),
+                'org1_reporting_manager_name' => $this->input->post('org1_reporting_manager_name'),
+                'org1_reporting_manager_contact' => $this->input->post('org1_reporting_manager_contact'),
+                'org1_reporting_manager_email' => $this->input->post('org1_reporting_manager_email'),
+                'org1_hr1_name' => $this->input->post('org1_hr1_name'),
+                'org1_hr1_contact' => $this->input->post('org1_hr1_contact'),
+                'org1_hr1_email' => $this->input->post('org1_hr1_email'),
+                'org1_hr2_name' => $this->input->post('org1_hr2_name'),
+                'org1_hr2_contact' => $this->input->post('org1_hr2_contact'),
+                'org1_hr2_email' => $this->input->post('org1_hr2_email'),
+                'referee1_name' => $this->input->post('referee1_name'),
+                'referee1_organization' => $this->input->post('referee1_organization'),
+                'referee1_designation' => $this->input->post('referee1_designation'),
+                'referee1_contact' => $this->input->post('referee1_contact'),
+                'referee1_email' => $this->input->post('referee1_email'),
+                'referee2_name' => $this->input->post('referee2_name'),
+                'referee2_organization' => $this->input->post('referee2_organization'),
+                'referee2_designation' => $this->input->post('referee2_designation'),
+                'referee2_contact' => $this->input->post('referee2_contact'),
+                'referee2_email' => $this->input->post('referee2_email'),
+                'status' => 'Submitted',
+            ];
+
+            $uploadDir = FCPATH . 'uploads/kyc_documents/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+
+            $docFields = [
+                'education_verification_doc',
+                'employment_verification_doc',
+                'address_criminal_verification_doc',
+                'identity_verification_doc',
+                'cibil_verification_doc',
+            ];
+
+            foreach ($docFields as $field) {
+                if (!empty($_FILES[$field]['name'])) {
+                    $name = $_FILES[$field]['name'];
+                    $tmp = $_FILES[$field]['tmp_name'];
+                    if (!is_uploaded_file($tmp)) {
+                        continue;
+                    }
+                    if (!_upload_extension_allowed($name)) {
+                        continue;
+                    }
+                    $safeName = 'kyc_' . time() . '_' . mt_rand(1000, 9999) . '.' . pathinfo($name, PATHINFO_EXTENSION);
+                    $dest = $uploadDir . $safeName;
+                    if (@move_uploaded_file($tmp, $dest)) {
+                        $data[$field] = 'uploads/kyc_documents/' . $safeName;
+                        
+                    }
+                }
+            }
+
+           
+                $data['created_at'] = date('Y-m-d H:i:s');
+                
+               if($_SESSION['kyc_form']==""){
+				 $this->db->insert('it_crm_staff_kyc_details', $data);
+				$last_id = $this->db->insert_id();
+				$_SESSION['kyc_form']=$last_id;
+				$_SESSION['rid']=10000 + $last_id;
+				}else{
+				$rid=$_SESSION['rid'];
+				}
+                $data['title'] = "KYC Form";
+				$data['reference_number'] = "KF-".$_SESSION['rid'];
+				
+                $this->load->view('forms/form_submitted', $data);
+        
+		}
+	}
+	
 	public function employee_details_form()
     {
 	$_SESSION['employee_details_form']="";
