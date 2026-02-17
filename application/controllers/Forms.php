@@ -889,10 +889,131 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
         $this->load->view('forms/ticket', $data);
     }
 	
+	
+	//// For Job Application Form ////////
 	public function job_application_form()
     {
-	echo "Job Application Form comming soon";exit;
+	$_SESSION['job_application_form']="";
+	$_SESSION['rid']="";
+	$data['title'] = "Job Application Form";
+    $this->load->view('forms/job_application_form', $data);
 	}
+	public function job_application_form_submit()
+    {
+	  $_SESSION['job_application_form'] = $_SESSION['job_application_form'] ?? '';
+	
+	       if ($this->input->method() === 'post') {
+            //print_r($this->input->post());exit;
+			$fullName = trim((string) $this->input->post('full_name'));
+            $mobile = preg_replace('/\D+/', '', (string) $this->input->post('mobile_no'));
+            $alternative = preg_replace('/\D+/', '', (string) $this->input->post('alternative_no'));
+            $email = trim((string) $this->input->post('email'));
+
+            // Validation
+            /*if ($fullName === '') {
+                set_alert('warning', 'Full name is required');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                set_alert('warning', 'Invalid email');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+            if ($mobile !== '' && !preg_match('/^\d{10}$/', $mobile)) {
+                set_alert('warning', 'Invalid mobile number');
+                redirect(admin_url('hrd/job_application_form'));
+            }
+            if ($alternative !== '' && !preg_match('/^\d{10}$/', $alternative)) {
+                set_alert('warning', 'Invalid alternative number');
+                redirect(admin_url('hrd/job_application_form'));
+            }*/
+
+            $data = [
+                'full_name' => $fullName,
+                'sex' => $this->input->post('sex'),
+                'applied_post' => $this->input->post('applied_post'),
+                'mobile_no' => $mobile,
+                'alternative_no' => $alternative,
+                'address_with_pincode' => $this->input->post('address_with_pincode'),
+                'email' => $email,
+                'marital_status' => $this->input->post('marital_status'),
+                'has_linkedin' => $this->input->post('has_linkedin'),
+                'linkedin_connections' => $this->input->post('linkedin_connections'),
+                'major_skill_1' => $this->input->post('major_skill_1'),
+                'major_skill_2' => $this->input->post('major_skill_2'),
+                'candidate_signature' => $this->input->post('candidate_signature'),
+                'coordinating_person_name' => $this->input->post('coordinating_person_name'),
+                'interviewed_by_1' => $this->input->post('interviewed_by_1'),
+                'interviewed_by_2' => $this->input->post('interviewed_by_2'),
+                'doj_datetime' => $this->input->post('doj_datetime'),
+                'offered_salary' => $this->input->post('offered_salary'),
+                'offered_designation' => $this->input->post('offered_designation'),
+                'interview_remarks_1' => $this->input->post('interview_remarks_1'),
+                'interview_remarks_2' => $this->input->post('interview_remarks_2'),
+                'status' => $this->input->post('status'),
+            ];
+
+            // Add educational qualifications
+            for ($i = 1; $i <= 5; $i++) {
+                $data['edu' . $i . '_degree'] = $this->input->post('edu' . $i . '_degree');
+                $data['edu' . $i . '_university'] = $this->input->post('edu' . $i . '_university');
+                $data['edu' . $i . '_major_subject'] = $this->input->post('edu' . $i . '_major_subject');
+                $data['edu' . $i . '_year'] = $this->input->post('edu' . $i . '_year');
+            }
+
+            // Add family details
+            for ($i = 1; $i <= 6; $i++) {
+                $data['fam' . $i . '_name'] = $this->input->post('fam' . $i . '_name');
+                $data['fam' . $i . '_age'] = $this->input->post('fam' . $i . '_age');
+                $data['fam' . $i . '_relationship'] = $this->input->post('fam' . $i . '_relationship');
+                $data['fam' . $i . '_occupation'] = $this->input->post('fam' . $i . '_occupation');
+            }
+
+            // Add job experience
+            for ($i = 1; $i <= 2; $i++) {
+                $data['job' . $i . '_title'] = $this->input->post('job' . $i . '_title');
+                $data['job' . $i . '_start_date'] = $this->input->post('job' . $i . '_start_date');
+                $data['job' . $i . '_end_date'] = $this->input->post('job' . $i . '_end_date');
+                $data['job' . $i . '_company'] = $this->input->post('job' . $i . '_company');
+                $data['job' . $i . '_designation'] = $this->input->post('job' . $i . '_designation');
+                $data['job' . $i . '_reason_for_leaving'] = $this->input->post('job' . $i . '_reason_for_leaving');
+                $data['job' . $i . '_start_salary'] = $this->input->post('job' . $i . '_start_salary');
+                $data['job' . $i . '_end_salary'] = $this->input->post('job' . $i . '_end_salary');
+            }
+
+            
+                $data['created_at'] = date('Y-m-d H:i:s');
+                
+                 if($_SESSION['job_application_form']==""){
+				$this->db->insert('it_crm_staff_job_application_form', $data);
+				$last_id = $this->db->insert_id();
+				$_SESSION['job_application_form']=$last_id;
+				$_SESSION['rid']=10000 + $last_id;
+				
+				// For Send Email
+		        $msgdata['recipientEmail']="jyotiv@itio.in";
+		        //$msgdata['recipientCC']=$customer;
+				$ref="JAF-".$_SESSION['rid'];
+		        $msgdata['emailSubject']="Job Application Form submitted. ".$ref;
+		        $msgdata['emailBody']=$this->form_submitted_mail_format($ref, $fullName, 'Job Application Form');
+				// Load webmail model
+                $this->load->model('webmail_model');
+		        $this->webmail_model->compose_email_super($msgdata);
+				}else{
+				$rid=$_SESSION['rid'];
+				}
+                $data['title'] = "Job Application Form";
+				$data['reference_number'] = "JAF-".$_SESSION['rid'];
+				
+                $this->load->view('forms/form_submitted', $data);
+			}else{
+			$data['title'] = "Job Application Form";
+            $this->load->view('forms/job_application_form', $data);
+			}
+			
+	}
+	//// End Job Application Form ////////
+	
+	//// For Joining Form ////////
 	
 	public function joining_form()
     {
@@ -951,7 +1072,7 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 				$_SESSION['rid']=10000 + $last_id;
 				
 				// For Send Email
-		        $msgdata['recipientEmail']="vikashg@itio.in";
+		        $msgdata['recipientEmail']="jyotiv@itio.in";
 		        //$msgdata['recipientCC']=$customer;
 				$ref="JF-".$_SESSION['rid'];
 		        $msgdata['emailSubject']="Joining Form submitted. ".$ref;
@@ -970,6 +1091,11 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 	$data['title'] = "Joining Form";
     $this->load->view('forms/joining_form', $data);
 	}
+	
+	//// End Joining Form ////////
+	
+	
+	//// For KYC Form ////////
 	
 	public function kyc_form()
     {
@@ -1131,6 +1257,15 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 				$last_id = $this->db->insert_id();
 				$_SESSION['kyc_form']=$last_id;
 				$_SESSION['rid']=10000 + $last_id;
+				// For Send Email
+		        $msgdata['recipientEmail']="jyotiv@itio.in";
+		        //$msgdata['recipientCC']=$customer;
+				$ref="KF-".$_SESSION['rid'];
+		        $msgdata['emailSubject']="KYC Form submitted. ".$ref;
+		        $msgdata['emailBody']=$this->form_submitted_mail_format($ref, $candidateName, 'KYC Form');
+				// Load webmail model
+                $this->load->model('webmail_model');
+		        $this->webmail_model->compose_email_super($msgdata);
 				}else{
 				$rid=$_SESSION['rid'];
 				}
@@ -1142,6 +1277,10 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 		}
 	}
 	
+	//// End KYC Form ////////
+	
+	
+	//// For Employee Details Form ////////
 	public function employee_details_form()
     {
 	$_SESSION['employee_details_form']="";
@@ -1155,7 +1294,8 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 	$_SESSION['employee_details_form'] = $_SESSION['employee_details_form'] ?? '';
 	
 		if ($this->input->method() === 'post') {
-		$name = trim((string) $this->input->post('name'));
+		    $name = trim((string) $this->input->post('name'));
+			$contactname = trim((string) $this->input->post('name'));
             $email = trim((string) $this->input->post('email'));
             $contact = preg_replace('/\D+/', '', (string) $this->input->post('contact_number'));
             $emergency = preg_replace('/\D+/', '', (string) $this->input->post('emergency_contact_number'));
@@ -1237,19 +1377,24 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 				$last_id = $this->db->insert_id();
 				$_SESSION['employee_details_form']=$last_id;
 				$_SESSION['rid']=10000 + $last_id;
+				// For Send Email
+		        $msgdata['recipientEmail']="jyotiv@itio.in";
+		        //$msgdata['recipientCC']=$customer;
+				$ref="EDF-".$_SESSION['rid'];
+		        $msgdata['emailSubject']="Employee Details Form submitted. ".$ref;
+		        $msgdata['emailBody']=$this->form_submitted_mail_format($ref, $contactname, 'Employee Details Form');
+				// Load webmail model
+                $this->load->model('webmail_model');
+		        $this->webmail_model->compose_email_super($msgdata);
 				}else{
 				$rid=$_SESSION['rid'];
 				}
                 $data['title'] = "Employee Details Form";
 				$data['reference_number'] = "EDF-".$_SESSION['rid'];
-				
                 $this->load->view('forms/form_submitted', $data);
-				
-                
-                
-            
 		}
 	}
+	//// End Employee Details Form ////////
 	
 	public function form_submitted_mail_format($ref, $name, $form )
     {
@@ -1271,15 +1416,11 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 
       <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
         <tr>
-          <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
-
-<p style="margin:0 0 16px;">Hi, <strong>'.$name.'! </strong></p>
-<p style="margin:0 0 20px; text-align:left;">Thank you for submitting your '.$form.'.</p>
-<p style="margin:0 0 16px;">Your reference number is : <strong>'.$ref.'</strong></p>
-<p style="margin:0 0 16px;">Our HR team will contact you soon regarding the next steps.</strong></p>
-
-<p style="margin:0;">See you soon,<br><strong>HR Manager</strong></p>
-
+<td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
+<p style="margin:0 0 16px;">Hi, <strong>HRD Team! </strong></p>
+<p style="margin:0 0 20px; text-align:left;">This is to inform you that the '.$form.' as been successfully submitted by '.$name.'.</p>
+<p style="margin:0 0 16px;">Reference number is : <strong>'.$ref.'</strong></p>
+<p style="margin:0;">Thank you.,<br><strong>CRM - '.$form.'</strong></p>
           </td>
         </tr>
       </table>
