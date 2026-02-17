@@ -257,6 +257,28 @@ function app_init_admin_sidebar_menu_items()
 		]);
     }
 	
+	if (is_super()) {
+	
+	    $CI->app_menu->add_sidebar_menu_item('support-tickets', [
+			'name'     => 'Support Ticket',
+			'href'     => admin_url('support/web'),
+			'icon'     => 'fa-solid fa-ticket',
+			'position' => 90,
+			'badge'    => [],
+		]);
+		
+		$CI->app_menu->add_sidebar_menu_item('ai-content-generator', [
+			'name'     => 'Maintenance Notice',
+			'href'     => admin_url('support_maintenance_notice'),
+			'icon'     => 'fa-solid fa-circle-info',
+			'position' => 45,
+			'badge'    => [],
+		]);
+	
+	}
+	
+	
+	
 	if (is_admin()) {
 		$CI->app_menu->add_sidebar_menu_item('crm_setup', [
 			'name'     => _l('crm_setup'),

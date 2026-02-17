@@ -13,6 +13,30 @@
   background-color: #e9ecef !important;
   cursor: not-allowed;
 }
+.support-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0d6efd;
+    color: #fff;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-decoration: none;
+    z-index: 9999;
+    transition: 0.3s;
+}
+
+.support-icon:hover {
+    background-color: #084298;
+    transform: scale(1.1);
+}
+
 </style>
 <div id="wrapper">
   <div class="content">
@@ -122,7 +146,7 @@
                 ?>
                   <tr class="<?php echo $rowClass; ?>" data-staffid="<?php echo (int)$sid; ?>" data-attendance-id="<?php echo $attendanceId; ?>" data-locked="<?php echo $isLocked ? '1' : '0'; ?>">
                     <td>
-                      <input type="checkbox" class="row-check" value="<?php echo (int)$sid; ?>" <?php echo $isLocked ? 'disabled' : ''; ?>>
+                      <input type="checkbox" class="row-check" value="<?php echo (int)$sid; ?>">
                     </td>
                     <td><?php echo e(($s['firstname']??'') . ' ' . ($s['lastname']??'')); ?></td>
                     <td><?php echo e($date); ?></td>
@@ -271,19 +295,19 @@ jQuery(document).ready(function($){
       return false;
     });
     
-    // Select all checkbox (skip locked rows)
+    // Select all checkbox (all rows including locked)
     var selAll = document.getElementById('select-all');
     if(selAll){ 
       selAll.addEventListener('change', function(){
         var checked = this.checked;
-        var checkboxes = document.querySelectorAll('.row-check:not(:disabled)');
+        var checkboxes = document.querySelectorAll('.row-check');
         for(var i = 0; i < checkboxes.length; i++) {
           checkboxes[i].checked = checked;
         }
       });
     }
 
-  // Bulk apply button
+  // Bulk apply button - Apply to Selected & Locked In (only non-locked rows)
   var applyBtn = document.getElementById('apply-bulk');
   if(applyBtn){ 
     applyBtn.addEventListener('click', function(){
@@ -293,16 +317,25 @@ jQuery(document).ready(function($){
       var date = '<?php echo e($date); ?>';
       var staffData = [];
       var missingFirstHalf = [];
+      var skippedLocked = [];
       
       for(var i = 0; i < checkedRows.length; i++) {
         var checkbox = checkedRows[i];
         var staffid = checkbox.value;
         var $row = $(checkbox).closest('tr');
+        var isLocked = $row.data('locked') == '1';
+        var staffName = $row.find('td').eq(1).text().trim();
+        
+        // Skip locked rows - they cannot be modified
+        if(isLocked) {
+          skippedLocked.push(staffName || 'Staff ID: ' + staffid);
+          continue;
+        }
+        
         var inTime = $row.find('input.in-time[data-staffid="'+staffid+'"]').val();
         var outTime = $row.find('input.out-time[data-staffid="'+staffid+'"]').val();
         var fh = $row.find('select.fh-select[data-staffid="'+staffid+'"]').val();
         var sh = $row.find('select.sh-select[data-staffid="'+staffid+'"]').val();
-        var staffName = $row.find('td').eq(1).text().trim();
         
         // Validate First Half is required for checked data
         if (!fh || fh === '') {
@@ -324,9 +357,29 @@ jQuery(document).ready(function($){
         return;
       }
       
-      $.post(admin_url + 'hrd/attendance_bulk_update_by_date', {date: date, staff_data: staffData}, function(resp){
+      if(staffData.length === 0) {
+        if(skippedLocked.length > 0) {
+          alert('All selected rows are already locked. Use "Locked Out" to unlock them first.');
+        } else {
+          alert('No valid rows to update.');
+        }
+        return;
+      }
+      
+      // Show warning if some rows were skipped
+      var confirmMsg = 'This will update and lock ' + staffData.length + ' attendance record(s).';
+      if(skippedLocked.length > 0) {
+        confirmMsg += '\n\nNote: ' + skippedLocked.length + ' already locked row(s) will be skipped.';
+      }
+      confirmMsg += '\n\nContinue?';
+      
+      if(!confirm(confirmMsg)) {
+        return;
+      }
+      
+      $.post(admin_url + 'hrd/attendance_bulk_update_by_date', {date: date, staff_data: staffData, lock_after_save: 1}, function(resp){
         if(resp && resp.success){ 
-          alert('Attendance updated successfully');
+          alert('Attendance updated and locked successfully');
           window.location.reload(); 
         } else { 
           alert('Failed to update: ' + (resp.message || 'Unknown error')); 
@@ -387,28 +440,45 @@ jQuery(document).ready(function($){
     });
   }
 
-  // Lock Out button - Set status to 0 (unlocked) for current month
+  // Lock Out button - Set status to 0 (unlocked) for selected checkboxes only
   var lockOutBtn = document.getElementById('lock-out-btn');
   if(lockOutBtn){
     lockOutBtn.addEventListener('click', function(){
-      var date = '<?php echo e($date); ?>';
-      var currentDate = new Date(date);
-      var year = currentDate.getFullYear();
-      var month = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
-      var monthYear = year + '-' + (month < 10 ? '0' + month : month);
+      // Get all checked checkboxes (including disabled ones from locked rows)
+      var checkedRows = document.querySelectorAll('.row-check:checked');
+      if(checkedRows.length === 0){ 
+        alert('Select at least one staff to unlock'); 
+        return; 
+      }
       
-      if(!confirm('Are you sure you want to unlock all attendance records for the current month (' + monthYear + ')?')) {
+      if(!confirm('Are you sure you want to unlock ' + checkedRows.length + ' selected attendance record(s)?')) {
+        return;
+      }
+      
+      var date = '<?php echo e($date); ?>';
+      var attendanceIds = [];
+      
+      for(var i = 0; i < checkedRows.length; i++) {
+        var checkbox = checkedRows[i];
+        var $row = $(checkbox).closest('tr');
+        var attendanceId = $row.data('attendance-id');
+        if(attendanceId > 0) {
+          attendanceIds.push(attendanceId);
+        }
+      }
+      
+      if(attendanceIds.length === 0) {
+        alert('No attendance records found to unlock.');
         return;
       }
       
       $.post(admin_url + 'hrd/attendance_lock_by_date', {
         date: date,
-        month_year: monthYear,
-        unlock_month: true,
+        attendance_ids: attendanceIds,
         status: 0
       }, function(resp){
         if(resp && resp.success){ 
-          alert('All attendance records for ' + monthYear + ' unlocked successfully');
+          alert('Attendance unlocked successfully');
           window.location.reload(); 
         } else { 
           alert('Failed to unlock: ' + (resp.message || 'Unknown error')); 

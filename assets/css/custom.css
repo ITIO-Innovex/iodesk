@@ -1093,6 +1093,30 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
       text-transform: uppercase;
       margin-left: 6px;
     }
+	.support-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0d6efd;
+    color: #fff;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    text-decoration: none;
+    z-index: 9999;
+    transition: 0.3s;
+}
+
+.support-icon:hover {
+    background-color: #ffd700;
+    transform: scale(1.1);
+}
+
 
     /* responsive */
     @media (max-width:420px){
