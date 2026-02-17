@@ -330,3 +330,12 @@ $route['admin/database_backups/delete'] = 'admin/database_backups/delete';
 $route['admin/hrd/gallery/latest'] = 'admin/hrd/gallery_latest';
 $route['admin/hrd/employee_details_form'] = 'admin/hrd/employee_details_form';
 $route['admin/hrd/job_application_form'] = 'admin/hrd/job_application_form';
+
+/**
+ * Support Ticket Routes
+ */
+$route['admin/support/web'] = 'admin/support/web/index';
+$route['admin/support/web/add'] = 'admin/support/web/add';
+$route['admin/support/web/submit'] = 'admin/support/web/submit';
+$route['admin/support/web/view/(:num)'] = 'admin/support/web/view/$1';
+$route['admin/support/web/reply'] = 'admin/support/web/reply';

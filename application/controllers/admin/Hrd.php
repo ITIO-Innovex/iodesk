@@ -3722,8 +3722,8 @@ class Hrd extends AdminController
             return;
         }
 
-        // Original logic: Update specific attendance IDs for a single date
-        if (!$date || !is_array($attendance_ids) || empty($attendance_ids)) {
+        // Original logic: Update specific attendance IDs
+        if (!is_array($attendance_ids) || empty($attendance_ids)) {
             echo json_encode(['success' => false, 'message' => 'Missing data']);
             return;
         }
@@ -3732,7 +3732,10 @@ class Hrd extends AdminController
         $attendance_ids = array_map('intval', $attendance_ids);
         $this->db->where_in('attendance_id', $attendance_ids);
         $this->db->where('company_id', $company_id);
-        $this->db->where('entry_date', $date);
+        // Only filter by date if provided
+        if ($date) {
+            $this->db->where('entry_date', $date);
+        }
         $this->db->update(db_prefix() . 'hrd_attendance', ['status' => $status]);
 
         echo json_encode(['success' => true, 'message' => 'Status updated successfully']);

@@ -40,8 +40,11 @@
 <div id="lead_reminder_modal"></div>
 <style>
 #leads_filter{ display:none !important;}
-</style>
 
+</style>
+<a href="<?php echo admin_url('support/web/add'); ?>" class="support-icon" id="crm-support-manager" title="Support">
+    <i class="fa-solid fa-headset"></i>
+</a>
 <?php 
 if (!is_client_logged_in() && !is_admin() && is_staff_logged_in()) {
 //echo "staff"; echo get_staff_user_id(); echo get_staff_full_name(get_staff_user_id());
