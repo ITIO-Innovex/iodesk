@@ -346,7 +346,15 @@ function get_dark_company_logo($uri = '', $href_class = '')
 {
     if (get_option('company_logo_dark') == '') {
         return get_company_logo($uri, $href_class);
-    }
+    }else{
+	$company_logo=get_option('company_logo_dark');	
+	$company_name="Super Admin";
+	$logoURL="#";
+	return $logo = '<a href="' . $logoURL . '" class="logo img-responsive' . ($href_class != '' ? ' ' . $href_class : '') . '">
+        <img src="' . base_url('uploads/company/' . $company_logo) . '" class="img-responsive logoadmin" alt="' . e($company_name) . '"></a>';
+
+	}
+	
 
     return get_company_logo($uri, $href_class, 'dark');
 }

@@ -3,7 +3,12 @@
     <ul class="nav metis-menu" id="side-menu">
         <li class="tw-mt-[63px] sm:tw-mt-0 -tw-mx-2 tw-overflow-hidden" style="border-bottom: 1px solid #e2e8f0;">
             <div id="logo" class="tw-py-2 tw-px-2 tw-h-[63px] tw-flex tw-items-center">
+			<?php if(is_super()){ ?>
+			<?php echo get_dark_company_logo(get_admin_uri() . '/', 'v-logo')?>
+			<?php }else{ ?>
                 <?php echo get_company_logo(get_admin_uri() . '/', 'v-logo')?>
+				
+				<?php }?>
             </div>
         </li>
         <?php

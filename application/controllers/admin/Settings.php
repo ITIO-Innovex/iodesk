@@ -87,8 +87,16 @@ class Settings extends AdminController
                     }
             }
             if(isset($post_data))
-            //print_r($post_data);
             $success = $this->settings_model->update($post_data);
+			
+			if(is_super()){
+			$compdata['companyname']=$post_data['settings']['companyname'];
+			$compdata['website']=$post_data['settings']['main_domain'];
+			$compdata['email_notification']=$post_data['settings']['notification_email'];
+			$company_id=get_staff_company_id() ?? 1;
+			$this->db->where('company_id', $company_id);
+            $this->db->update(db_prefix() . 'company_master', $compdata);
+			}
 
             if ($success > 0) {
                 set_alert('success', _l('settings_updated'));
