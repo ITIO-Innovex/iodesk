@@ -252,8 +252,8 @@
         return;
       }
       
-      //var description = $('#dar-view-description').val();
-	  var description = $('#dar-view-description').jqteVal();
+      var description = $('#dar-view-description').val();
+	  //var description = $('#dar-view-description').jqteVal();
 	  //alert(description);
       if ($.trim(description).length < 5) {
         //alert_float('warning', 'Description is required (minimum 5 characters)');
@@ -306,8 +306,8 @@
         return;
       }
       
-      //var description = $('#dar-view-description').val();
-	  var description = $('#dar-view-description').jqteVal();
+      var description = $('#dar-view-description').val();
+	  //var description = $('#dar-view-description').jqteVal();
       if ($.trim(description).length < 5) {
         //alert_float('warning', 'Description is required (minimum 5 characters)');
         //return;
