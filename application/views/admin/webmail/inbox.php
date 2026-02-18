@@ -277,6 +277,10 @@ if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 <i class="fa-solid fa-envelope-circle-check text-warning isdelete" data-mid="<?=$message['id'];?>" data-fid="2" title="Move to inbox"></i>
 <?php } ?>
 
+<?php if(isset($message['folder'])&&$message['folder']=='Outbox'){ ?>
+<a href="<?php echo admin_url('webmail/update_schedule/');?><?php echo $message['uniqid'];?>"<i class="fa-solid fa-pen-to-square text-success" data-mid="<?=$message['id'];?>" title="Edit"></i></a>
+<?php } ?>
+
 
 </div>
 </td>

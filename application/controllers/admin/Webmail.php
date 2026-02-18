@@ -624,6 +624,212 @@ See you soon,<br>
 		$data['title'] = 'Email Contacts';
 		$this->load->view('admin/webmail/contacts', $data);
 	}
+
+	/**
+	 * Update scheduled email page
+	 */
+	public function update_schedule($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Scheduled Emails');
+		}
+
+		$id = (int) $id;
+		if (!$id) {
+			redirect(admin_url('webmail/inbox?fd=Outbox'));
+		}
+
+		$companyId = get_staff_company_id();
+		$this->db->where('id', $id);
+		$this->db->where('company_id', $companyId);
+		$this->db->where('status', 'pending');
+		$schedule = $this->db->get(db_prefix() . 'email_queue')->row_array();
+
+		if (!$schedule) {
+			set_alert('warning', 'Scheduled email not found or already sent');
+			redirect(admin_url('webmail/inbox?fd=Outbox'));
+		}
+
+		$data['schedule'] = $schedule;
+		$data['title'] = 'Update Scheduled Email';
+		$data['email_signature'] = get_staff_signature();
+		$this->load->view('admin/webmail/update_schedule', $data);
+	}
+
+	/**
+	 * Process update scheduled email
+	 */
+	public function process_update_schedule()
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$id = (int) $this->input->post('schedule_id');
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid schedule ID']);
+			return;
+		}
+
+		$companyId = get_staff_company_id();
+		$this->db->where('id', $id);
+		$this->db->where('company_id', $companyId);
+		$this->db->where('status', 'pending');
+		$existing = $this->db->get(db_prefix() . 'email_queue')->row_array();
+
+		if (!$existing) {
+			echo json_encode(['success' => false, 'message' => 'Scheduled email not found or already sent']);
+			return;
+		}
+
+		$toEmail = trim($this->input->post('recipientEmail'));
+		$ccEmails = trim($this->input->post('recipientCC'));
+		$bccEmails = trim($this->input->post('recipientBCC'));
+		$subject = trim($this->input->post('emailSubject'));
+		$body = $this->input->post('emailBody');
+		$scheduleAt = trim($this->input->post('schedule_at'));
+
+		if (empty($toEmail)) {
+			echo json_encode(['success' => false, 'message' => 'Recipient email is required']);
+			return;
+		}
+		if (empty($subject)) {
+			echo json_encode(['success' => false, 'message' => 'Subject is required']);
+			return;
+		}
+		if (empty($scheduleAt)) {
+			echo json_encode(['success' => false, 'message' => 'Scheduled time is required']);
+			return;
+		}
+
+		$existingAttachments = [];
+		if (!empty($existing['attachments'])) {
+			$existingAttachments = json_decode($existing['attachments'], true) ?: [];
+		}
+
+		$deletedAttachments = $this->input->post('deleted_attachments');
+		if (!empty($deletedAttachments)) {
+			$deletedArr = json_decode($deletedAttachments, true) ?: [];
+			foreach ($deletedArr as $delFile) {
+				$key = array_search($delFile, $existingAttachments);
+				if ($key !== false) {
+					$filePath = FCPATH . 'uploads/email_queue/' . $delFile;
+					if (file_exists($filePath)) {
+						@unlink($filePath);
+					}
+					unset($existingAttachments[$key]);
+				}
+			}
+			$existingAttachments = array_values($existingAttachments);
+		}
+
+		$newAttachments = [];
+		if (!empty($_FILES['attachments']) && is_array($_FILES['attachments']['name'])) {
+			$uploadDir = FCPATH . 'uploads/email_queue/';
+			if (!is_dir($uploadDir)) {
+				@mkdir($uploadDir, 0755, true);
+			}
+			foreach ($_FILES['attachments']['name'] as $index => $name) {
+				if ($name === '') {
+					continue;
+				}
+				$tmpName = $_FILES['attachments']['tmp_name'][$index] ?? '';
+				if ($tmpName === '' || !is_uploaded_file($tmpName)) {
+					continue;
+				}
+				$ext = pathinfo($name, PATHINFO_EXTENSION);
+				$storedName = uniqid('queue_', true) . ($ext ? '.' . $ext : '');
+				$targetPath = $uploadDir . $storedName;
+				if (move_uploaded_file($tmpName, $targetPath)) {
+					$newAttachments[] = $storedName;
+				}
+			}
+		}
+
+		$allAttachments = array_merge($existingAttachments, $newAttachments);
+
+		$updateData = [
+			'to_email' => $toEmail,
+			'cc_emails' => $ccEmails,
+			'bcc_emails' => $bccEmails,
+			'subject' => $subject,
+			'body' => $body,
+			'attachments' => $allAttachments ? json_encode($allAttachments) : null,
+			'scheduled_at' => date('Y-m-d H:i:s', strtotime($scheduleAt)),
+		];
+
+		$this->db->where('id', $id);
+		$this->db->update(db_prefix() . 'email_queue', $updateData);
+
+		$this->db->where('uniqid', $id);
+		$this->db->where('folder', 'Outbox');
+		$attachmentsString = $allAttachments ? implode(',', $allAttachments) : '';
+		$this->db->update(db_prefix() . 'emails', [
+			'to_emails' => $toEmail,
+			'cc_emails' => $ccEmails,
+			'bcc_emails' => $bccEmails,
+			'subject' => $subject,
+			'body' => $body,
+			'attachments' => $attachmentsString,
+			'date' => date('Y-m-d H:i:s', strtotime($scheduleAt)),
+		]);
+		
+		//log_message('error', 'Last Query - '.$this->db->last_query() );
+
+		echo json_encode(['success' => true, 'message' => 'Scheduled email updated successfully']);
+	}
+
+	/**
+	 * Delete scheduled email
+	 */
+	public function delete_schedule($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$id = (int) $id;
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid schedule ID']);
+			return;
+		}
+
+		$companyId = get_staff_company_id();
+		$this->db->where('id', $id);
+		$this->db->where('company_id', $companyId);
+		$this->db->where('status', 'pending');
+		$existing = $this->db->get(db_prefix() . 'email_queue')->row_array();
+
+		if (!$existing) {
+			echo json_encode(['success' => false, 'message' => 'Scheduled email not found or already sent']);
+			return;
+		}
+
+		if (!empty($existing['attachments'])) {
+			$attachments = json_decode($existing['attachments'], true) ?: [];
+			foreach ($attachments as $file) {
+				$filePath = FCPATH . 'uploads/email_queue/' . $file;
+				if (file_exists($filePath)) {
+					@unlink($filePath);
+				}
+			}
+		}
+
+		$this->db->where('id', $id);
+		$this->db->delete(db_prefix() . 'email_queue');
+
+		$this->db->where('uniqid', $id);
+		$this->db->where('folder', 'Outbox');
+		$this->db->delete(db_prefix() . 'emails');
+
+		if ($this->db->affected_rows() >= 0) {
+			echo json_encode(['success' => true, 'message' => 'Scheduled email deleted successfully']);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to delete scheduled email']);
+		}
+	}
 	
 
 	
