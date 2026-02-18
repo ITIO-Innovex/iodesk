@@ -40,6 +40,17 @@ $attendance_display_status=attendance_display_status();
 <?php init_head(); ?>
  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <div id="wrapper">
+<?php if (!empty($maintenance_notice)) : ?>
+
+    <?php foreach ($maintenance_notice as $notice) : ?>
+        <div class="top_stats_wrapper tw-my-2 tw-mx-2" style="background-color: <?= $notice->background_color ?>; 
+                    color: <?= $notice->text_color ?>;">
+            <strong><?= $notice->title ?></strong> : <br />
+<?= $notice->message ?>
+            <?= $notice->message ?>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
     <div class="screen-options-area">
 	             
 	<div class="top_stats_wrapper modal-content"> 

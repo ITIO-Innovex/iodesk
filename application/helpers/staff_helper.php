@@ -1569,6 +1569,26 @@ function formatEmailName($email) {
     return strstr($email, '@', true);
 }
 
+function get_maintenance_notice() {
+
+    $CI = & get_instance();
+    $maintenance_notice=$CI->db
+		->select('title, message, background_color, text_color')
+    ->where('is_active', 1)
+    ->group_start()
+        ->where('start_datetime IS NULL', null, false)
+        ->or_where('start_datetime <= NOW()', null, false)
+    ->group_end()
+    ->group_start()
+        ->where('end_datetime IS NULL', null, false)
+        ->or_where('end_datetime >= NOW()', null, false)
+    ->group_end()
+    ->order_by('id', 'DESC')
+    ->get('it_crm_support_maintenance_notice')
+    ->result();
+	return $maintenance_notice ?? [];
+}
+
 	
 function amountInWords($number)
 {

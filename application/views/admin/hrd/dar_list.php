@@ -342,7 +342,7 @@
       newFilesStore.forEach(function(file) {
         formData.append('dar_files[]', file);
       });
-      
+      //alert ("Hiii"); return false;
       $.ajax({
         url: '<?php echo admin_url('hrd/dar_update'); ?>',
         method: 'POST',

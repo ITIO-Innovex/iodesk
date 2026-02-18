@@ -278,7 +278,7 @@ if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 <?php } ?>
 
 <?php if(isset($message['folder'])&&$message['folder']=='Outbox'){ ?>
-<a href="<?php echo admin_url('webmail/update_schedule/');?><?php echo $message['uniqid'];?>"<i class="fa-solid fa-pen-to-square text-success" data-mid="<?=$message['id'];?>" title="Edit"></i></a>
+<a href="<?php echo admin_url('webmail/update_schedule/');?><?php echo $message['uniqid'];?>"<i class="fa-solid fa-pen-to-square text-success" data-mid="<?=$message['id'];?>" title="Edit New"></i></a>
 <?php } ?>
 
 
