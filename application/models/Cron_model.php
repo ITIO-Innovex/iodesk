@@ -2068,7 +2068,7 @@ class Cron_model extends App_Model
         $this->email->initialize();
         $this->email->from(get_option('smtp_email'), get_option('companyname'));
         //$this->email->to($staff->email);
-		$this->email->to('vikashg@itio.in');
+		//$this->email->to('vikashg@itio.in');
         $this->email->subject($subject);
         $this->email->message($message);
         $this->email->send();

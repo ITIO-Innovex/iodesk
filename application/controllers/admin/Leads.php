@@ -2336,8 +2336,6 @@ $this->leads_model->log_lead_activity($deal_id, $log_title);
 	 
 	 ////////////Sent EMAIL////////////
 	 
-//$recipientEmail="vikashg@itio.in";	 
-//$name="Vimalesh";
 $mailSub="NDA Sign  -  ITIO Innovex Private Limited !!";
 
 $mailbody='<!DOCTYPE html>

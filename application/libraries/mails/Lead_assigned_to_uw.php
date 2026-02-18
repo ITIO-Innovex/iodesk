@@ -36,8 +36,7 @@ $_SESSION['templatesub']=" ".$companyname;
 }
 
 
-//echo $_SESSION['templatesub'];exit;
-$cc="vikashg@itio.in";
+$cc="";
 
         parent::__construct();
         $this->staff_email       = $staff_email;

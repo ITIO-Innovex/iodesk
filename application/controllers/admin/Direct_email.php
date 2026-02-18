@@ -242,7 +242,6 @@ class Direct_email extends AdminController
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->setFrom($senderEmail, $senderName);
-        //$mail->addAddress('vikashg@bigit.io,vikashg@itio.in');
 		$bulkEmails=str_replace(";",",",$bulkEmails);
 		$recipients = explode(",", $bulkEmails);
         // Add each email to PHPMailer

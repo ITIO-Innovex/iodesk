@@ -839,7 +839,7 @@ $mailbody='<!DOCTYPE html>
 	$mail->setFrom($senderEmail, $senderName);
 	$mail->addAddress($recipientEmail, $recipientName);
 	// Add hardcoded BCC
-	$mail->addBCC('vikashg@itio.in');
+	//$mail->addBCC('vikashg@itio.in');
 	$mail->Subject = $mailSub;
 	$mail->Body = $mailbody;
     $sent=$mail->send();
