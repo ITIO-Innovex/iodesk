@@ -256,8 +256,8 @@
 	  var description = $('#dar-view-description').jqteVal();
 	  //alert(description);
       if ($.trim(description).length < 5) {
-        alert_float('warning', 'Description is required (minimum 5 characters)');
-        return;
+        //alert_float('warning', 'Description is required (minimum 5 characters)');
+        //return;
       }
       
       var $btn = $(this);
@@ -309,8 +309,8 @@
       //var description = $('#dar-view-description').val();
 	  var description = $('#dar-view-description').jqteVal();
       if ($.trim(description).length < 5) {
-        alert_float('warning', 'Description is required (minimum 5 characters)');
-        return;
+        //alert_float('warning', 'Description is required (minimum 5 characters)');
+        //return;
       }
       
       if (!confirm('Are you sure you want to submit this DAR? Once submitted, it cannot be edited.')) {
