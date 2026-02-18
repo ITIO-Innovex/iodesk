@@ -256,8 +256,8 @@
 	  var description = $('#dar-view-description').jqteVal();
 	  //alert(description);
       if ($.trim(description).length < 5) {
-        alert_float('warning', 'Description is required (minimum 5 characters)');
-        return;
+        //alert_float('warning', 'Description is required (minimum 5 characters)');
+        //return;
       }
       
       var $btn = $(this);
