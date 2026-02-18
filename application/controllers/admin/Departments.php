@@ -111,6 +111,37 @@ class Departments extends AdminController
         }
     }
 
+    /**
+     * Check if department name already exists for the same company
+     */
+    public function name_exists()
+    {
+        $departmentid = $this->input->post('departmentid');
+        $name = trim($this->input->post('name'));
+        $company_id = get_staff_company_id();
+
+        // If editing, check if the name is unchanged
+        if ($departmentid) {
+            $this->db->where('departmentid', $departmentid);
+            $current = $this->db->get(db_prefix() . 'departments')->row();
+            if ($current && strtolower(trim($current->name)) === strtolower($name)) {
+                echo json_encode(true);
+                die();
+            }
+        }
+
+        // Check for duplicate name within the same company
+        $this->db->where('LOWER(name)', strtolower($name));
+        $this->db->where('company_id', $company_id);
+        $exists = $this->db->count_all_results(db_prefix() . 'departments');
+
+        if ($exists > 0) {
+            echo 'false';
+        } else {
+            echo 'true';
+        }
+    }
+
     public function folders()
     {
         app_check_imap_open_function();

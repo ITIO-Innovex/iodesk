@@ -5553,6 +5553,172 @@ class Hrd extends AdminController
         $this->load->view('admin/hrd/dar_list', $data);
     }
 
+    /**
+     * Submit a draft DAR from the list page
+     */
+    public function dar_submit($id = 0)
+    {
+        if (!(is_admin() || staff_can('view_own', 'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid DAR ID']);
+            return;
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId = get_staff_user_id();
+
+        // Fetch the DAR
+        $this->db->where('id', $id);
+        $this->db->where('company_id', $companyId);
+        if (!is_admin()) {
+            $this->db->where('staffid', $staffId);
+        }
+        $dar = $this->db->get('it_crm_dar')->row_array();
+
+        if (!$dar) {
+            echo json_encode(['success' => false, 'message' => 'DAR not found']);
+            return;
+        }
+
+        // Check if already submitted
+        if ((int) $dar['status'] === 1) {
+            echo json_encode(['success' => false, 'message' => 'DAR is already submitted']);
+            return;
+        }
+
+        // Update status to submitted (1)
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_dar', ['status' => 1]);
+
+        echo json_encode(['success' => true, 'message' => 'DAR submitted successfully']);
+    }
+
+    /**
+     * Update DAR description and attachments by ID
+     */
+    public function dar_update()
+    {
+        if (!(is_admin() || staff_can('view_own', 'hr_department'))) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            return;
+        }
+
+        $id = (int) $this->input->post('dar_id');
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid DAR ID']);
+            return;
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId = get_staff_user_id();
+
+        // Fetch the DAR
+        $this->db->where('id', $id);
+        $this->db->where('company_id', $companyId);
+        if (!is_admin()) {
+            $this->db->where('staffid', $staffId);
+        }
+        $dar = $this->db->get('it_crm_dar')->row_array();
+        log_message('error', 'Display data - '.print_r($dar , true) );
+        if (!$dar) {
+            echo json_encode(['success' => false, 'message' => 'DAR not found']);
+            return;
+        }
+
+        // Check if already submitted (cannot edit submitted DAR)
+        if ((int) $dar['status'] === 1) {
+            echo json_encode(['success' => false, 'message' => 'Cannot edit submitted DAR']);
+            return;
+        }
+
+        $description = $this->input->post('description', false);
+        $submitDar = $this->input->post('submit_dar') === '1';
+
+        if (trim(strip_tags((string) $description)) === '') {
+            echo json_encode(['success' => false, 'message' => 'Description is required']);
+            return;
+        }
+
+        // Update data
+        $updateData = [
+            'descriptions' => $description,
+        ];
+
+        // If submit_dar flag is set, also update status
+        if ($submitDar) {
+            $updateData['status'] = 1;
+        }
+
+        // Handle file uploads
+        if (isset($_FILES['dar_files']['name'])) {
+            $files = $_FILES['dar_files'];
+            if (!is_array($files['name'])) {
+                $files = [
+                    'name' => [$files['name']],
+                    'type' => [$files['type']],
+                    'tmp_name' => [$files['tmp_name']],
+                    'error' => [$files['error']],
+                    'size' => [$files['size']],
+                ];
+            }
+
+            $uploadDir = FCPATH . 'uploads/dar/' . $id . '/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+
+            // Get existing files
+            $existingFiles = [];
+            if (!empty($dar['file'])) {
+                $existingFiles = array_filter(array_map('trim', explode(',', $dar['file'])));
+            }
+            $existingNames = [];
+            foreach ($existingFiles as $ef) {
+                $existingNames[] = basename($ef);
+            }
+
+            $newFiles = [];
+            for ($i = 0; $i < count($files['name']); $i++) {
+                if (empty($files['name'][$i])) {
+                    continue;
+                }
+                if (_perfex_upload_error($files['error'][$i])) {
+                    continue;
+                }
+                $tmpFilePath = $files['tmp_name'][$i];
+                if (empty($tmpFilePath)) {
+                    continue;
+                }
+
+                $origName = $files['name'][$i];
+                // Skip if file with same name already exists
+                if (in_array($origName, $existingNames)) {
+                    continue;
+                }
+
+                $destFilePath = $uploadDir . $origName;
+                if (move_uploaded_file($tmpFilePath, $destFilePath)) {
+                    $newFiles[] = 'uploads/dar/' . $id . '/' . $origName;
+                }
+            }
+
+            // Merge with existing files
+            $allFiles = array_merge($existingFiles, $newFiles);
+            $updateData['file'] = !empty($allFiles) ? implode(',', $allFiles) : null;
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_dar', $updateData);
+
+        $message = $submitDar ? 'DAR submitted successfully' : 'DAR updated successfully';
+        echo json_encode(['success' => true, 'message' => $message]);
+    }
+
     public function dar_delete_file($id = 0)
     {
         if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
