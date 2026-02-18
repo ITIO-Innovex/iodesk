@@ -43,6 +43,38 @@
                    placeholder="Email" />
 				   <small class="text-muted">This email receives all important emails such as invoices, subscriptions, and related notifications.</small>
         </div>
+
+        <div class="form-group">
+            <label for="email_notification">Email Notification</label>
+            <input type="email" name="email_notification" class="form-control"
+                   value="<?php echo isset($company->email_notification) ? e($company->email_notification) : ''; ?>"
+                   placeholder="Email for notifications" />
+            <small class="text-muted">This email receives general system notifications.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="email_hrd">Email HRD</label>
+            <input type="email" name="email_hrd" class="form-control"
+                   value="<?php echo isset($company->email_hrd) ? e($company->email_hrd) : ''; ?>"
+                   placeholder="HR Department Email" />
+            <small class="text-muted">This email receives HR related notifications.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="email_dar">Email DAR</label>
+            <input type="email" name="email_dar" class="form-control"
+                   value="<?php echo isset($company->email_dar) ? e($company->email_dar) : ''; ?>"
+                   placeholder="DAR Email" />
+            <small class="text-muted">This email receives Daily Activity Report (DAR) submissions.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="email_cc">Email CC</label>
+            <input type="text" name="email_cc" class="form-control"
+                   value="<?php echo isset($company->email_cc) ? e($company->email_cc) : ''; ?>"
+                   placeholder="CC Email addresses (comma separated)" />
+            <small class="text-muted">CC email addresses for notifications. Multiple emails can be separated by comma.</small>
+        </div>
     </div>
 
     <div class="col-md-12">

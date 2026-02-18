@@ -5531,6 +5531,73 @@ class Hrd extends AdminController
                 ]);
             }
 
+            $darEmail=get_company_fields($companyId ,'email_dar');
+            if ($status === 1 && !empty($darEmail)) {
+                // Get updated DAR data to include all files
+                $updatedDar = $this->db->where('id', $darId)->get('it_crm_dar')->row_array();
+                
+                $staffName = get_staff_full_name() ?? 'Staff';
+                
+                // Get reporting manager email
+                $reportingManagerEmail = '';
+                if (!empty($staffInfo['reporting_manager'])) {
+                    $manager = $this->db->where('staffid', $staffInfo['reporting_manager'])->get('it_crm_staff')->row_array();
+                    if (!empty($manager['email'])) {
+                        $reportingManagerEmail = $manager['email'];
+                    }
+                }
+                
+                // Get company email settings for DAR
+                $companySettings = $this->db->where('company_id', $companyId)->get('it_crm_company_master')->row_array();
+                $darEmail = !empty($companySettings['email_dar']) ? $companySettings['email_dar'] : '';
+                $ccEmails = !empty($companySettings['email_cc']) ? $companySettings['email_cc'] : '';
+                
+                // Determine recipient - priority: email_dar > reporting_manager > staff email
+                $recipientEmail = '';
+                if (!empty($darEmail)) {
+                    $recipientEmail = $darEmail;
+                } elseif (!empty($reportingManagerEmail)) {
+                    $recipientEmail = $reportingManagerEmail;
+                } elseif (!empty($staffInfo['email'])) {
+                    $recipientEmail = $staffInfo['email'];
+                }
+                
+                // Prepare attachments
+                $attachments = [];
+                if (!empty($updatedDar['file'])) {
+                    $files = array_filter(array_map('trim', explode(',', $updatedDar['file'])));
+                    foreach ($files as $file) {
+                        $filePath = FCPATH . $file;
+                        if (file_exists($filePath)) {
+                            $attachments[] = [
+                                'path' => $filePath,
+                                'name' => basename($file)
+                            ];
+                        }
+                    }
+                }
+                
+                // Prepare email data
+                $msgdata = [
+                    'recipientEmail' => $darEmail,
+                    //'recipientCC' => $ccEmails,
+                    'emailSubject' => 'DAR Submitted - ' . $staffName . ' - ' . date('d-m-Y'),
+                    'emailBody' => '<h3>Daily Activity Report</h3>'
+                        . '<p><strong>Staff:</strong> ' . htmlspecialchars($staffName) . '</p>'
+                        . '<p><strong>Date:</strong> ' . date('d-m-Y') . '</p>'
+                        . '<hr>'
+                        . '<div>' . $description . '</div>'
+                        . (!empty($attachments) ? '<p><strong>Attachments:</strong> ' . count($attachments) . ' file(s) attached</p>' : ''),
+                    'attachments' => $attachments
+                ];
+                
+                // Send email if recipient exists
+                if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->compose_email_super($msgdata);
+                }
+            }
+
             set_alert('success', 'DAR saved successfully');
             redirect(admin_url('hrd/dar'));
         }
@@ -5718,6 +5785,51 @@ class Hrd extends AdminController
 
         $this->db->where('id', $id);
         $this->db->update('it_crm_dar', $updateData);
+		
+		// Send email with attachments only when submitting DAR
+		$darEmail=get_company_fields($companyId ,'email_dar');
+		if ($submitDar && !empty($darEmail)) {
+			// Get updated DAR data to include all files
+			$updatedDar = $this->db->where('id', $id)->get('it_crm_dar')->row_array();
+			
+			// Get staff info
+			$staffName = get_staff_full_name() ?? 'Staff';
+			
+			//log_message('error', 'DAt - '.$staffName."".$darEmail);
+			// Prepare attachments
+			$attachments = [];
+			if (!empty($updatedDar['file'])) {
+				$files = array_filter(array_map('trim', explode(',', $updatedDar['file'])));
+				foreach ($files as $file) {
+					$filePath = FCPATH . $file;
+					if (file_exists($filePath)) {
+						$attachments[] = [
+							'path' => $filePath,
+							'name' => basename($file)
+						];
+					}
+				}
+			}
+			
+			// Prepare email data
+			$msgdata = [
+				'recipientEmail' => $darEmail,
+				'emailSubject' => 'DAR Submitted - ' . $staffName . ' - ' . date('d-m-Y'),
+				'emailBody' => '<h3>Daily Activity Report</h3>'
+					. '<p><strong>Staff:</strong> ' . htmlspecialchars($staffName) . '</p>'
+					. '<p><strong>Date:</strong> ' . date('d-m-Y') . '</p>'
+					. '<hr>'
+					. '<div>' . $description . '</div>'
+					. (!empty($attachments) ? '<p><strong>Attachments:</strong> ' . count($attachments) . ' file(s) attached</p>' : ''),
+				'attachments' => $attachments
+			];
+			
+			// Send email if recipient exists
+			if (!empty($msgdata['recipientEmail'])) {
+				$this->load->model('webmail_model');
+				$this->webmail_model->compose_email_super($msgdata);
+			}
+		}
 
         $message = $submitDar ? 'DAR submitted successfully' : 'DAR updated successfully';
         echo json_encode(['success' => true, 'message' => $message]);

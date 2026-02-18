@@ -95,6 +95,8 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
             $data['tickets_report'] = (new app\services\TicketsReportByStaff())->filterBy('this_month');
         }
 		
+		$data['maintenance_notice'] = get_maintenance_notice();
+	
        //send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), 'VK GUPTA', 'www.eindia.com','');
        //Email,StaffID,NDA LINK,CCMAIL
 	   
@@ -119,6 +121,9 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
 		$data['active_department_count']        = $department_count;
         $data['active_designation_count']       = $designation_count;		
         $data = hooks()->apply_filters('before_dashboard_render', $data);
+		
+		
+		
         $this->load->view('admin/dashboard/dashboard', $data);
     }
 	

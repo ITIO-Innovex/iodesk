@@ -1332,18 +1332,34 @@ $client->disconnect();
 	
 	$mail->Subject = $subject;
 	$mail->Body = $body;
+
+	// Add attachments if provided
+	if (!empty($emaildata['attachments']) && is_array($emaildata['attachments'])) {
+		foreach ($emaildata['attachments'] as $attachment) {
+			$filePath = '';
+			$fileName = '';
+			if (is_array($attachment)) {
+				$filePath = isset($attachment['path']) ? $attachment['path'] : '';
+				$fileName = isset($attachment['name']) ? $attachment['name'] : basename($filePath);
+			} else {
+				$filePath = $attachment;
+				$fileName = basename($attachment);
+			}
+			if (!empty($filePath) && file_exists($filePath)) {
+				$mail->addAttachment($filePath, $fileName);
+			}
+		}
+	}
+
     $mail->send();
     //echo "Email sent successfully!";
 	log_activity('Email Book an Appoinment With Subject Line -  [ Subject: ' . $subject . ']');
     return true;
 	} catch (Exception $e) {
 		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
+		log_message('error', 'Email send error: ' . $mail->ErrorInfo);
 		return false;
 	}
-	
-	
-	
-	
 	
 	}
 

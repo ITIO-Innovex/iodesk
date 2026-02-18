@@ -134,7 +134,17 @@
 	  
 	  <tr data-name="bulk_pdf_exporter">
         <td><?php echo render_input('mailer_username', 'Username','', 'text', ['required' => 'true']); ?></td>
-        <td><?php echo render_input('mailer_password', 'Password <span id="AppPass"></span>', '', 'password', ['required' => 'true']); ?></td>
+        <td>
+            <div class="form-group">
+                <label for="mailer_password" class="control-label">Password <span id="AppPass"></span></label>
+                <div class="input-group">
+                    <input type="password" id="mailer_password" name="mailer_password" class="form-control" required="true">
+                    <span class="input-group-addon" id="toggle-password" style="cursor: pointer;">
+                        <i class="fa fa-eye" id="password-icon"></i>
+                    </span>
+                </div>
+            </div>
+        </td>
       </tr>
 	  
 	  <tr data-name="bulk_pdf_exporter">
@@ -359,6 +369,20 @@ function retrieve_imap_department_folders() {
 $(document).ready(function(){
     $("#mailer_email").on("keyup", function(){
         $("#mailer_username").val($(this).val());
+    });
+
+    // Password show/hide toggle
+    $('#toggle-password').on('click', function() {
+        var $passwordInput = $('#mailer_password');
+        var $icon = $('#password-icon');
+        
+        if ($passwordInput.attr('type') === 'password') {
+            $passwordInput.attr('type', 'text');
+            $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            $passwordInput.attr('type', 'password');
+            $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
     });
 });
 </script>

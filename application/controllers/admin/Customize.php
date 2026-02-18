@@ -47,7 +47,11 @@ class Customize extends AdminController
             $data['lastname'] = $data['customize_lastname'] ?? '';
             $data['email'] = $data['customize_email'] ?? '';
 
-            
+            // Email notification fields
+            $data['email_notification'] = trim($data['email_notification'] ?? '');
+            $data['email_hrd'] = trim($data['email_hrd'] ?? '');
+            $data['email_dar'] = trim($data['email_dar'] ?? '');
+            $data['email_cc'] = trim($data['email_cc'] ?? '');
 
             // Collect SMTP fields
             $smtp_fields = [
