@@ -30,6 +30,7 @@
                       <th>Participant</th>
 					  <th>Notes</th>
                       <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -47,6 +48,21 @@
                             <option value="0" <?php echo (int) ($row['status'] ?? 1) === 0 ? 'selected' : ''; ?>>Inactive</option>
                             <option value="2" <?php echo (int) ($row['status'] ?? 1) === 2 ? 'selected' : ''; ?>>Completed</option>
                           </select>
+                        </td>
+                        <td>
+                          <button type="button" class="btn btn-xs btn-info edit-appointment"
+                                  data-id="<?php echo (int) $row['id']; ?>"
+                                  data-consultations="<?php echo (int) ($row['consultations'] ?? 15); ?>"
+                                  data-date_time="<?php echo e($row['date_time'] ?? ''); ?>"
+                                  data-consultant="<?php echo e($row['consultant'] ?? ''); ?>"
+                                  data-customer="<?php echo e($row['customer'] ?? ''); ?>"
+                                  data-notes="<?php echo e($row['notes'] ?? ''); ?>"
+                                  data-notification="<?php echo (int) ($row['notification'] ?? 0); ?>">
+                            <i class="fa fa-edit"></i>
+                          </button>
+                          <button type="button" class="btn btn-xs btn-danger delete-appointment" data-id="<?php echo (int) $row['id']; ?>">
+                            <i class="fa fa-trash"></i>
+                          </button>
                         </td>
                       </tr>
                     <?php } ?>
@@ -71,6 +87,7 @@
                       <th>Participant</th>
 					  <th>Notes</th>
                       <th>Status</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -88,6 +105,21 @@
                             <option value="0" <?php echo (int) ($row['status'] ?? 1) === 0 ? 'selected' : ''; ?>>Inactive</option>
                             <option value="2" <?php echo (int) ($row['status'] ?? 1) === 2 ? 'selected' : ''; ?>>Completed</option>
                           </select>
+                        </td>
+                        <td>
+                          <button type="button" class="btn btn-xs btn-info edit-appointment"
+                                  data-id="<?php echo (int) $row['id']; ?>"
+                                  data-consultations="<?php echo (int) ($row['consultations'] ?? 15); ?>"
+                                  data-date_time="<?php echo e($row['date_time'] ?? ''); ?>"
+                                  data-consultant="<?php echo e($row['consultant'] ?? ''); ?>"
+                                  data-customer="<?php echo e($row['customer'] ?? ''); ?>"
+                                  data-notes="<?php echo e($row['notes'] ?? ''); ?>"
+                                  data-notification="<?php echo (int) ($row['notification'] ?? 0); ?>">
+                            <i class="fa fa-edit"></i>
+                          </button>
+                          <button type="button" class="btn btn-xs btn-danger delete-appointment" data-id="<?php echo (int) $row['id']; ?>">
+                            <i class="fa fa-trash"></i>
+                          </button>
                         </td>
                       </tr>
                     <?php } ?>
@@ -112,14 +144,15 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">New Appointment</h4>
+        <h4 class="modal-title" id="appointment-modal-title">New Appointment</h4>
       </div>
       <div class="modal-body">
         <form id="appointment-form">
           <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
+          <input type="hidden" name="appointment_id" id="appointment-id" value="">
           <div class="form-group">
             <label>Consultations</label>
-            <select name="consultations" class="form-control" required>
+            <select name="consultations" id="appointment-consultations" class="form-control" required>
               <option value="15">15 Minut</option>
               <option value="30">30 Minut</option>
               <option value="45">45 Minut</option>
@@ -128,15 +161,15 @@
           </div>
           <div class="form-group">
             <label>Date and Time</label>
-            <input type="datetime-local" name="date_time" class="form-control" required>
+            <input type="datetime-local" name="date_time" id="appointment-datetime" class="form-control" required>
           </div>
           <div class="form-group">
             <label>Consultant</label>
-            <input type="text" name="consultant" class="form-control" value="<?php echo e($_SESSION['webmail']['mailer_email'] ?? ''); ?>" readonly>
+            <input type="text" name="consultant" id="appointment-consultant" class="form-control" value="<?php echo e($_SESSION['webmail']['mailer_email'] ?? ''); ?>" readonly>
           </div>
           <div class="form-group">
             <label>Customer</label>
-            <select name="customer" class="form-control" required>
+            <select name="customer" id="appointment-customer" class="form-control" required>
               <option value="">Select customer</option>
               <?php foreach (($contacts ?? []) as $c) { ?>
                 <option value="<?php echo e($c['email_id'] ?? ''); ?>"><?php echo e($c['email_id'] ?? ''); ?></option>
@@ -145,7 +178,7 @@
           </div>
           <div class="form-group">
             <label>Notes</label>
-            <textarea name="notes" class="form-control" rows="3"></textarea>
+            <textarea name="notes" id="appointment-notes" class="form-control" rows="3"></textarea>
           </div>
           <div class="checkbox checkbox-primary">
             <input type="checkbox" id="appointment-notify" name="notification" value="1">
@@ -204,9 +237,23 @@
 <script>
   $(function() {
     $('.editor').jqte();
+    
+    // Helper to format datetime for datetime-local input
+    function formatDateTimeLocal(dt) {
+      if (!dt) return '';
+      // Convert "2026-02-17 10:30:00" to "2026-02-17T10:30"
+      return dt.replace(' ', 'T').substring(0, 16);
+    }
+    
+    // Save appointment (add or update)
     $('#save-appointment').on('click', function() {
       var $form = $('#appointment-form');
-      $.post('<?php echo admin_url('webmail/add_appointment'); ?>', $form.serialize(), function(resp) {
+      var appointmentId = $('#appointment-id').val();
+      var url = appointmentId 
+        ? '<?php echo admin_url('webmail/update_appointment'); ?>/' + appointmentId 
+        : '<?php echo admin_url('webmail/add_appointment'); ?>';
+      
+      $.post(url, $form.serialize(), function(resp) {
         if (resp && resp.success) {
           $('#appointmentModal').modal('hide');
           alert_float('success', resp.message || 'Appointment saved');
@@ -215,6 +262,55 @@
           alert_float('warning', resp && resp.message ? resp.message : 'Failed to save appointment');
         }
       }, 'json');
+    });
+
+    // Edit appointment
+    $('.edit-appointment').on('click', function() {
+      var $btn = $(this);
+      var id = $btn.data('id');
+      var consultations = $btn.data('consultations');
+      var dateTime = $btn.data('date_time');
+      var consultant = $btn.data('consultant');
+      var customer = $btn.data('customer');
+      var notes = $btn.data('notes');
+      var notification = $btn.data('notification');
+      
+      $('#appointment-id').val(id);
+      $('#appointment-consultations').val(consultations);
+      $('#appointment-datetime').val(formatDateTimeLocal(dateTime));
+      $('#appointment-consultant').val(consultant);
+      $('#appointment-customer').val(customer);
+      $('#appointment-notes').val(notes);
+      $('#appointment-notify').prop('checked', notification == 1);
+      
+      $('#appointment-modal-title').text('Edit Appointment');
+      $('#appointmentModal').modal('show');
+    });
+    
+    // Delete appointment
+    $('.delete-appointment').on('click', function() {
+      var id = $(this).data('id');
+      if (!id) return;
+      if (!confirm('Are you sure you want to delete this appointment?')) return;
+      
+      $.post('<?php echo admin_url('webmail/delete_appointment'); ?>/' + id, {
+        <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+      }, function(resp) {
+        if (resp && resp.success) {
+          alert_float('success', resp.message || 'Appointment deleted');
+          location.reload();
+        } else {
+          alert_float('warning', resp && resp.message ? resp.message : 'Failed to delete appointment');
+        }
+      }, 'json');
+    });
+    
+    // Reset modal on close
+    $('#appointmentModal').on('hidden.bs.modal', function() {
+      $('#appointment-form')[0].reset();
+      $('#appointment-id').val('');
+      $('#appointment-modal-title').text('New Appointment');
+      $('#appointment-consultant').val('<?php echo e($_SESSION['webmail']['mailer_email'] ?? ''); ?>');
     });
 
     $('.appointment-status').on('change', function() {
