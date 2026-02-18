@@ -245,6 +245,17 @@
       }, 'json');
     });
     
+    // Helper function to get jQTE editor content
+    function getEditorContent() {
+      // jQTE stores content in .jqte_editor div, get its HTML
+      var $editor = $('#dar-view-description').closest('.jqte').find('.jqte_editor');
+      if ($editor.length) {
+        return $editor.html();
+      }
+      // Fallback to textarea value
+      return $('#dar-view-description').val();
+    }
+    
     // Handle update button click
     $('#dar-update-btn').on('click', function() {
       if (!currentDarId) {
@@ -252,12 +263,12 @@
         return;
       }
       
-      var description = $('#dar-view-description').val();
-	  //var description = $('#dar-view-description').jqteVal();
-	  //alert(description);
-      if ($.trim(description).length < 5) {
-        //alert_float('warning', 'Description is required (minimum 5 characters)');
-        //return;
+      var description = getEditorContent();
+      var plainText = $('<div>').html(description).text().trim();
+      
+      if (plainText.length < 5) {
+        alert_float('warning', 'Description is required (minimum 5 characters)');
+        return;
       }
       
       var $btn = $(this);
@@ -306,11 +317,12 @@
         return;
       }
       
-      var description = $('#dar-view-description').val();
-	  //var description = $('#dar-view-description').jqteVal();
-      if ($.trim(description).length < 5) {
-        //alert_float('warning', 'Description is required (minimum 5 characters)');
-        //return;
+      var description = getEditorContent();
+      var plainText = $('<div>').html(description).text().trim();
+      
+      if (plainText.length < 5) {
+        alert_float('warning', 'Description is required (minimum 5 characters)');
+        return;
       }
       
       if (!confirm('Are you sure you want to submit this DAR? Once submitted, it cannot be edited.')) {
