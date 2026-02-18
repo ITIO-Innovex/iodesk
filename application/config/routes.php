@@ -334,8 +334,8 @@ $route['admin/hrd/job_application_form'] = 'admin/hrd/job_application_form';
 /**
  * Support Ticket Routes
  */
-$route['admin/support/web'] = 'admin/support/web/index';
-$route['admin/support/web/add'] = 'admin/support/web/add';
-$route['admin/support/web/submit'] = 'admin/support/web/submit';
-$route['admin/support/web/view/(:num)'] = 'admin/support/web/view/$1';
-$route['admin/support/web/reply'] = 'admin/support/web/reply';
+$route['admin/support/web'] = 'admin/Support/Web/index';
+$route['admin/support/web/add'] = 'admin/Support/Web/add';
+$route['admin/support/web/submit'] = 'admin/Support/Web/submit';
+$route['admin/support/web/view/(:num)'] = 'admin/Support/Web/view/$1';
+$route['admin/support/web/reply'] = 'admin/Support/Web/reply';
