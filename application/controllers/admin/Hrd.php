@@ -4763,10 +4763,14 @@ class Hrd extends AdminController
         if ($this->db->field_exists('status', db_prefix() . 'hrd_holiday_list')) {
             $this->db->where('status !=', 0);
         }
-        // Order by available date column
+        
+        // Filter by current year
+        $currentYear = date('Y');
         if ($this->db->field_exists('date', db_prefix() . 'hrd_holiday_list')) {
+            $this->db->where('YEAR(date)', $currentYear);
             $this->db->order_by('date', 'asc');
         } elseif ($this->db->field_exists('holiday_date', db_prefix() . 'hrd_holiday_list')) {
+            $this->db->where('YEAR(holiday_date)', $currentYear);
             $this->db->order_by('holiday_date', 'asc');
         }
         $holidays = $this->db->get(db_prefix() . 'hrd_holiday_list')->result_array();
@@ -5544,10 +5548,10 @@ class Hrd extends AdminController
 
         $companyId = get_staff_company_id();
         $this->db->where('company_id', $companyId);
-        if (!is_admin()) {
+        //if (!is_admin()) {
             $this->db->where('staffid', get_staff_user_id());
-        }
-        $this->db->order_by('addedon', 'desc');
+        //}
+        $this->db->order_by('id', 'desc');
         $data['dars'] = $this->db->get('it_crm_dar')->result_array();
         $data['title'] = 'DAR List';
         $this->load->view('admin/hrd/dar_list', $data);

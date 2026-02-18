@@ -530,6 +530,87 @@ See you soon,<br>
 		echo json_encode(['success' => true, 'message' => 'Status updated']);
 	}
 
+	/**
+	 * Update appointment
+	 */
+	public function update_appointment($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$id = (int) $id;
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid appointment']);
+			return;
+		}
+
+		$consultations = (int) $this->input->post('consultations');
+		$date_time = trim($this->input->post('date_time'));
+		$consultant = trim($this->input->post('consultant'));
+		$customer = trim($this->input->post('customer'));
+		$notes = trim($this->input->post('notes'));
+		$notification = $this->input->post('notification') ? 1 : 0;
+
+		if (!$consultations || !in_array($consultations, [15, 30, 45, 60], true)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid consultation time']);
+			return;
+		}
+		if (empty($date_time)) {
+			echo json_encode(['success' => false, 'message' => 'Date and time are required']);
+			return;
+		}
+		if (empty($customer)) {
+			echo json_encode(['success' => false, 'message' => 'Customer is required']);
+			return;
+		}
+
+		$this->db->where('id', $id);
+		if (!is_admin()) {
+			$this->db->where('staffid', get_staff_user_id());
+		}
+		$this->db->update('it_crm_email_appoinment', [
+			'consultations' => $consultations,
+			'date_time' => $date_time,
+			'consultant' => $consultant,
+			'customer' => $customer,
+			'notes' => $notes,
+			'notification' => $notification,
+		]);
+
+		echo json_encode(['success' => true, 'message' => 'Appointment updated successfully']);
+	}
+
+	/**
+	 * Delete appointment
+	 */
+	public function delete_appointment($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$id = (int) $id;
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid appointment']);
+			return;
+		}
+
+		$this->db->where('id', $id);
+		if (!is_admin()) {
+			$this->db->where('staffid', get_staff_user_id());
+		}
+		$this->db->delete('it_crm_email_appoinment');
+
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['success' => true, 'message' => 'Appointment deleted successfully']);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to delete appointment']);
+		}
+	}
+
 	public function contacts()
 	{
 		if (!is_staff_logged_in()) {
