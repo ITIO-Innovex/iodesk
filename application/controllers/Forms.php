@@ -1400,6 +1400,7 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
     {
 	
 	$ref 	=	$ref  ?? "100100100";
+	$ref 	=	$ref."".date("Yms");
 	$name 	=	$name ?? "Vikash Gupta";
 	$form	=	$form ?? "KYC Form";
 	return $mailbody='<!DOCTYPE html>
@@ -1417,14 +1418,15 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
       <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.08);">
         <tr>
 <td style="padding:24px; color:#111827; font-size:14px; line-height:22px;">
-<p style="margin:0 0 16px;">Hi, <strong>HRD Team! </strong></p>
-<p style="margin:0 0 20px; text-align:left;">This is to inform you that the '.$form.' as been successfully submitted by '.$name.'.</p>
+<p style="margin:0 0 16px;"><strong>Dear HR Team</strong></p>
+<p style="margin:0 0 20px; text-align:left;">We are pleased to inform you that the '.$form.' has been successfully submitted by '.$name.'.</p>
 <p style="margin:0 0 16px;">Reference number is : <strong>'.$ref.'</strong></p>
-<p style="margin:0;">Thank you.,<br><strong>CRM - '.$form.'</strong></p>
+<p style="margin:0 0 16px;">Kindly proceed with the necessary onboarding formalities.</strong></p>
+<p style="margin:0 0 16px;">This is a system-generated email. Please do not reply to this email.</strong></p>
+<p style="margin:0;">Regards,<br><strong>CRM Portal</strong></p>
           </td>
         </tr>
       </table>
-
     </td>
   </tr>
 </table>

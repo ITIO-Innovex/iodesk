@@ -278,10 +278,10 @@
               <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
 			  
               <div class="form-section">
-                <h5><?php echo $title ?? "";?> Submitted Successfully</h5>
-<h6>Thank you for submitting your <?php echo $title ?? "";?>.</h6>
-<h6>Your reference number is <?php echo $reference_number ?? "";?>.</h6>
-<h6>Our HR team will contact you soon regarding the next steps.</h6>
+			  
+<h5>Welcome Aboard!</h5>
+<h6>Your journey with us begins here. Thank you for completing your <?php echo $title ?? "";?> - we`re excited to have you as part of our growing family!</h6>		
+
               </div>
               </div>
               </div>
