@@ -256,8 +256,8 @@
 	  var description = $('#dar-view-description').jqteVal();
 	  //alert(description);
       if ($.trim(description).length < 5) {
-        //alert_float('warning', 'Description is required (minimum 5 characters)');
-        //return;
+        alert_float('warning', 'Description is required (minimum 5 characters)');
+        return;
       }
       
       var $btn = $(this);
@@ -282,13 +282,13 @@
         contentType: false,
         success: function(resp) {
           $btn.html('<i class="fa-solid fa-save tw-mr-1"></i> Update DAR').prop('disabled', false);
-          alert(resp);
+          //alert(resp);
 		  console.log(resp);
           if (resp && (resp.success === true || resp.success === "true")) {
             alert_float('success', resp.message || 'DAR updated successfully');
             $('#dar_view_modal').modal('hide');
             location.reload();
-          } else {  alert(resp.success);
+          } else {  //alert(resp.success);
             alert_float('warning', resp && resp.message ? resp.message : 'Failed to update DAR !!');
           }
         },
@@ -306,7 +306,8 @@
         return;
       }
       
-      var description = $('#dar-view-description').val();
+      //var description = $('#dar-view-description').val();
+	  var description = $('#dar-view-description').jqteVal();
       if ($.trim(description).length < 5) {
         alert_float('warning', 'Description is required (minimum 5 characters)');
         return;
