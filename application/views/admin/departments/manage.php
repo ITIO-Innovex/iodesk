@@ -142,7 +142,21 @@
 $(function() {
     initDataTable('.table-departments', window.location.href, [4], [4], undefined, [1, 'asc']);
     appValidateForm($('form'), {
-        name: 'required',
+        name: {
+            required: true,
+            remote: {
+                url: admin_url + "departments/name_exists",
+                type: 'post',
+                data: {
+                    name: function() {
+                        return $('input[name="name"]').val();
+                    },
+                    departmentid: function() {
+                        return $('input[name="id"]').val();
+                    }
+                }
+            }
+        },
         email: {
             email: true,
             remote: {
@@ -159,6 +173,9 @@ $(function() {
             }
         }
     }, manage_departments);
+    
+    // Custom error message for duplicate department name
+    $.validator.messages.remote = "<?php echo _l('Department name already exists'); ?>";
     $('#department').on('hidden.bs.modal', function(event) {
         $('#additional').html('');
         $('#department input[type="text"]').val('');
