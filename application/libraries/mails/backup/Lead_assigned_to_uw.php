@@ -29,7 +29,7 @@ foreach ($dealdata as $key => $value) {
 
 $table.="</table><br><br>";
 
-$cc="vikashg@itio.in,shivamg@itio.in";
+$cc="";
 
         parent::__construct();
         $this->staff_email       = $staff_email;

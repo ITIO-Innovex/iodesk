@@ -97,8 +97,6 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
 		
 		$data['maintenance_notice'] = get_maintenance_notice();
 	
-       //send_mail_template('nda_sign', 'vikashg@itio.in', get_staff_user_id(), 'VK GUPTA', 'www.eindia.com','');
-       //Email,StaffID,NDA LINK,CCMAIL
 	   
 	   $company_id    = get_staff_company_id();
 	   $company_details   = [];
