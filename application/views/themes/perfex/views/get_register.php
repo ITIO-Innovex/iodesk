@@ -49,10 +49,14 @@
         </div>
         <?php } ?>
         <div class="form-group">
-          <?php /*?><button type="submit" autocomplete="off" 
-                        class="btn btn-primary btn-block"> <?php echo _l('clients_register_string'); ?> </button><?php */?>
-						<button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+         <button type="submit" class="btn btn-primary btn-block">Submit</button>
         </div>
+		 
+		<div class="form-group text-white">
+                <a href="<?php echo admin_url('authentication/'); ?>" class="text-white">
+                    <?php echo _l('Need Login?'); ?>
+                </a>
+            </div>
         <?php echo form_close(); ?> </div>
     </div>
   </div>

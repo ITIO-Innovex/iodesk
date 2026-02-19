@@ -1212,12 +1212,12 @@ height: 50px !important;
             </div>
             <div class="footer-bottom">
                 <p>&copy; <?php echo date('Y'); ?> CRM. All rights reserved.</p>
-                <div class="social-links">
-                    <a href="https://x.com/ItioLtd" target="_blank" title="twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="https://www.linkedin.com/company/itio-innovex/" target="_blank" title="linkedin"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="https://www.facebook.com/ITIOInnovex/" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="https://www.instagram.com/itioinnovex/" target="_blank" title="instagram"><i class="fab fa-instagram"></i></a>
-                </div>
+<div class="social-links">
+<a href="https://x.com/ItioLtd" target="_blank" title="twitter"><i class="fab fa-twitter"></i></a>
+<a href="https://www.linkedin.com/company/itio-innovex/" target="_blank" title="linkedin"><i class="fab fa-linkedin-in"></i></a>
+<a href="https://www.facebook.com/ITIOInnovex/" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+<a href="https://www.instagram.com/itioinnovex/" target="_blank" title="instagram"><i class="fab fa-instagram"></i></a>
+</div>
             </div>
         </div>
     </footer>
