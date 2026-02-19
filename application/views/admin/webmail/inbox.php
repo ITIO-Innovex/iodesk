@@ -417,8 +417,7 @@ if ($nextPage) {
 </p>
 <div class="collapse" id="reply-box">
   <div class="card card-body">
-  
-  
+
   
     <form action="<?=  admin_url('webmail/Reply') ?>" method="post" enctype="multipart/form-data">
 	<!-- CSRF Token -->
@@ -427,6 +426,7 @@ if ($nextPage) {
 	<input type="hidden" name="redirect" value="inbox.php">
 	<input type="hidden" name="messageid" id="messageidIT" value="">
 	<input type="hidden" name="messagetype" id="messagetypeIT" value="Reply">
+	<h5 class="h5 text-primary">From Email : <?=$_SESSION['webmail']['mailer_email'] ?? '';?></h5>
       <div class="mb-3">
         <label for="recipientEmail" class="form-label">Recipient Email</label>
         <input type="text" class="form-control" id="recipientEmailIT" name="recipientEmail" value="" placeholder="Enter recipient email" required>
@@ -480,6 +480,7 @@ if ($nextPage) {
 	<input type="hidden" name="redirect" value="inbox.php">
 	<input type="hidden" name="messageid" id="messageidFW" value="">
 	<input type="hidden" name="messagetype" id="messagetypeFW" value="Forward">
+	<h5 class="h5 text-primary">From Email : <?=$_SESSION['webmail']['mailer_email'] ?? '';?></h5>
       <div class="mb-3">
         <label for="recipientEmailFW" class="form-label">Recipient Email</label>
         <input type="text" class="form-control" id="recipientEmailFW" name="recipientEmail" value="" placeholder="Enter recipient email" required>

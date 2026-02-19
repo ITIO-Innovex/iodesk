@@ -43,7 +43,8 @@
         .navbar-custom {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--gray-200);
+            /* Removed by Priyanshu */
+            /* border-bottom: 1px solid var(--gray-200); */
             padding: 1rem 0;
             position: fixed;
             width: 100%;
@@ -66,8 +67,14 @@
             gap: 0.5rem;
         }
 
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+
         .nav-link {
-            color: var(--gray-600) !important;
+           /* color: var(--gray-600) !important; */
+           /* Added by Priyanshu */
+           color: #ffffff !important;
             font-weight: 500;
             padding: 0.5rem 1rem !important;
             transition: color 0.3s ease;
@@ -77,14 +84,22 @@
             color: var(--primary) !important;
         }
 
+        /* Hero Section */
         .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
             position: relative;
             padding-top: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+          /*  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); */
+          /* Added by Priyanshu */
+          background: radial-gradient(circle at center, #064d2a 0%, #012313 50%, #000d06 100%);
             overflow: hidden;
+            /* Added by Priyanshu */
+            border: 1px solid;
+    border-left: none;
+    border-right: none;
+            border-image: linear-gradient(102.05deg, #836dd6 40.6%, #367522 91.37%) 1;
         }
 
         .hero::before {
@@ -119,6 +134,99 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             color: var(--primary-dark);
         }
+		
+		/* Added by Priyanshu - Smooth Professional Version */
+
+.hover1 {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff;
+    padding: 17px 50px;
+    border-radius: 50px;
+    text-align: center;
+    text-decoration: none;
+
+    border: 1px solid transparent; /* Hidden initially */
+    z-index: 1;
+
+    transition: color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Background Layer */
+.hover1::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #1d5e2f, #79d100);
+    border-radius: 50px;
+    z-index: -1;
+
+    transform: scaleX(1);
+    transform-origin: left;
+    transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* Hover - Smooth Wipe */
+.hover1:hover::before {
+    transform: scaleX(0);
+}
+
+/* Show Border Only On Hover */
+.hover1:hover {
+    color: #ffffff;
+    border-color: #711fe3;
+}
+
+
+/* Added by Priyanshu - Smooth Professional Version */
+
+/* Added by Priyanshu - Smooth Professional Version */
+
+.hover2 {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff;
+    padding: 17px 50px;
+    border-radius: 40px;
+    text-align: center;
+    text-decoration: none;
+
+    border: 1px solid #711fe3; 
+    background: transparent;
+    z-index: 1;
+
+    transition: color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Background Layer */
+.hover2::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100.57deg, #3006a4 12.93%, #367522 121.02%);
+    border-radius: 40px;
+    z-index: -1;
+
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* Hover - Fill Right to Left */
+.hover2:hover::before {
+    transform: scaleX(1);
+}
+
+/* Hide Border on Hover */
+.hover2:hover {
+    border-color: transparent;
+}
 
         .btn-hero-outline {
             background: transparent;
@@ -260,20 +368,25 @@
             background: var(--primary);
             color: #fff;
         }
+		.logoadmin {
+height: 50px !important;
+}
     </style>
 </head>
 <body>
-    <nav class="navbar-custom">
+    <!-- Navbar -->
+    <nav class="navbar-custom"  style="background-color: #000;">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
-                <a class="navbar-brand" href="<?php echo base_url(); ?>">
+                <?php /*?><a class="navbar-brand" href="<?php echo base_url(); ?>">
                     <img src="https://itio.in/assets/img/logo/Logo_dark.png" alt="HRM" class="img-responsive" style="max-width: 150px; margin: 0 auto;">
-                </a>
+                </a><?php */?>
+				<?php echo get_dark_company_logo(get_admin_uri() . '/', 'v-logo')?>
                 <div class="d-none d-md-flex align-items-center gap-4">
                     <a href="<?php echo base_url(); ?>#features" class="nav-link">Features</a>
                     <a href="<?php echo base_url(); ?>#pricing" class="nav-link">Pricing</a>
                     <a href="<?php echo base_url('admin/authentication'); ?>" class="nav-link">Login</a>
-                    <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn btn-hero-primary" style="padding: 0.75rem 1.5rem;">Get Started</a>
+                    <a href="<?php echo base_url('/authentication/get_register'); ?>" class="hover1" style="padding: 0.75rem 1.5rem;">Get Started</a>
                 </div>
             </div>
         </div>
@@ -305,7 +418,7 @@
             <div class="row g-4">
                 <div class="col-lg-4">
                     <div class="footer-brand">
-                        <img src="https://itio.in/assets/img/logo/Logo_light.png" alt="HRM" class="img-responsive" style="max-width: 150px;">
+                        <?php echo get_dark_company_logo(get_admin_uri() . '/', 'v-logo')?>
                     </div>
                     <p class="footer-desc">Empowering businesses with modern HR solutions. Simplify your people management and focus on what matters most.</p>
                 </div>
