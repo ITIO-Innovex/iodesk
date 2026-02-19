@@ -27,7 +27,7 @@
                     $path = isset($d['document_path']) ? $d['document_path'] : '';
                     $added = isset($d['addedon']) ? $d['addedon'] : '';
                     $statusVal = isset($d['status']) ? (int)$d['status'] : 2;
-                    $statusLbl = $statusVal === 1 ? '<span class="label label-success">Active</span>' : ($statusVal === 2 ? '<span class="label label-default">Pending</span>' : '<span class="label label-danger">Inactive</span>');
+                    $statusLbl = $statusVal === 1 ? '<span class="label label-success">Approved</span>' : ($statusVal === 2 ? '<span class="label label-default">Pending</span>' : '<span class="label label-danger">Rejected</span>');
                   ?>
                   <tr>
                     <td><?php echo e($name); ?></td>

@@ -236,7 +236,7 @@ $attendance_display_status=attendance_display_status();
             
 <div class="col-md-12">
                 <div class="panel_s" style="position: relative; height: 500px; width: 100%; min-height:500px;">
-                    <div class="panel-body box-gradient-bg13">
+                    <div class="panel-body mail-bg">
                         <h4 class="panel-title ">
                             <i class="fa-solid fa-tasks tw-mr-2"></i>Event & Announcement
 <?php if(is_admin()){ ?>

@@ -2536,103 +2536,13 @@ class Hrd extends AdminController
 
         // Company scope
         $company_id = get_staff_company_id();
-        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
-            $company_id = $_SESSION['super_view_company_id'];
-        }
-
-        // Fetch all staff with approver field (not null/empty)
-        if (is_super()) {
-            if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
-                $this->db->where('company_id', $_SESSION['super_view_company_id']);
-            } else {
-                $this->db->where('company_id', get_staff_company_id());
-            }
-        } else {
-            $this->db->where('company_id', get_staff_company_id());
-        }
-        $this->db->where('approver IS NOT NULL');
-        $this->db->where('approver !=', '');
-        $this->db->where('approver !=', 'null');
-        $this->db->select('staffid, approver');
-        $staff_with_approvers = $this->db->get(db_prefix() . 'staff')->result_array();
-
-        // Collect all unique employee IDs from approver JSON with their titles
-        $approver_ids = [];
-        $approver_titles_map = []; // Map staffid => array of approver titles
-        
-        foreach ($staff_with_approvers as $staff) {
-            if (!empty($staff['approver'])) {
-                $approver_data = json_decode($staff['approver'], true);
-                if (is_array($approver_data)) {
-                    // Extract all approver IDs and track their titles
-                    if (!empty($approver_data['hr_approver']) && (int)$approver_data['hr_approver'] > 0) {
-                        $staffid = (int)$approver_data['hr_approver'];
-                        $approver_ids[$staffid] = true;
-                        if (!isset($approver_titles_map[$staffid])) {
-                            $approver_titles_map[$staffid] = [];
-                        }
-                        $approver_titles_map[$staffid][] = 'HR Approver';
-                    }
-                    if (!empty($approver_data['admin_approver']) && (int)$approver_data['admin_approver'] > 0) {
-                        $staffid = (int)$approver_data['admin_approver'];
-                        $approver_ids[$staffid] = true;
-                        if (!isset($approver_titles_map[$staffid])) {
-                            $approver_titles_map[$staffid] = [];
-                        }
-                        $approver_titles_map[$staffid][] = 'Admin Approver';
-                    }
-                    if (!empty($approver_data['hr_manager_approver']) && (int)$approver_data['hr_manager_approver'] > 0) {
-                        $staffid = (int)$approver_data['hr_manager_approver'];
-                        $approver_ids[$staffid] = true;
-                        if (!isset($approver_titles_map[$staffid])) {
-                            $approver_titles_map[$staffid] = [];
-                        }
-                        $approver_titles_map[$staffid][] = 'HR Manager Approver';
-                    }
-                    if (!empty($approver_data['reporting_approver']) && (int)$approver_data['reporting_approver'] > 0) {
-                        $staffid = (int)$approver_data['reporting_approver'];
-                        $approver_ids[$staffid] = true;
-                        if (!isset($approver_titles_map[$staffid])) {
-                            $approver_titles_map[$staffid] = [];
-                        }
-                        $approver_titles_map[$staffid][] = 'Reporting Approver';
-                    }
-                }
-            }
-        }
-
-        // Get employee details for all approver IDs
-        $approver_list = [];
-        if (!empty($approver_ids)) {
-            $approver_id_array = array_keys($approver_ids);
-            
-            if (is_super()) {
-                if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
-                    $this->db->where('company_id', $_SESSION['super_view_company_id']);
-                } else {
-                    $this->db->where('company_id', get_staff_company_id());
-                }
-            } else {
-                $this->db->where('company_id', get_staff_company_id());
-            }
-            $this->db->where_in('staffid', $approver_id_array);
-            $this->db->select('staffid, firstname, lastname, email, phonenumber, employee_code, CONCAT(firstname, " ", lastname) AS full_name');
-            $this->db->order_by('firstname', 'asc');
-            $approver_list = $this->db->get(db_prefix() . 'staff')->result_array();
-            
-            // Add approver titles to each employee
-            foreach ($approver_list as &$approver) {
-                $staffid = (int)$approver['staffid'];
-                if (isset($approver_titles_map[$staffid])) {
-                    $approver['approver_titles'] = array_unique($approver_titles_map[$staffid]);
-                } else {
-                    $approver['approver_titles'] = [];
-                }
-            }
-            unset($approver); // Break reference
-        }
-
-        $data['approver_list'] = $approver_list;
+	    $this->db->select('approver,reporting_manager');
+		$this->db->where('company_id', get_staff_company_id());
+        $this->db->where('staffid', get_staff_user_id());
+        $this->db->from(db_prefix() . 'staff');
+        $approver_list = $this->db->get()->row();
+        $data['approver_list'] = $approver_list->approver;
+		$data['reporting_manager'] = $approver_list->reporting_manager;
         $data['title'] = 'Approver List';
         $this->load->view('admin/hrd/approver', $data);
     }
@@ -4820,7 +4730,7 @@ class Hrd extends AdminController
         $this->db->where('staff', $staffid);
         // Only active (status != 0), default 2 is pending/active per spec
         if ($this->db->field_exists('status', db_prefix() . 'hrd_documents')) {
-            $this->db->where('status !=', 0);
+            //$this->db->where('status !=', 0);
         }
         $this->db->order_by('addedon', 'desc');
         $docs = $this->db->get(db_prefix() . 'hrd_documents')->result_array();
@@ -5374,22 +5284,71 @@ class Hrd extends AdminController
         }
         $staffid = get_staff_user_id();
         if (!empty($_FILES['profile_image']['name'])) {
-            $dir = FCPATH . 'uploads/staff_profile/';
+            // Check file extension
+            $extension = strtolower(pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION));
+            $allowed_extensions = ['jpg', 'jpeg', 'png'];
+            if (!in_array($extension, $allowed_extensions)) {
+                set_alert('warning', 'Only JPG, JPEG, and PNG files are allowed');
+                echo json_encode(['success' => false]);
+                return;
+            }
+            
+            // Create staff-specific directory: uploads/staff_profile_images/{staffid}/
+            $dir = FCPATH . 'uploads/staff_profile_images/' . $staffid . '/';
             if (!is_dir($dir)) { @mkdir($dir, 0755, true); }
-            $ext = pathinfo($_FILES['profile_image']['name'], PATHINFO_EXTENSION);
-            $filename = 'staff_'.$staffid.'.'.strtolower($ext ?: 'jpg');
-            $dest = $dir.$filename;
-            if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $dest)) {
-                if ($this->db->field_exists('profile_image', db_prefix().'staff')) {
-                    $this->db->where('staffid', $staffid);
-                    $this->db->update(db_prefix().'staff', ['profile_image' => 'uploads/staff_profile/'.$filename]);
+            
+            // Get original filename and make it unique
+            $origName = $_FILES['profile_image']['name'];
+            $filename = unique_filename($dir, $origName);
+            $newFilePath = $dir . $filename;
+            
+            if (move_uploaded_file($_FILES['profile_image']['tmp_name'], $newFilePath)) {
+                // Delete old profile images if exist
+                $oldRow = $this->db->select('profile_image')->where('staffid', $staffid)->get(db_prefix().'staff')->row_array();
+                if (!empty($oldRow['profile_image'])) {
+                    $oldThumb = $dir . 'thumb_' . $oldRow['profile_image'];
+                    $oldSmall = $dir . 'small_' . $oldRow['profile_image'];
+                    if (file_exists($oldThumb)) { @unlink($oldThumb); }
+                    if (file_exists($oldSmall)) { @unlink($oldSmall); }
                 }
-				set_alert('success','Profile images updated');
+                
+                // Create thumb_ image (320x320)
+                $this->load->library('image_lib');
+                $config = [];
+                $config['image_library'] = 'gd2';
+                $config['source_image'] = $newFilePath;
+                $config['new_image'] = $dir . 'thumb_' . $filename;
+                $config['maintain_ratio'] = true;
+                $config['width'] = 320;
+                $config['height'] = 320;
+                $this->image_lib->initialize($config);
+                $this->image_lib->resize();
+                $this->image_lib->clear();
+                
+                // Create small_ image (96x96)
+                $config['image_library'] = 'gd2';
+                $config['source_image'] = $newFilePath;
+                $config['new_image'] = $dir . 'small_' . $filename;
+                $config['maintain_ratio'] = true;
+                $config['width'] = 96;
+                $config['height'] = 96;
+                $this->image_lib->initialize($config);
+                $this->image_lib->resize();
+                $this->image_lib->clear();
+                
+                // Remove original image
+                @unlink($newFilePath);
+                
+                // Store only filename in database
+                $this->db->where('staffid', $staffid);
+                $this->db->update(db_prefix().'staff', ['profile_image' => $filename]);
+                
+                set_alert('success', 'Profile image updated');
                 echo json_encode(['success' => true]);
                 return;
             }
         }
-		set_alert('success','Profile images updated');
+        set_alert('danger', 'Failed to update profile image');
         echo json_encode(['success' => false]);
     }
 
@@ -5408,16 +5367,21 @@ class Hrd extends AdminController
 
         $profileImage = $row['profile_image'] ?? '';
         if ($profileImage) {
-            $baseDir = realpath(FCPATH . 'uploads/staff_profile');
-            $filePath = realpath(FCPATH . ltrim($profileImage, '/'));
-            if ($baseDir && $filePath && strpos($filePath, $baseDir) === 0 && is_file($filePath)) {
-                @unlink($filePath);
+            // Delete both thumb_ and small_ images
+            $dir = FCPATH . 'uploads/staff_profile_images/' . $staffid . '/';
+            $thumbPath = $dir . 'thumb_' . $profileImage;
+            $smallPath = $dir . 'small_' . $profileImage;
+            if (file_exists($thumbPath) && is_file($thumbPath)) {
+                @unlink($thumbPath);
+            }
+            if (file_exists($smallPath) && is_file($smallPath)) {
+                @unlink($smallPath);
             }
         }
 
         $this->db->where('staffid', $staffid);
         $this->db->update(db_prefix() . 'staff', ['profile_image' => null]);
-        set_alert('success','Profile images deleted');
+        set_alert('success', 'Profile image deleted');
         echo json_encode(['success' => true]);
     }
 

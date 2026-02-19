@@ -11,7 +11,9 @@
             <?php if (!empty($leave_list)) { ?>
             <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
+			  <th class="tw-hidden">&nbsp;</th>
               <th title="Serial Number">S. No</th>
+			  
                 <th>Employee</th>
                 <th>From</th>
                 <th>To</th>
@@ -20,18 +22,19 @@
                 <th><?php echo _l('options'); ?></th>
                 </thead>
               <tbody>
-                <?php foreach ($leave_list as $l) { $st=(int)($l['leave_status']??0); ?>
+                <?php $i=1; foreach ($leave_list as $l) { $st=(int)($l['leave_status']??0); ?>
                 <tr>
-                  <td><?php echo (int)$l['leave_id']; ?></td>
+				  <td class="tw-hidden"><?php echo (int)$l['leave_id']; ?></td>
+                  <td><?php echo $i; ?></td>
                   <td><?php echo function_exists('get_staff_full_name') ? e(get_staff_full_name($l['staffid'])) : (int)$l['staffid']; ?></td>
-                  <td><?php echo e($l['from_date']); ?></td>
+                  <td><?php e($l['from_date']); ?></td>
                   <td><?php echo e($l['to_date']); ?></td>
                   <td><?php echo ((int)$l['leave_for']===2)?'Half Day':'Full Day'; ?></td>
                   <td><?php $label='Pending';$class='warning'; if($st===1){$label='Approved';$class='success';}elseif($st===2){$label='Rejected';$class='danger';} ?>
                     <span class="label label-<?php echo $class; ?>"><?php echo $label; ?></span></td>
-                  <td><div class="tw-flex tw-items-center tw-space-x-3"> <a href="#" onclick="view_leave(this);return false;" data-all='<?php echo json_encode($l, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a> <a href="#" onclick="edit_leave(this);return false;" data-all='<?php echo json_encode($l, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-pen-to-square fa-lg"></i></a> </div></td>
+                  <td><div class="tw-flex tw-items-center tw-space-x-3"> <a href="#" onclick="view_leave(this);return false;" data-all='<?php echo json_encode($l, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-eye fa-lg"></i></a> <?php if($st != 1){ ?><?php /*?><a href="#" onclick="edit_leave(this);return false;" data-all='<?php echo json_encode($l, JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_TAG|JSON_HEX_QUOT); ?>' class="tw-text-neutral-500"><i class="fa-regular fa-pen-to-square fa-lg"></i></a><?php */?>  <?php } ?></div></td>
                 </tr>
-                <?php } ?>
+                <?php $i++; } ?>
               </tbody>
             </table>
             <?php } else { ?>

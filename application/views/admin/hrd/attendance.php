@@ -194,8 +194,8 @@ function printDiv(divId) {
 						<th>Second Half</th>
                         <th>Portion</th>
 						<th>Tot. Hrs.</th>
-                        <th>LateMark</th>
-						<th>ReMark</th>
+                        <th>Late Mark</th>
+						<th>Remark</th>
                       </tr>
                     </thead>
                     <tbody>

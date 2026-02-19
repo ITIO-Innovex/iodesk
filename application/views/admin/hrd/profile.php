@@ -12,7 +12,8 @@
                 <div class="text-center">
                   <?php 
                     $hasProfileImage = !empty($me['profile_image']);
-                    $img = $hasProfileImage ? base_url($me['profile_image']) : base_url('assets/images/user-placeholder.jpg');
+                    // Image path: uploads/staff_profile_images/{staffid}/thumb_{filename}
+                    $img = $hasProfileImage ? base_url('uploads/staff_profile_images/' . $me['staffid'] . '/thumb_' . $me['profile_image']) : base_url('assets/images/user-placeholder.jpg');
                   ?>
                   <img src="<?php echo $img; ?>" class="img img-responsive img-thumbnail" alt="Profile" />
                   <div class="mtop10">
@@ -51,8 +52,8 @@
                   <div class="col-md-4"><div class="form-group"><label>Father Name</label><input type="text" class="form-control" value="<?php echo e($me['father_name']??''); ?>" readonly></div></div>
                   <div class="col-md-4"><div class="form-group"><label>Personal Email</label><input type="text" class="form-control" value="<?php echo e($me['email_personal']??''); ?>" readonly></div></div>
                   <div class="col-md-4"><div class="form-group"><label>Mobile</label><input type="number" class="form-control" value="<?php echo e($me['mobile']??''); ?>" readonly></div></div>
-                  <div class="col-md-4"><div class="form-group"><label>Aadhar</label><input type="number" class="form-control" value="<?php echo e($me['aadhar']??''); ?>" readonly></div></div>
-                  <div class="col-md-4"><div class="form-group"><label>PAN</label><input type="text" class="form-control" value="<?php echo e($me['pan']??''); ?>" readonly></div></div>
+                  <div class="col-md-4"><div class="form-group"><label>Aadhaar No.</label><input type="number" class="form-control" value="<?php echo e($me['aadhar']??''); ?>" readonly></div></div>
+                  <div class="col-md-4"><div class="form-group"><label>PAN No.</label><input type="text" class="form-control" value="<?php echo e($me['pan']??''); ?>" readonly></div></div>
                 </div>
               </div>
             </div>
@@ -100,7 +101,7 @@
        pattern="[0-9]{10}"
        title="Enter 10 digit mobile number"
        oninput="this.value = this.value.replace(/\D/g, '')" required></div></div>
-          <div class="col-md-6"><div class="form-group"><label>Aadhar</label><input type="tel"
+          <div class="col-md-6"><div class="form-group"><label>Aadhaar No.</label><input type="tel"
        name="aadhar"
        class="form-control"
        value="<?php echo e($me['aadhar'] ?? ''); ?>"
@@ -110,7 +111,7 @@
        title="Enter 12 digit Aadhaar number"
        autocomplete="off"
        oninput="this.value = this.value.replace(/\D/g,'').slice(0,12)"></div></div>
-          <div class="col-md-6"><div class="form-group"><label>PAN</label><input type="text" name="pan" class="form-control" value="<?php echo e($me['pan']??''); ?>" maxlength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}" title="Format: ABCDE1234F"></div></div>
+          <div class="col-md-6"><div class="form-group"><label>PAN No.</label><input type="text" name="pan" class="form-control" value="<?php echo e($me['pan']??''); ?>" maxlength="10" pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}" title="Format: ABCDE1234F"></div></div>
         </div>
       </div>
       <div class="modal-footer">
@@ -157,7 +158,7 @@ $(function(){
     var aadhar = ($f.find('[name="aadhar"]').val() || '').replace(/\D+/g, '');
     var pan = ($f.find('[name="pan"]').val() || '').trim().toUpperCase();
     if (mobile && !/^\d{10}$/.test(mobile)) { alert('Invalid mobile number'); return; }
-    if (aadhar && !/^\d{12}$/.test(aadhar)) { alert('Invalid Aadhar number'); return; }
+    if (aadhar && !/^\d{12}$/.test(aadhar)) { alert('Invalid aadhaar number'); return; }
     if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan)) { alert('Invalid PAN number'); return; }
     $f.find('[name="mobile"]').val(mobile);
     $f.find('[name="aadhar"]').val(aadhar);

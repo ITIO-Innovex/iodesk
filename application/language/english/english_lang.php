@@ -4304,5 +4304,9 @@ $lang['expired_subscription'] = 'Your subscription has expired. Please renew to 
 $lang['crm_setup'] = 'CRM Setup Guide';
 $lang['user_documentation'] = 'User Guide';
 $lang['help_center'] = 'Help Center';
+$lang['admin_approver'] = 'Admin Approver';
+$lang['hr_approver'] = 'HR Approver';
+$lang['hr_manager_approver'] = 'HR Manager Approver';
+$lang['reporting_approver'] = 'Reporting Approver';
 ?>
 
