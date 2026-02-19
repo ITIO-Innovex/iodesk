@@ -38,10 +38,11 @@
         }
     </script>
 </head>
-
+<div class="row">
+<div class="table-responsive">
     <div id="chart_div"></div>
-
-
+</div>
+</div>
 
           </div>
         </div>

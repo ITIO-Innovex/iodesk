@@ -52,8 +52,11 @@
             </div>
 
             <div class="form-group tw-text-white">
-                <a href="<?php echo admin_url('authentication/forgot_password'); ?>">
+                <a href="<?php echo admin_url('authentication/forgot_password'); ?>" title="Forgot Password">
                     <?php echo _l('admin_auth_login_fp'); ?>
+                </a>
+				<a href="<?php echo base_url('authentication/get_register'); ?>" class="pull-right" title="Register your company">
+                    <?php echo 'Register your company'; ?>
                 </a>
             </div>
 
