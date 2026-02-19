@@ -236,10 +236,6 @@ class Webmail_model extends App_Model
 	
 		$recipientEmail=isset($_POST['recipientEmail']) ? $_POST['recipientEmail'] : "";
 		$messageid=isset($_POST['messageid']) ? $_POST['messageid'] : "";
-		if(preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $recipientEmail, $matches)){
-		$recipientEmail = $matches[0] ?? 'Email not found';
-		}
-		
 		$recipientCC=isset($_POST['recipientCC']) ? $_POST['recipientCC'] : "";
 		$recipientBCC=isset($_POST['recipientBCC']) ? $_POST['recipientBCC'] : "";
 		
@@ -291,10 +287,21 @@ class Webmail_model extends App_Model
     $senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
 	//$mail->setFrom($senderEmail, $senderName);
 	$mail->setFrom($senderEmail, $senderName, false);
-	$mail->addAddress($recipientEmail);
+	
+	// Add TO addresses from comma or semicolon separated string
+	$recipientEmail = str_replace(';', ',', $recipientEmail);
+	$toEmails = explode(',', trim($recipientEmail));
+	foreach ($toEmails as $toEmail) {
+		$toEmail = trim($toEmail);
+		if (filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+			$mail->addAddress($toEmail);
+		}
+	}
+	
 	if (isset($recipientCC) && $recipientCC != "") {
 	
-	      // Add CC addresses from comma-separated string
+	      // Add CC addresses from comma or semicolon separated string
+		$recipientCC = str_replace(';', ',', $recipientCC);
         $ccEmails = explode(',', trim($recipientCC));
         foreach ($ccEmails as $ccEmail) {
             $ccEmail = trim($ccEmail);
@@ -307,7 +314,8 @@ class Webmail_model extends App_Model
 	
 	if (isset($recipientBCC) && $recipientBCC != "") {
 	
-	       // Add CC addresses from comma-separated string
+	       // Add BCC addresses from comma or semicolon separated string
+		$recipientBCC = str_replace(';', ',', $recipientBCC);
         $bccEmails = explode(',', trim($recipientBCC));
         foreach ($bccEmails as $bccEmail) {
             $bccEmail = trim($bccEmail);
@@ -1175,10 +1183,6 @@ $client->disconnect();
         {
 		
 		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
-		if(preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $recipientEmail, $matches)){
-		$recipientEmail = $matches[0] ?? 'Email not found';
-		}
-		
 		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
 		
 		// Form Post Data
@@ -1228,10 +1232,21 @@ $client->disconnect();
     $senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
 	//$mail->setFrom($senderEmail, $senderName);
 	$mail->setFrom($senderEmail, $senderName, false);
-	$mail->addAddress($recipientEmail);
+	
+	// Add TO addresses from comma or semicolon separated string
+	$recipientEmail = str_replace(';', ',', $recipientEmail);
+	$toEmails = explode(',', trim($recipientEmail));
+	foreach ($toEmails as $toEmail) {
+		$toEmail = trim($toEmail);
+		if (filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+			$mail->addAddress($toEmail);
+		}
+	}
+	
 	if (isset($recipientCC) && $recipientCC != "") {
 	
 	      // Add CC addresses from comma-separated string
+		$recipientCC = str_replace(';', ',', $recipientCC);
         $ccEmails = explode(',', trim($recipientCC));
         foreach ($ccEmails as $ccEmail) {
             $ccEmail = trim($ccEmail);
@@ -1263,10 +1278,6 @@ $client->disconnect();
         {
 		
 		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
-		if(preg_match('/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/', $recipientEmail, $matches)){
-		$recipientEmail = $matches[0] ?? 'Email not found';
-		}
-		
 		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
 		
 		// Form Post Data
@@ -1316,10 +1327,21 @@ $client->disconnect();
     $senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
 	//$mail->setFrom($senderEmail, $senderName);
 	$mail->setFrom($senderEmail, $senderName, false);
-	$mail->addAddress($recipientEmail);
+	
+	// Add TO addresses from comma or semicolon separated string
+	$recipientEmail = str_replace(';', ',', $recipientEmail);
+	$toEmails = explode(',', trim($recipientEmail));
+	foreach ($toEmails as $toEmail) {
+		$toEmail = trim($toEmail);
+		if (filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+			$mail->addAddress($toEmail);
+		}
+	}
+	
 	if (isset($recipientCC) && $recipientCC != "") {
 	
 	      // Add CC addresses from comma-separated string
+		$recipientCC = str_replace(';', ',', $recipientCC);
         $ccEmails = explode(',', trim($recipientCC));
         foreach ($ccEmails as $ccEmail) {
             $ccEmail = trim($ccEmail);

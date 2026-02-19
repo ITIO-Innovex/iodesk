@@ -169,7 +169,7 @@
                                                                 <a href="<?php echo base_url('uploads/user_utility/' . $field_value); ?>" target="_blank">
                                                                     <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo $field_value; ?>
                                                                 </a>
-                                                                <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $field_value; ?>">Delete ##</button>
+                                                                <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $field_value; ?>">Delete</button>
                                                             </div>
                                                         <?php } ?>
                                                     </div>

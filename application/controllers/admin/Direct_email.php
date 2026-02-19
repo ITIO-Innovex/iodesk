@@ -242,13 +242,15 @@ class Direct_email extends AdminController
         $mail->isHTML(true);
         $mail->CharSet = 'UTF-8';
         $mail->setFrom($senderEmail, $senderName);
-		$bulkEmails=str_replace(";",",",$bulkEmails);
+		$bulkEmails = str_replace(";", ",", $bulkEmails);
 		$recipients = explode(",", $bulkEmails);
+		$addedRecipients = [];
         // Add each email to PHPMailer
-		foreach ($recipients as $email) {
-			$email = trim($email); // remove spaces
-			if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-				$mail->addAddress($email);
+		foreach ($recipients as $emailAddr) {
+			$emailAddr = trim($emailAddr);
+			if (!empty($emailAddr) && filter_var($emailAddr, FILTER_VALIDATE_EMAIL)) {
+				$mail->addAddress($emailAddr);
+				$addedRecipients[] = $emailAddr;
 			}
 		}
 		//log_message('error', '!!!'.$email_subject);
@@ -276,4 +278,62 @@ class Direct_email extends AdminController
         ];
     }
 }
+
+    public function search_emails()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+        
+        $term = trim($this->input->get('term', true));
+        $email = trim($this->input->get('email', true));
+        
+        if (empty($term) || strlen($term) < 2) {
+            echo json_encode([]);
+            return;
+        }
+        
+        if (empty($email)) {
+            echo json_encode([]);
+            return;
+        }
+        
+        $companyId = get_staff_company_id();
+        //log_message('error', 'Emailsxx - '. $email );
+        $this->db->distinct();
+        $this->db->select('to_emails');
+        $this->db->from(db_prefix() . 'emails');
+        //$this->db->where('company_id', $companyId);
+        $this->db->where('from_email', $email);
+        $this->db->like('to_emails', $term);
+        $this->db->where('to_emails IS NOT NULL');
+        $this->db->where('to_emails !=', '');
+        $this->db->limit(50);
+        
+        $results = $this->db->get()->result_array();
+        //log_message('error', 'Emails - '.$this->db->last_query() );
+        $emails = [];
+        $seen = [];
+        
+        foreach ($results as $row) {
+            $toEmails = $row['to_emails'];
+            $emailList = preg_split('/[,;]+/', $toEmails);
+            
+            foreach ($emailList as $e) {
+                $e = trim($e);
+                if (!empty($e) && filter_var($e, FILTER_VALIDATE_EMAIL)) {
+                    $eLower = strtolower($e);
+                    if (stripos($e, $term) !== false && !isset($seen[$eLower])) {
+                        $seen[$eLower] = true;
+                        $emails[] = $e;
+                    }
+                }
+            }
+        }
+        
+        sort($emails);
+        $emails = array_slice($emails, 0, 20);
+        
+        echo json_encode($emails);
+    }
 }
