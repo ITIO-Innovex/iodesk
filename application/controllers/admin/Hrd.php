@@ -145,7 +145,7 @@ class Hrd extends AdminController
 		
 		// Get stats counter
 		$data['status_counter'] = $this->hrd_model->get_status_counter();
-		
+		$data['maintenance_notice'] = get_maintenance_notice();
 		
         $this->load->view('admin/hrd/dashboard', $data);
     }
@@ -5474,7 +5474,19 @@ class Hrd extends AdminController
                         continue;
                     }
 
-                    $safeName = unique_filename($uploadDir, $originalName);
+                    // Sanitize filename - remove spaces and special characters
+                    $ext = pathinfo($originalName, PATHINFO_EXTENSION);
+                    $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+                    // Replace spaces with underscores and remove special characters
+                    $baseName = preg_replace('/\s+/', '_', $baseName);
+                    $baseName = preg_replace('/[^a-zA-Z0-9_\-]/', '', $baseName);
+                    // Ensure filename is not empty after sanitization
+                    if (empty($baseName)) {
+                        $baseName = 'file_' . time();
+                    }
+                    $sanitizedName = $baseName . '.' . strtolower($ext);
+                    
+                    $safeName = unique_filename($uploadDir, $sanitizedName);
                     $newFilePath = $uploadDir . $safeName;
                     if (move_uploaded_file($tmpFilePath, $newFilePath)) {
                         $savedFiles[] = 'uploads/dar/' . $darId . '/' . $safeName;
@@ -5731,14 +5743,29 @@ class Hrd extends AdminController
                 }
 
                 $origName = $files['name'][$i];
+                
+                // Sanitize filename - remove spaces and special characters
+                $ext = pathinfo($origName, PATHINFO_EXTENSION);
+                $baseName = pathinfo($origName, PATHINFO_FILENAME);
+                // Replace spaces with underscores and remove special characters
+                $baseName = preg_replace('/\s+/', '_', $baseName);
+                $baseName = preg_replace('/[^a-zA-Z0-9_\-]/', '', $baseName);
+                // Ensure filename is not empty after sanitization
+                if (empty($baseName)) {
+                    $baseName = 'file_' . time() . '_' . $i;
+                }
+                $sanitizedName = $baseName . '.' . strtolower($ext);
+                
                 // Skip if file with same name already exists
-                if (in_array($origName, $existingNames)) {
+                if (in_array($sanitizedName, $existingNames)) {
                     continue;
                 }
-
-                $destFilePath = $uploadDir . $origName;
+                
+                // Use unique filename to avoid conflicts
+                $safeName = unique_filename($uploadDir, $sanitizedName);
+                $destFilePath = $uploadDir . $safeName;
                 if (move_uploaded_file($tmpFilePath, $destFilePath)) {
-                    $newFiles[] = 'uploads/dar/' . $id . '/' . $origName;
+                    $newFiles[] = 'uploads/dar/' . $id . '/' . $safeName;
                 }
             }
 

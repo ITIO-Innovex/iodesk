@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();?>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -10,7 +10,7 @@
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (!empty($dars)) { ?>
-              <table class="table dt-table">
+              <table class="table dt-table" data-order-col="0" data-order-type="desc">
                 <thead>
                   <tr>
                     <th>Date</th>

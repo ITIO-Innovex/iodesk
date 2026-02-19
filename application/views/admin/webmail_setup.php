@@ -277,6 +277,8 @@ $('#crm_instruction').on('click', function(e) {
 </script>
 <script>
 var $entryModal = $('#entryModal');
+var currentEditId = 0;
+
 $(function() {
 
     appValidateForm($entryModal.find('form'), {
@@ -287,11 +289,54 @@ $(function() {
     setTimeout(function() {
         //$($entryModal.find('form')).trigger('reinitialize.areYouSure');
     }, 1000)
+    
+    // Form submit with duplicate email check
+    $entryModal.find('form').on('submit', function(e) {
+        var $form = $(this);
+        var email = $.trim($('#mailer_email').val());
+        
+        if (!email) {
+            alert('Email is required');
+            $('#mailer_email').focus();
+            e.preventDefault();
+            return false;
+        }
+        
+        // Check for duplicate email via AJAX (synchronous)
+        var isDuplicate = false;
+        $.ajax({
+            url: admin_url + 'webmail_setup/check_email_exists',
+            type: 'POST',
+            async: false,
+            data: {
+                email: email,
+                exclude_id: currentEditId
+            },
+            success: function(response) {
+                var res = typeof response === 'string' ? JSON.parse(response) : response;
+                if (res.exists) {
+                    isDuplicate = true;
+                }
+            }
+        });
+        
+        if (isDuplicate) {
+            alert('This email address is already registered in webmail setup');
+            $('#mailer_email').focus();
+            e.preventDefault();
+            return false;
+        }
+        
+        return true;
+    });
+    
     $entryModal.on('hidden.bs.modal', function() {
         var $form = $entryModal.find('form');
         $form.attr('action', $form.data('create-url'));
         $form.find('input[type="text"]').val('');
+        $form.find('#mailer_password').val('');
         $form.find('#share_in_projects').prop('checked', false);
+        currentEditId = 0;
         // Reset assignto multi-select
         var $assigntoSelect = $('select[name="assignto[]"]');
         $assigntoSelect.selectpicker('val', []);
@@ -301,6 +346,7 @@ $(function() {
 
 function edit_mailer_entry(id) {
          //alert(admin_url + 'webmail_setup/webmail_setup_entry/' + id);
+    currentEditId = id;
     $.get(admin_url + 'webmail_setup/webmail_setup_entry/' + id, function(response) {
         //alert(JSON.stringify(response, null, "\t"))
         var $form = $entryModal.find('form');

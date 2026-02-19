@@ -44,6 +44,17 @@ $attendance_display_status=attendance_display_status();
 
 </style>
 <div id="wrapper">
+<?php if (!empty($maintenance_notice)) : ?>
+
+    <?php foreach ($maintenance_notice as $notice) : ?>
+        <div class="top_stats_wrapper tw-my-2 tw-mx-2" style="background-color: <?= $notice->background_color ?>; 
+                    color: <?= $notice->text_color ?>;">
+            <strong><?= $notice->title ?></strong> : <br />
+<?= $notice->message ?>
+            <?= $notice->message ?>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
     <div class="content">
         <div class="row">
             <div class="col-md-12">
@@ -56,19 +67,27 @@ $attendance_display_status=attendance_display_status();
             </div>
         </div>
 <div class="pb-[10px]">
-  <div class="tw-flex tw-justify-end tw-gap-2">
-  
- <?php if($attendance_display_status==1){ ?> 
- <?php if(isset($in_time)&&$in_time){ ?>
+  <div class="tw-flex tw-justify-end tw-gap-2 tw-my-2">
+ <div class="tw-mt-2" style="margin-left: 30px;">
+        <!-- Place this where you want the clock to appear -->
+  <div class="digital-clock" aria-live="polite" title="Local time">
+    <div class="dc-time" id="dc-hours-min">00:00</div>
+    <div class="dc-seconds" id="dc-seconds">:00</div>
+    <div class="dc-ampm" id="dc-ampm">AM</div>
+  </div>
+  <?php if($attendance_display_status==1){ ?>
+  <?php if(isset($in_time)&&$in_time){ ?>
  <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
   <?php }else{ ?>
    <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
   <?php } ?>
- 
- <?php }else{ ?>
+  <a  href="<?php echo admin_url('hrd/dar');?>" class="digital-btn btn-info" title="Add your Daily Activity Report (DAR)"> DAR <i class="fa-solid fa-file-pen"></i></a>
+  <?php }else{ ?>
  
   <?php } ?>
-  </div></div> 
+    </div>
+  </div>
+  </div> 
         <!-- Statistics Cards -->
         <div class="row">
             <div class="col-md-3">
