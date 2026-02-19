@@ -78,6 +78,16 @@ class Webmail_setup extends AdminController
         $data['mailer_name']=trim($data['mailer_name']);
 		$data['mailer_password']=trim($data['mailer_password']);
 		$data['mailer_email']=trim($data['mailer_email']);
+        
+        // Check for duplicate email
+        if (!empty($data['mailer_email'])) {
+            $this->db->where('mailer_email', $data['mailer_email']);
+            $existing = $this->db->get(db_prefix() . 'webmail_setup')->row();
+            if ($existing) {
+                $validation_errors[] = 'This email address is already registered in webmail setup';
+            }
+        }
+        
         // If validation errors exist, return JSON response for AJAX requests
         if (!empty($validation_errors)) {
             if ($this->input->is_ajax_request()) {
@@ -256,6 +266,18 @@ class Webmail_setup extends AdminController
 			if (isset($data['source'])) {
             unset($data['source']);
         }
+        
+            // Check for duplicate email (excluding current record)
+            if (!empty($data['mailer_email'])) {
+                $data['mailer_email'] = trim($data['mailer_email']);
+                $this->db->where('mailer_email', $data['mailer_email']);
+                $this->db->where('id !=', $entry_id);
+                $existing = $this->db->get(db_prefix() . 'webmail_setup')->row();
+                if ($existing) {
+                    set_alert('danger', 'This email address is already registered in webmail setup');
+                    redirect(admin_url('webmail_setup'));
+                }
+            }
 		
 			unset($_SESSION['webmail']);
 
@@ -391,8 +413,28 @@ class Webmail_setup extends AdminController
         redirect(admin_url('webmail_setup'));
     }
 	
+    /**
+     * AJAX: Check if email already exists in webmail setup
+     */
+    public function check_email_exists()
+    {
+        $email = trim($this->input->post('email'));
+        $exclude_id = (int) $this->input->post('exclude_id');
+        
+        if (empty($email)) {
+            echo json_encode(['exists' => false]);
+            return;
+        }
+        
+        $this->db->where('mailer_email', $email);
+        if ($exclude_id > 0) {
+            $this->db->where('id !=', $exclude_id);
+        }
+        $existing = $this->db->get(db_prefix() . 'webmail_setup')->row();
+        
+        echo json_encode(['exists' => $existing ? true : false]);
+    }
 
-	
 	
 	public function folders()
     {
