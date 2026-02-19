@@ -597,7 +597,7 @@ function manage_project_form(form) {
                 var errorResponse = JSON.parse(xhr.responseText);
                 alert(errorResponse.message || 'Error submitting form. Please try again.');
             } catch (e) {
-                alert('!!Error submitting form. Please try again. Error: ' + error);
+                //alert('!!Error submitting form. Please try again. Error: ' + error);
             }
         },
         complete: function() {

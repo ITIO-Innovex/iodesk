@@ -161,7 +161,7 @@
                                                                     <a href="<?php echo base_url('uploads/user_utility/' . $file); ?>" target="_blank">
                                                                         <i class="fa-regular fa-file-lines tw-mr-1"></i><?php echo substr($file,11); ?>
                                                                     </a>
-                                                                    <!-- <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $file; ?>">Delete !!</button> -->
+                                                                    <button type="button" class="btn btn-danger btn-xs remove-existing-file" data-field="<?php echo $field_name; ?>" data-file="<?php echo $file; ?>">Delete</button> 
                                                                 </div>
                                                             <?php } ?>
                                                         <?php } else { ?>
@@ -440,7 +440,12 @@ $(document).ready(function() {
     }
   });
 
-  $('body').on('click', '.remove-existing-file', function(){
+  $('body').on('click', '.remove-existing-file', function(){ 
+  
+  if (!confirm('Are you sure you want to remove this file?')) {
+        return false; // Stop if user clicks Cancel
+    }
+
     var field = $(this).data('field');
     var file = $(this).data('file');
     var container = $('.deleted-files[data-field="' + field + '"]');

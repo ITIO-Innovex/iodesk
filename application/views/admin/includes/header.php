@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <div id="header">
     <div class="hide-menu tw-ml-1"><i class="fa fa-align-left tw-text-white"></i></div>
-
+<div class="tw-ml-1 pull-left mtop20"><a onclick="window.history.back()" title="Go Back"><i class="fa fa-arrow-circle-left tw-text-xl tw-text-white"></i></a></div>
     <nav>
         <div class="tw-flex tw-justify-between">
             <div class="tw-flex tw-flex-1 sm:tw-flex-initial">
@@ -83,7 +83,7 @@
                 <button type="button"
                     class="navbar-toggle visible-md visible-sm visible-xs mobile-menu-toggle collapsed tw-ml-1.5"
                     data-toggle="collapse" data-target="#mobile-collapse" aria-expanded="false">
-                    <i class="fa fa-chevron-down fa-lg"></i>
+                    <i class="fa fa-chevron-down fa-lg tw-text-white"></i>
                 </button>
                 <ul class="mobile-icon-menu tw-inline-flex tw-mt-5">
                     <?php
@@ -145,14 +145,14 @@
 			<li><a><span class="tw-text-white">Welcome <?php echo e(get_staff_full_name()); ?> !<br /></span>
 <span class="tw-text-neutral-300"><?php echo e(get_staff_company_name()); ?>
 <?php if(isset($_SESSION['super_view_company_name'])&&$_SESSION['super_view_company_name']){ ?> -> <span class='text-danger removebycompany' onclick="removebycompany(); return false;" title="Remove company"><?php echo $_SESSION['super_view_company_name'];?>&nbsp;<i class="fa-regular fa-circle-xmark"></i> <?php } ?></span></a></li>
-                <li>
+                <?php /*?><li>
                 <a onclick="window.history.back()"><i class="fa fa-arrow-circle-left tw-text-neutral-400 tw-text-xl tw-text-white" data-toggle="tooltip" title="Go Back" data-placement="bottom" aria-hidden="true"></i></a>
                 </li>
                 <li class="icon header-signout">
                     <a href="#" onclick="logout(); return false;" data-toggle="tooltip" title="<?php echo _l('nav_logout'); ?>" data-placement="bottom">
                         <i class="fa-solid fa-right-from-bracket tw-text-neutral-400 tw-text-xl tw-text-white"></i>
                     </a>
-                </li>
+                </li><?php */?>
                 <?php do_action_deprecated('after_render_top_search', [], '3.0.0', 'admin_navbar_start'); ?>
                 <?php hooks()->do_action('admin_navbar_start'); ?>
                 <?php if (is_staff_member()) { ?>
