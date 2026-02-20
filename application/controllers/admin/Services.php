@@ -319,6 +319,10 @@ $_SESSION['cms_subscription_created_at']=$subs['created_at'];
         if (!is_numeric($id)) {
             show_404();
         }
+		
+		if(isset($_SESSION['registered_subscription_id'])&&$_SESSION['registered_subscription_id']){
+	    $_SESSION['registered_subscription_id']="";
+        }
 
         $plan = $this->services_subscriptions_model->get((int) $id);
         if (!$plan) {
