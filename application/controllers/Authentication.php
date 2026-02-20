@@ -87,7 +87,7 @@ class Authentication extends ClientsController
 
     public function get_register($subs_id = null)
     {
-	
+	$_SESSION['registered_subscription_id']="";
 	
 	if(isset($subs_id)&&$subs_id){
 	$_SESSION['registered_subscription_id']=$subs_id;
