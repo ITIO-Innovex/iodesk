@@ -13,6 +13,11 @@ class Dashboard extends AdminController
     // This is admin dashboard view
     public function index() 
     {
+	
+	if(isset($_SESSION['registered_subscription_id'])&&$_SESSION['registered_subscription_id']){
+	 redirect(admin_url('services/plan_details/'.$_SESSION['registered_subscription_id']));
+    }
+	
         close_setup_menu();
         $this->load->model('departments_model');
         $this->load->model('todo_model');
