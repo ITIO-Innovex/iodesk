@@ -235,7 +235,7 @@ class Hrd extends AdminController
         $data = [
             'branch' => $this->input->post('branch'),
             'title' => $this->input->post('title'),
-            'details' => $this->input->post('details', false),
+            'details' => $this->input->post('details'),
             'company_id' => get_staff_company_id(),
             'addedby' => get_staff_user_id(),
         ];
@@ -3113,7 +3113,7 @@ class Hrd extends AdminController
 
         $id = $this->input->post('id');
         $data = [
-            'details' => $this->input->post('details', false),
+            'details' => $this->input->post('details', false);,
             'company_id' => get_staff_company_id(),
             'addedby' => get_staff_user_id(),
         ];
@@ -3196,7 +3196,7 @@ class Hrd extends AdminController
         $id = $this->input->post('id');
         $data = [
             'title' => $this->input->post('title'),
-            'details' => $this->input->post('details', false),
+            'details' => $this->input->post('details'),
             'branch' => $this->input->post('branch') ? (int)$this->input->post('branch') : null,
             'company_id' => get_staff_company_id(),
             'addedby' => get_staff_user_id(),
@@ -3228,7 +3228,7 @@ class Hrd extends AdminController
         $data = [
             'branch' => $this->input->post('branch'),
             'title' => $this->input->post('title'),
-            'details' => $this->input->post('details', false),
+            'details' => $this->input->post('details'),
             'company_id' => get_staff_company_id(),
             'addedby' => get_staff_user_id(),
         ];
@@ -3257,7 +3257,7 @@ class Hrd extends AdminController
         $data = [
             'branch' => $this->input->post('branch'),
             'title' => $this->input->post('title'),
-            'details' => $this->input->post('details', false),
+            'details' => $this->input->post('details'),
             'company_id' => get_staff_company_id(),
             'addedby' => get_staff_user_id(),
         ];

@@ -443,13 +443,13 @@
                   <div class="col-md-3">
                     <div class="form-group">
                       <label>Stay From : <small class="req text-danger">* </small></label>
-                      <input type="date" name="present_stay_from" class="form-control" required>
+                      <input type="text" name="present_stay_from" class="form-control" required>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
                       <label>Stay To : <small class="req text-danger">* </small></label>
-                      <input type="date" name="present_stay_to" class="form-control" required>
+                      <input type="text" name="present_stay_to" class="form-control" required>
                     </div>
                   </div>
                 </div>
@@ -500,13 +500,13 @@
                   <div class="col-md-3">
                     <div class="form-group">
                       <label>Stay From : <small class="req text-danger">* </small></label>
-                      <input type="date" name="permanent_stay_from" class="form-control" required>
+                      <input type="text" name="permanent_stay_from" class="form-control" required>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="form-group">
                       <label>Stay To : <small class="req text-danger">* </small></label>
-                      <input type="date" name="permanent_stay_to" class="form-control" required>
+                      <input type="text" name="permanent_stay_to" class="form-control" required>
                     </div>
                   </div>
                 </div>
@@ -590,86 +590,86 @@
                   <h5>Organization Details</h5>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label>Organization Name  : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_name" class="form-control" required>
+                      <label>Organization Name  : </label>
+                      <input type="text" name="org1_name" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-group">
-                      <label>Designation  : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_designation" class="form-control" required>
+                      <label>Designation  : </label>
+                      <input type="text" name="org1_designation" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-12 mtop10">
                     <div class="form-group">
-                      <label>Address  : <small class="req text-danger">* </small></label>
-                      <textarea name="org1_address" class="form-control" rows="2" required></textarea>
+                      <label>Address  : </label>
+                      <textarea name="org1_address" class="form-control" rows="2" ></textarea>
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Employee Code  : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_employee_code" class="form-control"  required>
+                      <label>Employee Code  : </label>
+                      <input type="text" name="org1_employee_code" class="form-control"  >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Date of Joining  : <small class="req text-danger">* </small></label>
-                      <input type="date" name="org1_date_of_joining" class="form-control"  required>
+                      <label>Date of Joining  : </label>
+                      <input type="date" name="org1_date_of_joining" class="form-control"  >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Last Working Day  : <small class="req text-danger">* </small></label>
-                      <input type="date" name="org1_last_working_day" class="form-control" required>
+                      <label>Last Working Day  : </label>
+                      <input type="date" name="org1_last_working_day" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Salary CTC  : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_salary_ctc" class="form-control" required>
+                      <label>Salary CTC  : </label>
+                      <input type="text" name="org1_salary_ctc" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Reason for Leaving : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_reason_for_leaving" class="form-control" required>
+                      <label>Reason for Leaving : </label>
+                      <input type="text" name="org1_reason_for_leaving" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Reporting Manager Name : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_reporting_manager_name" class="form-control" required>
+                      <label>Reporting Manager Name : </label>
+                      <input type="text" name="org1_reporting_manager_name" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Reporting Manager Contact  : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_reporting_manager_contact" class="form-control" required>
+                      <label>Reporting Manager Contact  : </label>
+                      <input type="text" name="org1_reporting_manager_contact" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>Reporting Manager Email  : <small class="req text-danger">* </small></label>
-                      <input type="email" name="org1_reporting_manager_email" class="form-control"  required>
+                      <label>Reporting Manager Email  : </label>
+                      <input type="email" name="org1_reporting_manager_email" class="form-control"  >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>HR1 Name : <small class="req text-danger">* </small> </label>
-                      <input type="text" name="org1_hr1_name" class="form-control"  required>
+                      <label>HR1 Name :  </label>
+                      <input type="text" name="org1_hr1_name" class="form-control"  >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>HR1 Contact  : <small class="req text-danger">* </small></label>
-                      <input type="text" name="org1_hr1_contact" class="form-control" required>
+                      <label>HR1 Contact  : </label>
+                      <input type="text" name="org1_hr1_contact" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
                     <div class="form-group">
-                      <label>HR1 Email : <small class="req text-danger">* </small></label>
-                      <input type="email" name="org1_hr1_email" class="form-control" required>
+                      <label>HR1 Email : </label>
+                      <input type="email" name="org1_hr1_email" class="form-control" >
                     </div>
                   </div>
                   <div class="col-md-6 mtop10">
@@ -702,8 +702,8 @@
   <thead>
     <tr>
       <th scope="col">Referee Details</th>
-      <th scope="col">Referee 01</th>
-      <th scope="col">Referee 02</th>
+      <th scope="col">Referee 01 <small class="req text-danger">* </small></th>
+      <th scope="col">Referee 02 <small class="req text-danger">* </small></th>
     </tr>
   </thead>
   <tbody>
@@ -751,13 +751,13 @@
             <div class="top_stats_wrapper">
               <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                 <div class="row">
-                  <h5>Mandatory Documents To Provide</h5>
+                  <h5>Documents To Provide</h5>
 				  
 			<div class="col-md-12">
 				<div class="row">
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label>Education Verification Doc : <small class="req text-danger">* </small></label>
+                    <label>Education Verification Doc : </label>
                   </div>
 				  </div>
 				   <div class="col-md-8">
@@ -772,7 +772,7 @@
 				<div class="row">
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label>Employment Verification Doc : <small class="req text-danger">* </small></label>
+                    <label>Employment Verification Doc : </label>
                   </div>
 				  </div>
 				   <div class="col-md-8">
@@ -787,7 +787,7 @@
 				<div class="row">
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label>Address/Criminal Verification Doc : <small class="req text-danger">* </small></label>
+                    <label>Address/Criminal Verification Doc : </label>
                   </div>
 				  </div>
 				   <div class="col-md-8">
@@ -802,7 +802,7 @@
 				<div class="row">
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label>Identity Verification Doc : <small class="req text-danger">* </small></label>
+                    <label>Identity Verification Doc : </label>
                   </div>
 				  </div>
 				   <div class="col-md-8">
@@ -817,7 +817,7 @@
 				<div class="row">
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label>CIBIL Verification Doc : <small class="req text-danger">* </small></label>
+                    <label>CIBIL Verification Doc : </label>
                   </div>
 				  </div>
 				   <div class="col-md-8">

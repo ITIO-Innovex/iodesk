@@ -498,7 +498,7 @@
 				<div class="row">
                 <div class="col-md-4">
 				<div class="form-group">
-                    <label>Previous Company Documents : <small class="req text-danger">* </small></label>
+                    <label>Previous Company Documents : </label>
 					</div>
 				</div>
 				<div class="col-md-8">
@@ -525,9 +525,9 @@
   <thead>
     <tr>
       <th scope="col">S.NO</th>
-      <th scope="col">NAME</th>
-      <th scope="col">RELATION</th>
-      <th scope="col">CONTACT NUMBER</th>
+      <th scope="col">NAME <small class="req text-danger">* </small></th>
+      <th scope="col">RELATION <small class="req text-danger">* </small></th>
+      <th scope="col">CONTACT NUMBER <small class="req text-danger">* </small></th>
     </tr>
   </thead>
   <tbody>
@@ -842,7 +842,7 @@
                 var isFormValid = $('#employee-details-form').valid();
                 
                 // Additional check for required file uploads
-                var requiredFiles = ['profile_pic', 'educational_testimonials', 'id_proof', 'address_proof', 'previous_company_documents'];
+                var requiredFiles = ['profile_pic', 'educational_testimonials', 'id_proof', 'address_proof'];
                 var allFilesUploaded = true;
                 
                 for (var i = 0; i < requiredFiles.length; i++) {
@@ -908,9 +908,9 @@
                     case 'address_proof':
                         fieldLabel = 'Please upload address proof';
                         break;
-                    case 'previous_company_documents':
+                    /*case 'previous_company_documents':
                         fieldLabel = 'Please upload previous company documents';
-                        break;
+                        break;*/
                     default:
                         fieldLabel = 'Please upload file';
                 }

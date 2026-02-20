@@ -85,9 +85,14 @@ class Authentication extends ClientsController
         $this->handle_register('register', true, false);
     }
 
-    public function get_register()
+    public function get_register($subs_id = null)
     {
 	
+	
+	if(isset($subs_id)&&$subs_id){
+	$_SESSION['registered_subscription_id']=$subs_id;
+	}
+	  $_SESSION['registered_subscription_id']; // for set Subscription id from register form
 	
         $this->handle_register('get_register', false, true);
     }
