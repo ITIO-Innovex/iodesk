@@ -97,7 +97,72 @@ $attendance_rejected_count=$attendance_counter[0]['rejected_count'];
                 </div>
             </div>
 </div>
-            <div class="row mtop20">
+
+
+<div class="row mtop20">
+              <div class="col-md-12">
+                <div class="panel_s">
+                    <div class="panel-body">
+                        <div class="widget-card bg-warning text-white" >
+                    <div class="widget-card-body">
+                        <div class="widget-card-content">
+                            <h5><i class="fa-solid fa-user-check fa-2x"></i> Staff Notifications </h5>
+                            
+                        </div>
+                    </div>
+					
+                </div>
+				
+				
+				
+<?php
+if (!empty($notifications)) {
+    foreach ($notifications as $staff) {
+
+        $staffid = $staff['staffid'];
+        $name = $staff['firstname'] . ' ' . $staff['lastname'];
+        $joining_date = $staff['joining_date'];
+		
+		// Calculate difference in days
+        $today = new DateTime();
+        $joinDate = new DateTime($joining_date);
+        $difference = $today->diff($joinDate)->days;
+		$noti_title="";
+		$noti_class="";
+		if($difference==7){
+		$noti_title="7 Day Assesment";
+		$noti_class="alert-info";
+		
+		}elseif($difference==8){
+		$noti_title="Background Verification";
+		$noti_class="alert-warning";
+		}elseif($difference==15){
+		$noti_title="Appoinment Letter & NDA Noterized";
+		$noti_class="alert-warning";
+		}else{
+		$noti_title="Probation complete Mail & PF Enrollment & GMC";
+		$noti_class="alert-warning";
+		}
+?>
+<div class="alert <?php echo $noti_class;?> mtop20">
+<strong><?php echo $noti_title;?></strong> <br />
+ <?php echo $name." (".$staffid.")";?> Completed <?php echo $difference;?> Days ,  Joining Date : <?php echo date("d F Y",strtotime($joining_date));?> <span class="pull-right mt-2 lead-view"></span>
+</div>
+<?php
+}
+}
+?>
+
+				
+				
+                    </div>
+                </div>
+              </div>
+            </div>
+           
+		   
+		   
+ <div class="row mtop20">
               <div class="col-md-12">
 			  
                 <div class="panel panel-default">

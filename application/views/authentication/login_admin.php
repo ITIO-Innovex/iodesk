@@ -40,7 +40,7 @@
 
             <div class="form-group">
                 <div class="checkbox checkbox-inline tw-text-white">
-                    <input type="checkbox" value="estimate" id="remember" name="remember">
+                    <input type="checkbox" value="1" id="remember" name="remember"<?php echo !empty($remember_checked) ? ' checked' : ''; ?>>
                     <label for="remember"> <?php echo _l('admin_auth_login_remember_me'); ?></label>
                 </div>
             </div>
