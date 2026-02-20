@@ -43,7 +43,7 @@ class Authentication extends App_Controller
             if ($this->form_validation->run() !== false) {
                 $email    = $this->input->post('email');
                 $password = $this->input->post('password', false);
-                $remember = $this->input->post('remember');
+                $remember = $this->input->post('remember') ? true : false;
 
                 $data = $this->Authentication_model->login($email, $password, $remember, true);
 
@@ -73,6 +73,8 @@ class Authentication extends App_Controller
                     redirect(admin_url('authentication'));
                 }
 
+                $this->Authentication_model->set_remember_me_pref($remember);
+
                 $this->load->model('announcements_model');
                 $this->announcements_model->set_announcements_as_read_except_last_one(get_staff_user_id(), true);
 
@@ -84,7 +86,9 @@ class Authentication extends App_Controller
             }
         }
 
-        $data['title'] = _l('admin_auth_login_heading');
+        $this->load->helper('cookie');
+        $data['title']           = _l('admin_auth_login_heading');
+        $data['remember_checked'] = (bool) get_cookie('remember_me_pref', true);
         $this->load->view('authentication/login_admin', $data);
     }
 

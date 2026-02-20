@@ -83,4 +83,16 @@ class User_Autologin extends App_Model
         $this->db->where('staff', $staff);
         $this->db->delete(db_prefix() . 'user_auto_login');
     }
+
+    /**
+     * Delete all autologin entries for a user (so only one remember-me token per user)
+     * @param  mixed $user_id clientid/staffid
+     * @param integer $staff   is staff or client
+     */
+    public function delete_all_for_user($user_id, $staff)
+    {
+        $this->db->where('user_id', $user_id);
+        $this->db->where('staff', $staff);
+        $this->db->delete(db_prefix() . 'user_auto_login');
+    }
 }

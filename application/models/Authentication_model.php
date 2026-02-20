@@ -155,6 +155,8 @@ class Authentication_model extends App_Model
             if (!$twoFactorAuth) {
                 if ($remember) {
                     $this->create_autologin($user->$_id, $staff);
+                } else {
+                    $this->clear_autologin_for_user($user->$_id, $staff);
                 }
 
                 $this->update_login_info($user->$_id, $staff);
@@ -200,15 +202,20 @@ class Authentication_model extends App_Model
     {
         $this->load->helper('cookie');
         $key = substr(md5(uniqid(rand() . get_cookie($this->config->item('sess_cookie_name')))), 0, 16);
-        $this->user_autologin->delete($user_id, $key, $staff);
-        if ($this->user_autologin->set($user_id, md5($key), $staff)) {
+        $key_hashed = md5($key);
+        $this->user_autologin->delete_all_for_user($user_id, $staff);
+        if ($this->user_autologin->set($user_id, $key_hashed, $staff)) {
             set_cookie([
-                'name'  => 'autologin',
-                'value' => serialize([
+                'name'   => 'autologin',
+                'value'  => serialize([
                     'user_id' => $user_id,
                     'key'     => $key,
                 ]),
                 'expire' => 60 * 60 * 24 * 31 * 2, // 2 months
+                'path'   => $this->config->item('cookie_path') ?: '/',
+                'domain' => $this->config->item('cookie_domain') ?: '',
+                'secure' => $this->config->item('cookie_secure'),
+                'httponly' => true,
             ]);
 
             return true;
@@ -227,7 +234,54 @@ class Authentication_model extends App_Model
         if ($cookie = get_cookie('autologin', true)) {
             $data = unserialize($cookie);
             $this->user_autologin->delete($data['user_id'], md5($data['key']), $staff);
-            delete_cookie('autologin', 'aal');
+            delete_cookie(
+                'autologin',
+                $this->config->item('cookie_domain') ?: '',
+                $this->config->item('cookie_path') ?: '/',
+                $this->config->item('cookie_prefix') ?: ''
+            );
+        }
+    }
+
+    /**
+     * Clear autologin for user when they log in without "Remember me"
+     * @param  integer $user_id staffid or contact id
+     * @param  boolean $staff   is staff or client
+     */
+    private function clear_autologin_for_user($user_id, $staff)
+    {
+        $this->load->helper('cookie');
+        $this->user_autologin->delete_all_for_user($user_id, $staff);
+        delete_cookie(
+            'autologin',
+            $this->config->item('cookie_domain') ?: '',
+            $this->config->item('cookie_path') ?: '/',
+            $this->config->item('cookie_prefix') ?: ''
+        );
+    }
+
+    /**
+     * Set or clear the "remember me" checkbox preference for the login form.
+     * Call after successful login: set when remember=true, clear when remember=false.
+     */
+    public function set_remember_me_pref($remember)
+    {
+        $this->load->helper('cookie');
+        $path   = $this->config->item('cookie_path') ?: '/';
+        $domain = $this->config->item('cookie_domain') ?: '';
+        $prefix = $this->config->item('cookie_prefix') ?: '';
+        if ($remember) {
+            set_cookie([
+                'name'     => 'remember_me_pref',
+                'value'    => '1',
+                'expire'   => 60 * 60 * 24 * 31 * 2, // 2 months
+                'path'     => $path,
+                'domain'   => $domain,
+                'secure'   => $this->config->item('cookie_secure'),
+                'httponly' => false,
+            ]);
+        } else {
+            delete_cookie('remember_me_pref', $domain, $path, $prefix);
         }
     }
 

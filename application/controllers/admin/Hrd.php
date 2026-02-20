@@ -4321,6 +4321,29 @@ class Hrd extends AdminController
         $data['leave_counter'] = $this->hrd_model->get_leave_counter();
 		$data['attendance_counter'] = $this->hrd_model->get_attendance_counter();
 		
+		// Get Staff Notification ///////
+		
+$this->db->select('staffid, firstname, lastname, joining_date');
+$this->db->from('it_crm_staff');
+$this->db->where('company_id', get_staff_company_id());
+$this->db->where('active', 1);
+
+// Exclude NULL and invalid dates
+$this->db->where('joining_date IS NOT NULL', null, false);
+$this->db->where('joining_date !=', '0000-00-00');
+
+// Your anniversary conditions
+$this->db->where("
+    (
+        DATEDIFF(CURDATE(), joining_date) IN (7,8,15)
+        OR joining_date = DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+    )
+", null, false);
+
+$data['notifications'] = $this->db->get()->result_array();
+//print_r($result);
+//echo $this->db->last_query();exit;
+		
         $this->load->view('admin/hrd/setting_dashboard', $data);
     }
 
