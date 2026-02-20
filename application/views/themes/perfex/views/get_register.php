@@ -38,7 +38,7 @@
           <input type="text" class="form-control" name="companyname" id="companyname" value="" required>
           </div>
         <div class="form-group register-contact-website-group">
-          <label class="tw-text-white" for="website"> <span class="text-danger">*</span>website </label>
+          <label class="tw-text-white" for="website"> <span class="text-danger">*</span>Website </label>
           <input type="url" class="form-control" name="website" id="website" value="" required>
           <?php echo form_error('website'); ?> </div>
         <?php if (is_gdpr() && get_option('gdpr_enable_terms_and_conditions') == 1) { ?>

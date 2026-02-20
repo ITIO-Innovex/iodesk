@@ -1138,7 +1138,7 @@ height: 50px !important;
                                     <li><i class="fas fa-check-circle"></i> Basic analytics</li>
                                 </ul>
                             <?php } ?>
-                            <a href="<?php echo base_url('/authentication/get_register'); ?>" class="btn-pricing <?php echo $isFeatured ? 'btn-pricing-primary' : 'btn-pricing-outline'; ?>">
+                            <a href="<?php echo base_url('/authentication/get_register/'.$plan['id']); ?>" class="btn-pricing <?php echo $isFeatured ? 'btn-pricing-primary' : 'btn-pricing-outline'; ?>">
                                 Get Started
                             </a>
                         </div>

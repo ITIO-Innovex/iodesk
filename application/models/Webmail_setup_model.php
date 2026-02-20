@@ -18,28 +18,28 @@ class Webmail_setup_model extends App_Model
 	 
     public function get($id = false)
     {
-	    
+	
+	
+	
 	    $this->db->order_by('id', 'desc');
-		if(!is_super()){
-		$this->db->where('company_id', get_staff_company_id());
-		}else{
-		
-		 if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-		   $this->db->where('company_id', $_SESSION['super_view_company_id']);
-		   
-	      }
-		
-		}
-		
-        if (is_numeric($id)) {
+	    if (is_numeric($id)) {
             $this->db->where('staffid', $id);
             return $this->db->get(db_prefix().'webmail_setup')->result_array();
 			
-        }else{
-		//$this->db->where('staffid', 0); // for hide staff Added data from admin list
+        }
+	    
+	    
+		if(is_admin()){
+		$this->db->where('company_id', get_staff_company_id());
+		}else{
+		$this->db->where('company_id', get_staff_company_id());
+		$this->db->where('staffid', get_staff_user_id());
+		
 		}
+		
+        
 
-        return $this->db->get(db_prefix().'webmail_setup')->result_array();
+       return $this->db->get(db_prefix().'webmail_setup')->result_array();
 		
 		//echo $this->db->last_query();exit; //return 
     }
