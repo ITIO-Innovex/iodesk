@@ -631,20 +631,20 @@ class Webmail_model extends App_Model
 	
 	
 $folders = $client->getFolders();
-log_message('error', 'Folder List - '.print_r($folders , true) );
+
+
 $cnt=0;
 foreach ($folders as $folder) { 
 
       $folder=$folder->name;
 	  $data['folder'] = $folder; // for submit to db
       $mailbox = $client->getFolder($folder);
-	  log_message('error', 'Folder Name - '.$folder );
 	 // print_r($mailbox);
       if ($mailbox === null) {
       die("The ".$folder." folder could not be found.");
       }
 	  
-	 log_message('error', 'Folder Name 11 - '.$folder );
+	 
      
 	  $last_email_id=$this->webmail_model->lastemailid($mailer_username, $folder);
 	  $last_email_id = $last_email_id[0]['uniqid'] ?? 0;
@@ -782,7 +782,7 @@ $client->disconnect();
         $encryption       = trim($_SESSION['webmail']['encryption'] ?? '');
         $folder           = trim($_SESSION['webmail']['folder'] ?? '');
         $data['email']    = $mailer_username;
-        log_message('error', 'Refresh Folder - '.$folder );
+
         if ($mailer_username === '' || $mailer_password === '' || $folder === '') {
             $result['msg'] = 'Missing webmail session details.';
             return $result;
