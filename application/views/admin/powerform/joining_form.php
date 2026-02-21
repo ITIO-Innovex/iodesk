@@ -47,6 +47,7 @@
                                                 <td>
                                                     <button type="button" class="btn btn-info btn-xs view-jf-details" data-id="<?php echo $record['id']; ?>" title="View"><i class="fa fa-eye"></i></button>
                                                     <button type="button" class="btn btn-primary btn-xs edit-jf-details" data-id="<?php echo $record['id']; ?>" title="Edit"><i class="fa fa-pencil"></i></button>
+                                                    <a href="<?php echo admin_url('powerform/download_joining_form_pdf/' . $record['id']); ?>" class="btn btn-danger btn-xs" title="Download PDF"><i class="fa-solid fa-file-pdf"></i></a>
                                                     <button type="button" class="btn btn-danger btn-xs delete-jf-details" data-id="<?php echo $record['id']; ?>" title="Delete"><i class="fa fa-trash"></i></button>
                                                 </td>
                                             </tr>

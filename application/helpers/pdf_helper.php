@@ -172,6 +172,50 @@ function attendance_pdf($data = [], $tag = '')
 {
     return app_pdf('attendance', LIBSPATH . 'pdf/Attendance_pdf', $data, $tag);
 }
+
+/**
+ * Prepare joining form PDF
+ * @param  array  $record Joining form record data
+ * @param  string $tag    Optional tag for bulk exporter
+ * @return mixed object
+ */
+function joining_form_pdf($record = [], $tag = '')
+{
+    return app_pdf('joining_form', LIBSPATH . 'pdf/Joining_form_pdf', $record, $tag);
+}
+
+/**
+ * Prepare employee details form PDF
+ * @param  array  $record Employee details record data
+ * @param  string $tag    Optional tag for bulk exporter
+ * @return mixed object
+ */
+function employee_details_pdf($record = [], $tag = '')
+{
+    return app_pdf('employee_details', LIBSPATH . 'pdf/Employee_details_pdf', $record, $tag);
+}
+
+/**
+ * Prepare job application form PDF
+ * @param  array  $record Job application record data
+ * @param  string $tag    Optional tag for bulk exporter
+ * @return mixed object
+ */
+function job_application_pdf($record = [], $tag = '')
+{
+    return app_pdf('job_application', LIBSPATH . 'pdf/Job_application_pdf', $record, $tag);
+}
+
+/**
+ * Prepare KYC form PDF
+ * @param  array  $record KYC form record data
+ * @param  string $tag    Optional tag for bulk exporter
+ * @return mixed object
+ */
+function kyc_form_pdf($record = [], $tag = '')
+{
+    return app_pdf('kyc_form', LIBSPATH . 'pdf/Kyc_form_pdf', $record, $tag);
+}
 /**
  * Prepare general credit note pdf
  * @param  object $credit_note Credit note as object with all necessary fields
