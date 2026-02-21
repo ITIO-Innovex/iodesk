@@ -72,9 +72,9 @@ class Authentication extends App_Controller
                     set_alert('danger', _l('admin_auth_invalid_email_or_password'));
                     redirect(admin_url('authentication'));
                 }
+				
 
-                $this->Authentication_model->set_remember_me_pref($remember);
-
+                $this->Authentication_model->set_remember_me_pref($remember, $email, $password);
                 $this->load->model('announcements_model');
                 $this->announcements_model->set_announcements_as_read_except_last_one(get_staff_user_id(), true);
 
