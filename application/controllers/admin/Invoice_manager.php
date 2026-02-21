@@ -535,7 +535,8 @@ class Invoice_manager extends AdminController
 
         $this->db->insert(db_prefix() . 'sales_invoices', $invoiceData);
         $invoiceId = $this->db->insert_id();
-
+log_message('error', 'invoiceId - '.$invoiceId );
+log_message('error', 'QUERY - '.$this->db->last_query(); );
         if (!$invoiceId) {
             $this->db->trans_rollback();
             echo json_encode(['success' => false, 'message' => 'Failed to create invoice']);
