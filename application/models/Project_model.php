@@ -314,13 +314,28 @@ return $result = $this->db->get()->result_array();
         if ($insert_id) {
             $project_type=2; //Project=1, Task=2, Issues=3, Milestone=4
 			$changes = [];
-            foreach ($data as $field => $value) {
+            /*foreach ($data as $field => $value) {
 			    if($field=='owner'){
 				$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_staff_full_name($value);
 				}else{
                 $changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $value;
 				}
-            }
+            }*/
+			
+			foreach ($data as $field => $value) {
+			if(($field=='task_owner') || ($field=='task_addedby')){
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_staff_full_name($value);
+			}elseif($field=='task_priority'){
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_project_priority($value);
+			}elseif($field=='project_id'){
+			$changes[] = ucwords(str_replace("_"," ","Project Title")) . ': ' . get_project_title($value);
+			}elseif($field=='task_status'){
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_project_status_title($value);
+			}else{
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $value;
+			}
+			}
+
 			//===============================
 			$task_owner=get_task_owner($insert_id);
 			$emails=get_cc_mail_list($task_owner);
