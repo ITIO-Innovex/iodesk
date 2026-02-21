@@ -1,5 +1,77 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head();?>
+<?php init_head(); $companyId = get_staff_company_id();?>
+<style>
+  .email-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 38px;
+    background: #fff;
+    cursor: text;
+  }
+  .email-tags-container:focus-within {
+    border-color: #66afe9;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+  }
+  .email-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e0e0e0;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+  .email-tag .remove-tag {
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+  }
+  .email-tag .remove-tag:hover {
+    color: #c00;
+  }
+  .email-input-field {
+    flex: 1;
+    min-width: 150px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 2px 0;
+  }
+  .email-suggestions {
+    position: absolute;
+    z-index: 1050;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    display: none;
+  }
+  .email-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .email-suggestion-item:hover, .email-suggestion-item.active {
+    background: #f0f0f0;
+  }
+  .email-input-wrapper {
+    position: relative;
+  }
+  .suggestion-name {
+    font-weight: 500;
+  }
+  .suggestion-email {
+    color: #666;
+    font-size: 12px;
+  }
+</style>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -76,6 +148,18 @@
           <h4 class="modal-title">DAR Details</h4>
         </div>
         <div class="modal-body">
+<?php /*?>		<label for="dar-description">To : </label><br />
+<?php echo get_company_fields($companyId ,'email_dar') ?? '';?><?php */?>
+<div class="form-group">
+                <label for="cc_email">CC</label>
+                <div class="email-input-wrapper">
+                    <div class="email-tags-container" id="ccEmailTagsContainer">
+                        <input type="text" class="email-input-field" id="ccEmailInputField" placeholder="Type name or email to search" autocomplete="off">
+                    </div>
+                    <div class="email-suggestions" id="ccEmailSuggestions"></div>
+                </div>
+                <input type="hidden" id="cc_email" name="cc_email" value="">
+              </div>
           <div class="form-group">
             <label>Description <span class="text-danger" id="desc-required" style="display:none;">*</span></label>
             <div class="well well-sm" style="min-height:120px;">
@@ -265,7 +349,7 @@
       
       var description = getEditorContent();
       var plainText = $('<div>').html(description).text().trim();
-      
+	  
       if (plainText.length < 5) {
         alert_float('warning', 'Description is required (minimum 5 characters)');
         return;
@@ -319,6 +403,8 @@
       
       var description = getEditorContent();
       var plainText = $('<div>').html(description).text().trim();
+	  var cc_email = $('#cc_email').val();
+
       
       if (plainText.length < 5) {
         alert_float('warning', 'Description is required (minimum 5 characters)');
@@ -336,6 +422,7 @@
       formData.append('<?php echo $this->security->get_csrf_token_name(); ?>', '<?php echo $this->security->get_csrf_hash(); ?>');
       formData.append('dar_id', currentDarId);
       formData.append('description', description);
+	  formData.append('cc_email', cc_email);
       formData.append('submit_dar', '1');
       
       // Add new files
@@ -381,7 +468,219 @@
       $('#new-attachments-group').hide();
       $('#desc-required').hide();
       $fileList.empty();
+      // Clear CC email tags
+      if (typeof window.clearCcEmailTags === 'function') {
+        window.clearCcEmailTags();
+      }
     });
+
+    // CC Email Autocomplete with multiple tags
+    (function() {
+      var emailTags = [];
+      var $container = $('#ccEmailTagsContainer');
+      var $inputField = $('#ccEmailInputField');
+      var $hiddenInput = $('#cc_email');
+      var $suggestions = $('#ccEmailSuggestions');
+      var searchTimeout = null;
+      var activeSuggestionIndex = -1;
+      var currentSuggestions = [];
+
+      function isValidEmail(email) {
+        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+      }
+
+      function updateHiddenInput() {
+        $hiddenInput.val(emailTags.join(','));
+      }
+
+      function createTag(email, name) {
+        email = email.trim();
+        if (!email) return;
+
+        if (emailTags.indexOf(email) !== -1) {
+          return;
+        }
+
+        emailTags.push(email);
+
+        var displayText = name ? name + ' <' + email + '>' : email;
+        var $tag = $('<span class="email-tag"></span>');
+        $tag.text(displayText);
+        $tag.attr('data-email', email);
+        var $remove = $('<span class="remove-tag">&times;</span>');
+        $remove.on('click', function() {
+          var idx = emailTags.indexOf(email);
+          if (idx > -1) {
+            emailTags.splice(idx, 1);
+          }
+          $tag.remove();
+          updateHiddenInput();
+        });
+        $tag.append($remove);
+        $tag.insertBefore($inputField);
+        updateHiddenInput();
+      }
+
+      function hideSuggestions() {
+        $suggestions.hide().empty();
+        currentSuggestions = [];
+        activeSuggestionIndex = -1;
+      }
+
+      function showSuggestions(staffList) {
+        $suggestions.empty();
+        currentSuggestions = staffList;
+        activeSuggestionIndex = -1;
+
+        if (staffList.length === 0) {
+          hideSuggestions();
+          return;
+        }
+
+        staffList.forEach(function(staff, idx) {
+          var $item = $('<div class="email-suggestion-item"></div>');
+          $item.html('<span class="suggestion-name">' + escapeHtml(staff.name) + '</span><br><span class="suggestion-email">' + escapeHtml(staff.email) + '</span>');
+          $item.attr('data-index', idx);
+          $item.on('mousedown', function(e) {
+            e.preventDefault();
+            $inputField.val('');
+            createTag(staff.email, staff.name);
+            hideSuggestions();
+            $inputField.focus();
+          });
+          $suggestions.append($item);
+        });
+
+        $suggestions.show();
+      }
+
+      function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(text));
+        return div.innerHTML;
+      }
+
+      function selectActiveSuggestion() {
+        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestions.length) {
+          var staff = currentSuggestions[activeSuggestionIndex];
+          createTag(staff.email, staff.name);
+          $inputField.val('');
+          hideSuggestions();
+        }
+      }
+
+      function updateActiveSuggestion() {
+        $suggestions.find('.email-suggestion-item').removeClass('active');
+        if (activeSuggestionIndex >= 0) {
+          $suggestions.find('.email-suggestion-item[data-index="' + activeSuggestionIndex + '"]').addClass('active');
+        }
+      }
+
+      function searchStaffEmails(term) {
+        if (term.length < 2) {
+          hideSuggestions();
+          return;
+        }
+
+        $.ajax({
+          url: admin_url + 'hrd/search_staff_emails',
+          type: 'GET',
+          data: { term: term },
+          dataType: 'json',
+          success: function(data) {
+            if (Array.isArray(data)) {
+              var filtered = data.filter(function(staff) {
+                return emailTags.indexOf(staff.email) === -1;
+              });
+              showSuggestions(filtered);
+            } else {
+              hideSuggestions();
+            }
+          },
+          error: function() {
+            hideSuggestions();
+          }
+        });
+      }
+
+      $inputField.on('keydown', function(e) {
+        var val = $(this).val();
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
+            updateActiveSuggestion();
+          }
+          return;
+        }
+
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+            updateActiveSuggestion();
+          }
+          return;
+        }
+
+        if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+          e.preventDefault();
+          if (activeSuggestionIndex >= 0) {
+            selectActiveSuggestion();
+          } else if (val.trim() && isValidEmail(val.trim())) {
+            createTag(val.trim());
+            $(this).val('');
+            hideSuggestions();
+          }
+          return;
+        }
+
+        if (e.key === 'Backspace' && val === '') {
+          if (emailTags.length > 0) {
+            emailTags.pop();
+            $container.find('.email-tag').last().remove();
+            updateHiddenInput();
+          }
+          return;
+        }
+
+        if (e.key === 'Escape') {
+          hideSuggestions();
+          return;
+        }
+      });
+
+      $inputField.on('input', function() {
+        var val = $(this).val().trim();
+        if (searchTimeout) {
+          clearTimeout(searchTimeout);
+        }
+        searchTimeout = setTimeout(function() {
+          searchStaffEmails(val);
+        }, 300);
+      });
+
+      $inputField.on('blur', function() {
+        setTimeout(function() {
+          hideSuggestions();
+        }, 200);
+      });
+
+      $container.on('click', function() {
+        $inputField.focus();
+      });
+
+      // Expose clear function for modal reset
+      window.clearCcEmailTags = function() {
+        emailTags = [];
+        $container.find('.email-tag').remove();
+        $hiddenInput.val('');
+        $inputField.val('');
+        hideSuggestions();
+      };
+    })();
   });
 </script>
 </body></html>

@@ -24,7 +24,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
                   ?>
         <div class="quick-stats-leads col-xs-12 col-md-12 col-sm-12 col-lg-12 tw-mb-2 sm:tw-mb-0 mtop10">
 		         <div class="row tw-mb-2 sm:tw-mb-0">
-				 <div class=" col-sm-4 m-1">
+				 <div class=" col-sm-4 m-1 tw-pb-1">
                 <div class="top_stats_wrapper">
                 <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
@@ -37,7 +37,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
                 </div>
 				</div>
 				</div>
-				<div class=" col-sm-4 m-1">
+				<div class=" col-sm-4 m-1 tw-pb-1">
 				<div class="top_stats_wrapper">
 				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
@@ -49,7 +49,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
                     </span>
                 </div>
 				</div></div>
-				<div class=" col-sm-4 m-1">
+				<div class=" col-sm-4 m-1 tw-pb-1">
 				<div class="top_stats_wrapper">
 				<div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                     <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate  tw-my-2">
@@ -64,6 +64,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 				</div>
             </div>
         </div>
+		<div class="row m-1">
 		<div class="quick-stats-leads col-xs-6 col-md-4 col-sm-4 col-lg-4 tw-mb-2 tw-mt-2 sm:tw-mb-0">
 		<div class="row tw-pr-2 tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
@@ -237,6 +238,6 @@ $swhere="";
             </div>
 			</div>
         </div>
-			
+		</div>	
            
         <?php } ?>
