@@ -128,6 +128,47 @@ class Powerform extends AdminController
         }
     }
 
+    public function download_employee_details_pdf($id)
+    {
+        $this->db->where('id', $id);
+        $record = $this->db->get(db_prefix() . 'staff_joining_details')->row_array();
+
+        if (!$record) {
+            set_alert('danger', 'Record not found');
+            redirect(admin_url('powerform/employee_details_form'));
+        }
+
+        $this->load->helper('pdf');
+
+        try {
+            $pdf = employee_details_pdf($record);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            echo $message;
+            if (strpos($message, 'Unable to get the size of the image') !== false) {
+                show_pdf_unable_to_get_image_size_error();
+            }
+            die;
+        }
+
+        $name = isset($record['name']) ? slug_it($record['name']) : 'employee-details';
+        $filename = 'employee-details-' . $name . '-' . $id;
+
+        $type = 'D';
+        if ($this->input->get('output_type')) {
+            $type = $this->input->get('output_type');
+        }
+        if ($this->input->get('print')) {
+            $type = 'I';
+        }
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $pdf->Output(mb_strtoupper($filename) . '.pdf', $type);
+    }
+
     // Job Application Form
     public function job_application_form()
     {
@@ -282,6 +323,47 @@ class Powerform extends AdminController
         }
     }
 
+    public function download_job_application_pdf($id)
+    {
+        $this->db->where('id', $id);
+        $record = $this->db->get(db_prefix() . 'staff_job_application_form')->row_array();
+
+        if (!$record) {
+            set_alert('danger', 'Record not found');
+            redirect(admin_url('powerform/job_application_form'));
+        }
+
+        $this->load->helper('pdf');
+
+        try {
+            $pdf = job_application_pdf($record);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            echo $message;
+            if (strpos($message, 'Unable to get the size of the image') !== false) {
+                show_pdf_unable_to_get_image_size_error();
+            }
+            die;
+        }
+
+        $name = isset($record['full_name']) ? slug_it($record['full_name']) : 'job-application';
+        $filename = 'job-application-' . $name . '-' . $id;
+
+        $type = 'D';
+        if ($this->input->get('output_type')) {
+            $type = $this->input->get('output_type');
+        }
+        if ($this->input->get('print')) {
+            $type = 'I';
+        }
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $pdf->Output(mb_strtoupper($filename) . '.pdf', $type);
+    }
+
     // Joining Form (it_crm_staff_joining_form)
     public function joining_form()
     {
@@ -371,6 +453,47 @@ class Powerform extends AdminController
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to delete record']);
         }
+    }
+
+    public function download_joining_form_pdf($id)
+    {
+        $this->db->where('id', $id);
+        $record = $this->db->get(db_prefix() . 'staff_joining_form')->row_array();
+
+        if (!$record) {
+            set_alert('danger', 'Record not found');
+            redirect(admin_url('powerform/joining_form'));
+        }
+
+        $this->load->helper('pdf');
+
+        try {
+            $pdf = joining_form_pdf($record);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            echo $message;
+            if (strpos($message, 'Unable to get the size of the image') !== false) {
+                show_pdf_unable_to_get_image_size_error();
+            }
+            die;
+        }
+
+        $name = isset($record['name']) ? slug_it($record['name']) : 'joining-form';
+        $filename = 'joining-form-' . $name . '-' . $id;
+
+        $type = 'D';
+        if ($this->input->get('output_type')) {
+            $type = $this->input->get('output_type');
+        }
+        if ($this->input->get('print')) {
+            $type = 'I';
+        }
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $pdf->Output(mb_strtoupper($filename) . '.pdf', $type);
     }
 
     // KYC Form (it_crm_staff_kyc_details)
@@ -514,5 +637,46 @@ class Powerform extends AdminController
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to delete record']);
         }
+    }
+
+    public function download_kyc_form_pdf($id)
+    {
+        $this->db->where('id', $id);
+        $record = $this->db->get(db_prefix() . 'staff_kyc_details')->row_array();
+
+        if (!$record) {
+            set_alert('danger', 'Record not found');
+            redirect(admin_url('powerform/kyc_form'));
+        }
+
+        $this->load->helper('pdf');
+
+        try {
+            $pdf = kyc_form_pdf($record);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            echo $message;
+            if (strpos($message, 'Unable to get the size of the image') !== false) {
+                show_pdf_unable_to_get_image_size_error();
+            }
+            die;
+        }
+
+        $name = isset($record['candidate_name']) ? slug_it($record['candidate_name']) : 'kyc-form';
+        $filename = 'kyc-form-' . $name . '-' . $id;
+
+        $type = 'D';
+        if ($this->input->get('output_type')) {
+            $type = $this->input->get('output_type');
+        }
+        if ($this->input->get('print')) {
+            $type = 'I';
+        }
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $pdf->Output(mb_strtoupper($filename) . '.pdf', $type);
     }
 }

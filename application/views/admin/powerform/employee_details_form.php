@@ -56,6 +56,9 @@
                                                     <button type="button" class="btn btn-primary btn-xs edit-details" data-id="<?php echo $record['id']; ?>" title="Edit">
                                                         <i class="fa fa-pencil"></i>
                                                     </button>
+                                                    <a href="<?php echo admin_url('powerform/download_employee_details_pdf/' . $record['id']); ?>" class="btn btn-danger btn-xs" title="Download PDF">
+                                                        <i class="fa-solid fa-file-pdf"></i>
+                                                    </a>
                                                     <button type="button" class="btn btn-danger btn-xs delete-details" data-id="<?php echo $record['id']; ?>" title="Delete">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
