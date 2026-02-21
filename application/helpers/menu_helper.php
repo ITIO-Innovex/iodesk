@@ -312,6 +312,65 @@ function app_init_admin_sidebar_menu_items()
 			],
 		]);
     }
+	
+	   if (staff_can('view',  'invoices')) {
+	   
+	   
+	    $CI->app_menu->add_sidebar_menu_item('invoice_manager', [
+            'collapse' => true,
+            'name'     => 'Invoices',
+            'position' => 55,
+            'icon'     => 'fa-solid fa-file-invoice-dollar',
+            'badge'    => [],
+        ]);
+		
+		
+		
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'invoices',
+            'name'     => 'Invoices',
+            'href'     => admin_url('invoice_manager/invoices'),
+            'position' => 5,
+            'badge'    => [],
+        ]);
+		
+		
+		
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'payments',
+            'name'     => 'Payments',
+            'href'     => admin_url('invoice_manager/payments'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'products',
+            'name'     => 'Products',
+            'href'     => admin_url('invoice_manager/products'),
+            'position' => 10,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'payments',
+            'name'     => 'Payments',
+            'href'     => admin_url('invoice_manager/payments'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'invoice_notes',
+            'name'     => 'Invoice Notes',
+            'href'     => admin_url('invoice_manager/invoice_notes'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		
+		
+		}
+		
+		
 
     
         $CI->app_menu->add_sidebar_menu_item('subscriptions_menu', [
