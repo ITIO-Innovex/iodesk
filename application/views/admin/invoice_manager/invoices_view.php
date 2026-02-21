@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head();  print_r($bank_details);?>
 <style>
     .invoice-header { background: #f8f9fa; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
     .invoice-title { font-size: 28px; font-weight: bold; color: #333; }
@@ -89,6 +89,7 @@
                                         <h5><i class="fa fa-bank"></i> Payment Details</h5>
                                         <?php if (!empty($bank_details['name'])) { ?>
                                             <strong><?php echo htmlspecialchars($bank_details['name']); ?></strong><br>
+											<strong><?php echo htmlspecialchars($bank_details['description']); ?></strong><br>
                                         <?php } ?>
                                         <?php if (!empty($bank_details['bank_name'])) { ?>
                                             Bank: <?php echo htmlspecialchars($bank_details['bank_name']); ?><br>
