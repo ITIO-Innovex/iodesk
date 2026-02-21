@@ -1,7 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php $this->load->view('authentication/includes/head.php'); ?>
 
-<body class="authentication reset-password" style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1502.jpg');?>)  !important; ">
+<body class="authentication reset-password register_admin" >
+<?php /*?>style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1502.jpg');?>)  !important; "<?php */?>
     <div class="tw-max-w-md tw-mx-auto tw-pt-24 authentication-form-wrapper tw-relative tw-z-20">
 
         <div class="company-logo text-center">
@@ -17,7 +18,7 @@
             <?php echo render_input('password', 'admin_auth_reset_password', '', 'password'); ?>
             <?php echo render_input('passwordr', 'admin_auth_reset_password_repeat', '', 'password'); ?>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-success btn-block">
                     <?php echo _l('auth_reset_password_submit'); ?>
                 </button>
             </div>
