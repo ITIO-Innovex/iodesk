@@ -29,6 +29,11 @@ class Invoice extends ClientsController
             if ($companyname != '') {
                 $invoice_number .= '-' . mb_strtoupper(slug_it($companyname), 'UTF-8');
             }
+
+            if (ob_get_length()) {
+                ob_end_clean();
+            }
+
             $pdf->Output(mb_strtoupper(slug_it($invoice_number), 'UTF-8') . '.pdf', 'D');
             die();
         }

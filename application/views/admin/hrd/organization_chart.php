@@ -6,11 +6,11 @@
   <div class="content">
   <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  <?php echo $title;?> [ <?php echo get_staff_company_name(); ?> ] </span></h4>
   
-    <div class="row tw-mt-2">
+    <div class="row tw-mt-2" style="clear:both">
       <div class="col-md-12">
         <div class="panel_s">
           <div class="panel-body panel-table-fullxx">
-            <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"><?php echo $title;?></h4>
+            <h4 class="tw-mt-0 tw-font-semibold tw-text-lg "><?php echo $title;?></h4>
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">

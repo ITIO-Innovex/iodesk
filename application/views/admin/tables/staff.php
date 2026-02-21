@@ -45,9 +45,10 @@ $where = ['AND (company_id = ' . $_SESSION['super_view_company_id'] . ')'];
 }elseif(is_department_admin()){
 $departmentid = (int) get_departments_id();
 $where = ['AND (company_id = ' . get_staff_company_id() . ') AND ( department_id='.$departmentid.' OR reporting_manager='. get_staff_user_id() . ')']; 
-
+}elseif(is_admin()){
+$where = ['AND (company_id = ' . get_staff_company_id() . ')'];
 }else{
- $where = ['AND (company_id = ' . get_staff_company_id() . ')']; 
+$where = ['AND (company_id = ' . get_staff_company_id() . ') AND ( staffid='. get_staff_user_id() . ')'];  
 }
 //log_message('error', 'where data'.print_r($where, true) );
 $result = data_tables_init($aColumns, $sIndexColumn, $sTable, $join, $where, [

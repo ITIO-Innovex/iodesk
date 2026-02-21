@@ -101,6 +101,26 @@
             <small class="text-muted"><?php echo _l('customize_company_logo_help'); ?></small>
         </div>
 
+        <!-- Company Logo Dark -->
+        <div class="form-group">
+            <label for="customize_company_logo_dark">Company Logo Dark</label>
+            <div class="input-group">
+                <input type="file" name="customize_company_logo_dark" class="form-control" accept="image/*" />
+                <span class="input-group-addon">
+                    <i class="fa fa-image"></i>
+                </span>
+            </div>
+            <?php if (!empty($company->company_logo_dark)) { ?>
+                <div class="mt-2" style="background: #333; padding: 10px; display: inline-block; border-radius: 4px;">
+                    <img src="<?php echo base_url('uploads/company/' . $company->company_logo_dark); ?>" 
+                         alt="Current Dark Logo" style="max-height: 50px; max-width: 200px;" />
+                </div>
+                <br>
+                <small class="text-muted">Current dark logo (shown on dark background)</small>
+            <?php } ?>
+            <small class="text-muted">Upload a logo optimized for dark backgrounds (e.g., white or light-colored logo)</small>
+        </div>
+
         <!-- Favicon -->
         <div class="form-group">
             <label for="customize_favicon"><?php echo _l('customize_favicon'); ?></label>

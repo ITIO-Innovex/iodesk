@@ -1,6 +1,11 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
-
+<style>
+/* responsive */
+    @media (max-width:420px){
+      .tw-w-96 { width:unset !important; }
+    }
+</style>
 <div id="wrapper">
   <div class="content">
     <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"><i class="fa fa-home menu-icon tw-mr-2 "></i>  Self Service</h4>

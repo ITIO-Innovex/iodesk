@@ -63,9 +63,12 @@ table {
 
 <div id="wrapper">
   <div class="content">
+  <div>
   <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700 tw-mb-2"><span class="pull-left display-block mright5 tw-mb-2"><i class="fa-solid fa-chart-gantt tw-mr-2 "></i>  My Attendance</span><span class="tw-inline pull-right"><?php echo e(get_staff_full_name()); ?> <?php  if(isset($GLOBALS['current_user']->branch)&&$GLOBALS['current_user']->branch) { echo "[ ".get_staff_branch_name($GLOBALS['current_user']->branch)." ]";} ?></span></h4>
+  </div>
+  <div style="clear:both"></div>
   <?php if(empty($shift_details)){ ?>
-  <div class="row">
+  <div class="row" style="clear:both">
       <div class="col-md-12">
         
         
@@ -95,12 +98,12 @@ table {
                   <div class="form-group">
                     <label>&nbsp;</label>
                     <div>
-                      <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>
-                      <a href="<?php echo admin_url('hrd/attendance'); ?>" class="btn btn-default"><i class="fa-solid fa-xmark"></i> Reset</a>
-                      <button type="button" class="btn btn-success" onclick="printDiv('calendar-section')"><i class="fa-solid fa-print"></i> Print</button>
+                      <button type="submit" class="btn btn-primary  btn-sm"><i class="fa fa-search" title="Search"></i><span class="m-hide"> Search</span></button>
+                      <a href="<?php echo admin_url('hrd/attendance'); ?>" class="btn btn-default  btn-sm"><i class="fa-solid fa-xmark" title="Reset"></i><span class="m-hide"> Reset</span></a>
+                      <button type="button" class="btn btn-success btn-sm" onclick="printDiv('calendar-section')"><i class="fa-solid fa-print" title="Print"></i><span class="m-hide"> Print</span></button>
                       <?php $pdf_my = isset($filters['month_year']) ? $filters['month_year'] : ''; ?>
-                      <a href="<?php echo admin_url('hrd/attendance?month_year=' . urlencode($pdf_my) . '&download=pdf'); ?>" class="btn btn-danger">
-                        <i class="fa-regular fa-file-pdf"></i> Download PDF
+                      <a href="<?php echo admin_url('hrd/attendance?month_year=' . urlencode($pdf_my) . '&download=pdf'); ?>" class="btn btn-danger  btn-sm">
+                        <i class="fa-regular fa-file-pdf" title="Download PDF"></i><span class="m-hide"> Download PDF</span>
                       </a>
                     </div>
                   </div>

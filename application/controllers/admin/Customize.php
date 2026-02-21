@@ -100,6 +100,22 @@ class Customize extends AdminController
                 }
             }
 
+            // Handle company logo dark upload
+            if (isset($_FILES['customize_company_logo_dark']) && $_FILES['customize_company_logo_dark']['error'] == 0) {
+                $config['upload_path']   = $upload_path;
+                $config['allowed_types'] = 'gif|jpg|jpeg|png|pdf|svg';
+                $config['max_size']      = 2048; // 2MB
+                $config['file_name']     = 'company_logo_dark_' . time();
+
+                $this->load->library('upload', $config, 'upload_dark');
+                if ($this->upload_dark->do_upload('customize_company_logo_dark')) {
+                    $upload_data = $this->upload_dark->data();
+                    $data['company_logo_dark'] = $upload_data['file_name'];
+                } else {
+                    set_alert('danger', $this->upload_dark->display_errors());
+                }
+            }
+
             // Handle favicon upload
             if (isset($_FILES['customize_favicon']) && $_FILES['customize_favicon']['error'] == 0) {
                 $config['upload_path']   = $upload_path;

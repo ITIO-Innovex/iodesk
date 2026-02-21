@@ -24,6 +24,9 @@
   .second-col {
     left: 100px; /* Width of first column */
   }
+  .sticks{
+  position: sticky !important;
+  }
 .table-responsive{ min-height:500px; }
 
 /* Red border for project description validation error */
@@ -52,6 +55,14 @@
     border: 1px solid #007bff;
     outline: none;
 }
+/* responsive */
+    @media (max-width:420px){
+      .sticks{
+  position: unset !important;
+  }
+  .sticky-col {
+    position: unset !important;
+    }
 </style>
 
 
@@ -84,8 +95,8 @@ Active project group count: <?php echo $project_group_count; ?>
                 <thead>
                   <tr>
                     <?php /*?><th style="display:none" ><?php echo 'ID'; ?></th><?php */?>
-					<th  class="sticky-col first-col" style="position: sticky;"><?php echo 'ID'; ?></th>
-                    <th  class="sticky-col second-col" style="left: 100px;position: sticky;min-width: 200px;"><?php echo 'Project Name'; ?></th>
+					<th  class="sticky-col first-col sticks" style=""><?php echo 'ID'; ?></th>
+                    <th  class="sticky-col second-col sticks" style="left: 100px;min-width: 200px;"><?php echo 'Project Name'; ?></th>
                     <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
 					<th><?php echo '%'; ?></th>
                     <th ><?php echo 'Owner'; ?></th>

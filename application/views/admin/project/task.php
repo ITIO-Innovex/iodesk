@@ -24,6 +24,9 @@
   .second-col {
     left: 100px; /* Width of first column */
   }
+    .sticks{
+  position: sticky !important;
+  }
 .table-responsive{ min-height:500px; }
 
 /* Red border for task description validation error */
@@ -52,6 +55,14 @@
     border: 1px solid #007bff;
     outline: none;
 }
+/* responsive */
+    @media (max-width:420px){
+      .sticks{
+  position: unset !important;
+  }
+  .sticky-col {
+    position: unset !important;
+    }
 </style>
 
 
@@ -83,8 +94,8 @@
               <table class="table dt-table customizable-table" id="myTable" data-order-col="0" data-order-type="desc" style="overflow-x:auto; white-space:nowrap; max-width:100%;">
                 <thead>
                   <tr>
-					<th class="sticky-col first-col" style="position: sticky;"><?php echo 'ID'; ?></th>
-                    <th class="sticky-col second-col" style="left: 100px;position: sticky;min-width: 200px;"><?php echo 'Task Name'; ?></th>
+					<th class="sticky-col first-col sticks" ><?php echo 'ID'; ?></th>
+                    <th class="sticky-col second-col sticks" style="left: 100px;min-width: 200px;"><?php echo 'Task Name'; ?></th>
                      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
                     <th ><?php echo 'Assign To'; ?></th>
                     <th><?php echo 'Status'; ?></th>
