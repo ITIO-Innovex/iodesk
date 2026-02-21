@@ -19,6 +19,10 @@
 .top-left-btn.mg {
   left: 135px;
 }
+    /* responsive */
+    @media (max-width:420px){
+      .tw-w-96 { width:unset !important; }
+    }
 </style>
 <?php if ($this->session->flashdata('success')): ?>
   <div class="alert alert-success">

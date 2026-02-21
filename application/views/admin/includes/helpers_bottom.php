@@ -40,7 +40,11 @@
 <div id="lead_reminder_modal"></div>
 <style>
 #leads_filter{ display:none !important;}
-
+/* responsive */
+    @media (max-width:420px){
+      .m-hide { display:none !important; }
+	  .h4, h4 { font-size: 12px !important;} 
+    }
 </style>
 <a href="<?php echo admin_url('support/web/add'); ?>" class="support-icon" id="crm-support-manager" title="Support">
     <i class="fa-solid fa-headset"></i>

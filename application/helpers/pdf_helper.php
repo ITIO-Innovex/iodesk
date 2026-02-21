@@ -216,6 +216,21 @@ function kyc_form_pdf($record = [], $tag = '')
 {
     return app_pdf('kyc_form', LIBSPATH . 'pdf/Kyc_form_pdf', $record, $tag);
 }
+
+/**
+ * Prepare sales invoice PDF
+ * @param  array  $data Invoice data with items, payments, bank_details
+ * @param  string $tag  Optional tag for bulk exporter
+ * @return mixed object
+ */
+function sales_invoice_pdf($data = [], $tag = '')
+{
+    return app_pdf('invoice', LIBSPATH . 'pdf/Invoice_pdf', $data, $tag);
+}
+function sales_invoice_pdf_seperate($data = [], $tag = '')
+{
+    return app_pdf('invoice', LIBSPATH . 'pdf/Invoice_sales_pdf', $data, $tag);
+}
 /**
  * Prepare general credit note pdf
  * @param  object $credit_note Credit note as object with all necessary fields

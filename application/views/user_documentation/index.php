@@ -36,7 +36,7 @@
               <?php /*?>  <h1>User Documentation</h1>
                 <p class="lead">Get started quickly with step-by-step guidance and answers to common questions.</p><?php */?>
 				<div class="content-card">
-				<div class="section-title">CRM Modules – User Guide</div>
+				<div class="section-title text-dark">CRM Modules – User Guide</div>
 
 <div class="accordion" id="crmDocsAccordion">
 

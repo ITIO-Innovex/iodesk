@@ -26,6 +26,9 @@
                         <div class="tw-flex tw-justify-between tw-items-center tw-mb-4">
                             <h4 class="tw-my-0 tw-font-semibold"><?php echo $title; ?></h4>
                             <div>
+                                <a href="<?php echo admin_url('invoice_manager/invoices/pdf/' . $invoice['id']); ?>" class="btn btn-success">
+                                    <i class="fa fa-file-pdf-o"></i> Download PDF
+                                </a>
                                 <a href="<?php echo admin_url('invoice_manager/invoices/edit/' . $invoice['id']); ?>" class="btn btn-primary">
                                     <i class="fa fa-pencil"></i> Edit
                                 </a>

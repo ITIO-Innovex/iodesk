@@ -262,6 +262,11 @@ class Invoice_manager extends AdminController
             return;
         }
         
+        if ($action === 'pdf' && $id) {
+            $this->download_invoice_pdf($id);
+            return;
+        }
+        
         $companyId = get_staff_company_id();
         
         $this->db->select('*');
@@ -930,5 +935,78 @@ log_message('error', 'QUERY - '.$this->db->last_query() );
             'status' => $status,
             'updated_at' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    private function download_invoice_pdf($id)
+    {
+        $companyId = get_staff_company_id();
+        
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'sales_invoices');
+        $this->db->where('id', $id);
+        if ($companyId) {
+            $this->db->where('company_id', $companyId);
+        }
+        $invoice = $this->db->get()->row_array();
+        
+        if (!$invoice) {
+            set_alert('danger', 'Invoice not found');
+            redirect(admin_url('invoice_manager/invoices'));
+        }
+        
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'sales_invoice_items');
+        $this->db->where('invoice_id', $id);
+        $items = $this->db->get()->result_array();
+        
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'sales_invoice_payments');
+        $this->db->where('invoice_id', $id);
+        $this->db->order_by('payment_date', 'DESC');
+        $payments = $this->db->get()->result_array();
+        
+        $bank_details = null;
+        if ($invoice['payment_bank']) {
+            $this->db->select('*');
+            $this->db->from(db_prefix() . 'payment_modes');
+            $this->db->where('id', $invoice['payment_bank']);
+            $bank_details = $this->db->get()->row_array();
+        }
+
+        $this->load->helper('pdf');
+
+        try {
+            $pdfData = [
+                'invoice' => $invoice,
+                'items' => $items,
+                'payments' => $payments,
+                'bank_details' => $bank_details
+            ];
+            
+            $pdf = sales_invoice_pdf_seperate($pdfData);
+        } catch (Exception $e) {
+            $message = $e->getMessage();
+            echo $message;
+            if (strpos($message, 'Unable to get the size of the image') !== false) {
+                show_pdf_unable_to_get_image_size_error();
+            }
+            die;
+        }
+
+        $filename = 'invoice-' . slug_it($invoice['invoice_number']) . '-' . $id;
+
+        $type = 'D';
+        if ($this->input->get('output_type')) {
+            $type = $this->input->get('output_type');
+        }
+        if ($this->input->get('print')) {
+            $type = 'I';
+        }
+
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
+        $pdf->Output(mb_strtoupper($filename) . '.pdf', $type);
     }
 }
