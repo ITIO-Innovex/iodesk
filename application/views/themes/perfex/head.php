@@ -10,6 +10,6 @@
 	<script src="<?php echo base_url('assets/plugins/jquery/jquery.min.js'); ?>"></script>
 	<?php app_customers_head(); ?>
 </head>
-<body class="XXXX customers register_admin <?php echo strtolower($this->agent->browser()); ?><?php if(is_mobile()){echo ' mobile';}?><?php if(isset($bodyclass)){echo ' ' . $bodyclass; } ?>" <?php if($isRTL == 'true'){ echo 'dir="rtl"';} ?> "> 
+<body class="customers register_admin <?php echo strtolower($this->agent->browser()); ?><?php if(is_mobile()){echo ' mobile';}?><?php if(isset($bodyclass)){echo ' ' . $bodyclass; } ?>" <?php if($isRTL == 'true'){ echo 'dir="rtl"';} ?> "> 
 <?php /*?>style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1502.jpg');?>)  !important; <?php */?>
 	<?php hooks()->do_action('customers_after_body_start'); ?>

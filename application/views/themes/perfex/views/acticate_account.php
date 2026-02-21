@@ -13,7 +13,7 @@
 				<?php if(isset($title)&&$title<>404){ ?>
 				<p class="tw-text-white">Your account has been successfully activated!</p>
                 <p class="tw-text-white">You can now log in using your registered email and password. Sent with seperate email</p>
-                <p class="tw-text-white"><a href="<?php echo admin_url('authentication');?>" class="btn btn-primary">Click here to Login</a></p>              <?php }else{ ?>
+                <p class="tw-text-white"><a href="<?php echo admin_url('authentication');?>" class="btn btn-success">Click here to Login</a></p>              <?php }else{ ?>
 				<p class="tw-text-white">404 Page Not Found</p>
 				<?php } ?>
                 <div class="mtop20">

@@ -1,8 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php $this->load->view('authentication/includes/head.php'); ?>
 
-<body class="authentication forgot-password" style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1502.jpg');?>)  !important; " >
-
+<body class="authentication forgot-password register_admin"  ><?php /*?>style="background-image: url(<?php echo base_url('uploads/bg/iodesk-bg1502.jpg');?>)  !important; "
+<?php */?>
     <div class="tw-max-w-md tw-mx-auto tw-pt-24 authentication-form-wrappe tw-relative tw-z-20">
         <div class="company-logo text-center">
             <?php echo get_company_logo(get_admin_uri() . '/', 'v-logo')?>
@@ -20,7 +20,7 @@
 
             <?php echo render_input('email', 'admin_auth_forgot_password_email', set_value('email'), 'email'); ?>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">
+                <button type="submit" class="btn btn-success btn-block">
                     <?php echo _l('admin_auth_forgot_password_button'); ?>
                 </button>
             </div>
