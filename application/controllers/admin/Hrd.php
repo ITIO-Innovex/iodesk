@@ -5430,12 +5430,14 @@ $data['notifications'] = $this->db->get()->result_array();
             if (!in_array($status, [1, 2], true)) {
                 $status = 2;
             }
-
+            
             if (trim(strip_tags((string) $description)) === '') {
                 set_alert('warning', 'Description is required');
                 redirect(admin_url('hrd/dar'));
             }
 
+            $ccEmails = $this->input->post('cc_email') ?? '';
+			
             $data = [
                 'company_id' => $companyId,
                 'staffid' => $staffId,
@@ -5549,7 +5551,7 @@ $data['notifications'] = $this->db->get()->result_array();
                 // Get company email settings for DAR
                 $companySettings = $this->db->where('company_id', $companyId)->get('it_crm_company_master')->row_array();
                 $darEmail = !empty($companySettings['email_dar']) ? $companySettings['email_dar'] : '';
-                $ccEmails = !empty($companySettings['email_cc']) ? $companySettings['email_cc'] : '';
+                //$ccEmails = !empty($companySettings['email_cc']) ? $companySettings['email_cc'] : '';
                 
                 // Determine recipient - priority: email_dar > reporting_manager > staff email
                 $recipientEmail = '';
@@ -5579,7 +5581,7 @@ $data['notifications'] = $this->db->get()->result_array();
                 // Prepare email data
                 $msgdata = [
                     'recipientEmail' => $darEmail,
-                    //'recipientCC' => $ccEmails,
+                    'recipientCC' => $ccEmails,
                     'emailSubject' => 'DAR Submitted - ' . $staffName . ' - ' . date('d-m-Y'),
                     'emailBody' => '<h3>Daily Activity Report</h3>'
                         . '<p><strong>Staff:</strong> ' . htmlspecialchars($staffName) . '</p>'
@@ -5824,10 +5826,11 @@ $data['notifications'] = $this->db->get()->result_array();
 					}
 				}
 			}
-			
+			$ccEmails = $this->input->post('cc_email') ?? '';
 			// Prepare email data
 			$msgdata = [
 				'recipientEmail' => $darEmail,
+				 'recipientCC' => $ccEmails,
 				'emailSubject' => 'DAR Submitted - ' . $staffName . ' - ' . date('d-m-Y'),
 				'emailBody' => '<h3>Daily Activity Report</h3>'
 					. '<p><strong>Staff:</strong> ' . htmlspecialchars($staffName) . '</p>'
@@ -5901,6 +5904,50 @@ $data['notifications'] = $this->db->get()->result_array();
         ]);
 
         echo json_encode(['success' => true]);
+    }
+
+    public function search_staff_emails()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $term = trim($this->input->get('term', true));
+
+        if (empty($term) || strlen($term) < 2) {
+            echo json_encode([]);
+            return;
+        }
+
+        $companyId = get_staff_company_id();
+        
+        $this->db->select('staffid, firstname, lastname, email');
+        $this->db->from(db_prefix() . 'staff');
+        $this->db->where('company_id', $companyId);
+        $this->db->where('active', 1);
+        $this->db->group_start();
+        $this->db->like('firstname', $term);
+        $this->db->or_like('lastname', $term);
+        $this->db->or_like('email', $term);
+        $this->db->or_like("CONCAT(firstname, ' ', lastname)", $term);
+        $this->db->group_end();
+        $this->db->limit(20);
+
+        $results = $this->db->get()->result_array();
+
+        $staffList = [];
+        foreach ($results as $row) {
+            if (!empty($row['email']) && filter_var($row['email'], FILTER_VALIDATE_EMAIL)) {
+                $staffList[] = [
+                    'id' => $row['staffid'],
+                    'name' => trim($row['firstname'] . ' ' . $row['lastname']),
+                    'email' => $row['email'],
+                    'display' => trim($row['firstname'] . ' ' . $row['lastname']) . ' <' . $row['email'] . '>'
+                ];
+            }
+        }
+
+        echo json_encode($staffList);
     }
 
     public function awards_update($id)
