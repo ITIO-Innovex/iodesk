@@ -1,4 +1,10 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<?php
+$this->load->helper('cookie');
+$logged_email = get_cookie('logged_email') ?? '';
+$logged_password = get_cookie('logged_password') ?? '';
+$remember_pref = get_cookie('remember_pref') ?? '';
+?>
 <?php $this->load->view('authentication/includes/head.php'); ?>
 
 <body class="login_admin register_admin" >
@@ -20,7 +26,7 @@
                 <label for="email" class="tw-text-white">
                     <?php echo _l('admin_auth_login_email'); ?>
                 </label>
-                <input type="email" id="email" name="email" class="form-control" autofocus="1">
+                <input type="email" id="email" name="email" class="form-control" autofocus="1" value="<?php echo $logged_email;?>">
             </div>
 
             <div class="form-group">
@@ -28,7 +34,7 @@
                     <?php echo _l('admin_auth_login_password'); ?>
                 </label>
                 <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control">
+                    <input type="password" id="password" name="password" class="form-control" value="<?php echo $logged_password;?>">
                     <span class="input-group-addon" id="toggle-password" style="cursor:pointer;">
                         <i class="fa fa-eye" aria-hidden="true"></i>
                     </span>
@@ -41,7 +47,7 @@
 
             <div class="form-group">
                 <div class="checkbox checkbox-inline tw-text-white">
-                    <input type="checkbox" value="1" id="remember" name="remember"<?php echo !empty($remember_checked) ? ' checked' : ''; ?>>
+                    <input type="checkbox" value="1" id="remember" name="remember"<?php echo !empty($remember_pref) ? ' checked' : ''; ?>>
                     <label for="remember"> <?php echo _l('admin_auth_login_remember_me'); ?></label>
                 </div>
             </div>

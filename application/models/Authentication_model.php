@@ -264,25 +264,39 @@ class Authentication_model extends App_Model
      * Set or clear the "remember me" checkbox preference for the login form.
      * Call after successful login: set when remember=true, clear when remember=false.
      */
-    public function set_remember_me_pref($remember)
+    public function set_remember_me_pref($remember, $logged_email, $logged_password)
     {
         $this->load->helper('cookie');
-        $path   = $this->config->item('cookie_path') ?: '/';
-        $domain = $this->config->item('cookie_domain') ?: '';
-        $prefix = $this->config->item('cookie_prefix') ?: '';
+        
         if ($remember) {
-            set_cookie([
-                'name'     => 'remember_me_pref',
-                'value'    => '1',
-                'expire'   => 60 * 60 * 24 * 31 * 2, // 2 months
-                'path'     => $path,
-                'domain'   => $domain,
-                'secure'   => $this->config->item('cookie_secure'),
-                'httponly' => false,
-            ]);
+		
+             set_cookie([
+        'name'   => 'logged_email',
+        'value'  => trim($logged_email),
+        'expire' => 60 * 60 * 24 * 30, // 30 days
+        'path'   => '/',
+    ]);
+
+    set_cookie([
+        'name'   => 'logged_password',
+        'value'  => trim($logged_password),
+        'expire' => 60 * 60 * 24 * 30,
+        'path'   => '/',
+    ]);
+
+    set_cookie([
+        'name'   => 'remember_pref',
+        'value'  => 1,
+        'expire' => 60 * 60 * 24 * 30,
+        'path'   => '/',
+    ]);
+
         } else {
-            delete_cookie('remember_me_pref', $domain, $path, $prefix);
+            delete_cookie('logged_email');
+    		delete_cookie('logged_password');
+    		delete_cookie('remember_pref');
         }
+		
     }
 
     /**
