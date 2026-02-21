@@ -1,6 +1,36 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <style>
 #vsidebar { display:none !important;}
+.register_admin {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #064d2a 0%, #012313 50%, #000d06 100%);
+}
+
+/* SVG Pattern Overlay */
+.register_admin::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+
+    background-repeat: repeat;
+    background-size: 60px 60px;
+
+    opacity: 1.0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Ensure content stays above pattern */
+.register_admin > * {
+    position: relative;
+    z-index: 1;
+}
 </style>
 <div class="mtop40">
   <div class="company-logo text-center out-form"> <?php echo get_company_logo(get_admin_uri() . '/', 'navbar-brand logo v-logo')?> </div>
@@ -49,7 +79,7 @@
         </div>
         <?php } ?>
         <div class="form-group">
-         <button type="submit" class="btn btn-primary btn-block">Submit</button>
+         <button type="submit" class="btn btn-success btn-block">Submit</button>
         </div>
 		 
 		<div class="form-group text-white">
