@@ -102,6 +102,12 @@ $route['viewinvoice/(:num)/(:any)'] = 'invoice/index/$1/$2';
 $route['invoice/(:num)/(:any)'] = 'invoice/index/$1/$2';
 
 /**
+ * Sales Invoice Public View
+ */
+$route['invoice_view/(:num)/(:any)'] = 'invoice_view/index/$1/$2';
+$route['invoice_view/pdf/(:num)/(:any)'] = 'invoice_view/pdf/$1/$2';
+
+/**
  * @deprecated
  */
 $route['viewestimate/(:num)/(:any)'] = 'estimate/index/$1/$2';
