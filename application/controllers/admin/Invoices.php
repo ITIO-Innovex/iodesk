@@ -768,6 +768,10 @@ class Invoices extends AdminController
             $type = 'I';
         }
 
+        if (ob_get_length()) {
+            ob_end_clean();
+        }
+
         $pdf->Output(mb_strtoupper(slug_it($invoice_number)) . '.pdf', $type);
     }
 
