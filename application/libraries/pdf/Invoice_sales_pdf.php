@@ -14,6 +14,7 @@ class Invoice_sales_pdf extends App_pdf
     public function __construct($data = [])
     {
 	
+	
         $this->invoice = isset($data['invoice']) ? $data['invoice'] : [];
         $this->items = isset($data['items']) ? $data['items'] : [];
         $this->payments = isset($data['payments']) ? $data['payments'] : [];
