@@ -1034,10 +1034,10 @@ log_message('error', 'QUERY - '.$this->db->last_query() );
         $sendTo = $this->input->post('send_to');
         $ccEmails = $this->input->post('cc_email') ?? '';
         $subject = $this->input->post('email_subject');
-        $message = $this->input->post('email_message');
-		log_message('error', 'Display data -@@@ '.$message);
+        $message = $this->input->post('email_message', false);
 		
-		
+		log_message('error', 'message= '.$message );
+
 		
 
         if (empty($invoiceId) || empty($sendTo) || empty($subject)) {
@@ -1049,7 +1049,8 @@ log_message('error', 'QUERY - '.$this->db->last_query() );
                     'recipientEmail' => $sendTo,
                     'recipientCC' => $ccEmails,
                     'emailSubject' => $subject,
-                    'emailBody' => $message
+                    'emailBody' => $message,
+					'company_email' => 1
                     
                 ];
        

@@ -65,7 +65,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
             </div>
         </div>
 		<div class="row m-1">
-		<div class="quick-stats-leads col-xs-6 col-md-4 col-sm-4 col-lg-4 tw-mb-2 tw-mt-2 sm:tw-mb-0">
+		<div class="quick-stats-leads col-sm-4 tw-mb-2 tw-mt-2 sm:tw-mb-0">
 		<div class="row tw-pr-2 tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">
                 
@@ -89,34 +89,46 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
      
 
       // Callback that draws the pie chart for Sarah's pizza.
-      function drawLeadsChart() {
+      // Make sure google.charts.load is already called ONCE on page
+google.charts.setOnLoadCallback(drawLeadsChart);
 
-        // Create the data table for Sarah's pizza.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows([
-          ['Process', <?php echo $row->process_count;?>],
-          ['Completed', <?php echo $row->success_count;?>]
-          
-        ]);
+function drawLeadsChart() {
 
-        // Set options for Sarah's pie chart.
-        var options = {title:'Task by Status',
-		               width:300,
-					   height:300,
-					   legend:'bottom',
-					   colors: ['#FEBE10','#008000']
-					   };
-                       
-                       
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Status');
+    data.addColumn('number', 'Tasks');
 
-        // Instantiate and draw the chart for Sarah's pizza.
-        var chart = new google.visualization.PieChart(document.getElementById('Task_chart_div'));
+    data.addRows([
+        ['Process', <?php echo (int)$row->process_count;?>],
+        ['Completed', <?php echo (int)$row->success_count;?>]
+    ]);
+
+    var options = {
+        title: 'Task by Status',
+        legend: { position: 'bottom' },
+        chartArea: {
+            width: '90%',
+            height: '75%'
+        },
+        colors: ['#FEBE10', '#008000'],
+        tooltip: { text: 'percentage' },
+        pieHole: 0 // 0 = normal pie | 0.4 = donut
+    };
+
+    var chart = new google.visualization.PieChart(
+        document.getElementById('Task_chart_div')
+    );
+
+    chart.draw(data, options);
+
+    //  Responsive redraw
+    window.addEventListener('resize', function () {
         chart.draw(data, options);
-      }
+    });
+}
+
     </script> 
-	<div id="Task_chart_div" style="border: 1px solid #ccc"></div>
+	<div id="Task_chart_div" style="width:100%; height:450px;border: 1px solid #ccc"></div>
             </div>
 			</div>
         </div>
@@ -158,81 +170,93 @@ $months = [
 <script type="text/javascript">
 
  google.charts.load('current', {'packages':['bar']});
-      google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Month', 'Total', 'Process', 'Completed'],
+      // Make sure google.charts.load('current', {'packages':['bar']}) is already called ONCE
+google.charts.setOnLoadCallback(drawChart);
+
+function drawChart() {
+
+    var data = google.visualization.arrayToDataTable([
+        ['Month', 'Total', 'Process', 'Completed'],
 <?php foreach ($months as $num => $name) {
 
 $monthyear=$name." - ". $year;
 $monthyearnum=$year."-".$num; 
-$swhere="";
-                  
-	//Count Total Process Task
-	$_where = [
+
+// Process Task
+$_where = [
     'status'     => 2,
     'company_id' => get_staff_company_id(),
     'created_by' => get_staff_user_id(),
-   ];
-   $this->db->like('date_created', $monthyearnum);
-	$process_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
-	//echo $this->db->last_query();exit;
-		
-	//Count Total Completed Task
-	$_where = [
+];
+$this->db->like('date_created', $monthyearnum);
+$process_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
+
+// Completed Task
+$_where = [
     'status'     => 1,
     'company_id' => get_staff_company_id(),
     'created_by' => get_staff_user_id(),
-   ];
-   $this->db->like('date_created', $monthyearnum);
-	$completed_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
-	
-	
-	//Count Total Added Task
-	$_where = [
+];
+$this->db->like('date_created', $monthyearnum);
+$completed_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
+
+// Total Task
+$_where = [
     'company_id' => get_staff_company_id(),
     'created_by' => get_staff_user_id(),
-   ];
-   $this->db->like('date_created', $monthyearnum);
-	$total_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
-	//echo $this->db->last_query();exit;
-	
-	
-?>		  
- ['<?php echo $monthyear;?>', <?php echo $total_task;?>, <?php echo $completed_task;?>, <?php echo $process_task;?>],
- <?php } ?>         
-		  
-        ]);
+];
+$this->db->like('date_created', $monthyearnum);
+$total_task = total_rows(db_prefix() . 'user_utility_forms', $_where);
+?>
+        ['<?php echo $monthyear;?>',
+         <?php echo (int)$total_task;?>,
+         <?php echo (int)$process_task;?>,
+         <?php echo (int)$completed_task;?>],
+<?php } ?>
+    ]);
 
-        var options = {
-          chart: {
-            title: '',
+    var mobile = window.innerWidth < 768;
+
+    var options = {
+        chart: {
             subtitle: 'Tasks: <?php echo $year;?>',
-          },
-          bars: 'vertical',
-          vAxis: {format: 'decimal'},
-          height: 300,
-          colors: ['#00BFFF','#FFD700', '#008000']
-        };
+        },
+        bars: 'vertical',
+        vAxis: { format: 'decimal' },
+        height: mobile ? 300 : 450,
+        chartArea: {
+            width: '85%',
+            height: '70%'
+        },
+        colors: ['#00BFFF','#FFD700','#008000']
+    };
 
-        var chart = new google.charts.Bar(document.getElementById('chart_divXX'));
+    var chart = new google.charts.Bar(document.getElementById('chart_divXX'));
 
+    chart.draw(data, google.charts.Bar.convertOptions(options));
+
+    //  Responsive Redraw
+    window.addEventListener('resize', function () {
+        options.height = window.innerWidth < 768 ? 300 : 450;
         chart.draw(data, google.charts.Bar.convertOptions(options));
+    });
 
-        var btns = document.getElementById('btn-group');
-
+    // Format buttons
+    var btns = document.getElementById('btn-group');
+    if (btns) {
         btns.onclick = function (e) {
+            if (e.target.tagName === 'BUTTON') {
+                options.vAxis.format = e.target.id === 'none' ? '' : e.target.id;
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+        };
+    }
+}
 
-          if (e.target.tagName === 'BUTTON') {
-            options.vAxis.format = e.target.id === 'none' ? '' : e.target.id;
-            chart.draw(data, google.charts.Bar.convertOptions(options));
-          }
-        }
-      }
 
     </script>
-				    <div id="chart_divXX"></div>
+				    <div id="chart_divXX" style="width:100%; height:450px;"></div>
   
     
             </div>

@@ -875,6 +875,40 @@ $company_id=$_SESSION['staff_company_id'];
     return $company_id;
 }
 
+function get_staff_company_logo_dark($company_id = '')
+{  
+
+if(isset($_SESSION['staff_company_id'])&&$_SESSION['staff_company_id']<>1){
+$company_id=$_SESSION['staff_company_id'];
+}	
+
+        // check company id is found or not
+		if($company_id==""){
+				$tmpStaffUserId = get_staff_user_id();
+				if(isset($GLOBALS['current_user'])) {
+				$company_id=$GLOBALS['current_user']->company_id;
+				}
+		 }
+	
+        // Fetch company Name from company id
+		if(isset($company_id)&&$company_id){
+		$CI = & get_instance();
+		$CI->db->where('company_id', $company_id);
+		$com = $CI->db->select('company_logo, company_logo_dark')->from(db_prefix() . 'company_master')->get()->row();
+		//echo $this->db->last_query();exit;
+		if(isset($com)&&$com->company_logo_dark){
+		return $com->company_logo_dark;
+		}elseif(isset($com)&&$com->company_logo){
+		return $com->company_logo;
+		}else{
+		return "";
+		}
+		
+		}
+
+    return $company_id;
+}
+
 function get_staff_favicon($company_id = '')
 {   
 

@@ -16,13 +16,13 @@
                             <div class="col-md-12">
                                 <h4 class="no-margin">
                                     <?php echo $title; ?>
-                                    <a href="<?php echo admin_url('user_utility'); ?>" class="btn btn-default pull-right">
-                                        <i class="fa fa-arrow-left"></i> <?php echo _l('Back'); ?>
+                                    <a href="<?php echo admin_url('user_utility'); ?>" class="btn btn-default btn-sm pull-right" title="Back">
+                                        <i class="fa fa-arrow-left"></i><span class="m-hide"> <?php echo _l('Back'); ?></span>
                                     </a>
-                                    <a href="<?php echo admin_url('user_utility/edit/' . $form->id); ?>" class="btn btn-info pull-right" style="margin-right: 10px;">
-                                        <i class="fa fa-edit"></i> Edit Form
+                                    <a href="<?php echo admin_url('user_utility/edit/' . $form->id); ?>" class="btn btn-info pull-right btn-sm" style="margin-right: 10px;" title="Edot Form">
+                                        <i class="fa fa-edit"></i><span class="m-hide"> Edit Form</span>
                                     </a>
-<select class="form-control pull-right document-status-select" data-doc-id="<?php echo $form->id;?>" name="doc_status" style="width:100px;margin-right: 10px;color:#FFFFFF; <?php if($form->status == 2){ ?> background:#FF0000;  <?php  }else{?> background:#00CC33; <?php } ?>"  title="Document Status">
+<select class="form-control pull-right document-status-select m-hide" data-doc-id="<?php echo $form->id;?>" name="doc_status" style="width:100px;margin-right: 10px;color:#FFFFFF; <?php if($form->status == 2){ ?> background:#FF0000;  <?php  }else{?> background:#00CC33; <?php } ?>"  title="Document Status">
 <option value="2" <?php if($form->status == 2){ ?>  selected="selected" <?php  } ?>>Process</option>
 <option value="1" <?php if($form->status == 1){ ?>  selected="selected" <?php  } ?>>Completed</option>
 </select>
