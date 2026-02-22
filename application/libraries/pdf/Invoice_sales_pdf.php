@@ -10,15 +10,19 @@ class Invoice_sales_pdf extends App_pdf
     protected $items = [];
     protected $payments = [];
     protected $bank_details = [];
+	protected $company_name = "";
 
     public function __construct($data = [])
     {
 	
-	
+	//print_r($data['invoice']);
+	//echo $cmpid=$data['invoice']['company_id'];
+	//echo get_staff_company_id($cmpid)
         $this->invoice = isset($data['invoice']) ? $data['invoice'] : [];
         $this->items = isset($data['items']) ? $data['items'] : [];
         $this->payments = isset($data['payments']) ? $data['payments'] : [];
         $this->bank_details = isset($data['bank_details']) ? $data['bank_details'] : [];
+		$this->company_name = isset($data['company_name']) ? $data['company_name'] : [];
 
         parent::__construct();
 
@@ -109,7 +113,7 @@ class Invoice_sales_pdf extends App_pdf
         </style>';
 
         $html .= '<table class="header-table"><tr>';
-        $html .= '<td width="50%">' . $logoUrl . '</td>';
+        $html .= '<td width="50%">' . $logoUrl . '<br><strong>'.$this->company_name.'</strong></td>';
         $html .= '<td width="50%" style="text-align: right;">';
         $html .= '<span class="invoice-title">INVOICE</span><br>';
         $html .= '<span class="invoice-number">#' . $this->esc($inv['invoice_number'] ?? '') . '</span><br><br>';

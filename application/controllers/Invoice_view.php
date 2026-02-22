@@ -460,16 +460,18 @@ class Invoice_view extends App_Controller
         ];
 
         $this->load->helper('pdf');
-
+//print_r($company);
         try {
             $pdfData = [
                 'invoice' => $invoice,
                 'items' => $items,
                 'payments' => $payments,
                 'bank_details' => $bank_details,
-                'company' => $company
+                'company' => $company,
+				'company_name' => $company['companyname']
+				
             ];
-
+//print_r($pdfData);exit;
             $pdf = sales_invoice_pdf_seperate($pdfData);
         } catch (Exception $e) {
             echo $e->getMessage();

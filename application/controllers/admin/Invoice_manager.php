@@ -991,7 +991,8 @@ log_message('error', 'QUERY - '.$this->db->last_query() );
                 'invoice' => $invoice,
                 'items' => $items,
                 'payments' => $payments,
-                'bank_details' => $bank_details
+                'bank_details' => $bank_details,
+				'company_name' => get_staff_company_name($companyId)
             ];
             
             $pdf = sales_invoice_pdf_seperate($pdfData);
