@@ -39,47 +39,51 @@
 				
 				 <script type="text/javascript">
 
-      // Load Charts and the corechart package.
-      google.charts.load('current', {'packages':['corechart']});
+      // Load Google Charts
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawLeadsChart);
 
-      // Draw the pie chart for Sarah's pizza when Charts is loaded.
-      google.charts.setOnLoadCallback(drawLeadsChart);
+function drawLeadsChart() {
 
-     
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Status');
+    data.addColumn('number', 'Leads');
 
-      // Callback that draws the pie chart for Sarah's pizza.
-      function drawLeadsChart() {
+    data.addRows([
+        ['Hot', <?php echo (int)$row->hot_lead;?>],
+        ['Assign', <?php echo (int)$row->assign_lead;?>],
+        ['UnAssign', <?php echo (int)$row->unassign_lead;?>],
+        ['Junk', <?php echo (int)$row->junk_lead;?>]
+    ]);
 
-        // Create the data table for Sarah's pizza.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows([
-          ['Hot', <?php echo $row->hot_lead;?>],
-          ['Assign', <?php echo $row->assign_lead;?>],
-		  ['UnAssign', <?php echo $row->unassign_lead;?>],
-          ['Junk', <?php echo $row->junk_lead;?>]
-          
-        ]);
+    var options = {
+        title: 'Leads Stats by Status',
+        legend: { position: 'bottom' },
+        chartArea: {
+            width: '90%',
+            height: '75%'
+        },
+        colors: ['#008000', '#FEBE10', '#00BFFF', '#FF0000'],
+        pieHole: 0, // 0 = normal pie, 0.4 = donut
+        tooltip: { text: 'percentage' }
+    };
 
-        // Set options for Sarah's pie chart.
-        var options = {title:'Leads stats by Status',
-		               width:300,
-					   height:300,
-					   legend:'bottom',
-					   colors: ['#008000', '#FEBE10','#00BFFF','#FF0000']
-					   };
-                       
-                       
+    var chart = new google.visualization.PieChart(
+        document.getElementById('Leads_chart_div')
+    );
 
-        // Instantiate and draw the chart for Sarah's pizza.
-        var chart = new google.visualization.PieChart(document.getElementById('Leads_chart_div'));
+    chart.draw(data, options);
+
+    //  Responsive Redraw on Window Resize
+    window.addEventListener('resize', function() {
         chart.draw(data, options);
-      }
+    });
+}
+
 
 
     </script>
-                <div id="Leads_chart_div" style="border: 1px solid #ccc"></div>
+                <div id="Leads_chart_div" style="width:100%; height:300px;border: 1px solid #ccc"></div>
                 
             </div>
         </div>
@@ -170,43 +174,48 @@ foreach ($data as $item) {
 				
 				 <script type="text/javascript">
 
-      // Load Charts and the corechart package.
-      google.charts.load('current', {'packages':['corechart']});
+      // Load Google Charts only once in page
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(drawDealChart);
 
-      // Draw the pie chart for Sarah's pizza when Charts is loaded.
-      google.charts.setOnLoadCallback(drawDealChart);
+function drawDealChart() {
 
-     
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Status');
+    data.addColumn('number', 'Deals');
 
-      // Callback that draws the pie chart for Sarah's pizza.
-      function drawDealChart() {
+    data.addRows([
+        <?php echo $graphdata; ?>
+    ]);
 
-        // Create the data table for Sarah's pizza.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows([
-          <?php echo $graphdata;?>
-        ]);
+    var options = {
+        title: 'Deal Stats by Status',
+        legend: { position: 'bottom' },
+        chartArea: {
+            width: '90%',
+            height: '75%'
+        },
+        colors: ['#00BFFF', '#FFD700', '#FEBE10', '#008000'],
+        tooltip: { text: 'percentage' },
+        pieHole: 0 // 0 = pie | 0.4 = donut
+    };
 
-        // Set options for Sarah's pie chart.
-        var options = {title:'Deal stats by Status',
-		               width:300,
-					   height:300,
-					   legend:'bottom',
-					   colors: ['#00BFFF','#FFD700', '#FEBE10','#008000']
-					   };
-                       
-                       
+    var chart = new google.visualization.PieChart(
+        document.getElementById('Deal_chart_div')
+    );
 
-        // Instantiate and draw the chart for Sarah's pizza.
-        var chart = new google.visualization.PieChart(document.getElementById('Deal_chart_div'));
+    chart.draw(data, options);
+
+    //  Redraw on window resize (Responsive)
+    window.addEventListener('resize', function() {
         chart.draw(data, options);
-      }
+    });
+}
+
 
 
     </script>
-                <div id="Deal_chart_div" style="border: 1px solid #ccc"></div>
+                <div id="Deal_chart_div" style="width:100%; height:300px;border: 1px solid #ccc"></div>
                 
             </div>
         </div>
@@ -251,38 +260,47 @@ foreach ($data as $item) {
 				<script type="text/javascript">
 
 
-        // Draw the pie chart for the Anthony's pizza when Charts is loaded.
-      google.charts.setOnLoadCallback(drawInvoiceChart);
-      // Callback that draws the pie chart for Anthony's pizza.
-      function drawInvoiceChart() {
+ // Make sure google.charts.load is already called ONCE on page
+google.charts.setOnLoadCallback(drawInvoiceChart);
 
-        // Create the data table for Anthony's pizza.
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Topping');
-        data.addColumn('number', 'Slices');
-        data.addRows([
-          ['New', <?php echo $row->new_count;?>],
-          ['Process', <?php echo $row->process_count;?>],
-          ['Completed', <?php echo $row->success_count;?>]
-        ]);
+function drawInvoiceChart() {
 
-        // Set options for Anthony's pie chart.
-        var options = {
-		               title:'Invoice Stats By Status',
-					   legend:'bottom',
-					   width:300, 
-					   height:300,
-					   colors: ['#00BFFF','#FFD700', '#008000']
-					   };
-                       
-                      
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Status');
+    data.addColumn('number', 'Invoices');
 
-        // Instantiate and draw the chart for Invoice
-        var chart = new google.visualization.PieChart(document.getElementById('Invoice_chart_div'));
+    data.addRows([
+        ['New', <?php echo (int)$row->new_count;?>],
+        ['Process', <?php echo (int)$row->process_count;?>],
+        ['Completed', <?php echo (int)$row->success_count;?>]
+    ]);
+
+    var options = {
+        title: 'Invoice Stats By Status',
+        legend: { position: 'bottom' },
+        chartArea: {
+            width: '90%',
+            height: '75%'
+        },
+        colors: ['#00BFFF', '#FFD700', '#008000'],
+        tooltip: { text: 'percentage' },
+        pieHole: 0 // 0 = normal pie | 0.4 = donut style
+    };
+
+    var chart = new google.visualization.PieChart(
+        document.getElementById('Invoice_chart_div')
+    );
+
+    chart.draw(data, options);
+
+    //  Responsive redraw
+    window.addEventListener('resize', function () {
         chart.draw(data, options);
-      }
+    });
+}
+
     </script>
-				 <div id="Invoice_chart_div" style="border: 1px solid #ccc"></div>
+				 <div id="Invoice_chart_div" style="width:100%; height:300px;border: 1px solid #ccc"></div>
             </div>
         </div>
         <?php } ?>
@@ -327,80 +345,73 @@ $months = [
 <script type="text/javascript">
 
  google.charts.load('current', {'packages':['bar']});
-      google.charts.setOnLoadCallback(drawChart);
+google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['Month', 'Leads', 'Deals', 'Invoice'],
+function drawChart() {
+
+  var data = google.visualization.arrayToDataTable([
+    ['Month', 'Leads', 'Deals', 'Invoice'],
 <?php foreach ($months as $num => $name) {
 
 $monthyear=$name." - ". $year;
 $monthyearnum=$year."-".$num; 
 $swhere="";
 $iwhere="";
-                  if (is_super()) {
-				  if(isset($_SESSION['super_view_company_id'])&&$_SESSION['super_view_company_id']){
-				  $swhere= ' AND leads.company_id = '.$_SESSION['super_view_company_id'];
-				  }
-				  }elseif (is_admin()) {
-				  $swhere= ' AND leads.company_id = '.get_staff_company_id();
-				  $iwhere= ' AND company_id = '.get_staff_company_id();
-				  }else{
-				  $swhere= ' AND leads.company_id = '.get_staff_company_id().' AND assigned = '.get_staff_user_id();
-				  $iwhere= ' AND company_id = '.get_staff_company_id().' AND addedfrom = '.get_staff_user_id();
-				  }
-	
-	//Count Total Added Leads Except Junk
-	$_where=' `dateadded` LIKE "%' . $monthyearnum . '%" AND leads.status <> 4 AND `is_deal` = 0 '.$swhere; //exit;
-	$leads = total_rows(db_prefix() . 'leads', $_where);
-	
-		
-	//Count Total Added Deals Except Junk
-	$_where=' `dateadded` LIKE "%' . $monthyearnum . '%" AND `is_deal` = 1 '.$swhere;//exit;
-	$deals = total_rows(db_prefix() . 'leads', $_where);
-	
-	
-	//Count Total Added Invoice
-	$_where=' `datecreated` LIKE "%' . $monthyearnum . '%" '.$iwhere;
-	$invoice = total_rows(db_prefix() . 'invoices', $_where);
-	//echo $this->db->last_query();exit;
-	
-	
-?>		  
- ['<?php echo $monthyear;?>', <?php echo $leads;?>, <?php echo $deals;?>, <?php echo $invoice;?>],
- <?php } ?>         
-		  
-        ]);
 
-        var options = {
-          chart: {
-            title: '',
-            subtitle: 'Leads, Deals, and Invoice: <?php echo $year;?>',
-          },
-          bars: 'vertical',
-          vAxis: {format: 'decimal'},
-          height: 400,
-          colors: ['#00BFFF','#FFD700', '#008000']
-        };
+if (is_super()) {
+  if(isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']){
+    $swhere= ' AND leads.company_id = '.$_SESSION['super_view_company_id'];
+  }
+}elseif (is_admin()) {
+  $swhere= ' AND leads.company_id = '.get_staff_company_id();
+  $iwhere= ' AND company_id = '.get_staff_company_id();
+}else{
+  $swhere= ' AND leads.company_id = '.get_staff_company_id().' AND assigned = '.get_staff_user_id();
+  $iwhere= ' AND company_id = '.get_staff_company_id().' AND addedfrom = '.get_staff_user_id();
+}
 
-        var chart = new google.charts.Bar(document.getElementById('chart_div'));
+$_where=' `dateadded` LIKE "%' . $monthyearnum . '%" AND leads.status <> 4 AND `is_deal` = 0 '.$swhere;
+$leads = total_rows(db_prefix() . 'leads', $_where);
 
-        chart.draw(data, google.charts.Bar.convertOptions(options));
+$_where=' `dateadded` LIKE "%' . $monthyearnum . '%" AND `is_deal` = 1 '.$swhere;
+$deals = total_rows(db_prefix() . 'leads', $_where);
 
-        var btns = document.getElementById('btn-group');
+$_where=' `datecreated` LIKE "%' . $monthyearnum . '%" '.$iwhere;
+$invoice = total_rows(db_prefix() . 'invoices', $_where);
+?>
+    ['<?php echo $monthyear;?>', <?php echo $leads;?>, <?php echo $deals;?>, <?php echo $invoice;?>],
+<?php } ?>
+  ]);
 
-        btns.onclick = function (e) {
+  var options = {
+    chart: {
+      subtitle: 'Leads, Deals, and Invoice: <?php echo $year;?>',
+    },
+    bars: 'vertical',
+    vAxis: {format: 'decimal'},
+    height: 450,
+    chartArea: {
+      width: '80%',
+      height: '70%'
+    },
+    colors: ['#00BFFF','#FFD700', '#008000']
+  };
 
-          if (e.target.tagName === 'BUTTON') {
-            options.vAxis.format = e.target.id === 'none' ? '' : e.target.id;
-            chart.draw(data, google.charts.Bar.convertOptions(options));
-          }
-        }
-      }
+  var chart = new google.charts.Bar(document.getElementById('chart_div'));
+  chart.draw(data, google.charts.Bar.convertOptions(options));
+
+  //  Make Fully Responsive
+  window.addEventListener('resize', function () {
+      chart.draw(data, google.charts.Bar.convertOptions(options));
+  });
+}
+
 
     </script>
-				    <div id="chart_div"></div>
-  
+				    
+  <div style="width:100%; max-width:100%;">
+    <div id="chart_div" style="width:100%; height:450px;"></div>
+</div>
     
             </div>
         </div>

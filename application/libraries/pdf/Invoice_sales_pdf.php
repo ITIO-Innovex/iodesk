@@ -15,9 +15,7 @@ class Invoice_sales_pdf extends App_pdf
     public function __construct($data = [])
     {
 	
-	//print_r($data['invoice']);
-	//echo $cmpid=$data['invoice']['company_id'];
-	//echo get_staff_company_id($cmpid)
+
         $this->invoice = isset($data['invoice']) ? $data['invoice'] : [];
         $this->items = isset($data['items']) ? $data['items'] : [];
         $this->payments = isset($data['payments']) ? $data['payments'] : [];

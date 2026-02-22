@@ -1285,9 +1285,32 @@ $client->disconnect();
 		$subject=$emaildata['emailSubject'] ? $emaildata['emailSubject'] : " No Subject";
 		$body=$emaildata['emailBody'] ? $emaildata['emailBody'] : " Test Email";
 		
+		$company_email=isset($emaildata['company_email']) ? $emaildata['company_email'] : "";
 		
-		//exit;
+		
+		if($company_email==1){
+		$companyId = get_staff_company_id();
+		$company_smtp=get_company_fields($companyId,'settings');
+		$companysmtp = json_decode($company_smtp, true);
+		
 		// SMTP Details from session
+		if(isset($companysmtp['smtp_username'])&&$companysmtp['smtp_username']&&isset($companysmtp['smtp_password'])&&$companysmtp['smtp_password']){
+		$mailer_smtp_host=$companysmtp['smtp_host'];
+        $mailer_smtp_port=$companysmtp['smtp_port'];
+        $mailer_username=$companysmtp['smtp_username'];
+        $mailer_password=$companysmtp['smtp_password'];
+		$senderEmail=$companysmtp['smtp_email'];
+		$senderName=$companysmtp['smtp_email'];
+		$encryption=$companysmtp['smtp_encryption'];
+		log_message('error', 'smtp_host -'.$mailer_smtp_host );
+		log_message('error', 'mailer_smtp_port -'.$mailer_smtp_port );
+		log_message('error', 'mailer_username -'.$mailer_username );
+		log_message('error', 'mailer_password -'.$mailer_password );
+		log_message('error', 'senderEmail -'.$senderEmail );
+		log_message('error', 'senderName -'.$senderName );
+		log_message('error', 'encryption -'.$encryption );
+		
+		}else{
 		$mailer_smtp_host=$_SESSION['STAFFSMTP']['smtp_host'];
         $mailer_smtp_port=$_SESSION['STAFFSMTP']['smtp_port'];
         $mailer_username=$_SESSION['STAFFSMTP']['smtp_user'];
@@ -1295,6 +1318,19 @@ $client->disconnect();
 		$senderEmail=$_SESSION['STAFFSMTP']['smtp_user'];
 		$senderName=$_SESSION['STAFFSMTP']['smtp_user'];
 		$encryption=$_SESSION['STAFFSMTP']['smtp_crypto'];
+		}
+		}else{
+		
+		$mailer_smtp_host=$_SESSION['STAFFSMTP']['smtp_host'];
+        $mailer_smtp_port=$_SESSION['STAFFSMTP']['smtp_port'];
+        $mailer_username=$_SESSION['STAFFSMTP']['smtp_user'];
+        $mailer_password=base64_decode($_SESSION['STAFFSMTP']['smtp_pass']);
+		$senderEmail=$_SESSION['STAFFSMTP']['smtp_user'];
+		$senderName=$_SESSION['STAFFSMTP']['smtp_user'];
+		$encryption=$_SESSION['STAFFSMTP']['smtp_crypto'];
+		
+		}
+		
 		$mail = new PHPMailer(true);
 		
 		

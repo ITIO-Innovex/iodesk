@@ -40,6 +40,7 @@ $attendance_display_status=attendance_display_status();
 ?>
 
 <?php init_head(); ?>
+<style>#global {max-width:unset !important;}</style>
  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <div id="wrapper">
 <?php if (!empty($maintenance_notice)) : ?>
@@ -91,7 +92,7 @@ $attendance_display_status=attendance_display_status();
 	</div>
 	
 	</div>
-    <div class="screen-options-btn box-shadow-bg tw-mt-2">
+    <div class="screen-options-btn box-shadow-bg tw-mt-2 m-hide">
         <i class="fa-solid fa-user  menu-icon tw-mx-2 fa-2x" title="View Profile - <?=get_user_type();?>"></i>
     </div>
 	<div class="tw-mt-2" style="margin-left: 30px;">

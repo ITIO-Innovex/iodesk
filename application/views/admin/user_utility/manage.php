@@ -10,9 +10,9 @@
                             <div class="col-md-12">
                                 <h4 class="no-margin">
                                     <?php echo $title; ?>
-									<a href="javascript:void(0);" class="pull-right" id="crm_instruction" title="Manage Team Document Forms : User Guide"><i class="fa-solid fa-circle-info fa-2x text-warning tw-mx-2"></i></a>
-                                    <a href="<?php echo admin_url('user_utility/create'); ?>" class="btn btn-info pull-right">
-                                        <i class="fa fa-plus"></i> <?php echo _l('new'); ?>
+									<a href="javascript:void(0);" class="pull-right" id="crm_instruction" title="Manage Team Document Forms : User Guide"><i class="fa-solid fa-circle-info  text-warning tw-mx-2" style="font-size: 30px;"></i></a>
+                                    <a href="<?php echo admin_url('user_utility/create'); ?>" class="btn btn-info btn-sm pull-right">
+                                        <i class="fa fa-plus"></i><span class="m-hide"> <?php echo _l('new'); ?></span>
                                     </a>
                                 </h4>
                                 <hr class="hr-panel-heading" />

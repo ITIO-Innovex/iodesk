@@ -292,7 +292,7 @@ echo $mailbody='
 </table>
 
 <p>
-<a href="'.base_url('invoice_view/'.$invoice['id'].'/323038ed215ebc3190').'" class="my_button" target="_blank" style="">
+<a href="'.base_url('invoice_view/'.$invoice['id'].'/323038ed215ebc3190').'" class="my_button" target="_blank" style="font-size:20px;">
 Download Invoice PDF
 </a>
 </p>
