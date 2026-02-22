@@ -318,6 +318,17 @@ class Invoice_manager extends AdminController
             $data['bank_details'] = null;
         }
         
+        // Get company details for email
+        $invoiceCompanyId = $invoice['company_id'] ?? $companyId;
+        $this->db->select('companyname, email, phonenumber');
+        $this->db->from(db_prefix() . 'company_master');
+        $this->db->where('company_id', $invoiceCompanyId);
+        $data['company'] = $this->db->get()->row_array();
+        
+        if (!$data['company']) {
+            $data['company'] = ['companyname' => '', 'email' => '', 'phonenumber' => ''];
+        }
+        
         $data['invoice'] = $invoice;
         $data['title'] = 'Invoice ' . $invoice['invoice_number'];
         $this->load->view('admin/invoice_manager/invoices_view', $data);
@@ -1008,5 +1019,42 @@ log_message('error', 'QUERY - '.$this->db->last_query() );
         }
 
         $pdf->Output(mb_strtoupper($filename) . '.pdf', $type);
+    }
+
+    public function send_invoice()
+    {
+	
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request.']);
+            return;
+        }
+       
+        $invoiceId = $this->input->post('invoice_id');
+        $sendTo = $this->input->post('send_to');
+        $ccEmails = $this->input->post('cc_email') ?? '';
+        $subject = $this->input->post('email_subject');
+        $message = $this->input->post('email_message');
+		log_message('error', 'Display data -@@@ '.$message);
+		
+		
+		
+
+        if (empty($invoiceId) || empty($sendTo) || empty($subject)) {
+            echo json_encode(['success' => false, 'message' => 'Required fields are missing.']);
+            return;
+        }
+                // Prepare email data
+                $msgdata = [
+                    'recipientEmail' => $sendTo,
+                    'recipientCC' => $ccEmails,
+                    'emailSubject' => $subject,
+                    'emailBody' => $message
+                    
+                ];
+       
+        $this->load->model('webmail_model');
+        $this->webmail_model->compose_email_super($msgdata);
+        echo json_encode(['success' => true, 'message' => 'Invoice sent successfully.']);
+        
     }
 }

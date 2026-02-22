@@ -29,6 +29,9 @@
                                 <a href="<?php echo admin_url('invoice_manager/invoices/pdf/' . $invoice['id']); ?>" class="btn btn-success">
                                     <i class="fa fa-file-pdf-o"></i> Download PDF
                                 </a>
+                                <a href="#" class="btn btn-info" data-toggle="modal" data-target="#sendInvoiceModal">
+                                    <i class="fa fa-envelope"></i> Send Invoice
+                                </a>
                                 <a href="<?php echo admin_url('invoice_manager/invoices/edit/' . $invoice['id']); ?>" class="btn btn-primary">
                                     <i class="fa fa-pencil"></i> Edit
                                 </a>
@@ -229,6 +232,155 @@
     </div>
 </div>
 
+<!-- Send Invoice Modal -->
+<div class="modal fade" id="sendInvoiceModal" tabindex="-1" role="dialog" aria-labelledby="sendInvoiceModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="sendInvoiceModalLabel"><i class="fa fa-envelope"></i> Send Invoice</h4>
+            </div>
+            <form id="sendInvoiceForm" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>">
+                    <input type="hidden" name="invoice_id" value="<?php echo $invoice['id']; ?>">
+                    
+                    <div class="form-group">
+                        <label for="send_to">To <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="send_to" name="send_to" value="<?php echo htmlspecialchars($invoice['contact_email'] ?? ''); ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cc_email">CC</label>
+                        <input type="text" class="form-control" id="cc_email" name="cc_email" placeholder="Enter CC emails separated by comma">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email_subject">Subject <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="email_subject" name="email_subject" value="Invoice #<?php echo htmlspecialchars($invoice['invoice_number']); ?> from <?php echo htmlspecialchars($company['companyname'] ?? ''); ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email_message">Message</label>
+						
+<?php
+echo $mailbody='
+
+<p>Dear , '.htmlspecialchars($invoice['contact_person'] ?? 'Customer').'</p>
+
+<p>Greetings from <strong></strong>.</p>
+
+<p>Please find below the details of your invoice:</p>
+
+<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;">
+<tr>
+    <td><strong>Invoice Number</strong></td>
+    <td><strong>'.htmlspecialchars($invoice['invoice_number']).'</strong></td>
+</tr>
+<tr>
+    <td><strong>Invoice Date</strong></td>
+    <td><strong>'.date('d-m-Y', strtotime($invoice['invoice_date'])).'</strong></td>
+</tr>
+<tr>
+    <td><strong>Due Date</strong></td>
+    <td><strong>'.date('d-m-Y', strtotime($invoice['due_date'])).'</strong></td>
+</tr>
+<tr>
+    <td><strong>Total Amount</strong></td>
+    <td><strong>'.number_format((float)$invoice['total_amount'], 2).'</strong></td>
+</tr>
+</table>
+
+<p>
+<a href="'.base_url('invoice_view/'.$invoice['id'].'/323038ed215ebc3190').'" class="my_button" target="_blank" style="">
+Download Invoice PDF
+</a>
+</p>
+
+<p>Kindly process the payment on or before the due date.</p>
+
+<p>Thank you,<br>
+Accounts Team<br>'.htmlspecialchars($company['companyname']).'
+
+</p>
+
+
+';
+						?>
+                        <textarea  id="email_message" name="email_message" style="display:none;" ><?=$mailbody;?></textarea>
+                    </div>
+                    
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-info"><i class="fa fa-paper-plane"></i> Send Invoice</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <?php init_tail(); ?>
+<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>">
+<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+<style>
+    #sendInvoiceModal .jqte { margin: 0 !important; }
+    #sendInvoiceModal .jqte_editor { min-height: 180px !important; }
+</style>
+<script>
+$(function() {
+    var sendInvoiceJqteInitialized = false;
+
+    $('#sendInvoiceModal').on('shown.bs.modal', function() {
+        if (!sendInvoiceJqteInitialized && typeof $.fn.jqte === 'function') {
+            $('.send-invoice-jqte').jqte();
+            sendInvoiceJqteInitialized = true;
+        }
+    });
+
+    $(document).on('submit', '#sendInvoiceForm', function(e) {
+        e.preventDefault();
+
+        var form = $(this);
+        var submitBtn = form.find('button[type="submit"]');
+        var originalText = submitBtn.html();
+
+        var msgEl = form.find('#email_message');
+        <?php /*?>if (msgEl.length && typeof msgEl.jqteVal === 'function') {
+            try {
+                msgEl.val(msgEl.jqteVal() || '');
+            } catch (err) {}
+        }<?php */?>
+
+        submitBtn.html('<i class="fa fa-spinner fa-spin"></i> Sending...').prop('disabled', true);
+
+        $.ajax({
+            url: (typeof admin_url !== 'undefined' ? admin_url : '<?php echo admin_url(); ?>') + 'invoice_manager/send_invoice',
+            type: 'POST',
+            data: form.serialize(),
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            success: function(response) {
+                var r = (typeof response === 'string') ? (function() { try { return JSON.parse(response); } catch (e) { return {}; } })() : response;
+                if (r.success) {
+                    alert_float('success', r.message);
+                    $('#sendInvoiceModal').modal('hide');
+                } else {
+                    alert_float('danger', r.message || 'Failed to send invoice.');
+                }
+            },
+            error: function(xhr) {
+                alert_float('danger', xhr.status === 404 ? 'Request URL not found.' : 'An error occurred while sending the invoice.');
+            },
+            complete: function() {
+                submitBtn.html(originalText).prop('disabled', false);
+            }
+        });
+
+        return false;
+    });
+});
+</script>
 </body>
 </html>
