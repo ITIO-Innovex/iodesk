@@ -1300,15 +1300,9 @@ $client->disconnect();
         $mailer_username=$companysmtp['smtp_username'];
         $mailer_password=$companysmtp['smtp_password'];
 		$senderEmail=$companysmtp['smtp_email'];
-		$senderName=$companysmtp['smtp_email'];
+		$senderName=get_staff_company_name() ?? $companysmtp['smtp_email'];
 		$encryption=$companysmtp['smtp_encryption'];
-		log_message('error', 'smtp_host -'.$mailer_smtp_host );
-		log_message('error', 'mailer_smtp_port -'.$mailer_smtp_port );
-		log_message('error', 'mailer_username -'.$mailer_username );
-		log_message('error', 'mailer_password -'.$mailer_password );
-		log_message('error', 'senderEmail -'.$senderEmail );
-		log_message('error', 'senderName -'.$senderName );
-		log_message('error', 'encryption -'.$encryption );
+		
 		
 		}else{
 		$mailer_smtp_host=$_SESSION['STAFFSMTP']['smtp_host'];
