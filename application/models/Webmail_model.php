@@ -1375,7 +1375,7 @@ $client->disconnect();
 
     $mail->send();
     //echo "Email sent successfully!";
-	log_activity('Email Book an Appoinment With Subject Line -  [ Subject: ' . $subject . ']');
+	//log_activity('Email Book an Appoinment With Subject Line -  [ Subject: ' . $subject . ']');
     return true;
 	} catch (Exception $e) {
 		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
