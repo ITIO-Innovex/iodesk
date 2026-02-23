@@ -1,5 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head();  //print_r($bank_details);
+$currency_symbol=get_currency_symbol($invoice['currency']);
+
 ?>
 <style>
     .invoice-header { background: #f8f9fa; padding: 20px; border-radius: 4px; margin-bottom: 20px; }
@@ -13,7 +15,7 @@
     .totals-box .total-label { font-weight: 600; }
     .totals-box .grand-total { font-size: 20px; font-weight: bold; color: #333; }
     .status-badge { font-size: 14px; padding: 5px 15px; }
-    .bank-info { background: #e8f4f8; padding: 15px; border-radius: 4px; margin-top: 15px; }
+    .bank-info { background: #e8f4f8; padding: 15px; border-radius: 4px; }
     .payment-history { margin-top: 20px; }
     .notes-section { background: #fffde7; padding: 15px; border-radius: 4px; border-left: 4px solid #ffc107; }
 </style>
@@ -138,9 +140,9 @@
                                                     <td><?php echo htmlspecialchars($item['item_name']); ?></td>
                                                     <td><?php echo htmlspecialchars($item['description'] ?? ''); ?></td>
                                                     <td class="text-right"><?php echo number_format((float)$item['quantity'], 2); ?></td>
-                                                    <td class="text-right"><?php echo number_format((float)$item['unit_price'], 2); ?></td>
+                                                    <td class="text-right"><?php echo $currency_symbol; ?> <?php echo number_format((float)$item['unit_price'], 2); ?></td>
                                                     <td class="text-right"><?php echo number_format((float)$item['tax_percent'], 2); ?>%</td>
-                                                    <td class="text-right"><?php echo number_format((float)$item['total'], 2); ?></td>
+                                                    <td class="text-right"><?php echo $currency_symbol; ?> <?php echo number_format((float)$item['total'], 2); ?></td>
                                                 </tr>
                                             <?php } ?>
                                         <?php } ?>
@@ -162,7 +164,7 @@
                                 <div class="totals-box">
                                     <div class="row">
                                         <div class="col-xs-6 total-label">Subtotal:</div>
-                                        <div class="col-xs-6 text-right"><?php echo number_format((float)$invoice['subtotal'], 2); ?></div>
+                                        <div class="col-xs-6 text-right"><?php echo $currency_symbol; ?> <?php echo number_format((float)$invoice['subtotal'], 2); ?></div>
                                     </div>
                                     <?php if ((float)$invoice['discount'] > 0) { ?>
                                         <div class="row">
@@ -177,18 +179,18 @@
                                     <hr style="margin: 10px 0;">
                                     <div class="row">
                                         <div class="col-xs-6 grand-total">Total:</div>
-                                        <div class="col-xs-6 text-right grand-total"><?php echo number_format((float)$invoice['total_amount'], 2); ?></div>
+                                        <div class="col-xs-6 text-right grand-total"><?php echo $currency_symbol; ?> <?php echo number_format((float)$invoice['total_amount'], 2); ?></div>
                                     </div>
                                     <hr style="margin: 10px 0;">
                                     <div class="row">
                                         <div class="col-xs-6 total-label text-success">Paid:</div>
-                                        <div class="col-xs-6 text-right text-success"><?php echo number_format((float)$invoice['paid_amount'], 2); ?></div>
+                                        <div class="col-xs-6 text-right text-success"><?php echo $currency_symbol; ?> <?php echo number_format((float)$invoice['paid_amount'], 2); ?></div>
                                     </div>
                                     <?php $balance = (float)$invoice['total_amount'] - (float)$invoice['paid_amount']; ?>
                                     <?php if ($balance > 0) { ?>
                                         <div class="row">
                                             <div class="col-xs-6 total-label text-danger">Balance Due:</div>
-                                            <div class="col-xs-6 text-right text-danger"><?php echo number_format($balance, 2); ?></div>
+                                            <div class="col-xs-6 text-right text-danger"><?php echo $currency_symbol; ?> <?php echo number_format($balance, 2); ?></div>
                                         </div>
                                     <?php } ?>
                                 </div>
@@ -287,7 +289,7 @@ echo $mailbody='
 </tr>
 <tr>
     <td><strong>Total Amount</strong></td>
-    <td><strong>'.number_format((float)$invoice['total_amount'], 2).'</strong></td>
+    <td><strong>'.$currency_symbol.' '.number_format((float)$invoice['total_amount'], 2).'</strong></td>
 </tr>
 </table>
 

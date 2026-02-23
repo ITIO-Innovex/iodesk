@@ -360,6 +360,14 @@ function app_init_admin_sidebar_menu_items()
         ]);
 		
 		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'invoice_company',
+            'name'     => 'Manage Company',
+            'href'     => admin_url('invoice_manager/invoice_company'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
             'slug'     => 'invoice_notes',
             'name'     => 'Invoice Notes',
             'href'     => admin_url('invoice_manager/invoice_notes'),
@@ -721,7 +729,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 
-    if (is_admin()) {
+/*    if (is_admin()) {
     if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
         $CI->app_menu->add_sidebar_menu_item('reports', [
             'name'     => _l('als_reports'),
@@ -731,7 +739,7 @@ function app_init_admin_sidebar_menu_items()
             'badge'    => [],
         ]);
     }
-	}
+	}*/
 
    /* if (staff_can('view-timesheets', 'reports')) {
         $CI->app_menu->add_sidebar_children_item('reports', [

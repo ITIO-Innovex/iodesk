@@ -15,6 +15,7 @@ class Invoice_sales_pdf extends App_pdf
     public function __construct($data = [])
     {
 	
+	//print_r($data['invoice']);exit;
 
         $this->invoice = isset($data['invoice']) ? $data['invoice'] : [];
         $this->items = isset($data['items']) ? $data['items'] : [];
@@ -40,6 +41,8 @@ class Invoice_sales_pdf extends App_pdf
     {
         $inv = $this->invoice;
         $logoUrl = pdf_logo_url();
+		$currency_symbol=get_currency_symbol_pdf($this->invoice['currency']) ?? '';
+		$from_company=get_invoice_company_pdf($this->invoice['inv_company_name']) ?? '';
         $html = '<style>
             .header-table { width: 100%; margin-bottom: 20px; }
             .invoice-title { font-size: 28px; font-weight: bold; color: #333; }
@@ -111,7 +114,7 @@ class Invoice_sales_pdf extends App_pdf
         </style>';
 
         $html .= '<table class="header-table"><tr>';
-        $html .= '<td width="50%">' . $logoUrl . '<br><strong>'.$this->company_name.'</strong></td>';
+        $html .= '<td width="50%">' . $logoUrl . '<br><strong>'.$from_company.'</strong></td>';
         $html .= '<td width="50%" style="text-align: right;">';
         $html .= '<span class="invoice-title">INVOICE</span><br>';
         $html .= '<span class="invoice-number">#' . $this->esc($inv['invoice_number'] ?? '') . '</span><br><br>';
@@ -178,26 +181,26 @@ class Invoice_sales_pdf extends App_pdf
                 $html .= '<td>' . $this->esc($item['item_name'] ?? '') . '</td>';
                 $html .= '<td>' . $this->esc($item['description'] ?? '') . '</td>';
                 $html .= '<td class="text-right">' . number_format((float)($item['quantity'] ?? 0), 2) . '</td>';
-                $html .= '<td class="text-right">' . number_format((float)($item['unit_price'] ?? 0), 2) . '</td>';
+                $html .= '<td class="text-right">'.$currency_symbol.' ' . number_format((float)($item['unit_price'] ?? 0), 2) . '</td>';
                 $html .= '<td class="text-right">' . number_format((float)($item['tax_percent'] ?? 0), 2) . '%</td>';
-                $html .= '<td class="text-right">' . number_format((float)($item['total'] ?? 0), 2) . '</td>';
+                $html .= '<td class="text-right">'.$currency_symbol.' ' . number_format((float)($item['total'] ?? 0), 2) . '</td>';
                 $html .= '</tr>';
             }
         }
         $html .= '</table>';
 
         $html .= '<table class="totals-table">';
-        $html .= '<tr><td class="label">Subtotal:</td><td class="value">' . number_format((float)($inv['subtotal'] ?? 0), 2) . '</td></tr>';
+        $html .= '<tr><td class="label">Subtotal:</td><td class="value">'.$currency_symbol.' ' . number_format((float)($inv['subtotal'] ?? 0), 2) . '</td></tr>';
         if ((float)($inv['discount'] ?? 0) > 0) {
             $html .= '<tr><td class="label">Discount:</td><td class="value" style="color: #a94442;">-' . number_format((float)$inv['discount'], 2) . '</td></tr>';
         }
         $html .= '<tr><td class="label">Tax:</td><td class="value">' . number_format((float)($inv['tax_amount'] ?? 0), 2) . '</td></tr>';
-        $html .= '<tr class="grand-total"><td class="label">Total:</td><td class="value">' . number_format((float)($inv['total_amount'] ?? 0), 2) . '</td></tr>';
+        $html .= '<tr class="grand-total"><td class="label">Total:</td><td class="value">'.$currency_symbol.' ' . number_format((float)($inv['total_amount'] ?? 0), 2) . '</td></tr>';
         $html .= '<tr><td class="label" style="color: #3c763d;">Paid:</td><td class="value" style="color: #3c763d;">' . number_format((float)($inv['paid_amount'] ?? 0), 2) . '</td></tr>';
         
         $balance = (float)($inv['total_amount'] ?? 0) - (float)($inv['paid_amount'] ?? 0);
         if ($balance > 0) {
-            $html .= '<tr><td class="label" style="color: #a94442;">Balance Due:</td><td class="value" style="color: #a94442; font-weight: bold;">' . number_format($balance, 2) . '</td></tr>';
+            $html .= '<tr><td class="label" style="color: #a94442;">Balance Due:</td><td class="value" style="color: #a94442; font-weight: bold;">'.$currency_symbol.' ' . number_format($balance, 2) . '</td></tr>';
         }
         $html .= '</table>';
 

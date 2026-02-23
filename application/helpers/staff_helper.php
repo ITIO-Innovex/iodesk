@@ -627,6 +627,36 @@ function get_nda_url($company_id)
 		return 0;
 }
 
+function get_currency_symbol($cid)
+{   
+        
+		if(isset($cid)&&$cid){
+		$CI = & get_instance();
+		$CI->db->where('id', $cid);
+		$com = $CI->db->select('symbol')->from(db_prefix() . 'currencies')->get()->row();
+		if(isset($com)&&$com->symbol){
+		return $com->symbol;
+		}
+		}
+		
+		return '';
+}
+
+function get_invoice_company($cid)
+{   
+        
+		if(isset($cid)&&$cid){
+		$CI = & get_instance();
+		$CI->db->where('inv_company_id', $cid);
+		$com = $CI->db->select('inv_company_name')->from(db_prefix() . 'sales_invoices_companies')->get()->row();
+		if(isset($com)&&$com->inv_company_name){
+		return $com->inv_company_name;
+		}
+		}
+		
+		return '';
+}
+
 function get_nda_setting($company_id)
 {   
         

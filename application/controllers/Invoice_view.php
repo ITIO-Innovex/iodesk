@@ -15,6 +15,8 @@ class Invoice_view extends App_Controller
             show_404();
         }
 
+
+
         $this->db->select('*');
         $this->db->from(db_prefix() . 'sales_invoices');
         $this->db->where('id', $id);
@@ -44,7 +46,7 @@ class Invoice_view extends App_Controller
         }
 
         $companyId = isset($invoice['company_id']) ? $invoice['company_id'] : 0;
-        $this->db->select('companyname, company_logo, phonenumber');
+        $this->db->select('companyname, company_logo, company_logo_dark, phonenumber');
         $this->db->from(db_prefix() . 'company_master');
         $this->db->where('company_id', $companyId);
         $companyResult = $this->db->get()->row_array();
@@ -52,6 +54,7 @@ class Invoice_view extends App_Controller
         $company = $companyResult ? $companyResult : [
             'companyname' => '',
             'company_logo' => '',
+			'company_logo_dark' => '',
             'phonenumber' => ''
         ];
 
@@ -199,20 +202,26 @@ class Invoice_view extends App_Controller
     </style>
 </head>
 <body>
+<?php
+$this->load->helper('staff');
+$currency=get_currency_symbol($invoice['currency']) ?? '';
+$inv_company_name=get_invoice_company($invoice['inv_company_name']) ?? '';
+
+?>
     <div class="invoice-container">
         <div class="invoice-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <?php if (!empty($company['company_logo'])) { ?>
-                        <img src="<?php echo base_url('uploads/company/' . $company['company_logo']); ?>" alt="Logo" class="company-logo" style="background: #fff; padding: 5px; border-radius: 4px;">
+                    <?php if (!empty($company['company_logo_dark'])) { ?>
+                        <img src="<?php echo base_url('uploads/company/' . $company['company_logo_dark']); ?>" alt="Logo" class="company-logo" style="background: #fff; padding: 5px; border-radius: 4px;">
                         <br>
                     <?php } ?>
-                    <?php if (!empty($company['companyname'])) { ?>
-                        <strong style="font-size: 18px;"><?php echo htmlspecialchars($company['companyname']); ?></strong><br>
+                    <?php if (!empty($inv_company_name)) { ?>
+                        <strong style="font-size: 18px;"><?php echo htmlspecialchars($inv_company_name); ?></strong><br>
                     <?php } ?>
-                    <?php if (!empty($company['phonenumber'])) { ?>
+                    <?php /*?><?php if (!empty($company['phonenumber'])) { ?>
                         <small><i class="fa fa-phone"></i> <?php echo htmlspecialchars($company['phonenumber']); ?></small>
-                    <?php } ?>
+                    <?php } ?><?php */?>
                 </div>
                 <div class="col-sm-6 text-right">
                     <div class="invoice-title">INVOICE</div>
@@ -308,9 +317,9 @@ class Invoice_view extends App_Controller
                                         <td><strong><?php echo htmlspecialchars($item['item_name'] ?? ''); ?></strong></td>
                                         <td><?php echo htmlspecialchars($item['description'] ?? ''); ?></td>
                                         <td class="text-right"><?php echo number_format((float)($item['quantity'] ?? 0), 2); ?></td>
-                                        <td class="text-right"><?php echo number_format((float)($item['unit_price'] ?? 0), 2); ?></td>
+                                        <td class="text-right"><?php echo $currency;?> <?php echo number_format((float)($item['unit_price'] ?? 0), 2); ?></td>
                                         <td class="text-right"><?php echo number_format((float)($item['tax_percent'] ?? 0), 2); ?>%</td>
-                                        <td class="text-right"><strong><?php echo number_format((float)($item['total'] ?? 0), 2); ?></strong></td>
+                                        <td class="text-right"><strong><?php echo $currency;?> <?php echo number_format((float)($item['total'] ?? 0), 2); ?></strong></td>
                                     </tr>
                                 <?php } ?>
                             <?php } ?>
@@ -332,7 +341,7 @@ class Invoice_view extends App_Controller
                     <div class="totals-box">
                         <div class="total-row">
                             <span class="total-label">Subtotal:</span>
-                            <span><?php echo number_format((float)($invoice['subtotal'] ?? 0), 2); ?></span>
+                            <span><?php echo $currency;?> <?php echo number_format((float)($invoice['subtotal'] ?? 0), 2); ?></span>
                         </div>
                         <?php if ((float)($invoice['discount'] ?? 0) > 0) { ?>
                             <div class="total-row">
@@ -352,13 +361,13 @@ class Invoice_view extends App_Controller
                         <?php if ($balance > 0) { ?>
                             <div class="total-row">
                                 <span class="total-label text-danger">Balance Due:</span>
-                                <span class="text-danger"><strong><?php echo number_format($balance, 2); ?></strong></span>
+                                <span class="text-danger"><strong><?php echo $currency;?> <?php echo number_format($balance, 2); ?></strong></span>
                             </div>
                         <?php } ?>
                         <div class="grand-total">
                             <div class="total-row" style="border: none; padding: 0;">
                                 <span>Total:</span>
-                                <span><?php echo number_format((float)($invoice['total_amount'] ?? 0), 2); ?></span>
+                                <span><?php echo $currency;?> <?php echo number_format((float)($invoice['total_amount'] ?? 0), 2); ?></span>
                             </div>
                         </div>
                     </div>
@@ -366,7 +375,7 @@ class Invoice_view extends App_Controller
             </div>
             
             <?php if (!empty($payments)) { ?>
-                <div class="payment-history">
+                <?php /*?><div class="payment-history">
                     <h5><i class="fa fa-money"></i> Payment History</h5>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
@@ -392,14 +401,14 @@ class Invoice_view extends App_Controller
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div><?php */?>
             <?php } ?>
             
             <div class="text-center" style="margin-top: 30px;">
                 <a href="<?php echo site_url('invoice_view/pdf/' . $invoice['id'] . '/' . $hash); ?>" class="btn btn-download">
                     <i class="fa fa-file-pdf-o"></i> Download PDF
                 </a>
-                <button onClick="window.print();" class="btn btn-default btn-print" style="margin-left: 10px;">
+                <button onClick="window.print();" class="btn btn-download" style="margin-left: 10px;">
                     <i class="fa fa-print"></i> Print
                 </button>
             </div>
@@ -448,7 +457,7 @@ class Invoice_view extends App_Controller
         }
 
         $companyId = isset($invoice['company_id']) ? $invoice['company_id'] : 0;
-        $this->db->select('companyname, company_logo, phonenumber');
+        $this->db->select('companyname, company_logo, company_logo_dark, phonenumber');
         $this->db->from(db_prefix() . 'company_master');
         $this->db->where('company_id', $companyId);
         $companyResult = $this->db->get()->row_array();
@@ -456,6 +465,7 @@ class Invoice_view extends App_Controller
         $company = $companyResult ? $companyResult : [
             'companyname' => '',
             'company_logo' => '',
+			'company_logo_dark' => '',
             'phonenumber' => ''
         ];
 
