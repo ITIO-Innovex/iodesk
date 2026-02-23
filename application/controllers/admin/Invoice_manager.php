@@ -1162,6 +1162,8 @@ class Invoice_manager extends AdminController
         $invoiceId = $this->input->post('invoice_id');
         $sendTo = $this->input->post('send_to');
         $ccEmails = $this->input->post('cc_email') ?? '';
+		$bccEmails = $this->input->post('bcc_email') ?? '';
+		log_message('error', 'bccEmails= '.$bccEmails );
         $subject = $this->input->post('email_subject');
         $message = $this->input->post('email_message', false);
 		
@@ -1177,6 +1179,7 @@ class Invoice_manager extends AdminController
                 $msgdata = [
                     'recipientEmail' => $sendTo,
                     'recipientCC' => $ccEmails,
+					'recipientBCC' => $bccEmails,
                     'emailSubject' => $subject,
                     'emailBody' => $message,
 					'company_email' => 1

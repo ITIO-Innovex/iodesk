@@ -50,7 +50,7 @@
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>Due Date <span class="text-danger">*</span></label>
-                                                        <input type="date" class="form-control" name="due_date" id="due_date" required>
+                                                        <input type="date" class="form-control" name="due_date" id="due_date" value="<?php echo date('Y-m-d', strtotime('+7 days')); ?>" required>
                                                     </div>
                                                 </div>
                                             </div>

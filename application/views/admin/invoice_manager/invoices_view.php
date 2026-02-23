@@ -255,6 +255,10 @@ $currency_symbol=get_currency_symbol($invoice['currency']);
                     <div class="form-group">
                         <label for="cc_email">CC</label>
                         <input type="text" class="form-control" id="cc_email" name="cc_email" placeholder="Enter CC emails separated by comma">
+						</div>
+						<div class="form-group">
+                        <label for="bcc_email">BCC</label>
+                        <input type="text" class="form-control" id="bcc_email" name="bcc_email" placeholder="Enter BCC emails separated by comma">
                     </div>
                     
                     <div class="form-group">
@@ -294,7 +298,14 @@ echo $mailbody='
 </table>
 
 <p>
-<a href="'.base_url('invoice_view/'.$invoice['id'].'/323038ed215ebc3190').'" class="my_button" target="_blank" style="font-size:20px;">
+<a href="'.base_url('invoice_view/'.$invoice['id'].'/323038ed215ebc3190').'" class="my_button" target="_blank" style="display:inline-block;
+          background-color:#4f81bd;
+          color:#ffffff;
+          padding:10px 20px;
+          text-decoration:none;
+          font-size:14px;
+          font-weight:bold;
+          border-radius:4px;margin: 20px">
 Download Invoice PDF
 </a>
 </p>

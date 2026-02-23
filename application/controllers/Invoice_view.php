@@ -205,7 +205,12 @@ class Invoice_view extends App_Controller
 <?php
 $this->load->helper('staff');
 $currency=get_currency_symbol($invoice['currency']) ?? '';
-$inv_company_name=get_invoice_company($invoice['inv_company_name']) ?? '';
+//print_r($invoice);
+
+$inv_company_details=get_invoice_company($invoice['inv_company_name']);
+//print_r($inv_company_details);
+$inv_company_name=$inv_company_details->inv_company_name ?? '';
+$inv_company_address=$inv_company_details->inv_company_address ?? '';
 
 ?>
     <div class="invoice-container">
@@ -218,6 +223,7 @@ $inv_company_name=get_invoice_company($invoice['inv_company_name']) ?? '';
                     <?php } ?><?php */?>
                     <?php if (!empty($inv_company_name)) { ?>
                         <strong style="font-size: 18px;"><?php echo htmlspecialchars($inv_company_name); ?></strong><br>
+					<?php echo htmlspecialchars($inv_company_address); ?>
                     <?php } ?>
                     <?php /*?><?php if (!empty($company['phonenumber'])) { ?>
                         <small><i class="fa fa-phone"></i> <?php echo htmlspecialchars($company['phonenumber']); ?></small>

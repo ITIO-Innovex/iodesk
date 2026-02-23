@@ -35,6 +35,9 @@ if (count($custom_fields) > 4) {
 
 //$where = hooks()->apply_filters('staff_table_sql_where', []);
 $where = [];
+
+$user_role=get_staff_rolex();
+log_message('error', 'User Roles - '.$user_role );
 if(is_super()){
 if(isset($_GET['cid'])&&$_GET['cid']){	
 $where = ['AND (company_id = ' . $_GET['cid'] . ')'];
@@ -42,7 +45,7 @@ $where = ['AND (company_id = ' . $_GET['cid'] . ')'];
 $where = ['AND (company_id = ' . $_SESSION['super_view_company_id'] . ')'];
  }
  
-}elseif(is_department_admin()){
+}elseif(is_department_admin() && $user_role <> 7){ // 7 Role for HR Department
 $departmentid = (int) get_departments_id();
 $where = ['AND (company_id = ' . get_staff_company_id() . ') AND ( department_id='.$departmentid.' OR reporting_manager='. get_staff_user_id() . ')']; 
 }elseif(is_admin()){
