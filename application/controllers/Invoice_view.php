@@ -212,10 +212,10 @@ $inv_company_name=get_invoice_company($invoice['inv_company_name']) ?? '';
         <div class="invoice-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <?php if (!empty($company['company_logo_dark'])) { ?>
+                    <?php /*?><?php if (!empty($company['company_logo_dark'])) { ?>
                         <img src="<?php echo base_url('uploads/company/' . $company['company_logo_dark']); ?>" alt="Logo" class="company-logo" style="background: #fff; padding: 5px; border-radius: 4px;">
                         <br>
-                    <?php } ?>
+                    <?php } ?><?php */?>
                     <?php if (!empty($inv_company_name)) { ?>
                         <strong style="font-size: 18px;"><?php echo htmlspecialchars($inv_company_name); ?></strong><br>
                     <?php } ?>

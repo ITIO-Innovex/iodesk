@@ -112,9 +112,9 @@ class Invoice_sales_pdf extends App_pdf
             .bank-info { background: #e8f4f8; padding: 10px; border: 1px solid #cde; font-size: 12px; }
             .notes-section { background: #fffde7; padding: 10px; border-left: 3px solid #ffc107; font-size: 12px; margin-top: 15px; }
         </style>';
-
+  //' . $logoUrl . '<br>
         $html .= '<table class="header-table"><tr>';
-        $html .= '<td width="50%">' . $logoUrl . '<br><strong>'.$from_company.'</strong></td>';
+        $html .= '<td width="50%"><strong>'.$from_company.'</strong></td>';
         $html .= '<td width="50%" style="text-align: right;">';
         $html .= '<span class="invoice-title">INVOICE</span><br>';
         $html .= '<span class="invoice-number">#' . $this->esc($inv['invoice_number'] ?? '') . '</span><br><br>';
