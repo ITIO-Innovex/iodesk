@@ -93,7 +93,7 @@ class Invoice_sales_pdf extends App_pdf
                 font-size: 12px;
             }
             .items-table .text-right { text-align: right; }
-            .totals-table { width: 50%; margin-left: 50%; }
+            .totals-table { width: 50%; }
             .totals-table td { padding: 5px 8px; font-size: 12px; }
             .totals-table .label { text-align: right; font-weight: bold; }
             .totals-table .value { text-align: right; }
@@ -161,7 +161,7 @@ class Invoice_sales_pdf extends App_pdf
         }
         $html .= '</td>';
         $html .= '</tr></table>';
-
+$html .= '<br><br>';
         $html .= '<table class="items-table" border=2 style="margin-bottom: 20px;" >';
         $html .= '<tr>';
         $html .= '<th width="5%">#</th>';
@@ -189,18 +189,19 @@ class Invoice_sales_pdf extends App_pdf
         }
         $html .= '</table>';
 
-        $html .= '<table class="totals-table">';
-        $html .= '<tr><td class="label">Subtotal:</td><td class="value">'.$currency_symbol.' ' . number_format((float)($inv['subtotal'] ?? 0), 2) . '</td></tr>';
+        $html .= '<br><br>';
+$html .= '<table class="totals-table" width="100%" align="right">';
+        $html .= '<tr><td></td><td class="label">Subtotal:</td><td class="value">'.$currency_symbol.' ' . number_format((float)($inv['subtotal'] ?? 0), 2) . '</td></tr>';
         if ((float)($inv['discount'] ?? 0) > 0) {
-            $html .= '<tr><td class="label">Discount:</td><td class="value" style="color: #a94442;">-' . number_format((float)$inv['discount'], 2) . '</td></tr>';
+            $html .= '<tr><td></td><td class="label">Discount:</td><td class="value" style="color: #a94442;">-' . number_format((float)$inv['discount'], 2) . '</td></tr>';
         }
-        $html .= '<tr><td class="label">Tax:</td><td class="value">' . number_format((float)($inv['tax_amount'] ?? 0), 2) . '</td></tr>';
-        $html .= '<tr class="grand-total"><td class="label">Total:</td><td class="value">'.$currency_symbol.' ' . number_format((float)($inv['total_amount'] ?? 0), 2) . '</td></tr>';
-        $html .= '<tr><td class="label" style="color: #3c763d;">Paid:</td><td class="value" style="color: #3c763d;">' . number_format((float)($inv['paid_amount'] ?? 0), 2) . '</td></tr>';
+        $html .= '<tr><td></td><td class="label">Tax:</td><td class="value">' . number_format((float)($inv['tax_amount'] ?? 0), 2) . '</td></tr>';
+        $html .= '<tr class="grand-total"><td></td><td class="label">Total:</td><td class="value">'.$currency_symbol.' ' . number_format((float)($inv['total_amount'] ?? 0), 2) . '</td></tr>';
+        $html .= '<tr><td></td><td class="label" style="color: #3c763d;">Paid:</td><td class="value" style="color: #3c763d;">' . number_format((float)($inv['paid_amount'] ?? 0), 2) . '</td></tr>';
         
         $balance = (float)($inv['total_amount'] ?? 0) - (float)($inv['paid_amount'] ?? 0);
         if ($balance > 0) {
-            $html .= '<tr><td class="label" style="color: #a94442;">Balance Due:</td><td class="value" style="color: #a94442; font-weight: bold;">'.$currency_symbol.' ' . number_format($balance, 2) . '</td></tr>';
+            $html .= '<tr><td></td><td class="label" style="color: #a94442;">Balance Due:</td><td class="value" style="color: #a94442; font-weight: bold;">'.$currency_symbol.' ' . number_format($balance, 2) . '</td></tr>';
         }
         $html .= '</table>';
 
