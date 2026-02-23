@@ -48,6 +48,8 @@ $where = ['AND (company_id = ' . $_SESSION['super_view_company_id'] . ')'];
 }elseif(is_department_admin() && $user_role <> 7){ // 7 Role for HR Department
 $departmentid = (int) get_departments_id();
 $where = ['AND (company_id = ' . get_staff_company_id() . ') AND ( department_id='.$departmentid.' OR reporting_manager='. get_staff_user_id() . ')']; 
+}elseif(is_department_admin() && $user_role == 7){ // 7 Role for HR Department
+$where = ['AND (company_id = ' . get_staff_company_id() . ')'];
 }elseif(is_admin()){
 $where = ['AND (company_id = ' . get_staff_company_id() . ')'];
 }else{
