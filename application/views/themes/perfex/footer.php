@@ -13,6 +13,7 @@
     background: unset !important;
     border-top: unset !important;
 }
+.copyright-footer { color:#FFFFFF !important;}
 </style>
 <footer class="bg footer">
     <div class="container">
