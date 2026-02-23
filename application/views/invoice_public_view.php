@@ -333,7 +333,7 @@
                 <a href="<?php echo site_url('invoice_view/pdf/' . $invoice['id'] . '/' . $hash); ?>" class="btn btn-download">
                     <i class="fa fa-file-pdf-o"></i> Download PDF
                 </a>
-                <button onclick="window.print();" class="btn btn-default" style="margin-left: 10px;">
+                <button onClick="window.print();" class="btn btn-default" style="margin-left: 10px;">
                     <i class="fa fa-print"></i> Print
                 </button>
             </div>

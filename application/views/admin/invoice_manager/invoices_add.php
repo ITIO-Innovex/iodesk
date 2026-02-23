@@ -49,8 +49,8 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <label>Due Date</label>
-                                                        <input type="date" class="form-control" name="due_date" id="due_date">
+                                                        <label>Due Date <span class="text-danger">*</span></label>
+                                                        <input type="date" class="form-control" name="due_date" id="due_date" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -60,6 +60,7 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label>Company Name</label>
+														
                                                         <input type="text" class="form-control" name="company_name" id="company_name">
                                                     </div>
                                                 </div>
@@ -135,9 +136,9 @@
                                                                 <input type="text" class="form-control mtop5" name="items[0][item_name]" placeholder="Item name" required>
                                                             </td>
                                                             <td><textarea class="form-control" name="items[0][description]" rows="2" placeholder="Description"></textarea></td>
-                                                            <td><input type="number" class="form-control item-qty" name="items[0][quantity]" value="1" min="0.01" step="0.01" onchange="calculateRow(0)"></td>
-                                                            <td><input type="number" class="form-control item-price" name="items[0][unit_price]" value="0" min="0" step="0.01" onchange="calculateRow(0)"></td>
-                                                            <td>
+<td style="min-width: 100px;"><input type="number" class="form-control item-qty" name="items[0][quantity]" value="1" min="1" step="1" onchange="calculateRow(0)"></td>
+<td style="min-width: 100px;"><input type="number" class="form-control item-price" name="items[0][unit_price]" value="0" min="0" step="0.01" onchange="calculateRow(0)"></td>
+<td style="min-width: 100px;">
                                                                 <select class="form-control item-tax" name="items[0][tax_percent]" onchange="calculateRow(0)">
                                                                     <option value="0">0%</option>
                                                                     <?php foreach ($tax_rates as $tax) { ?>
@@ -145,7 +146,7 @@
                                                                     <?php } ?>
                                                                 </select>
                                                             </td>
-                                                            <td><input type="text" class="form-control item-total" name="items[0][total]" value="0.00" readonly></td>
+<td style="min-width: 100px;"><input type="text" class="form-control item-total" name="items[0][total]" value="0.00" readonly></td>
                                                             <td class="text-center"><i class="fa fa-trash remove-item" onclick="removeRow(this)"></i></td>
                                                         </tr>
                                                     </tbody>
@@ -177,11 +178,38 @@
                                 </div>
                                 
                                 <div class="col-md-4">
+								
+								<div class="panel panel-default">
+                                        <div class="panel-heading">Company</div>
+                                        <div class="panel-body totals-section">
+                                            <div class="form-group">
+                                                <label>Company From</label>
+                                                <select class="form-control" name="inv_company_name" id="inv_company_name">
+                                                     <?php foreach ($inv_company as $cmp) { ?>
+                                                        <option value="<?php echo $cmp['inv_company_id']; ?>" >
+                                                            <?php echo htmlspecialchars($cmp['inv_company_name']); ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+											<div class="form-group">
+                                                <label>Currency</label>
+                                                <select class="form-control" name="currency" id="currency">
+                                                    <?php foreach ($inv_currency as $cr) { ?>
+<option value="<?php echo $cr['id']; ?>" data-value="<?php echo $cr['symbol']; ?>" <?php if($cr['isdefault']==1){ ?> selected="selected" <?php } ?>  ><?php echo htmlspecialchars($cr['symbol']); ?> - <?php echo htmlspecialchars($cr['name']); ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+									
+									
                                     <div class="panel panel-default">
                                         <div class="panel-heading">Summary</div>
                                         <div class="panel-body totals-section">
                                             <div class="row">
-                                                <div class="col-xs-6 total-label">Subtotal:</div>
+                                                <div class="col-xs-6 total-label">Subtotal: (<span class="curr_data"></span>)</div>
                                                 <div class="col-xs-6 text-right" id="displaySubtotal">0.00</div>
                                             </div>
                                             <div class="row">
@@ -196,7 +224,7 @@
                                             </div>
                                             <hr style="margin: 10px 0;">
                                             <div class="row">
-                                                <div class="col-xs-6 grand-total">Total:</div>
+                                                <div class="col-xs-6 grand-total">Total: (<span class="curr_data"></span>)</div>
                                                 <div class="col-xs-6 text-right grand-total" id="displayTotal">0.00</div>
                                             </div>
                                             <input type="hidden" name="subtotal" id="subtotal" value="0">
@@ -222,8 +250,8 @@
                                                 <input type="number" class="form-control" name="paid_amount" id="paid_amount" value="0" min="0" step="0.01">
                                             </div>
                                             <div class="form-group">
-                                                <label>Payment Bank / Mode</label>
-                                                <select class="form-control" name="payment_bank" id="payment_bank" onchange="showBankDetails()">
+                                                <label>Payment Bank / Mode <span class="text-danger">*</span></label>
+                                                <select class="form-control" name="payment_bank" id="payment_bank" onchange="showBankDetails()" required>
                                                     <option value="">-- Select --</option>
                                                     <?php foreach ($payment_modes as $pm) { ?>
                                                         <option value="<?php echo $pm['id']; ?>" 
@@ -344,8 +372,8 @@ function addItemRow() {
             '<input type="text" class="form-control mtop5" name="items[' + rowIndex + '][item_name]" placeholder="Item name" required>' +
         '</td>' +
         '<td><textarea class="form-control" name="items[' + rowIndex + '][description]" rows="2" placeholder="Description"></textarea></td>' +
-        '<td><input type="number" class="form-control item-qty" name="items[' + rowIndex + '][quantity]" value="1" min="0.01" step="0.01" onchange="calculateRow(' + rowIndex + ')"></td>' +
-        '<td><input type="number" class="form-control item-price" name="items[' + rowIndex + '][unit_price]" value="0" min="0" step="0.01" onchange="calculateRow(' + rowIndex + ')"></td>' +
+        '<td><input type="number" class="form-control item-qty" name="items[' + rowIndex + '][quantity]" value="1" min="1" step="1" onchange="calculateRow(' + rowIndex + ')"></td>' +
+        '<td><input type="number" class="form-control item-price" name="items[' + rowIndex + '][unit_price]" value="0" min="0" step="1" onchange="calculateRow(' + rowIndex + ')"></td>' +
         '<td><select class="form-control item-tax" name="items[' + rowIndex + '][tax_percent]" onchange="calculateRow(' + rowIndex + ')">' + taxOptions + '</select></td>' +
         '<td><input type="text" class="form-control item-total" name="items[' + rowIndex + '][total]" value="0.00" readonly></td>' +
         '<td class="text-center"><i class="fa fa-trash remove-item" onclick="removeRow(this)"></i></td>' +
@@ -424,6 +452,20 @@ $(function() {
     });
     
     calculateTotals();
+});
+
+$(document).ready(function() {
+
+    // On page load – set default selected value
+    var selectedValue = $('#currency option:selected').data('value');
+    $('.curr_data').text(selectedValue);
+
+    // On change – update span
+    $('#currency').on('change', function() {
+        var value = $(this).find(':selected').data('value');
+        $('.curr_data').text(value);
+    });
+
 });
 </script>
 </body>

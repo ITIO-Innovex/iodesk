@@ -118,6 +118,99 @@ class Invoice_manager extends AdminController
         }
     }
 
+    public function invoice_company()
+    {
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'sales_invoices_companies');
+        $this->db->order_by('inv_company_id', 'DESC');
+        $data['records'] = $this->db->get()->result_array();
+
+        $data['title'] = 'Invoice Companies';
+        $this->load->view('admin/invoice_manager/invoice_company', $data);
+    }
+
+    public function get_invoice_company($id)
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $this->db->select('*');
+        $this->db->from(db_prefix() . 'sales_invoices_companies');
+        $this->db->where('inv_company_id', $id);
+        $record = $this->db->get()->row_array();
+
+        if ($record) {
+            echo json_encode(['success' => true, 'data' => $record]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Record not found']);
+        }
+    }
+
+    public function save_invoice_company()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $id = $this->input->post('id');
+        $name = trim($this->input->post('inv_company_name'));
+        $address = trim($this->input->post('inv_company_address'));
+        $email = trim($this->input->post('inv_company_email'));
+        $contact = trim($this->input->post('inv_company_contact'));
+        $status = $this->input->post('inv_company_status') !== null ? (int)$this->input->post('inv_company_status') : 1;
+
+        if (empty($name)) {
+            echo json_encode(['success' => false, 'message' => 'Company name is required']);
+            return;
+        }
+        $companyId = get_staff_company_id();
+        $data = [
+            'inv_company_name' => $name,
+            'inv_company_address' => $address,
+            'inv_company_email' => $email,
+            'inv_company_contact' => $contact,
+            'inv_company_status' => $status,
+			'company_id' => $companyId
+        ];
+
+        if (!empty($id)) {
+            $this->db->where('inv_company_id', $id);
+            $exists = $this->db->get(db_prefix() . 'sales_invoices_companies')->row();
+            if (!$exists) {
+                echo json_encode(['success' => false, 'message' => 'Record not found']);
+                return;
+            }
+            $success = $this->db->where('inv_company_id', $id)->update(db_prefix() . 'sales_invoices_companies', $data);
+            $message = 'Invoice company updated successfully';
+        } else {
+            $success = $this->db->insert(db_prefix() . 'sales_invoices_companies', $data);
+            $message = 'Invoice company added successfully';
+        }
+
+        if ($success) {
+            echo json_encode(['success' => true, 'message' => $message]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to save record']);
+        }
+    }
+
+    public function delete_invoice_company($id)
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $this->db->where('inv_company_id', $id);
+        $success = $this->db->delete(db_prefix() . 'sales_invoices_companies');
+
+        if ($success && $this->db->affected_rows() > 0) {
+            echo json_encode(['success' => true, 'message' => 'Record deleted successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to delete record']);
+        }
+    }
+
     public function products()
     {
         $companyId = get_staff_company_id();
@@ -388,6 +481,19 @@ class Invoice_manager extends AdminController
         $data['invoice_notes'] = $this->db->get()->result_array();
         
         $data['invoice'] = $invoice;
+		
+		$this->db->select('inv_company_name, inv_company_id');
+        $this->db->from(db_prefix() . 'sales_invoices_companies');
+        if ($companyId) {
+            $this->db->where('company_id', $companyId);
+        }
+        $this->db->where('inv_company_status', 1);
+        $data['inv_company'] = $this->db->get()->result_array();
+		
+		$this->db->select('id, symbol, name, isdefault');
+        $this->db->from(db_prefix() . 'currencies');
+        $data['inv_currency'] = $this->db->get()->result_array();
+		
         $data['title'] = 'Edit Invoice ' . $invoice['invoice_number'];
         $this->load->view('admin/invoice_manager/invoices_edit', $data);
     }
@@ -426,6 +532,19 @@ class Invoice_manager extends AdminController
         }
         $this->db->where('status', 1);
         $data['invoice_notes'] = $this->db->get()->result_array();
+		
+		$this->db->select('inv_company_name, inv_company_id');
+        $this->db->from(db_prefix() . 'sales_invoices_companies');
+        if ($companyId) {
+            $this->db->where('company_id', $companyId);
+        }
+        $this->db->where('inv_company_status', 1);
+        $data['inv_company'] = $this->db->get()->result_array();
+		
+		$this->db->select('id, symbol, name, isdefault');
+        $this->db->from(db_prefix() . 'currencies');
+        $data['inv_currency'] = $this->db->get()->result_array();
+		
         
         $nextNumber = $this->get_next_invoice_number();
         $data['invoice_number'] = $nextNumber;
@@ -507,6 +626,9 @@ class Invoice_manager extends AdminController
         $paymentBank = $this->input->post('payment_bank') ?: null;
         $status = $this->input->post('status') ?: 'Draft';
         $notes = $this->input->post('notes', false);
+		$inv_company_name = (float)$this->input->post('inv_company_name');
+		$currency = (float)$this->input->post('currency');
+		$taxAmount = (float)$this->input->post('tax_amount');
         
         $items = $this->input->post('items');
 
@@ -545,6 +667,8 @@ class Invoice_manager extends AdminController
             'payment_bank' => $paymentBank,
             'status' => $status,
             'notes' => $notes,
+			'inv_company_name' => $inv_company_name,
+			'currency' => $currency,
             'company_id' => $companyId ?: 0,
             'created_at' => date('Y-m-d H:i:s')
         ];
@@ -677,8 +801,11 @@ class Invoice_manager extends AdminController
         $totalAmount = (float)$this->input->post('total_amount');
         $paidAmount = (float)$this->input->post('paid_amount');
         $paymentBank = $this->input->post('payment_bank') ?: null;
+		$inv_company_name = (float)$this->input->post('inv_company_name');
+		$currency = (float)$this->input->post('currency');
         $status = $this->input->post('status') ?: 'Draft';
         $notes = $this->input->post('notes', false);
+		
         
         $items = $this->input->post('items');
 
@@ -715,6 +842,8 @@ class Invoice_manager extends AdminController
             'total_amount' => number_format($totalAmount, 2, '.', ''),
             'paid_amount' => number_format($paidAmount, 2, '.', ''),
             'payment_bank' => $paymentBank,
+			'inv_company_name' => $inv_company_name,
+			'currency' => $currency,
             'status' => $status,
             'notes' => $notes,
             'updated_at' => date('Y-m-d H:i:s')

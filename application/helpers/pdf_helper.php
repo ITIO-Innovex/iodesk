@@ -34,6 +34,14 @@ function load_pdf_language($clientLanguage)
         hooks()->do_action('load_pdf_language', ['language' => $language]);
     }
 }
+function get_currency_symbol_pdf($cid){
+return get_currency_symbol($cid);
+
+}
+
+function get_invoice_company_pdf($cid){
+return get_invoice_company($cid);
+}
 
 /**
  * Fetches custom pdf logo url for pdf or use the default logo uploaded for the company

@@ -143,8 +143,8 @@
                                                                         <input type="text" class="form-control mtop5" name="items[<?php echo $rowIdx; ?>][item_name]" placeholder="Item name" value="<?php echo htmlspecialchars($item['item_name']); ?>" required>
                                                                     </td>
                                                                     <td><textarea class="form-control" name="items[<?php echo $rowIdx; ?>][description]" rows="2" placeholder="Description"><?php echo htmlspecialchars($item['description'] ?? ''); ?></textarea></td>
-                                                                    <td><input type="number" class="form-control item-qty" name="items[<?php echo $rowIdx; ?>][quantity]" value="<?php echo $item['quantity']; ?>" min="0.01" step="0.01" onchange="calculateRow(<?php echo $rowIdx; ?>)"></td>
-                                                                    <td><input type="number" class="form-control item-price" name="items[<?php echo $rowIdx; ?>][unit_price]" value="<?php echo $item['unit_price']; ?>" min="0" step="0.01" onchange="calculateRow(<?php echo $rowIdx; ?>)"></td>
+                                                                    <td><input type="number" class="form-control item-qty" name="items[<?php echo $rowIdx; ?>][quantity]" value="<?php echo $item['quantity']; ?>" min="1" step="1" onchange="calculateRow(<?php echo $rowIdx; ?>)"></td>
+                                                                    <td><input type="number" class="form-control item-price" name="items[<?php echo $rowIdx; ?>][unit_price]" value="<?php echo $item['unit_price']; ?>" min="0" step="1" onchange="calculateRow(<?php echo $rowIdx; ?>)"></td>
                                                                     <td>
                                                                         <select class="form-control item-tax" name="items[<?php echo $rowIdx; ?>][tax_percent]" onchange="calculateRow(<?php echo $rowIdx; ?>)">
                                                                             <option value="0" <?php echo $item['tax_percent'] == 0 ? 'selected' : ''; ?>>0%</option>
@@ -187,11 +187,39 @@
                                 </div>
                                 
                                 <div class="col-md-4">
+								
+								    <div class="panel panel-default">
+                                        <div class="panel-heading">Company</div>
+                                        <div class="panel-body totals-section">
+                                            <div class="form-group">
+                                                <label>Company From</label>
+                                                <select class="form-control" name="inv_company_name" id="inv_company_name">
+                                                     <?php foreach ($inv_company as $cmp) { ?>
+                                                        <option value="<?php echo $cmp['inv_company_id']; ?>"  <?php if($invoice['inv_company_name'] == $cmp['inv_company_id']){ ?> selected="selected" <?php } ?>>
+                                                            <?php echo htmlspecialchars($cmp['inv_company_name']); ?>
+                                                        </option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+											<div class="form-group">
+                                                <label>Currency</label>
+                                                <select class="form-control" name="currency" id="currency">
+                                                    <?php foreach ($inv_currency as $cr) { ?>
+<option value="<?php echo $cr['id']; ?>" data-value="<?php echo $cr['symbol']; ?>" 
+<?php if($invoice['currency'] == $cr['id']){ ?> selected="selected" <?php } ?> ><?php echo htmlspecialchars($cr['symbol']); ?> - <?php echo htmlspecialchars($cr['name']); ?>
+                                                        </option>
+                                                    <?php } ?> 
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+									
+									
                                     <div class="panel panel-default">
                                         <div class="panel-heading">Summary</div>
                                         <div class="panel-body totals-section">
                                             <div class="row">
-                                                <div class="col-xs-6 total-label">Subtotal:</div>
+                                                <div class="col-xs-6 total-label">Subtotal:(<span class="curr_data"></span>)</div>
                                                 <div class="col-xs-6 text-right" id="displaySubtotal"><?php echo number_format((float)$invoice['subtotal'], 2); ?></div>
                                             </div>
                                             <div class="row">
@@ -206,7 +234,7 @@
                                             </div>
                                             <hr style="margin: 10px 0;">
                                             <div class="row">
-                                                <div class="col-xs-6 grand-total">Total:</div>
+                                                <div class="col-xs-6 grand-total">Total: (<span class="curr_data"></span>)</div>
                                                 <div class="col-xs-6 text-right grand-total" id="displayTotal"><?php echo number_format((float)$invoice['total_amount'], 2); ?></div>
                                             </div>
                                             <input type="hidden" name="subtotal" id="subtotal" value="<?php echo $invoice['subtotal']; ?>">
@@ -355,8 +383,8 @@ function addItemRow() {
             '<input type="text" class="form-control mtop5" name="items[' + rowIndex + '][item_name]" placeholder="Item name" required>' +
         '</td>' +
         '<td><textarea class="form-control" name="items[' + rowIndex + '][description]" rows="2" placeholder="Description"></textarea></td>' +
-        '<td><input type="number" class="form-control item-qty" name="items[' + rowIndex + '][quantity]" value="1" min="0.01" step="0.01" onchange="calculateRow(' + rowIndex + ')"></td>' +
-        '<td><input type="number" class="form-control item-price" name="items[' + rowIndex + '][unit_price]" value="0" min="0" step="0.01" onchange="calculateRow(' + rowIndex + ')"></td>' +
+        '<td><input type="number" class="form-control item-qty" name="items[' + rowIndex + '][quantity]" value="1" min="1" step="1" onchange="calculateRow(' + rowIndex + ')"></td>' +
+        '<td><input type="number" class="form-control item-price" name="items[' + rowIndex + '][unit_price]" value="0" min="0" step="1" onchange="calculateRow(' + rowIndex + ')"></td>' +
         '<td><select class="form-control item-tax" name="items[' + rowIndex + '][tax_percent]" onchange="calculateRow(' + rowIndex + ')">' + taxOptions + '</select></td>' +
         '<td><input type="text" class="form-control item-total" name="items[' + rowIndex + '][total]" value="0.00" readonly></td>' +
         '<td class="text-center"><i class="fa fa-trash remove-item" onclick="removeRow(this)"></i></td>' +
@@ -436,6 +464,19 @@ $(function() {
     
     showBankDetails();
     calculateTotals();
+});
+$(document).ready(function() {
+
+    // On page load – set default selected value
+    var selectedValue = $('#currency option:selected').data('value');
+    $('.curr_data').text(selectedValue);
+
+    // On change – update span
+    $('#currency').on('change', function() {
+        var value = $(this).find(':selected').data('value');
+        $('.curr_data').text(value);
+    });
+
 });
 </script>
 </body>
