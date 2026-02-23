@@ -1,7 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <style>
 #vsidebar { display:none !important;}
-
 </style>
 <div class="mtop40">
   <div class="company-logo text-center out-form"> <?php echo get_company_logo(get_admin_uri() . '/', 'navbar-brand logo v-logo')?> </div>

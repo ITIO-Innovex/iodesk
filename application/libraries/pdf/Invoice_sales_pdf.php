@@ -42,7 +42,14 @@ class Invoice_sales_pdf extends App_pdf
         $inv = $this->invoice;
         $logoUrl = pdf_logo_url();
 		$currency_symbol=get_currency_symbol_pdf($this->invoice['currency']) ?? '';
-		$from_company=get_invoice_company_pdf($this->invoice['inv_company_name']) ?? '';
+		
+		
+		//$from_company=get_invoice_company_pdf($this->invoice['inv_company_name']) ?? '';
+		$inv_company_details=get_invoice_company_pdf($this->invoice['inv_company_name']);
+        //print_r($inv_company_details);exit;
+        $from_company=$inv_company_details->inv_company_name ?? '';
+        $from_company_address=$inv_company_details->inv_company_address ?? '';
+		
         $html = '<style>
             .header-table { width: 100%; margin-bottom: 20px; }
             .invoice-title { font-size: 28px; font-weight: bold; color: #333; }
@@ -114,7 +121,7 @@ class Invoice_sales_pdf extends App_pdf
         </style>';
   //' . $logoUrl . '<br>
         $html .= '<table class="header-table"><tr>';
-        $html .= '<td width="50%"><strong>'.$from_company.'</strong></td>';
+        $html .= '<td width="50%"><strong>'.$from_company.'</strong><br>'.$from_company_address.'</td>';
         $html .= '<td width="50%" style="text-align: right;">';
         $html .= '<span class="invoice-title">INVOICE</span><br>';
         $html .= '<span class="invoice-number">#' . $this->esc($inv['invoice_number'] ?? '') . '</span><br><br>';

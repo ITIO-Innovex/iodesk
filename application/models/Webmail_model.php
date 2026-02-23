@@ -1279,6 +1279,7 @@ $client->disconnect();
 		
 		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
 		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
+		$recipientBCC=isset($emaildata['recipientBCC']) ? $emaildata['recipientBCC'] : "";
 		
 		// Form Post Data
 		//echo $recipientEmail;
@@ -1377,6 +1378,20 @@ $client->disconnect();
             $ccEmail = trim($ccEmail);
             if (filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
                 $mail->addCC($ccEmail);
+            }
+        }
+		
+	}
+	
+	if (isset($recipientBCC) && $recipientBCC != "") {
+	
+	      // Add BCC addresses from comma-separated string
+		$recipientBCC = str_replace(';', ',', $recipientBCC);
+        $bccEmails = explode(',', trim($recipientBCC));
+        foreach ($bccEmails as $bccEmail) {
+            $bccEmail = trim($bccEmail);
+            if (filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addBCC($bccEmail);
             }
         }
 		

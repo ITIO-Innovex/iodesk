@@ -648,13 +648,14 @@ function get_invoice_company($cid)
 		if(isset($cid)&&$cid){
 		$CI = & get_instance();
 		$CI->db->where('inv_company_id', $cid);
-		$com = $CI->db->select('inv_company_name')->from(db_prefix() . 'sales_invoices_companies')->get()->row();
+		$com = $CI->db->select('*')->from(db_prefix() . 'sales_invoices_companies')->get()->row();
+		//print_r($com);exit;
 		if(isset($com)&&$com->inv_company_name){
-		return $com->inv_company_name;
+		return $com;
 		}
 		}
 		
-		return '';
+		return [];
 }
 
 function get_nda_setting($company_id)
