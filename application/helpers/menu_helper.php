@@ -360,6 +360,13 @@ function app_init_admin_sidebar_menu_items()
         ]);
 		
 		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
+            'slug'     => 'paymentmodes',
+            'name'     => 'Payment Modes',
+            'href'     => admin_url('paymentmodes'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
             'slug'     => 'invoice_company',
             'name'     => 'Manage Company',
             'href'     => admin_url('invoice_manager/invoice_company'),
