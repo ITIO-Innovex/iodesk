@@ -117,11 +117,11 @@
                   <tr>
 					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo $status['id']; ?></td>
                     <td  class="sticky-col second-col" style="width: 300px;
-    max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 50) . '...' : '-'; ?>
+    max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 30) . '...' : '-'; ?>
 	<?php //echo get_project_title($project_id);?>
 	<?php if(!isset($project_id)||empty($project_id) || isset($status['project_id'])){ ?><br />
 <span class="text-warning text-bold" title="Project Title">
-	<?php echo isset($status['project_id']) ? get_project_title($status['project_id'], 0, 50) . '' : '-'; ?>
+	<?php echo isset($status['project_id']) ? get_project_title($status['project_id'], 0, 30) . '' : '-'; ?>
 	</span>
 	<?php }else{?>
 	

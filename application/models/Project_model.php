@@ -422,9 +422,9 @@ return $result = $this->db->get()->result_array();
         $this->db->where('id', $id);
 		//$this->db->where('company_id', get_staff_company_id());
 		
-		if(!is_admin()){
+		//if(!is_admin()){
 		$this->db->where_in('task_owner', get_staff_user_id());
-		}
+		//}
 		
         $this->db->update(db_prefix() . 'project_task', ['task_is_deleted' => 1]);
 		
