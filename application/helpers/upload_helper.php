@@ -1378,9 +1378,15 @@ function _file_attachments_index_fix($index_name)
  */
 function _maybe_create_upload_path($path)
 {
+    $path = rtrim($path, '/') . '/';
     if (!file_exists($path)) {
-        mkdir($path, 0755);
-        fopen(rtrim($path, '/') . '/' . 'index.html', 'w');
+        if (!@mkdir($path, 0755, true)) {
+            return;
+        }
+    }
+    $indexFile = $path . 'index.html';
+    if (!file_exists($indexFile)) {
+        @fopen($indexFile, 'w');
     }
 }
 
