@@ -537,7 +537,12 @@ class Project extends AdminController
                     
                     // Handle file uploads using existing helper function
                     $uploaded_files = [];
-                    if (!empty($_FILES['task_attachments']['name'][0])) {
+                    $has_files = isset($_FILES['task_attachments']['name'])
+                        && (is_array($_FILES['task_attachments']['name'])
+                            ? count(array_filter($_FILES['task_attachments']['name'])) > 0
+                            : !empty($_FILES['task_attachments']['name']));
+                    if ($has_files) {
+                        $this->load->helper('upload');
                         $uploaded_files = handle_project_attachments_array($id, 'task_attachments');
                         
                         // Add attachments to database if files were uploaded

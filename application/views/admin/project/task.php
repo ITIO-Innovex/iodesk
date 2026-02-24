@@ -558,29 +558,27 @@ function manage_project_form(form) {
         return false;
     }
 
-    var formData = new FormData(form);
-	
-	//alert(formData);
+    var formEl = form && form.length !== undefined ? form[0] : form;
+    if (!formEl || formEl.tagName !== 'FORM') {
+        formEl = document.getElementById('add-task-form');
+    }
+    var formData = new FormData(formEl || form);
     
-	 //alert(JSON.stringify(formData));
-	 console.log(JSON.stringify(formData));
-   
-  
-    
-    var url = form.action;
+    var url = formEl ? formEl.action : (form && form.action) || form.action;
     //alert(url);
     // Show loading state
-    var submitBtn = $(form).find('button[type="submit"]');
+    var submitBtn = $(formEl || form).find('button[type="submit"]');
     var originalText = submitBtn.text();
     submitBtn.prop('disabled', true).text('Adding...');
     
-    // Use jQuery AJAX with proper error handling
+    // Use jQuery AJAX with proper error handling (cache: false helps with file uploads)
     $.ajax({
         url: url,
         type: 'POST',
         data: formData,
         processData: false,
         contentType: false,
+        cache: false,
         dataType: 'json',
         success: function(response) {
             console.log('Response:', response);
