@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); //print_r($project); ?>
 <style>
 .panel-body.panel-table-full.mail-bg {
   position: relative; /* ensures button is positioned within this div */
@@ -125,6 +125,8 @@
     <li><a data-toggle="tab" href="#info">Project Information</a></li>
     <li><a data-toggle="tab" href="#comments">Comments (<?php echo count($datacomments);?>)</a></li>
     <li><a data-toggle="tab" href="#activity">Activity Stream (<?php echo count($datalogs);?>)</a></li>
+	<li><a data-toggle="tab" href="#custom">Custom Fields</a></li>
+	<li><a data-toggle="tab" href="#Support">Support Files</a></li>
   </ul>
   
             <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
@@ -252,6 +254,49 @@ $date   = _dt($log['date']);
 <div class="alert alert-info">Activity stream not found.</div>					 
 <?php } ?>
 					 </div>
+    </div>
+	<div id="custom" class="tab-pane fade in">
+      <h4>Custom Fields</h4>
+      <div><?php //echo !empty($project['custom_field']) ? $project['custom_field'] : '<em>No custom fields.</em>'; 
+	  
+	  if(isset($project['custom_field'])&&$project['custom_field']){
+	  $fields = json_decode($project['custom_field'], true);
+	  
+	  if (!empty($fields)) :
+            foreach ($fields as $field) :
+			echo $field['name'].': '.$field['value'].'<br>';
+			
+		    endforeach;
+			endif;
+	  }
+	  
+	  ?></div>
+    </div>
+	<div id="Support" class="tab-pane fade in">
+      <h4>Support Files</h4>
+	  <?php //echo $path = get_upload_path_by_type('project') . $project['id'] . '/support_files/'; ?>
+      <div><?php //echo !empty($project['support_files']) ? $project['support_files'] : '<em>No support files.</em>'; ?>
+	  <?php //echo !empty($project['custom_field']) ? $project['custom_field'] : '<em>No custom fields.</em>'; 
+	  
+	  if(isset($project['support_files'])&&$project['support_files']){
+	  $fieldsf = json_decode($project['support_files'], true);
+	  
+	  if (!empty($fieldsf)) :
+            foreach ($fieldsf as $fieldsff) :
+			$files=base_url('uploads/projects').'/' . $project['id'].'/support_files/'.$fieldsff['file_name'].'<br>';
+			?>
+			<a href="<?php echo $files;?>" target="_blank"><?php echo $fieldsff['file_name'];?></a><br />
+
+			<?php
+			
+			
+		    endforeach;
+			endif;
+	  }
+	  
+	  ?>
+	  
+	  </div>
     </div>
   </div>
   

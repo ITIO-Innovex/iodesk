@@ -38,7 +38,9 @@
                             <div class="form-group">
                                 <label for="participants">Select Participants <span class="text-danger">*</span></label>
                                 <select class="form-control selectpicker" id="participants" name="participants[]" required multiple data-live-search="true" data-width="100%" data-none-selected-text="<?php echo _l('dropdown_non_selected_tex'); ?>" title="Participants">
-                  <?php if (isset($staff_members) && is_array($staff_members)) { ?>
+
+
+<?php /*?><?php if (isset($staff_members) && is_array($staff_members)) { ?>
 				  
                     <?php foreach ($staff_members as $staff) { ?>
                    
@@ -47,6 +49,9 @@
                       </option>
                     <?php } ?>
                   <?php } ?>
+<?php */?>
+				  
+				  
                 </select>
                                 <small class="text-muted">Select team members to include in this conversation</small>
                             </div>
@@ -71,14 +76,7 @@
 
 <script>
 $(document).ready(function() {
-    // Initialize Select2 for participants
-    $('#participants').select2({
-        placeholder: "Select participants...",
-        allowClear: true,
-        width: '100%'
-    });
-
-    // Initialize Bootstrap Select for projects
+    // Initialize Bootstrap Select for projects & participants
     $('.selectpicker').selectpicker();
 
     // Form validation
@@ -109,9 +107,11 @@ $(document).ready(function() {
     });
 
     // Auto-generate title based on project selection
-    $('#project_id').on('change', function() {
+    $('#project_id55').on('change', function() {
         var selectedText = $(this).find('option:selected').text();
         var currentTitle = $('#title').val();
+		/alert(selectedText);
+		//alert(currentTitle);
         
         if (!currentTitle && selectedText !== 'Choose a project...') {
             $('#title').val(selectedText + ' Discussion');
@@ -119,6 +119,65 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
+$(document).ready(function () {
+
+    $('#project_id').on('change', function () {
+
+        var project_id = $(this).val();
+        var $select = $('#participants');
+
+        if (!project_id) {
+            $select.html('').selectpicker('refresh');
+            return;
+        }
+
+        $.ajax({
+            url: "<?= admin_url('project_chat/group_staff'); ?>",
+            type: "POST",
+            dataType: "json",
+            data: { project_id: project_id },
+
+            success: function (response) {
+
+                console.log('group_staff response:', response);
+
+                if (response.status && response.staff_ids.length > 0) {
+
+                    // Clear old options
+                    $select.empty();
+
+                    // Append new options (ID + Name)
+                    $.each(response.staff_ids, function (index, staff) {
+
+                        $select.append(
+                            $('<option>', {
+                                value: staff.id,
+                                text: staff.name,
+                                selected: true
+                            })
+                        );
+
+                    });
+
+                    // Refresh bootstrap select
+                    $select.selectpicker('refresh');
+
+                } else {
+                    $select.empty().selectpicker('refresh');
+                }
+            },
+
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('Error loading participants.');
+            }
+        });
+    });
+
+});
+</script>
+
 
 <style>
 .form-group {

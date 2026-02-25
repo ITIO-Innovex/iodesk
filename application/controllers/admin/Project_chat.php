@@ -25,6 +25,8 @@ class Project_chat extends AdminController
     // Create new conversation
     public function new_conversation()
     {
+	
+	echo $this->input->post('project_id');
         if ($this->input->post()) {
             $this->form_validation->set_rules('project_id', 'Project', 'required');
             $this->form_validation->set_rules('title', 'Conversation Title', 'required');
@@ -59,6 +61,57 @@ class Project_chat extends AdminController
         $data['title'] = 'New Conversation';
         $data['projects'] = $this->project_chat_model->get_projects();
         //$data['staff'] = $this->project_chat_model->get_staff_members();
+		//print_r($data['staff']);exit;
+		
+		$project_id = 26;
+
+$sql = "
+SELECT 
+GROUP_CONCAT(DISTINCT val ORDER BY val) AS all_ids
+FROM (
+    
+    SELECT a.owner AS val
+    FROM it_crm_project_master a
+    WHERE a.id = ?
+    
+    UNION ALL
+    
+    SELECT a.addedby
+    FROM it_crm_project_master a
+    WHERE a.id = ?
+    
+    UNION ALL
+    
+    SELECT TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(b.task_owner, ',', numbers.n), ',', -1)) AS val
+    FROM it_crm_project_task b
+    JOIN (
+        SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
+    ) numbers
+    ON CHAR_LENGTH(b.task_owner) 
+       - CHAR_LENGTH(REPLACE(b.task_owner, ',', '')) >= numbers.n - 1
+    WHERE b.project_id = ?
+    
+    UNION ALL
+    
+    SELECT b.task_addedby
+    FROM it_crm_project_task b
+    WHERE b.project_id = ?
+
+) AS combined
+";
+
+$query = $this->db->query($sql, array(
+    $project_id,
+    $project_id,
+    $project_id,
+    $project_id
+));
+
+$result = $query->row();
+$all_ids = $result->all_ids;
+
+//echo $all_ids;//exit;
+
 		$data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
         $this->load->view('admin/project_chat/new_conversation', $data);
     }
@@ -159,6 +212,16 @@ class Project_chat extends AdminController
             redirect(admin_url('project_chat'));
         }
 
+		
+$leadOriginal= $this->db->select('project_id')->where('id', $conversation_id)->get(db_prefix() .'project_conversations')->row();
+$data['chat_project_id'] = $leadOriginal->project_id;
+
+///////////get staff list////////////
+
+
+////////////////////////////////////
+
+
         if ($this->input->post()) {
             $post_data = $this->input->post();
             
@@ -199,7 +262,55 @@ class Project_chat extends AdminController
 
         $data['projects'] = $this->project_chat_model->get_projects();
         //$data['staff_members'] = $this->project_chat_model->get_staff_members();
-		$data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
+		
+		///////////get staff list////////////
+		$project_id=$data['chat_project_id'];
+         if(empty($project_id)){
+            echo json_encode([
+                'status' => false,
+                'message' => 'Project ID is required'
+            ]);
+            return;
+        }
+
+        // Get project + task related staff
+        $this->db->select('a.owner, a.addedby, b.task_owner, b.task_addedby');
+        $this->db->from('it_crm_project_master a');
+        $this->db->join('it_crm_project_task b', 'a.id = b.project_id', 'left');
+        $this->db->where('a.id', $project_id);
+
+        $query = $this->db->get();
+        $result = $query->result();
+
+        $ids = [];
+
+        foreach ($result as $row) {
+
+            $ids[] = $row->owner;
+            $ids[] = $row->addedby;
+            $ids[] = $row->task_addedby;
+
+            if (!empty($row->task_owner)) {
+                $ids = array_merge($ids, explode(',', $row->task_owner));
+            }
+        }
+
+        $ids = array_filter($ids);
+        $ids = array_unique($ids);
+		$final_ids = implode(',', $ids);
+		log_message('error', 'Project ID: ' . print_r($final_ids , true));
+		//$final_ids = implode(',', $ids);
+
+$id_array = explode(',', $final_ids);
+$this->db->select('firstname, lastname, staffid');
+$this->db->where('active', 1);
+$this->db->where_in('staffid', $id_array);
+$data['staff_members'] = $this->db->get(db_prefix().'staff')->result_array();
+//print_r($data['staff_members']);
+        //$data['staff_members'] = $this->staff_model->get('', ['active' => 1]);
+        ////////////////////////////////////
+
+		
         $data['current_participants'] = $this->project_chat_model->get_conversation_participants($conversation_id);
         $data['title'] = 'Edit Conversation';
 
@@ -230,4 +341,64 @@ class Project_chat extends AdminController
         $staff = $this->project_chat_model->get_staff_members();
         echo json_encode($staff);
     }
+	
+	public function group_staff(){
+	
+	
+	 $project_id = $this->input->post('project_id');
+	 log_message('error', 'Project ID: ' . $project_id);
+
+        if(empty($project_id)){
+            echo json_encode([
+                'status' => false,
+                'message' => 'Project ID is required'
+            ]);
+            return;
+        }
+
+        // Get project + task related staff
+        $this->db->select('a.owner, a.addedby, b.task_owner, b.task_addedby');
+        $this->db->from('it_crm_project_master a');
+        $this->db->join('it_crm_project_task b', 'a.id = b.project_id', 'left');
+        $this->db->where('a.id', $project_id);
+
+        $query = $this->db->get();
+        $result = $query->result();
+
+        $ids = [];
+
+        foreach ($result as $row) {
+
+            $ids[] = $row->owner;
+            $ids[] = $row->addedby;
+            $ids[] = $row->task_addedby;
+
+            if (!empty($row->task_owner)) {
+                $ids = array_merge($ids, explode(',', $row->task_owner));
+            }
+        }
+
+        $ids = array_filter($ids);
+        $ids = array_unique($ids);
+
+        $final_ids = $ids;
+		log_message('error', 'Project ID: ' . print_r($final_ids , true));
+		//$final_ids = implode(',', $ids);
+		
+		foreach ($ids as $id) {
+
+        $staff_list[] = [
+            'id'   => $id,
+            'name' => get_staff_full_name($id)
+        ];
+        }
+	//log_message('error', 'Project ID: ' . print_r($staff_list , true));
+
+        echo json_encode([
+            'status' => true,
+            'staff_ids' => $staff_list
+        ]);
+    }
+	
+	
 }

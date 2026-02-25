@@ -284,6 +284,44 @@ Portal users can only view, follow, and comment whereas, project users will have
                             
                         </div>
 			  </div>
+			  <!-- File Attachments -->
+			  <div class="col-md-12">
+              <div class="form-group">
+                <label for="task_attachments" class="control-label"><?php echo _l('Attachments'); ?> - Supported Document <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Choose multiple files to upload together."></i></label>
+                <div class="input-group">
+                  <input type="file" class="form-control" id="support_files" name="support_files[]" multiple accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx,.zip,.rar">
+                
+                </div>
+                <div id="attachments_container" class="mt-2">
+                  <!-- Additional attachment fields will be added here -->
+                </div>
+                <small class="text-muted">Allowed file types: PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX, ZIP, RAR</small>
+              </div>
+			  </div>
+			  <div class="col-md-12">
+			<label for="tags" class="control-label">Custom Fields <i class="fa-solid fa-circle-info" data-toggle="tooltip" data-title="Custom Fields – Use this section to add project-specific information such as Website URL, Login Credentials, API URL, Git Repository URL, Support Contact Number, Support Email Address, and other relevant details."></i></label>
+            
+        
+<div id="custom-fields">
+</div>
+<div class="field-group form-group row">
+<div class="col-sm-3">
+<input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" value="" required>
+</div>
+<div class="col-sm-7">
+<input type="text" class="form-control" name="custom_field_value[]" placeholder="Field Value" value="" required>
+</div>
+<div class="col-sm-2">
+<a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove"><i class="fa fa fa-times"></i></a>
+</div>
+</div>
+<button type="button" id="add-field" class="btn btn-primary btn-sm" title="Add Field"> + </button>	             
+	
+    <br><br>
+			
+			
+			</div>
+			 
            </div> 
           </div>
         </div>
@@ -334,7 +372,7 @@ Portal users can only view, follow, and comment whereas, project users will have
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Edit Project</h4>
       </div>
-      <?php echo form_open(admin_url('project/updateproject'), ['id' => 'edit-project-form']); ?>
+      <?php echo form_open_multipart(admin_url('project/updateproject'), ['id' => 'edit-project-form']); ?>
       <div class="modal-body">
         <input type="hidden" name="project_id" id="edit_project_id">
         <div class="row">
@@ -388,7 +426,35 @@ Portal users can only view, follow, and comment whereas, project users will have
               <input type="text" class="form-control tagify-input" id="edit_tags" name="edit_tags" placeholder="Enter a tag name">
               
             </div>
-			
+            
+            <!-- Support Files (upload more) -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">
+                    Support Files
+                    <i class="fa-solid fa-circle-info" data-toggle="tooltip"
+                       data-title="Upload additional support files for this project. Existing files will be kept."></i>
+                  </label>
+                  <input type="file" class="form-control" id="edit_support_files" name="support_files[]" multiple
+                         accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.xls,.xlsx,.zip,.rar">
+                  <small class="text-muted">Allowed: PDF, DOC, DOCX, TXT, JPG, PNG, GIF, XLS, XLSX, ZIP, RAR</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom Fields (edit) -->
+            <div class="row">
+              <div class="col-md-12">
+                <label class="control-label">
+                  Custom Fields
+                  <i class="fa-solid fa-circle-info" data-toggle="tooltip"
+                     data-title="Edit or add project-specific fields like URLs, credentials, etc."></i>
+                </label>
+                <div id="edit-custom-fields"></div>
+                <button type="button" id="edit-add-field" class="btn btn-primary btn-sm" title="Add Field"> + </button>
+              </div>
+            </div>
 			
 			<div class="row">
               <div class="col-md-6">
@@ -790,6 +856,41 @@ $('#deadline').on('change', function() {
 // Initialize Tagify
 document.querySelectorAll('.tagify-input').forEach(function(input){
 new Tagify(input);
+});
+
+$('#add-field').click(function () {
+        $('#custom-fields').append(`
+          <div class="field-group form-group row">
+	  <div class="col-sm-3">
+        <input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" required>
+		</div><div class="col-sm-7">
+        <input type="text" class="form-control" name="custom_field_value[]" placeholder="Field Value" required>
+		</div><div class="col-sm-2">
+		<a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove"><i class="fa fa fa-times"></i></a>
+		</div>
+      </div>`);
+      });
+
+      $(document).on('click', '.remove', function () {
+        $(this).closest('.field-group').remove();
+      });
+
+// Edit modal: dynamic custom fields
+$('#edit-add-field').click(function () {
+  $('#edit-custom-fields').append(`
+    <div class="field-group form-group row">
+      <div class="col-sm-3">
+        <input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" required>
+      </div>
+      <div class="col-sm-7">
+        <input type="text" class="form-control" name="custom_field_value[]" placeholder="Field Value" required>
+      </div>
+      <div class="col-sm-2">
+        <a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove">
+          <i class="fa fa fa-times"></i>
+        </a>
+      </div>
+    </div>`);
 });
 </script>
 
