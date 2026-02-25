@@ -402,6 +402,29 @@ class Project extends AdminController
             $insert_data['make_this_a_strict_project'] = isset($data['make_this_a_strict_project']) ? 1 : 0;
             $insert_data['project_access'] = isset($data['project_access']) ? $data['project_access'] : 1;
 			
+            // Handle custom fields (name/value pairs) -> store as JSON in custom_field
+            $customFields = [];
+            if (!empty($data['custom_field_name']) && is_array($data['custom_field_name'])) {
+                $names  = $data['custom_field_name'];
+                $values = isset($data['custom_field_value']) && is_array($data['custom_field_value'])
+                    ? $data['custom_field_value']
+                    : [];
+
+                foreach ($names as $idx => $name) {
+                    $name = trim($name);
+                    if ($name === '') {
+                        continue;
+                    }
+                    $value = isset($values[$idx]) ? $values[$idx] : '';
+                    $customFields[] = [
+                        'name'  => $name,
+                        'value' => $value,
+                    ];
+                }
+            }
+            if (!empty($customFields)) {
+                $insert_data['custom_field'] = json_encode($customFields);
+            }
 			
             
             // Set default values
@@ -419,6 +442,64 @@ class Project extends AdminController
                 $id = $this->project_model->add($insert_data);
                 
                 if ($id) {
+                    // Handle support_files uploads (multiple) and store JSON metadata in project_master.support_files
+                    if (isset($_FILES['support_files']['name']) &&
+                        (
+                            $_FILES['support_files']['name'] != '' ||
+                            (is_array($_FILES['support_files']['name']) && count(array_filter($_FILES['support_files']['name'])) > 0)
+                        )
+                    ) {
+                        $this->load->helper('upload');
+
+                        $path = get_upload_path_by_type('project') . $id . '/support_files/';
+
+                        // Normalize single file to array
+                        if (!is_array($_FILES['support_files']['name'])) {
+                            $_FILES['support_files']['name']     = [$_FILES['support_files']['name']];
+                            $_FILES['support_files']['type']     = [$_FILES['support_files']['type']];
+                            $_FILES['support_files']['tmp_name'] = [$_FILES['support_files']['tmp_name']];
+                            $_FILES['support_files']['error']    = [$_FILES['support_files']['error']];
+                            $_FILES['support_files']['size']     = [$_FILES['support_files']['size']];
+                        }
+
+                        _file_attachments_index_fix('support_files');
+
+                        $uploadedSupportFiles = [];
+                        for ($i = 0; $i < count($_FILES['support_files']['name']); $i++) {
+                            $tmpFilePath = $_FILES['support_files']['tmp_name'][$i];
+                            if (empty($tmpFilePath)) {
+                                continue;
+                            }
+
+                            if (_perfex_upload_error($_FILES['support_files']['error'][$i])
+                                || !_upload_extension_allowed($_FILES['support_files']['name'][$i])) {
+                                continue;
+                            }
+
+                            _maybe_create_upload_path($path);
+                            $filename    = unique_filename($path, $_FILES['support_files']['name'][$i]);
+                            $newFilePath = $path . $filename;
+
+                            if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                                $uploadedSupportFiles[] = [
+                                    'file_name' => $filename,
+                                    'filetype'  => $_FILES['support_files']['type'][$i],
+                                ];
+
+                                if (is_image($newFilePath)) {
+                                    create_img_thumb($path, $filename);
+                                }
+                            }
+                        }
+
+                        if (!empty($uploadedSupportFiles)) {
+                            $this->db->where('id', $id);
+                            $this->db->update(db_prefix() . 'project_master', [
+                                'support_files' => json_encode($uploadedSupportFiles),
+                            ]);
+                        }
+                    }
+					
                     log_message('debug', 'Project added successfully with ID: ' . $id);
                     echo json_encode(['success' => true, 'id' => $id, 'message' => _l('added_successfully', _l('Project'))]);
                 } else {
@@ -621,7 +702,7 @@ class Project extends AdminController
         echo json_encode(['success' => $data ? true : false, 'data' => $data]);
     }
 	
-	public function updateproject() {
+    public function updateproject() {
         if (!$this->input->post('project_id')) {
             echo json_encode(['success' => false, 'message' => 'No project ID provided.']);
             return;
@@ -652,16 +733,109 @@ class Project extends AdminController
             'project_group' => $this->input->post('project_group'),
             'start_date' => $this->input->post('start_date'),
             'deadline' => $this->input->post('deadline'),
-            'project_description' => $this->input->post('project_description'),
+            // Use edit_project_description from edit modal
+            'project_description' => $this->input->post('edit_project_description'),
             'tags' => $tags,
             'make_this_a_strict_project' => $this->input->post('make_this_a_strict_project') ? 1 : 0,
             'project_access' => $this->input->post('project_access') ? $this->input->post('project_access') : 1,
         ];
+
+        // Handle custom fields in edit (same POST names as add)
+        $customFields = [];
+        $names  = $this->input->post('custom_field_name');
+        $values = $this->input->post('custom_field_value');
+        if (is_array($names) && !empty($names)) {
+            foreach ($names as $idx => $name) {
+                $name = trim($name);
+                if ($name === '') {
+                    continue;
+                }
+                $val = is_array($values) && isset($values[$idx]) ? $values[$idx] : '';
+                $customFields[] = [
+                    'name'  => $name,
+                    'value' => $val,
+                ];
+            }
+        }
+        if (!empty($customFields)) {
+            $data['custom_field'] = json_encode($customFields);
+        }
 		
 		//log_message('error', 'Update Project - Received tags: ' . print_r($data, true)); // Debug log
         $this->load->model('project_model');
         $success = $this->project_model->update($data, $project_id);
-		if($path==9){
+
+        // Handle additional support_files uploads for existing project
+        if (isset($_FILES['support_files']['name']) &&
+            (
+                $_FILES['support_files']['name'] != '' ||
+                (is_array($_FILES['support_files']['name']) && count(array_filter($_FILES['support_files']['name'])) > 0)
+            )
+        ) {
+            $this->load->helper('upload');
+
+            // Get existing support_files JSON
+            $row = $this->db->select('support_files')
+                            ->from(db_prefix() . 'project_master')
+                            ->where('id', $project_id)
+                            ->get()
+                            ->row();
+            $existing = [];
+            if ($row && !empty($row->support_files)) {
+                $decoded = json_decode($row->support_files, true);
+                if (is_array($decoded)) {
+                    $existing = $decoded;
+                }
+            }
+
+            $path = get_upload_path_by_type('project') . $project_id . '/support_files/';
+
+            if (!is_array($_FILES['support_files']['name'])) {
+                $_FILES['support_files']['name']     = [$_FILES['support_files']['name']];
+                $_FILES['support_files']['type']     = [$_FILES['support_files']['type']];
+                $_FILES['support_files']['tmp_name'] = [$_FILES['support_files']['tmp_name']];
+                $_FILES['support_files']['error']    = [$_FILES['support_files']['error']];
+                $_FILES['support_files']['size']     = [$_FILES['support_files']['size']];
+            }
+
+            _file_attachments_index_fix('support_files');
+
+            $uploadedSupportFiles = [];
+            for ($i = 0; $i < count($_FILES['support_files']['name']); $i++) {
+                $tmpFilePath = $_FILES['support_files']['tmp_name'][$i];
+                if (empty($tmpFilePath)) {
+                    continue;
+                }
+                if (_perfex_upload_error($_FILES['support_files']['error'][$i])
+                    || !_upload_extension_allowed($_FILES['support_files']['name'][$i])) {
+                    continue;
+                }
+
+                _maybe_create_upload_path($path);
+                $filename    = unique_filename($path, $_FILES['support_files']['name'][$i]);
+                $newFilePath = $path . $filename;
+
+                if (move_uploaded_file($tmpFilePath, $newFilePath)) {
+                    $uploadedSupportFiles[] = [
+                        'file_name' => $filename,
+                        'filetype'  => $_FILES['support_files']['type'][$i],
+                    ];
+
+                    if (is_image($newFilePath)) {
+                        create_img_thumb($path, $filename);
+                    }
+                }
+            }
+
+            if (!empty($uploadedSupportFiles)) {
+                $merged = array_merge($existing, $uploadedSupportFiles);
+                $this->db->where('id', $project_id);
+                $this->db->update(db_prefix() . 'project_master', [
+                    'support_files' => json_encode($merged),
+                ]);
+            }
+        }
+        if($path==9){
 		set_alert('success', _l('updated_successfully', _l('Project')));
         redirect(admin_url('project/view/'.$project_id));
 		}

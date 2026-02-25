@@ -88,9 +88,11 @@
         </div>
     </div>
 </div>
-
+<?php init_tail(); ?>
 <script>
 $(document).ready(function() {
+
+
     // Initialize Select2 for participants
     $('#participants').select2({
         placeholder: "Select participants",
@@ -129,5 +131,55 @@ $(document).ready(function() {
     });
 });
 </script>
+<script>
 
-<?php init_tail(); ?>
+
+
+        <?php /*?>var project_id = <?php echo $chat_project_id;?>;
+        var $select = $('#participants');
+
+            $.ajax({
+            url: "<?= admin_url('project_chat/group_staff'); ?>",
+            type: "POST",
+            dataType: "json",
+            data: { project_id: project_id },
+
+            success: function (response) {
+
+                console.log('group_staff response:', response);
+
+                if (response.status && response.staff_ids.length > 0) {
+
+                    // Clear old options
+                    $select.empty();
+
+                    // Append new options (ID + Name)
+                    $.each(response.staff_ids, function (index, staff) {
+
+                        $select.append(
+                            $('<option>', {
+                                value: staff.id,
+                                text: staff.name,
+                                selected: true
+                            })
+                        );
+
+                    });
+
+                    // Refresh bootstrap select
+                    $select.selectpicker('refresh');
+
+                } else {
+                    $select.empty().selectpicker('refresh');
+                }
+            },
+
+            error: function (xhr) {
+                console.error('Error:', xhr.responseText);
+                alert('Error loading participants.');
+            }
+        });<?php */?>
+
+</script>
+
+
