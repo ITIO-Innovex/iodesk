@@ -52,6 +52,10 @@ class Customize extends AdminController
             $data['email_hrd'] = trim($data['email_hrd'] ?? '');
             $data['email_dar'] = trim($data['email_dar'] ?? '');
             $data['email_cc'] = trim($data['email_cc'] ?? '');
+			
+			$data['email_underwriting'] = trim($data['email_underwriting'] ?? '');
+			$data['GOOGLE_CLIENT_ID'] = trim($data['GOOGLE_CLIENT_ID'] ?? '');
+			$data['GOOGLE_CLIENT_SECRET'] = trim($data['GOOGLE_CLIENT_SECRET'] ?? '');
 
             // Collect SMTP fields
             $smtp_fields = [
