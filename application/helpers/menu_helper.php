@@ -747,6 +747,16 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 	
+	if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
+        $CI->app_menu->add_sidebar_menu_item('underwriting', [
+            'name'     => 'Under Writing',
+            'href'     => admin_url('underwriting'),
+            'icon'     => 'fa-solid fa-file-zipper',
+            'position' => 40,
+            'badge'    => [],
+        ]);
+    }
+	
 	if (is_admin()) {  // || staff_can('view', 'user_utility')
         $CI->app_menu->add_sidebar_menu_item('drive', [
             'name'     => 'My Drive',
