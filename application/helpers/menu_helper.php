@@ -523,6 +523,15 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 	
+	if (is_admin()) {
+	$CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'project_custom_fields',
+            'name'     => 'Custom Fields',
+            'href'     => admin_url('project/project_custom_fields'),
+            'position' => 30,
+            'badge'    => [],
+        ]);
+	}
 	if (is_super()) {
 	
         $CI->app_menu->add_sidebar_children_item('project', [
@@ -540,6 +549,8 @@ function app_init_admin_sidebar_menu_items()
             'position' => 30,
             'badge'    => [],
         ]);
+		
+		
 		
     }
 	
@@ -731,6 +742,16 @@ function app_init_admin_sidebar_menu_items()
             'name'     => 'Team Document',
             'href'     => admin_url('user_utility'),
             'icon'     => 'fa-solid fa-file-zipper',
+            'position' => 40,
+            'badge'    => [],
+        ]);
+    }
+	
+	if (is_admin()) {  // || staff_can('view', 'user_utility')
+        $CI->app_menu->add_sidebar_menu_item('drive', [
+            'name'     => 'My Drive',
+            'href'     => admin_url('drive'),
+            'icon'     => 'fa-brands fa-google-drive',
             'position' => 40,
             'badge'    => [],
         ]);

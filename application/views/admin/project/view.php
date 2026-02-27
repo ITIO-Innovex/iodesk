@@ -283,9 +283,9 @@ $date   = _dt($log['date']);
 	  
 	  if (!empty($fieldsf)) :
             foreach ($fieldsf as $fieldsff) :
-			$files=base_url('uploads/projects').'/' . $project['id'].'/support_files/'.$fieldsff['file_name'].'<br>';
+			$files=base_url('uploads/projects').'/' . $project['id'].'/support_files/'.$fieldsff['file_name'];
 			?>
-			<a href="<?php echo $files;?>" target="_blank"><?php echo $fieldsff['file_name'];?></a><br />
+			<div><a href="<?php echo $files;?>" target="_blank"><?php echo $fieldsff['file_name'];?></a></div>
 
 			<?php
 			
