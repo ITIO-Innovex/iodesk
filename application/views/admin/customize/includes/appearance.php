@@ -67,6 +67,14 @@
                    placeholder="DAR Email" />
             <small class="text-muted">This email receives Daily Activity Report (DAR) submissions.</small>
         </div>
+		
+		<div class="form-group">
+            <label for="email_underwriting">Email Under Writing</label>
+            <input type="email" name="email_underwriting" class="form-control"
+                   value="<?php echo isset($company->email_underwriting) ? e($company->email_underwriting) : ''; ?>"
+                   placeholder="Under Writing Email" />
+            <small class="text-muted">This email receives Under Writing form submissions.</small>
+        </div>
 
         <div class="form-group">
             <label for="email_cc">Email CC</label>
@@ -195,6 +203,29 @@
         </div>
     </div>
 </div>
+<!-- Google Docs API -->
+<div class="row">
+    <div class="col-md-12">
+        <h4 class="bold mt-4"><?php echo 'Google API'; ?></h4>
+        <hr class="hr-panel-separator" />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="GOOGLE_CLIENT_ID"><?php echo 'GOOGLE CLIENT ID'; ?></label>
+                    <input type="GOOGLE_CLIENT_ID" name="GOOGLE_CLIENT_ID" class="form-control" value="<?php echo isset($company->GOOGLE_CLIENT_ID) ? $company->GOOGLE_CLIENT_ID : ''; ?>" placeholder="GOOGLE_CLIENT_ID" />
+                </div>
+            </div>
+            
+			<div class="col-md-6">
+                <div class="form-group">
+                    <label for="GOOGLE_CLIENT_SECRET"><?php echo 'GOOGLE CLIENT SECRET'; ?></label>
+                    <input type="GOOGLE_CLIENT_SECRET" name="GOOGLE_CLIENT_SECRET" class="form-control" value="<?php echo isset($company->GOOGLE_CLIENT_SECRET) ? $company->GOOGLE_CLIENT_SECRET : ''; ?>" placeholder="GOOGLE CLIENT SECRET" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+
 
 <!-- Lead Setting Section -->
 <div class="row">

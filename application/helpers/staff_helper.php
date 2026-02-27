@@ -676,6 +676,24 @@ function get_nda_setting($company_id)
 		return 0;
 }
 
+function get_google_api_details($company_id)
+{   
+        
+		if(isset($company_id)&&$company_id){
+		$CI = & get_instance();
+		$CI->db->where('company_id', $company_id);
+		$com = $CI->db->select('GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,')->from(db_prefix() . 'company_master')->get()->row();
+		
+		if(isset($com)&&$com->GOOGLE_CLIENT_ID&&$com->GOOGLE_CLIENT_SECRET){
+		return $com;
+		}else{
+		return '';
+		}
+		}
+		
+		return '';
+}
+
 function get_direct_mail_smtp($company_id)
 {   
         
