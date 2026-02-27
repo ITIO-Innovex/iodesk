@@ -189,6 +189,88 @@ class Project extends AdminController
 		}
 	}
 
+    // Project custom fields
+    /* Get all project custom fields */
+    public function project_custom_fields()
+    {
+        if (!is_admin()) {
+            //access_denied('Project Custom Fields');
+        }
+
+        $this->load->model('project_model');
+
+        $data['custom_fields'] = $this->project_model->get_project_custom_fields();
+        $data['groups']        = $this->project_model->get_project_groups();
+        $data['title']         = 'Project Custom Fields';
+
+        $this->load->view('admin/project/project_custom_fields', $data);
+    }
+
+    /* Add new or edit existing project custom field */
+    public function projectcustomfield()
+    {
+        if (!is_admin()) {
+            //access_denied('Project Custom Fields');
+        }
+
+        if ($this->input->post()) {
+            $data = $this->input->post();
+
+            if (!$this->input->post('id')) {
+                $inline = isset($data['inline']);
+                if (isset($data['inline'])) {
+                    unset($data['inline']);
+                }
+
+                $id = $this->project_model->add_project_custom_field($data);
+
+                if (!$inline) {
+                    if ($id) {
+                        set_alert('success', _l('added_successfully', 'Project Custom Field'));
+                        redirect(admin_url('project/project_custom_fields'));
+                    }
+                } else {
+                    echo json_encode(['success' => $id ? true : false, 'id' => $id]);
+                }
+            } else {
+                $id = $data['id'];
+                unset($data['id']);
+
+                $success = $this->project_model->update_project_custom_field($data, $id);
+
+                if ($success) {
+                    set_alert('success', _l('updated_successfully', 'Project Custom Field'));
+                } else {
+                    set_alert('danger', 'No any Update found');
+                }
+
+                redirect(admin_url('project/project_custom_fields'));
+            }
+        }
+    }
+
+    /* Delete project custom field from database */
+    public function delete_project_custom_field($id)
+    {
+        if (!is_admin()) {
+            //access_denied('Project Custom Fields');
+        }
+
+        if (!$id) {
+            redirect(admin_url('project/project_custom_fields'));
+        }
+
+        $response = $this->project_model->delete_project_custom_field($id);
+
+        if ($response == true) {
+            set_alert('success', _l('deleted', 'Project Custom Field'));
+        } else {
+            set_alert('warning', _l('problem_deleting', 'Project Custom Field'));
+        }
+
+        redirect(admin_url('project/project_custom_fields'));
+    }
+
 	/* Delete project priority from database */
 	public function delete_project_priority($id)
 	{
@@ -1083,6 +1165,20 @@ echo '<div class="tw-my-2" style="padding-left: 40px;">'. $c['comments'].'</div>
 
         }
     }
+	
+	public function get_custom_fields_by_group()
+    {
+	
+	$group_id = $this->input->post('group_id');
+
+    $fields = $this->db
+        ->where('group_id', $group_id)
+        ->where('status', 1)
+        ->get('it_crm_project_custom_fields')
+        ->result();
+    echo json_encode($fields);
+	
+	}
 	
 	
 }

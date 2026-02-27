@@ -88,8 +88,11 @@ border-radius: 20px;
 <div class="alert alert-warning" onclick="togglediv('#myDiv1')">Description <span class="pull-right mt-2 lead-view"><i class="fa-solid fa-angle-down"></i></span></div>
 <div id="myDiv1" class="tw-border-neutral-200" style="display:none;">
 <div class="panel-body tw-mb-4">
-<div class="form-group">
-<?php echo isset($task['task_description']) ? $task['task_description'] : '-'; ?>
+<div class="description-box">
+<iframe style="width:100%; height:300px; border:1px solid #ddd;"
+        srcdoc='<?php echo htmlspecialchars(isset($task['task_description']) ? $task['task_description'] : '-'); ?>'>
+</iframe>
+
 </div>
 </div>
 </div>

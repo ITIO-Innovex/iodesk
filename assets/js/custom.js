@@ -151,11 +151,6 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
         $('#edit_start_date').val(p.start_date);
         $('#edit_deadline').val(p.deadline);
 		$('#edit_tags').val(p.tags);
-        //if(window.tinymce && tinymce.get('edit_project_description')) {
-          //tinymce.get('edit_project_description').setContent(p.project_description || '');
-        //} else {
-          //$('#edit_project_description').val(p.project_description);
-        //}
         // Set strict project checkbox
         $('#edit_make_this_a_strict_project').prop('checked', p.make_this_a_strict_project == 1);
         // Set project access radio buttons
@@ -164,8 +159,54 @@ $(document).on('click', '.project-dropdown-menu .dropdown-item[href*="/edit/"]',
         } else if(p.project_access == 2) {
           $('#edit_project_access_public').prop('checked', true);
         }
-        // Tags
-      
+
+        // Custom fields: load from p.custom_field (JSON array of {name, value})
+        var customFields = [];
+        try {
+          customFields = typeof p.custom_field === 'string' ? (JSON.parse(p.custom_field || '[]') || []) : (p.custom_field || []);
+        } catch (e) { customFields = []; }
+        $('#edit-custom-fields').empty();
+        if (customFields.length > 0) {
+          customFields.forEach(function(item) {
+            var $row = $('<div class="field-group form-group row">' +
+              '<div class="col-sm-3"><input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" required></div>' +
+              '<div class="col-sm-7"><input type="text" class="form-control" name="custom_field_value[]" placeholder="Field Value" required></div>' +
+              '<div class="col-sm-2"><a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove"><i class="fa fa fa-times"></i></a></div>' +
+              '</div>');
+            $row.find('input[name="custom_field_name[]"]').val(item.name != null ? item.name : '');
+            $row.find('input[name="custom_field_value[]"]').val(item.value != null ? item.value : '');
+            $('#edit-custom-fields').append($row);
+          });
+        } else {
+          var $emptyRow = $('<div class="field-group form-group row">' +
+            '<div class="col-sm-3"><input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" required></div>' +
+            '<div class="col-sm-7"><input type="text" class="form-control" name="custom_field_value[]" placeholder="Field Value" required></div>' +
+            '<div class="col-sm-2"><a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove"><i class="fa fa fa-times"></i></a></div>' +
+            '</div>');
+          $('#edit-custom-fields').append($emptyRow);
+        }
+
+        // Support files: show existing files with download links
+        var supportFiles = [];
+        try {
+          supportFiles = typeof p.support_files === 'string' ? (JSON.parse(p.support_files || '[]') || []) : (p.support_files || []);
+        } catch (e) { supportFiles = []; }
+        var uploadsBase = window.projectUploadsBaseUrl || (window.location.origin + '/');
+        var projectId = p.id;
+        $('#edit-existing-support-files').empty();
+        if (supportFiles.length > 0) {
+          $('#edit-existing-support-files-wrap').show();
+          supportFiles.forEach(function(file) {
+            var fileName = file.file_name || file.fileName || file.name || 'file';
+            var fileUrl = uploadsBase + projectId + '/support_files/' + encodeURIComponent(fileName);
+            var $li = $('<li class="list-group-item"></li>');
+            $li.append($('<a></a>').attr('href', fileUrl).attr('target', '_blank').attr('rel', 'noopener').text(fileName));
+            $('#edit-existing-support-files').append($li);
+          });
+        } else {
+          $('#edit-existing-support-files-wrap').hide();
+        }
+
         // Set the textarea value first
         var description = p.project_description || '';
         console.log('Setting description to textarea:', description); // Debug log

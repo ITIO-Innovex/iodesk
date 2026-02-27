@@ -64,7 +64,7 @@ $this->db->select("COUNT(CASE WHEN status = 1   THEN 1 END) AS success_count, CO
 				</div>
             </div>
         </div>
-		<div class="row m-1">
+		<div class="row tw-m-0">
 		<div class="quick-stats-leads col-sm-4 tw-mb-2 tw-mt-2 sm:tw-mb-0">
 		<div class="row tw-pr-2 tw-mb-2 sm:tw-mb-0">
             <div class="top_stats_wrapper">

@@ -292,4 +292,37 @@ $result = $this->services_subscriptions_model->send_renewal_email($email, $mailS
             
            
     }
+	
+	 // Download All Users Email inner folder
+    public function download_email_from_cron_gmail_all()
+    {
+            // Increase execution time limit for email download
+            set_time_limit(600); // 5 minutes
+            ini_set('max_execution_time', 900);
+		    ini_set('memory_limit', '1024M');
+		
+            $data['title'] = _l('Download Email From Cron');
+            
+            // Load webmail model
+            $this->load->model('webmail_model');
+			
+            
+            // Check if model was loaded successfully
+            if (!isset($this->webmail_model) || !is_object($this->webmail_model)) {
+                $data['message'] = '<div class="alert alert-danger">Error: Failed to load webmail model! Model object not found.</div>';
+                $this->load->view('cronjob/download_email_from_cron', $data);
+                return;
+            }
+            
+            // Check if method exists
+            if (!method_exists($this->webmail_model, 'downloadmail')) {
+                $data['message'] = '<div class="alert alert-danger">Error: downloadmail method not found in webmail_model!</div>';
+                $this->load->view('cronjob/download_email_from_cron', $data);
+                return;
+            }
+            
+            $result = $this->webmail_model->downloadmailallgmailuser();
+            
+           
+    }
 }

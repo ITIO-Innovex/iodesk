@@ -136,6 +136,7 @@ class Webmail extends AdminController
         $this->webmail_model->reply($data, $entry_id);
         set_alert('success', _l('Email Sent Successfully', _l('Email Sent')));
 		log_message('error', 'Redirect : ' . previous_url() ?: $_SERVER['HTTP_REFERER']);
+		$_SESSION['replySavedEmail']="1";
         redirect(previous_url() ?: $_SERVER['HTTP_REFERER']);
 	} 
 

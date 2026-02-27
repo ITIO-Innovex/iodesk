@@ -426,9 +426,21 @@ if ($nextPage) {
 	<input type="hidden" name="redirect" value="inbox.php">
 	<input type="hidden" name="messageid" id="messageidIT" value="">
 	<input type="hidden" name="messagetype" id="messagetypeIT" value="Reply">
-	<h5 class="h5 text-primary">From Email : <?=$_SESSION['webmail']['mailer_email'] ?? '';?></h5>
+	<h5 class="h5 text-primary">From Email : </h5>
+	
+       <div class="mb-3">
+        <label for="recipientEmail" class="form-label mtop10">Reply From Email</label>
+        <select name="reply_from_email" id="reply_from_email" class="form-control" required>
+    <option value="">Select Email</option>
+    <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
+        <option value="<?php echo $row['id']; ?>" <?php if($row['id']==$_SESSION['webmail']['id']){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
+    <?php } ?>
+
+</select>
+      </div>
+	  
       <div class="mb-3">
-        <label for="recipientEmail" class="form-label">Recipient Email</label>
+        <label for="recipientEmail" class="form-label mtop10">Recipient Email</label>
         <input type="text" class="form-control" id="recipientEmailIT" name="recipientEmail" value="" placeholder="Enter recipient email" required>
       </div>
 	  <div class="mb-3">
@@ -480,7 +492,18 @@ if ($nextPage) {
 	<input type="hidden" name="redirect" value="inbox.php">
 	<input type="hidden" name="messageid" id="messageidFW" value="">
 	<input type="hidden" name="messagetype" id="messagetypeFW" value="Forward">
-	<h5 class="h5 text-primary">From Email : <?=$_SESSION['webmail']['mailer_email'] ?? '';?></h5>
+	<h5 class="h5 text-primary">From Email : </h5>
+	
+       <div class="mb-3">
+        <label for="recipientEmail" class="form-label mtop10">Reply From Email</label>
+        <select name="reply_from_email" id="reply_from_email" class="form-control" required>
+    <option value="">Select Email</option>
+    <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
+        <option value="<?php echo $row['id']; ?>" <?php if($row['id']==$_SESSION['webmail']['id']){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
+    <?php } ?>
+
+</select>
+      </div>
       <div class="mb-3">
         <label for="recipientEmailFW" class="form-label">Recipient Email</label>
         <input type="text" class="form-control" id="recipientEmailFW" name="recipientEmail" value="" placeholder="Enter recipient email" required>
@@ -499,7 +522,7 @@ if ($nextPage) {
       </div>
       <div class="mb-3">
     
-	   <textarea  name="emailBody" id="emailBodyFW" class="form-control editor" required></textarea>
+	   <textarea  name="emailBody" id="emailBodyFW" class="form-controls" required></textarea>
         <div class="checkbox checkbox-primary">
 <input type="checkbox" id="toggleSignatureFW" name="toggleSignature" value="1">
 <label for="SignatureXFW">Add Signature</label>
@@ -1103,15 +1126,14 @@ $('#emailBody_ifr').contents().find('#tinymce').html(content);
     $( "#reply-box" ).toggle();
 });
 
-	$( "#forward-button" ).click(function() {
+	$( "#forward-button" ).click(function() { 
     $( "#reply-box" ).hide();
     $( "#forward-box" ).show();
-    
     // Initialize editor when forward box is shown
     setTimeout(function() {
         // Check if editor is already initialized
-        if(!$('#emailBodyFW').siblings('.jqte_editor').length) {
-            $('#emailBodyFW').jqte();
+        if(!$('#emailBodyFW').siblings('.jqte_editor').length) { 
+           // $('#emailBodyFW').jqte();
         }
         
         // Set forward body content if available
@@ -1370,6 +1392,46 @@ $('.refreshemail').click(function(){
     });
   })();
 </script>
+<script>
+$(document).ready(function () {
+
+    // Initialize jqte editor
+    //$('#emailBody').jqte();
+
+    const storageKey = "modal_email_body";
+
+    //  Load saved data when modal opens
+    $('#myModal12').on('shown.bs.modal', function () {
+        let savedData = localStorage.getItem(storageKey);
+        if (savedData) {
+            $('#emailBody').val(savedData);
+            $('#emailBody').jqteVal(savedData); // important for jqte
+        }
+    });
+
+    //  Save data while typing
+    $(document).on('keyup', '.jqte_editor', function () {
+        let content = $('#emailBody').val();
+        localStorage.setItem(storageKey, content);
+    });
+
+});
+</script>
+<?php
+$_SESSION['replySavedEmail'] = $_SESSION['replySavedEmail'] ?? 0;
+if(isset($_SESSION['replySavedEmail']) && $_SESSION['replySavedEmail']==1){
+?>
+<script>
+    // Your save logic here
+    localStorage.removeItem("modal_email_body");
+    $('#emailBody').val('');
+    $('#emailBody').jqteVal('');
+</script>
+<?php
+$_SESSION['replySavedEmail']=0;
+}
+
+?>
 </body>
 
 </html>

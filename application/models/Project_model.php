@@ -105,6 +105,82 @@ class Project_model extends App_Model
         }
         return false;
     }
+
+    /**
+     * Project custom fields
+     */
+    public function get_project_custom_fields()
+    {
+        $this->db->select('pcf.*, pg.name as group_name');
+        $this->db->from(db_prefix() . 'project_custom_fields pcf');
+        $this->db->join(db_prefix() . 'project_group pg', 'pg.id = pcf.group_id', 'left');
+        $this->db->order_by('pcf.id', 'desc');
+
+        return $this->db->get()->result_array();
+    }
+
+    public function add_project_custom_field($data)
+    {
+        $insert = [
+            'group_id'    => isset($data['group_id']) && $data['group_id'] !== '' ? (int) $data['group_id'] : null,
+            'field_title' => $data['field_title'] ?? null,
+            'status'      => isset($data['status']) ? (int) $data['status'] : 1,
+        ];
+
+        $this->db->insert(db_prefix() . 'project_custom_fields', $insert);
+        $insert_id = $this->db->insert_id();
+
+        if ($insert_id) {
+            log_activity('New Project Custom Field Added [ID: ' . $insert_id . ', Title: ' . ($insert['field_title'] ?? '') . ']');
+            return $insert_id;
+        }
+
+        return false;
+    }
+
+    public function update_project_custom_field($data, $id)
+    {
+        $update = [];
+
+        if (isset($data['group_id'])) {
+            $update['group_id'] = $data['group_id'] !== '' ? (int) $data['group_id'] : null;
+        }
+
+        if (isset($data['field_title'])) {
+            $update['field_title'] = $data['field_title'];
+        }
+
+        if (isset($data['status'])) {
+            $update['status'] = (int) $data['status'];
+        }
+
+        if (empty($update)) {
+            return false;
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update(db_prefix() . 'project_custom_fields', $update);
+
+        if ($this->db->affected_rows() > 0) {
+            log_activity('Project Custom Field Updated [ID: ' . $id . ']');
+            return true;
+        }
+
+        return false;
+    }
+
+    public function delete_project_custom_field($id)
+    {
+        $this->db->where('id', $id);
+        $this->db->delete(db_prefix() . 'project_custom_fields');
+
+        if ($this->db->affected_rows() > 0) {
+            log_activity('Project Custom Field Deleted [ID: ' . $id . ']');
+            return true;
+        }
+
+        return false;
+    }
 	public function get_projectlist()
     {
 	

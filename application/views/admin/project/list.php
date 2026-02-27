@@ -304,7 +304,7 @@ Portal users can only view, follow, and comment whereas, project users will have
         
 <div id="custom-fields">
 </div>
-<div class="field-group form-group row">
+<?php /*?><div class="field-group form-group row">
 <div class="col-sm-3">
 <input type="text" class="form-control" name="custom_field_name[]" placeholder="Field Name" value="" required>
 </div>
@@ -314,7 +314,7 @@ Portal users can only view, follow, and comment whereas, project users will have
 <div class="col-sm-2">
 <a href="#" class="remove text-danger btn btn-danger btn-sm" title="Remove"><i class="fa fa fa-times"></i></a>
 </div>
-</div>
+</div><?php */?>
 <button type="button" id="add-field" class="btn btn-primary btn-sm" title="Add Field"> + </button>	             
 	
     <br><br>
@@ -427,6 +427,15 @@ Portal users can only view, follow, and comment whereas, project users will have
               
             </div>
             
+            <!-- Existing Support Files (display) -->
+            <div class="row" id="edit-existing-support-files-wrap" style="display: none;">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label class="control-label">Existing Support Files</label>
+                  <ul id="edit-existing-support-files" class="list-group list-unstyled mb-2"></ul>
+                </div>
+              </div>
+            </div>
             <!-- Support Files (upload more) -->
             <div class="row">
               <div class="col-md-12">
@@ -853,6 +862,7 @@ $('#deadline').on('change', function() {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.min.js"></script>
 <script>
+window.projectUploadsBaseUrl = '<?php echo base_url("uploads/projects/"); ?>';
 // Initialize Tagify
 document.querySelectorAll('.tagify-input').forEach(function(input){
 new Tagify(input);
@@ -892,6 +902,59 @@ $('#edit-add-field').click(function () {
       </div>
     </div>`);
 });
+
+
+
+$('#project_group').change(function(){
+
+        var groupId = $(this).val();
+
+        if(groupId == ''){
+            $('#custom-fields').html('');
+            return;
+        }
+
+        $.ajax({
+            url: "<?php echo admin_url('project/get_custom_fields_by_group'); ?>",
+            type: "POST",
+            data: {group_id: groupId},
+            success: function(response){
+
+                var data = JSON.parse(response);
+                var html = '';
+
+                if(data.length > 0){
+
+                    data.forEach(function(field){
+
+                        html += `
+                        <div class="field-group form-group row">
+                            <div class="col-sm-3">
+                                <input type="hidden" name="custom_field_name[]" value="${field.field_title}">
+                                <input type="text" class="form-control" value="${field.field_title}" readonly>
+                            </div>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" name="custom_field_value[]" placeholder="Enter ${field.field_title}" required>
+                            </div>
+                            <div class="col-sm-2">
+                                <a href="#" class="remove text-danger btn btn-danger btn-sm">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        `;
+                    });
+
+                } else {
+                    html = '<div class="text-danger">No custom fields found.</div>';
+                }
+
+                $('#custom-fields').html(html);
+            }
+        });
+
+    });
+
 </script>
 
 </body></html> 

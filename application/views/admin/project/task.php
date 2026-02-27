@@ -29,32 +29,11 @@
   }
 .table-responsive{ min-height:500px; }
 
-/* Red border for task description validation error */
-.jqte_editor.error-border {
-    border: 2px solid #dc3545 !important;
-    border-radius: 4px;
-    padding: 2px;
-    transition: border-color 0.3s ease;
+
+.ck-editor__editable_inline {
+    min-height: 300px;
 }
 
-.jqte_editor.error-border [contenteditable="true"] {
-    border: 1px solid #dc3545 !important;
-    outline: none;
-}
-
-/* Focus effect for task description */
-#task_description:focus + .jqte_editor,
-.jqte_editor:has([contenteditable="true"]:focus) {
-    border: 2px solid #007bff;
-    border-radius: 4px;
-    padding: 2px;
-    transition: border-color 0.3s ease;
-}
-
-.jqte_editor [contenteditable="true"]:focus {
-    border: 1px solid #007bff;
-    outline: none;
-}
 /* responsive */
     @media (max-width:420px){
       .sticks{
@@ -269,7 +248,7 @@
                          <!-- Description -->
 			<div class="form-group">
                   <label for="task_start_date" class="control-label"><small class="req text-danger">* </small>Project Description</label>
-             <?php echo render_textarea('task_description', '', '', [], [], '', 'editor'); ?>
+             <?php echo render_textarea('task_description', '', '', [], [], '', ''); ?>
              </div>
                            <!-- Tags -->
               <div class="form-group">
@@ -716,12 +695,23 @@ $('body').on('click', '.remove_attachment', function() {
       toggleReminderFields();
     });
 </script>
-<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
-
-<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
 <script>
-	$('.editor').jqte();
+ClassicEditor
+    .create(document.querySelector('#task_description'))
+    .catch(error => {
+        console.error(error);
+    });
+	ClassicEditor.create(document.querySelector('#editor'), {
+    toolbar: [
+        'heading', '|',
+        'bold', 'italic', 'underline', '|',
+        'link', 'bulletedList', 'numberedList', '|',
+        'blockQuote', 'insertTable', '|',
+        'undo', 'redo'
+    ]
+});
 </script>
 <!-- Tagify CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">
