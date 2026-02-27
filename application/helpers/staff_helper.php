@@ -200,6 +200,15 @@ function get_available_staff_permissions($data = [])
 				'webmail_setup' => _l('Webmail Setup'),
             ],
         ],
+		
+		'under_writing' => [
+            'name'         => _l('Under Writing'),
+            'capabilities' => [
+                'adder' => _l('Manager <i class="fa-regular fa-circle-question" data-toggle="tooltip" data-title="If this permission is not checked, a staff member will be not able to add / edit / delete under writing" data-original-title="" title=""></i> '),
+                'approver' => _l('Approver'),
+            ],
+        ],
+		
 		'user_utility' => [
             'name'         => _l('Team Document'),
             'capabilities' => [
