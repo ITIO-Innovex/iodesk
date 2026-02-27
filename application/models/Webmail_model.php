@@ -248,7 +248,7 @@ class Webmail_model extends App_Model
 		
 		//print_r($data);
 	
-	$replyID=$data['reply_from_email'];
+	$replyID=$data['reply_from_email'] ?? 0;
 	$savedReplyID=$_SESSION['webmail']['id'];
 	
 	
