@@ -200,5 +200,108 @@ class Underwriting extends AdminController
     {
         redirect(admin_url('underwriting'));
     }
+	
+	
+	/**
+     * Create or update underwriting record (from modal).
+     */
+    public function approve()
+    {
+        if (!$this->input->post()) {
+            redirect(admin_url('underwriting'));
+        }
+		
+		
+
+        $id            = (int) $this->input->post('id');
+        $status        = (int) $this->input->post('uw_status');
+        $Reason        = $this->input->post('Reason', true);
+       
+       
+
+        if ($id === '' || $status === '' || $Reason === '' ) {
+            set_alert('danger', 'Please fill reason.');
+            redirect(admin_url('underwriting'));
+        }
+
+          
+        $data = [
+            'status'        => $status,
+            'Reason'        => $Reason,
+        ];
+		
+		
+		
+
+        $table = db_prefix() . 'deal_underwriting';
+        $company_id = get_staff_company_id();
+        
+        
+            // Update
+            $this->db->where('id', $id);
+            $this->db->where('company_id', $company_id);
+            $success = $this->db->update($table, $data);
+			//echo $this->db->last_query();exit;
+            if ($success) {
+			
+                set_alert('success', 'Underwriting details updated successfully.');
+            } else {
+                set_alert('danger', 'Failed to update underwriting details.');
+            }
+      
+		/////////////Email Send //////////
+		//$email_underwriting=get_company_fields($company_id ,'email_underwriting');
+		
+		$staffName = get_staff_full_name() ?? 'Staff';
+		$ccEmails = $ccEmail ?? "";
+		
+								$statusUW="";
+								if($status==1){
+								$statusUW="Approved";
+								}elseif($status==2){
+								$statusUW="Pending";
+								}else{
+								$statusUW="Rejected";
+								}
+								
+		$this->db->select('for_company, web_link, addedby');
+        $this->db->where('id', $id);
+        $this->db->where('company_id', $company_id);
+        $uw_data = $this->db->get($table, $data)->row();
+		$for_company="";
+		$web_link="";
+		$addedby="";
+		if($uw_data){
+		$for_company=$uw_data->for_company;
+		$web_link=$uw_data->web_link;
+		$addedby=$uw_data->addedby;
+		}
+        $staffEmail = get_staff_email($addedby) ?? '';
+		 // Prepare email data
+                $msgdata = [
+                    'recipientEmail' => $staffEmail,
+                    'recipientCC' => $ccEmails,
+                    'emailSubject' => 'Under Writing ' . $statusUW . ' By - ' . $staffName . ' - ' . date('d-m-Y'),
+                    'emailBody' => '<h3>Please find under writing the ' . $statusUW . ' details</h3>'
+						. '<p><strong>Company Name:</strong> ' . $for_company . '</p>'
+						. '<p><strong>Website:</strong> ' . $web_link . '</p>'
+						. '<p><strong>Comments / Reason:</strong> ' . $Reason . '</p>'
+						. '<p><strong>Status:</strong> ' . $statusUW . '</p>'
+						. '<p><strong>Best Regards, <br><br></strong> ' . $staffName . '</p>',
+                ];
+				 
+       //print_r( $msgdata);exit;
+                
+                // Send email if recipient exists
+                if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->compose_email_super($msgdata);
+                }
+				
+		//echo "Mail Send";exit;
+		
+
+        redirect(admin_url('underwriting'));
+    }
 }
 

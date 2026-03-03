@@ -59,6 +59,8 @@ class Hrd extends AdminController
             $this->attendance_request();
         } elseif ($type == 'dar_master') {
             $this->dar_master();
+        } elseif ($type == 'dar_form') {
+            $this->dar_form();
         } elseif ($type == 'shift_manager') {
             $this->shift_manager();
         } elseif ($type == 'awards') {
@@ -6288,6 +6290,371 @@ $data['notifications'] = $this->db->get()->result_array();
         ];
         $data['title'] = 'DAR Master';
         $this->load->view('admin/hrd/setting/dar_master', $data);
+    }
+
+    /**
+     * DAR Form custom fields configuration.
+     * URL: /admin/hrd/setting/dar_form
+     */
+    public function dar_form()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Form');
+        }
+
+        // Departments list
+        $this->db->select('departmentid, name');
+        $this->db->from(db_prefix() . 'departments');
+
+        if (!is_super()) {
+            $this->db->where('company_id', get_staff_company_id());
+        } elseif (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $this->db->where('company_id', $_SESSION['super_view_company_id']);
+        }
+
+        $departments = $this->db->get()->result_array();
+
+        // Filter by department (for search)
+        $filter_department_id = (int) $this->input->get('department_id');
+
+        $this->db->from(db_prefix() . 'dar_custom_fields');
+        if ($filter_department_id > 0) {
+            $this->db->where('department_id', $filter_department_id);
+        }
+        // Order by custom statusorder first, then by id as fallback
+        $this->db->order_by('statusorder', 'ASC');
+        $this->db->order_by('id', 'ASC');
+        $fields = $this->db->get()->result_array();
+
+        // Index departments by id for quick lookup in view
+        $dept_index = [];
+        foreach ($departments as $d) {
+            $dept_index[(int)$d['departmentid']] = $d['name'];
+        }
+
+        $data['departments']          = $departments;
+        $data['department_index']     = $dept_index;
+        $data['dar_custom_fields']    = $fields;
+        $data['filter_department_id'] = $filter_department_id;
+        $data['title']                = 'DAR Form';
+
+        $this->load->view('admin/hrd/setting/dar_form', $data);
+    }
+
+    /**
+     * Create or update DAR custom field.
+     */
+    public function dar_form_save()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Form');
+        }
+
+        if (!$this->input->post()) {
+            redirect(admin_url('hrd/setting/dar_form'));
+        }
+
+        $id            = (int) $this->input->post('id');
+        $department_id = (int) $this->input->post('department_id');
+        $field_title   = trim($this->input->post('field_title', true));
+        $status        = (int) $this->input->post('status');
+
+        if ($status !== 0 && $status !== 1) {
+            $status = 1;
+        }
+
+        if ($department_id <= 0 || $field_title === '') {
+            set_alert('danger', 'Department and Field Title are required.');
+            redirect(admin_url('hrd/setting/dar_form'));
+        }
+
+        $data = [
+            'department_id' => $department_id,
+            'field_title'   => $field_title,
+            'status'        => $status,
+        ];
+
+        $table = db_prefix() . 'dar_custom_fields';
+
+        if ($id > 0) {
+            $this->db->where('id', $id);
+            $success = $this->db->update($table, $data);
+            if ($success) {
+                set_alert('success', 'DAR field updated successfully.');
+            } else {
+                set_alert('danger', 'Failed to update DAR field.');
+            }
+        } else {
+            // Set statusorder to last+1 within this department
+            $this->db->select_max('statusorder');
+            $this->db->where('department_id', $department_id);
+            $maxRow = $this->db->get($table)->row();
+            $nextOrder = isset($maxRow->statusorder) ? ((int) $maxRow->statusorder + 1) : 1;
+            $data['statusorder'] = $nextOrder;
+
+            $this->db->insert($table, $data);
+            $insert_id = $this->db->insert_id();
+            if ($insert_id) {
+                set_alert('success', 'DAR field added successfully.');
+            } else {
+                set_alert('danger', 'Failed to add DAR field.');
+            }
+        }
+
+        redirect(admin_url('hrd/setting/dar_form'));
+    }
+
+    /**
+     * Delete DAR custom field.
+     */
+    public function delete_dar_form_field($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Form');
+        }
+
+        $id = (int) $id;
+        if ($id <= 0) {
+            redirect(admin_url('hrd/setting/dar_form'));
+        }
+
+        $table = db_prefix() . 'dar_custom_fields';
+        $this->db->where('id', $id);
+        $success = $this->db->delete($table);
+
+        if ($success) {
+            set_alert('success', 'DAR field deleted successfully.');
+        } else {
+            set_alert('danger', 'Failed to delete DAR field.');
+        }
+
+        redirect(admin_url('hrd/setting/dar_form'));
+    }
+
+    /**
+     * Reorder DAR custom fields for a department (drag & drop).
+     * Expects POST: department_id, order[] (array of field IDs in new order)
+     */
+    public function dar_form_reorder()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['success' => false, 'message' => 'Access denied']));
+            return;
+        }
+
+        $department_id = (int) $this->input->post('department_id');
+        $order         = $this->input->post('order');
+
+        $this->output->set_content_type('application/json');
+
+        if ($department_id <= 0 || !is_array($order) || empty($order)) {
+            $this->output->set_output(json_encode(['success' => false, 'message' => 'Invalid data']));
+            return;
+        }
+
+        $table = db_prefix() . 'dar_custom_fields';
+
+        $position = 1;
+        foreach ($order as $id) {
+            $id = (int) $id;
+            if ($id <= 0) {
+                continue;
+            }
+            $this->db->where('id', $id);
+            $this->db->where('department_id', $department_id);
+            $this->db->update($table, ['statusorder' => $position]);
+            $position++;
+        }
+
+        $this->output->set_output(json_encode(['success' => true]));
+    }
+
+    /**
+     * Daily Activity Report (DAR) entry form.
+     * URL: /admin/hrd/daily_activity_report_dar
+     */
+    public function daily_activity_report_dar()
+    {
+        if (!(is_admin() || staff_can('view_own', 'hr_department'))) {
+            access_denied('Daily Activity Report');
+        }
+
+        $department_id = function_exists('get_departments_id') ? (int) get_departments_id() : 0;
+
+        // Selected date (allow query param, default today)
+        $selected_date = $this->input->get('date');
+        if (!$selected_date) {
+            $selected_date = date('Y-m-d');
+        }
+
+        // Load DAR custom fields for this department (ordered by statusorder)
+        $this->db->from(db_prefix() . 'dar_custom_fields');
+        if ($department_id > 0) {
+            $this->db->where('department_id', $department_id);
+        }
+        $this->db->where('status', 1);
+        $this->db->order_by('statusorder', 'ASC');
+        $this->db->order_by('id', 'ASC');
+        $dar_fields = $this->db->get()->result_array();
+
+        // Existing DAR record for this staff, date and company
+        $this->db->where('company_id', get_staff_company_id());
+        $this->db->where('staffid', get_staff_user_id());
+        $this->db->where('date', $selected_date);
+        $existing_dar = $this->db->get('it_crm_dar')->row_array();
+
+        if ($this->input->method() === 'post') {
+            $date = $this->input->post('date');
+            if (!$date) {
+                $date = date('Y-m-d');
+            }
+			
+			$status = (int) $this->input->post('status');
+            if (!in_array($status, [1, 2], true)) {
+                $status = 2;
+            }
+
+            $details = [];
+            // Build row-wise details from array fields
+            // Each field_X[] corresponds to multiple rows
+            $rowCount = 0;
+            $fieldValues = [];
+            foreach ($dar_fields as $field) {
+                $fid = (int) $field['id'];
+                $values = $this->input->post('field_' . $fid, true);
+                if (!is_array($values)) {
+                    $values = [$values];
+                }
+                $fieldValues[$fid] = $values;
+                $rowCount = max($rowCount, count($values));
+            }
+
+            for ($i = 0; $i < $rowCount; $i++) {
+                $row = [];
+                foreach ($dar_fields as $field) {
+                    $fid   = (int) $field['id'];
+                    $title = (string) $field['field_title'];
+                    $value = isset($fieldValues[$fid][$i]) ? $fieldValues[$fid][$i] : '';
+                    $row[] = [
+                        'id'    => $fid,
+                        'title' => $title,
+                        'value' => $value,
+                    ];
+                }
+                $details[] = $row;
+            }
+
+            // Check if there is existing record for this date
+            $this->db->where('company_id', get_staff_company_id());
+            $this->db->where('staffid', get_staff_user_id());
+            $this->db->where('date', $date);
+            $existing_for_date = $this->db->get('it_crm_dar')->row_array();
+
+            $data = [
+                'details' => json_encode($details),
+                'status'  => $status,
+                'date'    => $date,
+            ];
+
+            if ($existing_for_date) {
+                // Update existing DAR for this date
+                $this->db->where('id', (int) $existing_for_date['id']);
+                $success = $this->db->update('it_crm_dar', $data);
+                if ($success) {
+                    set_alert('success', 'Daily Activity Report updated successfully.');
+                } else {
+                    set_alert('danger', 'Failed to update Daily Activity Report.');
+                }
+            } else {
+                // Insert new DAR
+                $data['company_id'] = get_staff_company_id();
+                $data['staffid']    = get_staff_user_id();
+                $this->db->insert('it_crm_dar', $data);
+                $insert_id = $this->db->insert_id();
+                if ($insert_id) {
+                    set_alert('success', 'Daily Activity Report saved successfully.');
+                } else {
+                    set_alert('danger', 'Failed to save Daily Activity Report.');
+                }
+            }
+			$companyId = get_staff_company_id();
+			$darEmail=get_company_fields($companyId ,'email_dar');
+            if ($status === 1 && !empty($darEmail)) {
+                
+                
+                $staffName = get_staff_full_name() ?? 'Staff';
+                
+                
+                // Get company email settings for DAR
+                $companySettings = $this->db->where('company_id', $companyId)->get('it_crm_company_master')->row_array();
+                $darEmail = !empty($companySettings['email_dar']) ? $companySettings['email_dar'] : '';
+				$companyname = !empty($companySettings['companyname']) ? $companySettings['companyname'] : 'CRM';
+                //$ccEmails = !empty($companySettings['email_cc']) ? $companySettings['email_cc'] : '';
+               
+                
+$emaildetails="<table width='100%' border='1' cellpadding='8' cellspacing='0' 
+style='border-collapse: collapse; font-family: Arial, sans-serif; font-size:14px;'>";
+// ===== CREATE HEADER DYNAMICALLY =====
+	if (!empty($details)) {
+$emaildetails.="<tr style='background-color:#f2f2f2;'>";
+	foreach ($details[0] as $field) {
+$emaildetails.="<th style='
+                border:1px solid #dddddd;
+                padding:8px;
+                text-align:left;
+                font-weight:bold;
+                color:#333333;
+            '>" . htmlspecialchars($field['title']) . "</th>";
+	}
+$emaildetails.="</tr>";
+	}
+// ===== CREATE ROWS DYNAMICALLY =====
+foreach ($details as $project) {
+$emaildetails.="<tr>";
+	foreach ($project as $field) {
+$emaildetails.="<td style='border:1px solid #dddddd;padding:8px;color:#555555;'>" . htmlspecialchars($field['value']) . "</td>";
+	}
+$emaildetails.="</tr>";
+}
+$emaildetails.="</table>";
+
+
+                
+                // Prepare email data
+                $msgdata = [
+                    'recipientEmail' => $darEmail,
+                    'recipientCC' => $ccEmails ?? 'vikashg@itio.in',
+                    'emailSubject' => 'DAR Submitted - ' . $staffName . ' - ' . date('d-m-Y'),
+                    'emailBody' => '<h3>Daily Activity Report</h3>'
+                        . '<p><strong>Staff:</strong> ' . htmlspecialchars($staffName) . '</p>'
+                        . '<p><strong>Date:</strong> ' . date('d-m-Y') . '</p>'
+                        . '<hr>'
+						. $emaildetails
+						. '<hr>'
+						. '<p><strong>CRM - </strong> ' . $companyname . '</p>'
+                ];
+				
+				//print_r($msgdata);exit;
+                
+                // Send email if recipient exists
+                if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->compose_email_super($msgdata);
+                }
+            }
+            
+            redirect(admin_url('hrd/daily_activity_report_dar?date=' . $date));
+        }
+        //print_r($existing_dar);exit;
+        $data['dar_fields']       = $dar_fields;
+        $data['existing_details'] = $existing_dar ? json_decode($existing_dar['details'], true) : [];
+		$data['existing_status'] = $existing_dar ? $existing_dar['status'] : 2;
+        $data['date']             = $selected_date;
+        $data['title']      = 'Daily Activity Report (DAR)';
+
+        $this->load->view('admin/hrd/daily_activity_report_dar', $data);
     }
 
     public function joining_form()

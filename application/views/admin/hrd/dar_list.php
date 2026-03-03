@@ -84,7 +84,7 @@
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (!empty($dars)) { ?>
-              <table class="table dt-table" data-order-col="0" data-order-type="desc">
+              <table class="table dt-table" data-order-col="0" data-order-type="asc">
                 <thead>
                   <tr>
                     <th>Date</th>
@@ -96,12 +96,39 @@
                 <tbody>
                   <?php foreach ($dars as $dar) { ?>
                     <?php
-                      $files = [];
-                      if (!empty($dar['file'])) {
-                        $files = array_filter(array_map('trim', explode(',', $dar['file'])));
-                      }
-                      $desc = htmlspecialchars($dar['descriptions'] ?? '', ENT_QUOTES, 'UTF-8');
-                      $filesJson = htmlspecialchars(json_encode(array_values($files)), ENT_QUOTES, 'UTF-8');
+                     
+$desc = $dar['details'] ?? '';
+$detailstable="No description found";
+if(isset($desc)&&$desc){ 
+$details = json_decode($desc, true) ?? [];
+if (!empty($details) && is_array($details)) {
+$detailstable="<table class='table dt-table' border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;width:100%;'>";
+// ===== Header =====
+if (!empty($details)) {
+$detailstable.="<tr style='background:#f2f2f2;'>";
+foreach ($details[0] as $field) {
+$detailstable.="<th>" . htmlspecialchars($field['title']) . "</th>";
+}
+$detailstable.="</tr>";
+}
+
+// ===== Rows =====
+foreach ($details as $project) {
+$detailstable.="<tr>";
+
+foreach ($project as $field) {
+$detailstable.="<td>" . htmlspecialchars($field['value']) . "</td>";
+}
+
+$detailstable.="</tr>";
+}
+
+$detailstable.="</table>";
+
+
+
+}
+}
                     ?>
                     <tr>
                       <td><?php echo e(date('d-m-Y', strtotime($dar['addedon']))); ?></td>
@@ -112,16 +139,18 @@
                           <span class="label label-default">Draft</span>
                         <?php } ?>
                       </td>
-                      <?php /*?><td><?php echo e(wordwrap(strip_tags($dar['descriptions'] ?? ''), 60, "\n", true)); ?></td><?php */?>
+                      
                       <td>
                         <button type="button"
                                 class="btn btn-info btn-xs dar-view"
                                 data-id="<?php echo (int) $dar['id']; ?>"
                                 data-status="<?php echo (int) $dar['status']; ?>"
-                                data-description="<?php echo $desc; ?>"
-                                data-files="<?php echo $filesJson; ?>">
+                                data-description="<?php echo htmlspecialchars($detailstable ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                           View
                         </button>
+<?php if($dar['status'] == 2 && date('Y-m-d',strtotime($dar['addedon'])) == date('Y-m-d')){ ?>
+<a href="<?php echo admin_url('hrd/daily_activity_report_dar');?>" class="btn btn-warning btn-xs" title="View and submit">Edit</a>
+<?php } ?>
                       </td>
                     </tr>
                   <?php } ?>
@@ -138,11 +167,9 @@
 </div>
 
 <div class="modal fade" id="dar_view_modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
-      <form id="dar-update-form" enctype="multipart/form-data">
-        <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
-        <input type="hidden" name="dar_id" id="dar-id" value="">
+      
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
@@ -150,539 +177,38 @@
           <h4 class="modal-title">DAR Details</h4>
         </div>
         <div class="modal-body">
-<?php /*?>		<label for="dar-description">To : </label><br />
-<?php echo get_company_fields($companyId ,'email_dar') ?? '';?><?php */?>
-<div class="form-group">
-                <label for="cc_email">CC</label>
-                <div class="email-input-wrapper">
-                    <div class="email-tags-container" id="ccEmailTagsContainer">
-                        <input type="text" class="email-input-field" id="ccEmailInputField" placeholder="Type name or email to search" autocomplete="off">
-                    </div>
-                    <div class="email-suggestions" id="ccEmailSuggestions"></div>
-                </div>
-                <input type="hidden" id="cc_email" name="cc_email" value="">
-              </div>
+
+
           <div class="form-group">
             <label>Description <span class="text-danger" id="desc-required" style="display:none;">*</span></label>
-            <div class="well well-sm" style="min-height:120px;">
-              <textarea id="dar-view-description" name="description" class="form-control editor"></textarea>
-            </div>
+            <div class="dataDisplay" style="min-height:120px;"></div>
+              
+            
           </div>
-          <div class="form-group">
-            <label>Existing Attachments</label>
-            <div id="dar-view-files"></div>
-          </div>
-          <div class="form-group" id="new-attachments-group" style="display:none;">
-            <label>Add New Attachments</label>
-            <input type="file" name="dar_files[]" id="dar-new-files" class="form-control" multiple>
-            <div id="dar-new-files-list" class="tw-mt-2"></div>
-          </div>
+          
+          
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-success" id="dar-update-btn" style="display:none;">
-            <i class="fa-solid fa-save tw-mr-1"></i> Update DAR
-          </button>
-          <button type="button" class="btn btn-primary" id="dar-submit-btn" style="display:none;">
-            <i class="fa-solid fa-paper-plane tw-mr-1"></i> Submit DAR
-          </button>
-        </div>
-      </form>
+        
+      
     </div>
   </div>
 </div>
 
 <?php init_tail(); ?>
-<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
-<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
-<script>
-  $('.editor').jqte();
-</script>
+
 <script>
   $(function() {
-    var currentDarId = 0;
-    var currentDarStatus = 0;
-    var currentFiles = [];
-    var newFilesStore = [];
-    
-    // File input management
-    var $fileInput = $('#dar-new-files');
-    var $fileList = $('#dar-new-files-list');
-    
-    function renderNewFilesList() {
-      $fileList.empty();
-      if (newFilesStore.length === 0) return;
-      var $ul = $('<ul class="list-unstyled mb-0"></ul>');
-      newFilesStore.forEach(function(file, index) {
-        var $li = $('<li class="tw-my-1"></li>');
-        var $name = $('<span></span>').text(file.name + ' (' + Math.round(file.size / 1024) + ' KB)');
-        var $btn = $('<button type="button" class="btn btn-xs btn-danger ml-2">Remove</button>');
-        $btn.on('click', function() {
-          newFilesStore.splice(index, 1);
-          renderNewFilesList();
-        });
-        $li.append($name).append($btn);
-        $ul.append($li);
-      });
-      $fileList.append($ul);
-    }
-    
-    $fileInput.on('change', function() {
-      var files = Array.from($fileInput[0].files);
-      files.forEach(function(file) {
-        newFilesStore.push(file);
-      });
-      renderNewFilesList();
-      $fileInput.val('');
-    });
+   
     
     $('.dar-view').on('click', function() {
       var desc = $(this).data('description') || '';
-      var filesData = $(this).data('files');
-      var darId = $(this).data('id');
-      var darStatus = $(this).data('status');
-      var files = [];
-      
-      currentDarId = darId;
-      currentDarStatus = darStatus;
-      $('#dar-id').val(darId);
-      
-      if (Array.isArray(filesData)) {
-        files = filesData;
-      } else if (typeof filesData === 'string') {
-        try { files = JSON.parse(filesData); } catch (e) { files = []; }
-      } else if (filesData) {
-        files = [filesData];
-      }
-      currentFiles = files;
-
-      var decoded = $('<textarea/>').html(desc).text();
-      if (decoded) {
-        $('#dar-view-description').jqteVal(decoded);
-      } else {
-        $('#dar-view-description').jqteVal('');
-      }
-      
-      // Check if draft - enable/disable editor
-      var isDraft = (darStatus == 2 || darStatus == 0);
-      if (isDraft) {
-        $('.jqte').css('opacity', '1');
-        $('.jqte_editor').attr('contenteditable', 'true');
-      } else {
-        $('.jqte').css('opacity', '0.8');
-        $('.jqte_editor').attr('contenteditable', 'false');
-      }
-
-      // Render existing files with delete option for drafts
-      if (!files.length) {
-        $('#dar-view-files').html('<span class="text-muted">No attachments</span>');
-      } else {
-        var list = '<ul class="list-unstyled">';
-        for (var i = 0; i < files.length; i++) {
-          var f = files[i];
-          var name = f.split('/').pop();
-          list += '<li class="tw-my-1">';
-          list += '<a href="<?php echo base_url(''); ?>' + f + '" target="_blank">' + $('<div>').text(name).html() + '</a>';
-          if (isDraft) {
-            list += ' <button type="button" class="btn btn-xs btn-danger delete-existing-file" data-file="' + f + '"><i class="fa fa-trash"></i></button>';
-          }
-          list += '</li>';
-        }
-        list += '</ul>';
-        $('#dar-view-files').html(list);
-      }
-      
-      // Show/hide buttons based on status
-      if (isDraft) {
-        $('#dar-submit-btn').show();
-        $('#dar-update-btn').show();
-        $('#new-attachments-group').show();
-        $('#desc-required').show();
-      } else {
-        $('#dar-submit-btn').hide();
-        $('#dar-update-btn').hide();
-        $('#new-attachments-group').hide();
-        $('#desc-required').hide();
-      }
-      
-      $('#dar_view_modal').modal('show');
+	 $(".dataDisplay").html(desc);
+	 $('#dar_view_modal').modal('show');
+     
     });
     
-    // Delete existing file
-    $(document).on('click', '.delete-existing-file', function() {
-      var file = $(this).data('file');
-      if (!currentDarId || !file) return;
-      if (!confirm('Delete this attachment?')) return;
-      
-      var $btn = $(this);
-      $btn.prop('disabled', true);
-      
-      $.post('<?php echo admin_url('hrd/dar_delete_file'); ?>/' + currentDarId, {
-        <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>',
-        file: file
-      }, function(resp) {
-        if (resp && resp.success) {
-          $btn.closest('li').remove();
-          alert_float('success', 'File deleted');
-        } else {
-          $btn.prop('disabled', false);
-          alert_float('warning', 'Failed to delete file');
-        }
-      }, 'json');
-    });
+  
     
-    // Helper function to get jQTE editor content
-    function getEditorContent() {
-      // jQTE stores content in .jqte_editor div, get its HTML
-      var $editor = $('#dar-view-description').closest('.jqte').find('.jqte_editor');
-      if ($editor.length) {
-        return $editor.html();
-      }
-      // Fallback to textarea value
-      return $('#dar-view-description').val();
-    }
-    
-    // Handle update button click
-    $('#dar-update-btn').on('click', function() {
-      if (!currentDarId) {
-        alert_float('warning', 'Invalid DAR');
-        return;
-      }
-      
-      var description = getEditorContent();
-      var plainText = $('<div>').html(description).text().trim();
-	  
-      if (plainText.length < 5) {
-        alert_float('warning', 'Description is required (minimum 5 characters)');
-        return;
-      }
-      
-      var $btn = $(this);
-      $btn.html('<i class="fa-solid fa-spinner fa-spin-pulse"></i> Updating...').prop('disabled', true);
-      
-      var formData = new FormData();
-      formData.append('<?php echo $this->security->get_csrf_token_name(); ?>', '<?php echo $this->security->get_csrf_hash(); ?>');
-      formData.append('dar_id', currentDarId);
-      formData.append('description', description);
-      
-      // Add new files
-      newFilesStore.forEach(function(file) {
-        formData.append('dar_files[]', file);
-      });
-      
-      $.ajax({
-        url: '<?php echo admin_url('hrd/dar_update'); ?>',
-        method: 'POST',
-        data: formData,
-		dataType: "json", 
-        processData: false,
-        contentType: false,
-        success: function(resp) {
-          $btn.html('<i class="fa-solid fa-save tw-mr-1"></i> Update DAR').prop('disabled', false);
-          //alert(resp);
-		  console.log(resp);
-          if (resp && (resp.success === true || resp.success === "true")) {
-            alert_float('success', resp.message || 'DAR updated successfully');
-            $('#dar_view_modal').modal('hide');
-            location.reload();
-          } else {  //alert(resp.success);
-            alert_float('warning', resp && resp.message ? resp.message : 'Failed to update DAR !!');
-          }
-        },
-        error: function() {
-          $btn.html('<i class="fa-solid fa-save tw-mr-1"></i> Update DAR').prop('disabled', false);
-          alert_float('danger', 'Failed to update DAR. Please try again.');
-        }
-      });
-    });
-    
-    // Handle submit button click
-    $('#dar-submit-btn').on('click', function() {
-      if (!currentDarId) {
-        alert_float('warning', 'Invalid DAR');
-        return;
-      }
-      
-      var description = getEditorContent();
-      var plainText = $('<div>').html(description).text().trim();
-	  var cc_email = $('#cc_email').val();
-
-      
-      if (plainText.length < 5) {
-        alert_float('warning', 'Description is required (minimum 5 characters)');
-        return;
-      }
-      
-      if (!confirm('Are you sure you want to submit this DAR? Once submitted, it cannot be edited.')) {
-        return;
-      }
-      
-      var $btn = $(this);
-      $btn.html('<i class="fa-solid fa-spinner fa-spin-pulse"></i> Submitting...').prop('disabled', true);
-      
-      var formData = new FormData();
-      formData.append('<?php echo $this->security->get_csrf_token_name(); ?>', '<?php echo $this->security->get_csrf_hash(); ?>');
-      formData.append('dar_id', currentDarId);
-      formData.append('description', description);
-	  formData.append('cc_email', cc_email);
-      formData.append('submit_dar', '1');
-      
-      // Add new files
-      newFilesStore.forEach(function(file) {
-        formData.append('dar_files[]', file);
-      });
-      //alert ("Hiii"); return false;
-      $.ajax({
-        url: '<?php echo admin_url('hrd/dar_update'); ?>',
-        method: 'POST',
-        data: formData,
-		dataType: "json", 
-        processData: false,
-        contentType: false,
-        success: function(resp) {
-          $btn.html('<i class="fa-solid fa-paper-plane tw-mr-1"></i> Submit DAR').prop('disabled', false);
-          
-          
-          if (resp && (resp.success === true || resp.success === "true")) {
-            alert_float('success', resp.message || 'DAR submitted successfully');
-            $('#dar_view_modal').modal('hide');
-            location.reload();
-          } else {
-            alert_float('warning', resp && resp.message ? resp.message : 'Failed to submit DAR');
-          }
-        },
-        error: function() {
-          $btn.html('<i class="fa-solid fa-paper-plane tw-mr-1"></i> Submit DAR').prop('disabled', false);
-          alert_float('danger', 'Failed to submit DAR. Please try again.');
-        }
-      });
-    });
-    
-    // Reset on modal close
-    $('#dar_view_modal').on('hidden.bs.modal', function() {
-      currentDarId = 0;
-      currentDarStatus = 0;
-      currentFiles = [];
-      newFilesStore = [];
-      $('#dar-id').val('');
-      $('#dar-submit-btn').hide();
-      $('#dar-update-btn').hide();
-      $('#new-attachments-group').hide();
-      $('#desc-required').hide();
-      $fileList.empty();
-      // Clear CC email tags
-      if (typeof window.clearCcEmailTags === 'function') {
-        window.clearCcEmailTags();
-      }
-    });
-
-    // CC Email Autocomplete with multiple tags
-    (function() {
-      var emailTags = [];
-      var $container = $('#ccEmailTagsContainer');
-      var $inputField = $('#ccEmailInputField');
-      var $hiddenInput = $('#cc_email');
-      var $suggestions = $('#ccEmailSuggestions');
-      var searchTimeout = null;
-      var activeSuggestionIndex = -1;
-      var currentSuggestions = [];
-
-      function isValidEmail(email) {
-        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-      }
-
-      function updateHiddenInput() {
-        $hiddenInput.val(emailTags.join(','));
-      }
-
-      function createTag(email, name) {
-        email = email.trim();
-        if (!email) return;
-
-        if (emailTags.indexOf(email) !== -1) {
-          return;
-        }
-
-        emailTags.push(email);
-
-        var displayText = name ? name + ' <' + email + '>' : email;
-        var $tag = $('<span class="email-tag"></span>');
-        $tag.text(displayText);
-        $tag.attr('data-email', email);
-        var $remove = $('<span class="remove-tag">&times;</span>');
-        $remove.on('click', function() {
-          var idx = emailTags.indexOf(email);
-          if (idx > -1) {
-            emailTags.splice(idx, 1);
-          }
-          $tag.remove();
-          updateHiddenInput();
-        });
-        $tag.append($remove);
-        $tag.insertBefore($inputField);
-        updateHiddenInput();
-      }
-
-      function hideSuggestions() {
-        $suggestions.hide().empty();
-        currentSuggestions = [];
-        activeSuggestionIndex = -1;
-      }
-
-      function showSuggestions(staffList) {
-        $suggestions.empty();
-        currentSuggestions = staffList;
-        activeSuggestionIndex = -1;
-
-        if (staffList.length === 0) {
-          hideSuggestions();
-          return;
-        }
-
-        staffList.forEach(function(staff, idx) {
-          var $item = $('<div class="email-suggestion-item"></div>');
-          $item.html('<span class="suggestion-name">' + escapeHtml(staff.name) + '</span><br><span class="suggestion-email">' + escapeHtml(staff.email) + '</span>');
-          $item.attr('data-index', idx);
-          $item.on('mousedown', function(e) {
-            e.preventDefault();
-            $inputField.val('');
-            createTag(staff.email, staff.name);
-            hideSuggestions();
-            $inputField.focus();
-          });
-          $suggestions.append($item);
-        });
-
-        $suggestions.show();
-      }
-
-      function escapeHtml(text) {
-        var div = document.createElement('div');
-        div.appendChild(document.createTextNode(text));
-        return div.innerHTML;
-      }
-
-      function selectActiveSuggestion() {
-        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestions.length) {
-          var staff = currentSuggestions[activeSuggestionIndex];
-          createTag(staff.email, staff.name);
-          $inputField.val('');
-          hideSuggestions();
-        }
-      }
-
-      function updateActiveSuggestion() {
-        $suggestions.find('.email-suggestion-item').removeClass('active');
-        if (activeSuggestionIndex >= 0) {
-          $suggestions.find('.email-suggestion-item[data-index="' + activeSuggestionIndex + '"]').addClass('active');
-        }
-      }
-
-      function searchStaffEmails(term) {
-        if (term.length < 2) {
-          hideSuggestions();
-          return;
-        }
-
-        $.ajax({
-          url: admin_url + 'hrd/search_staff_emails',
-          type: 'GET',
-          data: { term: term },
-          dataType: 'json',
-          success: function(data) {
-            if (Array.isArray(data)) {
-              var filtered = data.filter(function(staff) {
-                return emailTags.indexOf(staff.email) === -1;
-              });
-              showSuggestions(filtered);
-            } else {
-              hideSuggestions();
-            }
-          },
-          error: function() {
-            hideSuggestions();
-          }
-        });
-      }
-
-      $inputField.on('keydown', function(e) {
-        var val = $(this).val();
-
-        if (e.key === 'ArrowDown') {
-          e.preventDefault();
-          if (currentSuggestions.length > 0) {
-            activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
-            updateActiveSuggestion();
-          }
-          return;
-        }
-
-        if (e.key === 'ArrowUp') {
-          e.preventDefault();
-          if (currentSuggestions.length > 0) {
-            activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
-            updateActiveSuggestion();
-          }
-          return;
-        }
-
-        if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
-          e.preventDefault();
-          if (activeSuggestionIndex >= 0) {
-            selectActiveSuggestion();
-          } else if (val.trim() && isValidEmail(val.trim())) {
-            createTag(val.trim());
-            $(this).val('');
-            hideSuggestions();
-          }
-          return;
-        }
-
-        if (e.key === 'Backspace' && val === '') {
-          if (emailTags.length > 0) {
-            emailTags.pop();
-            $container.find('.email-tag').last().remove();
-            updateHiddenInput();
-          }
-          return;
-        }
-
-        if (e.key === 'Escape') {
-          hideSuggestions();
-          return;
-        }
-      });
-
-      $inputField.on('input', function() {
-        var val = $(this).val().trim();
-        if (searchTimeout) {
-          clearTimeout(searchTimeout);
-        }
-        searchTimeout = setTimeout(function() {
-          searchStaffEmails(val);
-        }, 300);
-      });
-
-      $inputField.on('blur', function() {
-        setTimeout(function() {
-          hideSuggestions();
-        }, 200);
-      });
-
-      $container.on('click', function() {
-        $inputField.focus();
-      });
-
-      // Expose clear function for modal reset
-      window.clearCcEmailTags = function() {
-        emailTags = [];
-        $container.find('.email-tag').remove();
-        $hiddenInput.val('');
-        $inputField.val('');
-        hideSuggestions();
-      };
-    })();
   });
 </script>
 </body></html>
