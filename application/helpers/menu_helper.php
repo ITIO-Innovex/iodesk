@@ -757,7 +757,7 @@ function app_init_admin_sidebar_menu_items()
         ]);
     }
 	
-	//if (is_admin()) {  // || staff_can('view', 'user_utility')
+	if (is_admin()) {  // || staff_can('view', 'user_utility')
         $CI->app_menu->add_sidebar_menu_item('drive', [
             'name'     => 'My Drive',
             'href'     => admin_url('drive'),
@@ -765,7 +765,7 @@ function app_init_admin_sidebar_menu_items()
             'position' => 40,
             'badge'    => [],
         ]);
-    //}
+    }
 
 /*    if (is_admin()) {
     if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
