@@ -5412,6 +5412,9 @@ $data['notifications'] = $this->db->get()->result_array();
 
     public function dar()
     {
+	
+	redirect(admin_url('hrd/daily_activity_report_dar'));
+	exit;
         if (!(is_admin() || staff_can('view_own',  'hr_department'))) {
             access_denied('DAR');
         }

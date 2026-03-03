@@ -142,10 +142,16 @@
         </div>
         <input type="hidden" id="recipientCCIT" name="recipientCC" value="">
       </div>
-	  <?php /*?><div class="mb-3">
+	  <div class="mb-3">
         <label for="recipientBCCEmail" class="form-label mtop10">BCC</label>
-        <input type="text" class="form-control" id="recipientBCCIT" name="recipientBCC" value="" placeholder="Enter BCC email" >
-      </div><?php */?>
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="bccEmailTagsContainer">
+                <input type="text" class="email-input-field" id="bccEmailInputField" placeholder="Type BCC email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="bccEmailSuggestions"></div>
+        </div>
+        <input type="hidden" id="recipientBCCIT" name="recipientBCC" value="">
+      </div>
       <div class="mb-3">
 	  <label for="emailSubject" class="form-label mtop10">Subject</label>
 	  <input type="text" class="form-control" id="emailSubjectIT" name="emailSubject" value="" placeholder="Enter email subject"  required>
@@ -778,13 +784,22 @@ window.addEventListener('beforeunload', function (e) {
         suggestions: '#ccEmailSuggestions'
     });
     
+    var bccEmailInput = createEmailTagInput({
+        container: '#bccEmailTagsContainer',
+        inputField: '#bccEmailInputField',
+        hiddenInput: '#recipientBCCIT',
+        suggestions: '#bccEmailSuggestions'
+    });
+    
     // Expose globally for form submission
-    window.webmailToEmailInput = toEmailInput;
-    window.webmailCcEmailInput = ccEmailInput;
+    window.webmailToEmailInput  = toEmailInput;
+    window.webmailCcEmailInput  = ccEmailInput;
+    window.webmailBccEmailInput = bccEmailInput;
     
     window.updateWebmailEmailInputs = function() {
         toEmailInput.updateHiddenInput();
         ccEmailInput.updateHiddenInput();
+        bccEmailInput.updateHiddenInput();
     };
     
     if (initialToEmail) {
@@ -798,7 +813,7 @@ window.addEventListener('beforeunload', function (e) {
     
     $(document).on('click', function(e) {
         if (!$(e.target).closest('.email-input-wrapper').length) {
-            $('#toEmailSuggestions, #ccEmailSuggestions').hide().empty();
+            $('#toEmailSuggestions, #ccEmailSuggestions, #bccEmailSuggestions').hide().empty();
         }
     });
 })();
@@ -827,6 +842,22 @@ $(document).ready(function () {
 
 });
 </script>
+
+<?php
+$_SESSION['replySavedEmail'] = $_SESSION['replySavedEmail'] ?? 0;
+if(isset($_SESSION['replySavedEmail']) && $_SESSION['replySavedEmail']==1){
+?>
+<script>
+    // Your save logic here
+    localStorage.removeItem("outbox_email_body");
+    $('#emailBody').val('');
+    $('#emailBody').jqteVal('');
+</script>
+<?php
+$_SESSION['replySavedEmail']=0;
+}
+
+?>
 
 </body>
 
