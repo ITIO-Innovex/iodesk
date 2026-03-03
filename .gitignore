@@ -1,5 +1,6 @@
 application/logs
 application/vendor
+application/vendor/composer
 attachments/
 uploads/leads/
 uploads/ticket_attachments/
@@ -9,8 +10,8 @@ uploads/company/
 
 # Ignore all .log files
 *.log
-Copy.php
-Copy(*).php
+*Copy.php
+*Copy(*).php
 
 # Ignore node_modules folder
 node_modules/
