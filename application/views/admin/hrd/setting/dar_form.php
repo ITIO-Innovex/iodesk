@@ -54,7 +54,11 @@
                 </thead>
                 <tbody <?php if ((int)$filter_department_id > 0) { ?>id="dar-sortable" data-department-id="<?php echo (int)$filter_department_id; ?>"<?php } ?>>
                   <?php foreach ($dar_custom_fields as $f) { ?>
-                    <tr data-id="<?php echo (int)$f['id']; ?>">
+                    <tr class="dar-form-row"
+                        data-id="<?php echo (int)$f['id']; ?>"
+                        data-department_id="<?php echo (int)$f['department_id']; ?>"
+                        data-field_title="<?php echo htmlspecialchars($f['field_title'], ENT_QUOTES, 'UTF-8'); ?>"
+                        data-status="<?php echo (int)$f['status']; ?>">
                       <td>
                         <?php
                         $deptId = (int) ($f['department_id'] ?? 0);
@@ -156,8 +160,12 @@
 
     $('#dar-field-modal').on('hidden.bs.modal', function () {
       $('#dar-additional').html('');
-      $('#dar_department_id').val('').trigger('change');
-      $('#dar_field_title').val('');
+      var $dept = $('#department_id').length ? $('#department_id') : $('#dar_department_id');
+      $dept.val('').trigger('change');
+      if ($dept.hasClass('selectpicker') && typeof $dept.selectpicker === 'function') {
+        $dept.selectpicker('refresh');
+      }
+      $('#dar-field-form').find('input[name="field_title"]').val('');
       $('#dar_status').val('1');
       $('.add-title').removeClass('hide');
       $('.edit-title').removeClass('hide');
@@ -170,12 +178,31 @@
   }
 
   function editDarField(invoker, id) {
-    $('#dar-additional').append('<input type="hidden" name="id" value="' + id + '">');
-    $('#dar_department_id').val($(invoker).data('department_id')).trigger('change');
-    $('#dar_field_title').val($(invoker).data('field_title'));
-    $('#dar_status').val($(invoker).data('status'));
-    $('#dar-field-modal').modal('show');
+    var $row = $(invoker).closest('tr.dar-form-row');
+    if (!$row.length) {
+      $row = $(invoker).closest('tr');
+    }
+    var departmentId = $row.attr('data-department_id') || $(invoker).attr('data-department_id') || '';
+    var fieldTitle = ($row.attr('data-field_title') || $(invoker).attr('data-field_title') || '');
+    var status = String($row.attr('data-status') || $(invoker).attr('data-status') || '1');
+
+    $('#dar-additional').html('<input type="hidden" name="id" value="' + id + '">');
+    $('#dar-field-form').find('input[name="field_title"]').val(fieldTitle);
+    $('#dar_status').val(status);
+
+    var $deptSelect = $('#department_id');
+    if (!$deptSelect.length) {
+      $deptSelect = $('#dar_department_id');
+    }
+    $deptSelect.val(departmentId);
+    if ($deptSelect.hasClass('selectpicker') && typeof $deptSelect.selectpicker === 'function') {
+      $deptSelect.selectpicker('refresh');
+    }
+    $deptSelect.trigger('change');
+
     $('.add-title').addClass('hide');
+    $('.edit-title').removeClass('hide');
+    $('#dar-field-modal').modal('show');
   }
 
   function applyDepartmentFilter() {
