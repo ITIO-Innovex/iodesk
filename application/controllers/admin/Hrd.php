@@ -6263,14 +6263,30 @@ $data['notifications'] = $this->db->get()->result_array();
             access_denied('DAR Master');
         }
 
-        $date = $this->input->get('date');
+        $date    = $this->input->get('date');
+        $month   = $this->input->get('month'); // format: YYYY-MM from <input type="month">
         $staffId = $this->input->get('staffid');
-        $date = $date ? $date : date('Y-m-d');
+
+        // Default to today only when no date/month filter is provided
+        if (empty($date) && empty($month)) {
+            $date = date('Y-m-d');
+        }
 
         $this->db->select('d.*, s.firstname, s.lastname');
         $this->db->from('it_crm_dar d');
         $this->db->join(db_prefix().'staff s', 's.staffid = d.staffid', 'left');
-        $this->db->where('d.date=', $date);
+        // Filter by specific day or by whole month
+        if (!empty($month)) {
+            // Expecting YYYY-MM, e.g. 2026-03
+            $year  = (int) substr($month, 0, 4);
+            $m     = (int) substr($month, 5, 2);
+            if ($year > 0 && $m > 0) {
+                $this->db->where('YEAR(d.date)', $year);
+                $this->db->where('MONTH(d.date)', $m);
+            }
+        } else {
+            $this->db->where('d.date', $date);
+        }
         if (!empty($staffId)) {
             $this->db->where('d.staffid', (int) $staffId);
         }
@@ -6285,7 +6301,8 @@ $data['notifications'] = $this->db->get()->result_array();
             ->result_array();
         //echo $this->db->last_query();exit;
         $data['filters'] = [
-            'date' => $date,
+            'date'    => $date,
+            'month'   => $month,
             'staffid' => $staffId,
         ];
         $data['title'] = 'DAR Master';
