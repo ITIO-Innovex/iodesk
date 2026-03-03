@@ -129,7 +129,7 @@ View
               <table id="dar-master-export-table" class="hidden" style="display:none;">
                 <thead>
                   <tr>
-                    <th>Date1</th>
+                    <th>Date</th>
                     <th>Staff</th>
 					<th>Status</th>
 					<th>Details</th>

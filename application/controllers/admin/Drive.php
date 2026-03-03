@@ -42,6 +42,7 @@ class Drive extends AdminController
 	////// Get Document List 
     public function document()
     {
+	$_SESSION['DriveTypeStatus']="PersonalGoogle";
 	if(!$_SESSION['GOOGLE_CLIENT_ID']){ 
 	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
      redirect(admin_url('drive/'));
@@ -73,41 +74,55 @@ class Drive extends AdminController
     }
 
   
-	/// Get Excel List
+	/// Get Excel List - shared logic
 	public function excel()
     {
+        // Default Excel listing (currently personal Google drive)
+	    $_SESSION['DriveTypeStatus'] = "PersonalGoogle";
 	
-	 if(!$_SESSION['GOOGLE_CLIENT_ID']){ 
-	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
-     redirect(admin_url('drive/'));
-	 }
+	    if (!$_SESSION['GOOGLE_CLIENT_ID']) { 
+	        set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
+            redirect(admin_url('drive/'));
+	    }
+       
+        $client  = $this->getGoogleClient();
+        $service = new Google_Service_Drive($client);
 
-     $client = $this->getGoogleClient();
+        $files = $service->files->listFiles([
+            'q'      => "mimeType='application/vnd.google-apps.spreadsheet'",
+            'fields' => 'files(id, name, createdTime)'
+        ]);
 
-    $service = new Google_Service_Drive($client);
-
-    $files = $service->files->listFiles([
-        'q' => "mimeType='application/vnd.google-apps.spreadsheet'",
-        'fields' => 'files(id, name, createdTime)'
-    ]);
-
-    //$data['files'] = $files->getFiles();
-	//////////////////////////////////
-	$staff_id = get_staff_user_id();
-	     $data['files'] = $this->db
-        ->where('staff_id', $staff_id)
-		->where('is_deleted', 1)
-		->where('file_type', 'Excel')
-		->where('source', 'Google')
-        ->get('it_crm_staff_drive_files')
-        ->result_array();
+        // $data['files'] = $files->getFiles();
+	    //////////////////////////////////
+	    $staff_id      = get_staff_user_id();
+	    $data['files'] = $this->db
+            ->where('staff_id', $staff_id)
+		    ->where('is_deleted', 1)
+		    ->where('file_type', 'Excel')
+		    ->where('source', 'Google')
+            ->get('it_crm_staff_drive_files')
+            ->result_array();
         //echo $this->db->last_query();exit;
-	//////////////////////////////////
-    $this->load->view('admin/drive/list', $data);
-}
+	    //////////////////////////////////
+        $this->load->view('admin/drive/list', $data);
+    }
+
+    /**
+     * Personal Excel page alias:
+     * URL: /admin/drive/personal/excel
+     * Currently behaves the same as /admin/drive/excel
+     */
+    public function personal_excel()
+    {
+        // Ensure we are in personal drive mode (same as excel())
+        $_SESSION['DriveTypeStatus'] = "PersonalGoogle";
+        return $this->excel();
+    }
 
     public function slides()
     {
+	    $_SESSION['DriveTypeStatus']="PersonalGoogle";
         $data['title'] = 'Drive - Slides';
         $this->load->view('admin/drive/slides', $data);
     }
@@ -115,10 +130,10 @@ class Drive extends AdminController
 	private function checkGoogleLogin()
 {
     $staff_id = get_staff_user_id();
-
+    $companyId = get_staff_company_id();
     $token = $this->db
-        ->where('staff_id', $staff_id)
-        ->get('staff_google_tokens')
+        ->where('company_id', $companyId)
+        ->get('it_crm_staff_google_tokens')
         ->row();
 //echo $this->db->last_query();exit;
     if (!$token) {
@@ -301,7 +316,8 @@ private function getGoogleClient()
      redirect(admin_url('drive/'));
 	 }
     $token = $this->checkGoogleLogin();
-    $tokenData = $this->db->where('staff_id', get_staff_user_id())
+	$companyId = get_staff_company_id();
+    $tokenData = $this->db->where('company_id', $companyId)
         ->get('it_crm_staff_google_tokens')
         ->row();
 
@@ -356,9 +372,9 @@ private function refreshAccessToken($client, $tokenData)
         }
 
         $client->setAccessToken($newToken);
-
+        $companyId = get_staff_company_id();
         // Update DB
-        $this->db->where('staff_id', get_staff_user_id())
+        $this->db->where('company_id', companyId())
             ->update('it_crm_staff_google_tokens', [
                 'access_token' => json_encode($newToken),
                 'refresh_token' => $newToken['refresh_token']

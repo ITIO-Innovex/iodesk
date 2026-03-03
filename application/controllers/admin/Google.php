@@ -64,17 +64,18 @@ class Google extends AdminController
         );
 
         $staff_id = get_staff_user_id();
+		$companyId = get_staff_company_id();
 
-        $this->db->where('staff_id', $staff_id)
-                 ->delete('staff_google_tokens');
+        $this->db->where('company_id', $companyId)
+                 ->delete('it_crm_staff_google_tokens');
 
-        $this->db->insert('staff_google_tokens', [
-            'staff_id'      => $staff_id,
+        $this->db->insert('it_crm_staff_google_tokens', [
+            'company_id'      => $companyId,
             'access_token'  => json_encode($token),
             'refresh_token' => $token['refresh_token'] ?? null,
             'created_at'    => date('Y-m-d H:i:s')
         ]);
-
+//echo $this->db->last_query();exit;
         redirect(admin_url('drive'));
     }
 }
