@@ -89,7 +89,7 @@ $attendance_display_status=attendance_display_status();
 	</div>
 	
 	</div>
-    <div class="screen-options-btn box-shadow-bg tw-mt-2 m-hide">
+    <div class="screen-options-btn box-shadow-bg tw-mt-3 m-hide">
         <i class="fa-solid fa-user  menu-icon tw-mx-2 fa-2x" title="View Profile - <?=get_user_type();?>"></i>
     </div>
 	<div class="tw-mt-2" style="margin-left: 30px;">
@@ -101,11 +101,11 @@ $attendance_display_status=attendance_display_status();
   </div>
   <?php if($attendance_display_status==1){ ?>
   <?php if(isset($in_time)&&$in_time){ ?>
- <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
+ <button type="submit" class="digital-btn btn-success attendance-submit"  name="attendance" data-mode="Out"  style="padding-top: 14px;" data-toggle="tooltip" data-title="Your Mark in Time : <?php echo date("Y F d");?> <?php echo $in_time;?>" data-original-title="" ><i class="fa-solid fa-right-from-bracket"></i> Mark out </button>
   <?php }else{ ?>
-   <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
+   <button type="submit" class="digital-btn btn-warning attendance-submit"  name="attendance" data-mode="In" style="padding-top: 14px;" > Mark in <i class="fa-solid fa-right-from-bracket fa-rotate-180"></i></button>
   <?php } ?>
-  <a  href="<?php echo admin_url('hrd/dar');?>" class="digital-btn btn-info" title="Add your Daily Activity Report (DAR)"> DAR <i class="fa-solid fa-file-pen"></i></a>
+  <a  href="<?php echo admin_url('hrd/dar');?>" class="digital-btn btn-info" title="Add your Daily Activity Report (DAR)" style="padding-top: 16px;"> DAR <i class="fa-solid fa-file-pen"></i></a>
   <?php }else{ ?>
  
   <?php } ?>
