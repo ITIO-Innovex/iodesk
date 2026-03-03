@@ -275,7 +275,7 @@
                         <div class="col-md-12">
                         <div class="form-group">
                             <label for="uw_status" class="control-label">Status</label>
-                            <select name="status" name="uw_status" id="uw_statusx" class="form-control">
+                            <select  name="uw_status" id="uw_statusx" class="form-control">
                                 <option value="2">Pending</option>
                                 <option value="1">Approve</option>
                                 <option value="3">Reject</option>

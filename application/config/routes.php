@@ -337,6 +337,12 @@ $route['admin/hrd/gallery/latest'] = 'admin/hrd/gallery_latest';
 $route['admin/hrd/employee_details_form'] = 'admin/hrd/employee_details_form';
 $route['admin/hrd/job_application_form'] = 'admin/hrd/job_application_form';
 
+// HRD DAR Form custom fields
+$route['admin/hrd/setting/dar_form'] = 'admin/hrd/dar_form';
+
+// HRD Daily Activity Report (DAR) entry
+$route['admin/hrd/daily_activity_report_dar'] = 'admin/hrd/daily_activity_report_dar';
+
 /**
  * Support Ticket Routes
  */

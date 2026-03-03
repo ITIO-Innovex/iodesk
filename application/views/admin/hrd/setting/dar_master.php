@@ -52,12 +52,41 @@
                   </thead>
                   <tbody>
                     <?php foreach ($dars as $dar) { ?>
-                      <?php
-                        $files = [];
-                        if (!empty($dar['file'])) {
-                          $files = array_filter(array_map('trim', explode(',', $dar['file'])));
-                        }
-                      ?>
+<?php
+                     
+$desc = $dar['details'] ?? '';
+$detailstable="No description found";
+if(isset($desc)&&$desc){ 
+$details = json_decode($desc, true) ?? [];
+if (!empty($details) && is_array($details)) {
+$detailstable="<table class='table dt-table' border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;width:100%;'>";
+// ===== Header =====
+if (!empty($details)) {
+$detailstable.="<tr style='background:#f2f2f2;'>";
+foreach ($details[0] as $field) {
+$detailstable.="<th>" . htmlspecialchars($field['title']) . "</th>";
+}
+$detailstable.="</tr>";
+}
+
+// ===== Rows =====
+foreach ($details as $project) {
+$detailstable.="<tr>";
+
+foreach ($project as $field) {
+$detailstable.="<td>" . htmlspecialchars($field['value']) . "</td>";
+}
+
+$detailstable.="</tr>";
+}
+
+$detailstable.="</table>";
+
+
+
+}
+}
+                    ?>
                       <tr>
                         <td><?php echo e(date('d-m-Y', strtotime($dar['addedon']))); ?></td>
                         <td><?php echo e(trim(($dar['firstname'] ?? '') . ' ' . ($dar['lastname'] ?? ''))); ?></td>
@@ -74,7 +103,7 @@
                         </td>
 						<td>
               <button type="button" class="btn btn-info btn-xs dar-view"
-                      data-description="<?php echo htmlspecialchars($dar['descriptions'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                      data-description="<?php echo htmlspecialchars($detailstable ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                 View
               </button>
             </td>
@@ -101,7 +130,7 @@
 </div>
 
 <div class="modal fade" id="darViewModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">

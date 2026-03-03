@@ -804,6 +804,30 @@ window.addEventListener('beforeunload', function (e) {
 })();
 </script>
 
+<script>
+$(document).ready(function () {
+
+    const storageKey = "outbox_email_body";
+
+    // Initialize jqte
+    //$('#emailBody').jqte();
+
+    // Load saved content on page load
+    let savedData = localStorage.getItem(storageKey);
+    if (savedData) {
+        $('#emailBody').val(savedData);
+        $('#emailBody').jqteVal(savedData);
+    }
+
+    // Save while typing inside jqte
+    $(document).on('keyup', '.jqte_editor', function () {
+        let content = $('#emailBody').val();
+        localStorage.setItem(storageKey, content);
+    });
+
+});
+</script>
+
 </body>
 
 </html>
