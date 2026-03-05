@@ -16,7 +16,7 @@ class Drive extends AdminController
 		$GOOGLE_CLIENT_ID=$gapi->GOOGLE_CLIENT_ID ?? '';
 		$GOOGLE_CLIENT_SECRET=$gapi->GOOGLE_CLIENT_SECRET ?? '';
 	
-		if(isset($GOOGLE_CLIENT_ID)&&$GOOGLE_CLIENT_ID&&isset($GOOGLE_CLIENT_ID)&&$GOOGLE_CLIENT_ID){
+		if(isset($GOOGLE_CLIENT_ID)&&$GOOGLE_CLIENT_ID&&isset($GOOGLE_CLIENT_SECRET)&&$GOOGLE_CLIENT_SECRET){
 		define('GOOGLE_CLIENT_ID', $GOOGLE_CLIENT_ID);
 		define('GOOGLE_CLIENT_SECRET', $GOOGLE_CLIENT_SECRET);
 		define('GOOGLE_REDIRECT_URI', admin_url('google/callback'));
@@ -42,7 +42,6 @@ class Drive extends AdminController
 	////// Get Document List 
     public function document()
     {
-	$_SESSION['DriveTypeStatus']="PersonalGoogle";
 	if(!$_SESSION['GOOGLE_CLIENT_ID']){ 
 	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
      redirect(admin_url('drive/'));
@@ -78,7 +77,6 @@ class Drive extends AdminController
 	public function excel()
     {
         // Default Excel listing (currently personal Google drive)
-	    $_SESSION['DriveTypeStatus'] = "PersonalGoogle";
 	
 	    if (!$_SESSION['GOOGLE_CLIENT_ID']) { 
 	        set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
@@ -116,13 +114,11 @@ class Drive extends AdminController
     public function personal_excel()
     {
         // Ensure we are in personal drive mode (same as excel())
-        $_SESSION['DriveTypeStatus'] = "PersonalGoogle";
         return $this->excel();
     }
 
     public function slides()
     {
-	    $_SESSION['DriveTypeStatus']="PersonalGoogle";
         $data['title'] = 'Drive - Slides';
         $this->load->view('admin/drive/slides', $data);
     }
@@ -172,11 +168,7 @@ public function create_excel()
      redirect(admin_url('drive/'));
 	 }
 	 
-    $token = $this->checkGoogleLogin();
-
-    $client = new Google_Client();
-    $client->setAccessToken(json_decode($token->access_token, true));
-
+    $client  = $this->getGoogleClient(); // auto-refresh token if expired
     $service = new Google_Service_Drive($client);
 
     $fileMetadata = new Google_Service_Drive_DriveFile([
@@ -211,11 +203,7 @@ public function sync_drive_files()
      redirect(admin_url('drive/'));
 	 }
 	 
-    $token = $this->checkGoogleLogin();
-
-    $client = new Google_Client();
-    $client->setAccessToken(json_decode($token->access_token, true));
-
+    $client  = $this->getGoogleClient(); // auto-refresh token if expired
     $service = new Google_Service_Drive($client);
 
     // Get all files from DB
@@ -248,11 +236,7 @@ public function sync_drive_files()
      redirect(admin_url('drive/'));
 	 }
 	 
-    $token = $this->checkGoogleLogin();
-
-    $client = new Google_Client();
-    $client->setAccessToken(json_decode($token->access_token, true));
-
+    $client  = $this->getGoogleClient(); // auto-refresh token if expired
     $service = new Google_Service_Drive($client);
 
     // Create Google Docs file

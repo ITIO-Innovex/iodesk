@@ -63,19 +63,31 @@ class Google extends AdminController
             $this->input->get('code')
         );
 
-        $staff_id = get_staff_user_id();
-		$companyId = get_staff_company_id();
+        $companyId = get_staff_company_id();
 
-        $this->db->where('company_id', $companyId)
-                 ->delete('it_crm_staff_google_tokens');
+        // Preserve existing refresh_token if Google doesn't return it again
+        $existing = $this->db->where('company_id', $companyId)
+                             ->get('it_crm_staff_google_tokens')
+                             ->row();
 
-        $this->db->insert('it_crm_staff_google_tokens', [
-            'company_id'      => $companyId,
+        $refreshToken = $token['refresh_token'] ?? null;
+        if (empty($refreshToken) && $existing && !empty($existing->refresh_token)) {
+            $refreshToken = $existing->refresh_token;
+        }
+
+        $data = [
+            'company_id'    => $companyId,
             'access_token'  => json_encode($token),
-            'refresh_token' => $token['refresh_token'] ?? null,
-            'created_at'    => date('Y-m-d H:i:s')
-        ]);
-//echo $this->db->last_query();exit;
+            'refresh_token' => $refreshToken,
+            'created_at'    => date('Y-m-d H:i:s'),
+        ];
+
+        if ($existing) {
+            $this->db->where('company_id', $companyId)->update('it_crm_staff_google_tokens', $data);
+        } else {
+            $this->db->insert('it_crm_staff_google_tokens', $data);
+        }
+
         redirect(admin_url('drive'));
     }
 }
