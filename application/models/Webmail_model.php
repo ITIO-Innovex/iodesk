@@ -1601,6 +1601,7 @@ if ($folder->children->count() > 0) {
 		$senderName = get_staff_full_name() ?? $senderName;
 		}
 		
+		//echo $senderName;exit;
 		$mail = new PHPMailer(true);
 		
 		

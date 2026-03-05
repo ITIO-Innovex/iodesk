@@ -15,7 +15,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="tw-flex tw-justify-between tw-items-center tw-mb-3">
-          <h4 class="tw-mt-0 tw-font-semibold tw-text-lg">Edit Excel</h4>
+          <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-white">Edit Excel</h4>
           <a href="<?php echo admin_url('important_document'); ?>" class="btn btn-default">Back</a>
         </div>
         <div class="panel_s">
