@@ -498,8 +498,14 @@ if (isset($app_csrf_exclude_uris)) {
     $config['csrf_exclude_uris'] = array_unique($config['csrf_exclude_uris']);
 }
 
-// Exclude CSRF protection for the 'wa-server' route
-$config['csrf_exclude_uris'] = array_merge($config['csrf_exclude_uris'], ['wa-server'],['admin/leads/updateAssignedUser']);
+// Exclude CSRF protection for specific routes
+$config['csrf_exclude_uris'] = array_merge(
+    $config['csrf_exclude_uris'],
+    ['wa-server'],
+    ['admin/leads/updateAssignedUser'],
+    ['important_document_public/save/.+'],
+    ['admin/hrd/daily_activity_report_dar']
+);
 $config['csrf_exclude_uris'] = array_unique($config['csrf_exclude_uris']);
 
 // Disable CSRF protection for gateways

@@ -85,6 +85,64 @@ $_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
 
         $this->load->view('admin/leads/manage_leads', $data);
     }
+
+    /**
+     * Standalone \"Add New Lead\" page.
+     * URL: /admin/leads/add_new_leads
+     * Uses the same form design as the Add New Lead modal.
+     */
+   public function add_new_leads()
+    {
+        if (!is_staff_member()) {
+            access_denied('Leads');
+        }
+		
+		if ($this->input->post()) {
+		
+		$data['name'] = trim($this->input->post('name'));
+		$data['email'] = trim($this->input->post('email'));
+		$data['country_code']= trim($this->input->post('country_code')) ?? 0;
+		$data['country']= trim($this->input->post('country')) ?? 0;
+		$data['company']= trim($this->input->post('company')) ?? '';
+		$data['address']= trim($this->input->post('address')) ?? '';
+		$data['description'] = nl2br($this->input->post('description'));
+        $data['dateadded']   = date('Y-m-d H:i:s');
+        $data['addedfrom']   = get_staff_user_id();
+		$data['assigned']    = get_staff_user_id();
+		$data['status']    = 3;
+		$data['source']   	 = 7;
+		$data['company_id']  = get_staff_company_id();
+		$data['subject']  = 'Web Service';
+		$data = hooks()->apply_filters('before_lead_added', $data);
+		
+		$this->db->insert(db_prefix() . 'leads', $data);
+        $insert_id = $this->db->insert_id();
+        if ($insert_id) {
+            log_activity('New Lead Added [ID: ' . $insert_id . ']');
+            $this->leads_model->log_lead_activity($insert_id, 'not_lead_activity_created');
+			set_alert('success', 'Leads added successfully');
+			redirect(admin_url('leads/add_new_leads'));
+			}
+		
+		    set_alert('warning', 'Leads not added');
+			redirect(admin_url('leads/add_new_leads'));
+		}
+
+        // Prepare minimal data required by admin/leads/profile (same as for a new lead in _get_lead_data)
+        $data                  = [];
+        $data['lead_locked']   = false;
+        $data['openEdit']      = true;
+        $data['members']       = $this->staff_model->get('', ['is_not_staff' => 0, 'active' => 1, 'company_id' => get_staff_company_id()]);
+        $data['status_id']     = get_option('leads_default_status');
+        $data['base_currency'] = get_base_currency();
+        $data['statuses']      = $this->leads_model->get_status();
+        $data['sources']       = $this->leads_model->get_source();
+
+        $data                  = hooks()->apply_filters('lead_view_data', $data);
+        $data['title']         = _l('add_new', _l('lead_lowercase'));
+
+        $this->load->view('admin/leads/add_new_leads', $data);
+    }
 	
 	/* List all leads */
     public function deals($id = '')
@@ -150,7 +208,9 @@ $_SESSION['deal_form_order']=$this->leads_model->get_deal_form_order();
 
         echo $this->load->view('admin/leads/kan-ban', $data, true);
     }
-
+    
+	
+	
     /* Add or update lead */
     public function lead($id = '')
     {

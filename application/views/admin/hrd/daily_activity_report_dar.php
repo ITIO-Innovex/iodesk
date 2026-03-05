@@ -120,6 +120,7 @@
                       <?php foreach ($dar_fields as $f) { ?>
                         <th><?php echo html_escape($f['field_title']); ?></th>
                       <?php } ?>
+                      <th style="width:90px;">Action</th>
                     </tr>
                   </thead>
                   <tbody id="dar-rows">
@@ -158,6 +159,11 @@
                                        placeholder="<?php echo html_escape($f['field_title']); ?>">
                               </td>
                           <?php } ?>
+                          <td>
+                            <button type="button" class="btn btn-danger btn-xs dar-remove-row" title="Delete Row">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </td>
                         </tr>
                     <?php } ?>
                   </tbody>
@@ -219,6 +225,23 @@
         return false;
       }
 	  
+      // Validate all DAR inputs are filled
+      var firstEmpty = null;
+      $('#dar-rows tr.dar-row').each(function() {
+        $(this).find('input').each(function() {
+          var val = $.trim($(this).val());
+          if (!val && !firstEmpty) {
+            firstEmpty = this;
+          }
+        });
+      });
+
+      if (firstEmpty) {
+        alert('All DAR fields are required. Please fill in all cells before submitting.');
+        $(firstEmpty).focus();
+        return false;
+      }
+	  
       $('#dar-status').val(status);
       $('#dar-entry-form').submit();
     });
@@ -232,6 +255,16 @@
       var $clone = $first.clone();
       $clone.find('input').val('');
       $tbody.append($clone);
+    });
+
+    // Delete row (keep at least one)
+    $('#dar-rows').on('click', '.dar-remove-row', function () {
+      var $rows = $('#dar-rows').find('tr.dar-row');
+      if ($rows.length <= 1) {
+        alert('At least one row is required.');
+        return;
+      }
+      $(this).closest('tr.dar-row').remove();
     });
   
     // CC Email Autocomplete with multiple tags (same as HRD DAR)
