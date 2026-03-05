@@ -1089,15 +1089,26 @@ class Project extends AdminController
 		$project_priority = $this->project_model->project_priority();
 		//print_r($data['project_priority']);exit;
 		$datalogs = $this->project_model->get_task_logs($task_id);
-		
-		//print_r($datalogs);
+
+        // Current running timer for this staff & task
+        $currentTimer = $this->db
+            ->where('project_id', (int)$task['project_id'])
+            ->where('task_id', (int)$task['id'])
+            ->where('staff_id', get_staff_user_id())
+            ->where('status', 1)
+            ->where('end_time IS NULL', null, false)
+            ->order_by('id', 'DESC')
+            ->get(db_prefix() . 'project_task_timer')
+            ->row_array();
+
         $data = [
-            'task' => $task,
-            'staff_members' => $staff_members,
+            'task'           => $task,
+            'staff_members'  => $staff_members,
             'project_statuses' => $project_statuses,
 			'project_priority' => $project_priority,
-			'datalogs' => $datalogs,
-            'title' => 'Task Details',
+			'datalogs'       => $datalogs,
+            'current_timer'  => $currentTimer,
+            'title'          => 'Task Details',
         ];
         $this->load->view('admin/project/task_details', $data);
     }
@@ -1155,18 +1166,148 @@ class Project extends AdminController
         foreach ($comments as $c) {
             $author = get_staff_full_name($c['addedby']);
             $date   = _dt($c['addedon']);
-           
-echo '<div>';
 
-echo '<div class="media-body"><h5 class="media-heading tw-font-semibold tw-mb-0"><div class="btn-group pull-right mleft5"></div>';
-echo staff_profile_image($c['addedby'], ['staff-profile-image-small',]);
-echo '<span class="tw-px-2">'.$author.'</span></h5><div class="tw-text-sm text-danger" style="padding-left: 40px;">'.$date.'</div>';
-echo '<div class="tw-my-2" style="padding-left: 40px;">'. $c['comments'].'</div></div></div>';
-
+            echo '<div>';
+            echo '<div class="media-body"><h5 class="media-heading tw-font-semibold tw-mb-0"><div class="btn-group pull-right mleft5"></div>';
+            echo staff_profile_image($c['addedby'], ['staff-profile-image-small',]);
+            echo '<span class="tw-px-2">'.$author.'</span></h5><div class="tw-text-sm text-danger" style="padding-left: 40px;">'.$date.'</div>';
+            echo '<div class="tw-my-2" style="padding-left: 40px;">'. $c['comments'].'</div></div></div>';
         }
     }
-	
-	public function get_custom_fields_by_group()
+
+    /**
+     * Start task timer for a project task.
+     * Inserts row in it_crm_project_task_timer (db_prefix().'project_task_timer').
+     */
+    public function start_task_timer()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $taskId    = (int)$this->input->post('task_id');
+        $projectId = (int)$this->input->post('project_id');
+
+        if (!$taskId || !$projectId) {
+            echo json_encode(['success' => false, 'message' => 'Missing task or project id']);
+            return;
+        }
+
+        $staffId = get_staff_user_id();
+
+        // Check if there is already a running timer for this task & staff
+        $running = $this->db
+            ->where('project_id', $projectId)
+            ->where('task_id', $taskId)
+            ->where('staff_id', $staffId)
+            ->where('status', 1)
+            ->where('end_time IS NULL', null, false)
+            ->order_by('id', 'DESC')
+            ->get(db_prefix() . 'project_task_timer')
+            ->row_array();
+
+        if ($running) {
+            echo json_encode([
+                'success'    => true,
+                'timer_id'   => (int)$running['id'],
+                'start_time' => $running['start_time'],
+                'message'    => 'Timer already running',
+            ]);
+            return;
+        }
+
+        $now = date('Y-m-d H:i:s');
+        $data = [
+            'project_id'    => $projectId,
+            'task_id'       => $taskId,
+            'staff_id'      => $staffId,
+            'start_time'    => $now,
+            'end_time'      => null,
+            'total_seconds' => null,
+            'status'        => 1,
+            'created_at'    => $now,
+        ];
+
+        $this->db->insert(db_prefix() . 'project_task_timer', $data);
+        $timerId = $this->db->insert_id();
+
+        if ($timerId) {
+            echo json_encode([
+                'success'    => true,
+                'timer_id'   => (int)$timerId,
+                'start_time' => $now,
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to start timer']);
+        }
+    }
+
+    /**
+     * Stop task timer.
+     * Updates end_time, total_seconds, status.
+     */
+    public function stop_task_timer()
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $timerId = (int)$this->input->post('timer_id');
+        if (!$timerId) {
+            echo json_encode(['success' => false, 'message' => 'Missing timer id']);
+            return;
+        }
+
+        $staffId = get_staff_user_id();
+
+        $timer = $this->db
+            ->where('id', $timerId)
+            ->where('staff_id', $staffId)
+            ->get(db_prefix() . 'project_task_timer')
+            ->row_array();
+
+        if (!$timer) {
+            echo json_encode(['success' => false, 'message' => 'Timer not found']);
+            return;
+        }
+
+        if (!empty($timer['end_time'])) {
+            echo json_encode(['success' => true, 'message' => 'Timer already stopped']);
+            return;
+        }
+
+        $end   = date('Y-m-d H:i:s');
+        $start = strtotime($timer['start_time']);
+        $endTs = strtotime($end);
+        $diff  = $endTs - $start;
+        if ($diff < 0) {
+            $diff = 0;
+        }
+
+        $this->db->where('id', $timerId)
+            ->update(db_prefix() . 'project_task_timer', [
+                'end_time'      => $end,
+                'total_seconds' => $diff,
+                'status'        => 0,
+            ]);
+
+        if ($this->db->affected_rows() > 0) {
+            $h = floor($diff / 3600);
+            $m = floor(($diff % 3600) / 60);
+            $s = $diff % 60;
+            $formatted = sprintf('%02d:%02d:%02d', $h, $m, $s);
+
+            echo json_encode([
+                'success'          => true,
+                'total_seconds'    => $diff,
+                'formatted_total'  => $formatted,
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to stop timer']);
+        }
+    }
+
+    public function get_custom_fields_by_group()
     {
 	
 	$group_id = $this->input->post('group_id');

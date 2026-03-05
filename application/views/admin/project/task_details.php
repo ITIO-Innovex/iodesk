@@ -44,11 +44,14 @@
                       ?></div>
 					  
 <div class="col-sm-3">
+
+
 <?php
 if(isset($task['task_status']) && $task['task_status']){
 $prod_status = proj_status_translate($task['task_status']);
 } 
-?>					  
+?>	
+				  
 					  <div class="btn tw-px-0">
                   <select class="form-control tw-text-white task-status-select" data-task-id="<?php echo $task['id']; ?>" name="task_status" style="background:<?php echo $prod_status->color; ?>; color:#FFFFFF;"  title="Task Status">
     <?php foreach($project_statuses as $ps): ?>
@@ -79,7 +82,15 @@ background: linear-gradient(to right, #ACBB78, #F7F8F8);
 border-radius: 20px;
 ">
              <span title="Addeb By">By <?php echo isset($task['task_addedby']) ? get_staff_full_name($task['task_addedby']) : '-'; ?></span> | <span title="Project Title"><i class="fa-solid fa-chart-gantt menu-icon"></i> <?php echo isset($task['project_id']) ? get_project_title($task['project_id']) : '-'; ?></span> | <span title="Comments"><i class="fa-solid fa-comment-dots"></i></span> | <span title="Documents"><i class="fa-solid fa-paperclip"></i></span>
-			 </div>
+			 <div id="task-timer-wrapper" class="tw-flex tw-items-center tw-space-x-2 pull-right">
+  <button type="button" class="btn btn-success btn-xs" id="task-timer-start">
+    <i class="fa fa-play"></i> Start
+  </button>
+  <button type="button" class="btn btn-danger btn-xs" id="task-timer-stop" style="display:none;">
+    <i class="fa fa-stop"></i> Stop
+  </button>
+  <span id="task-timer-display" class="label label-default">00:00:00</span>
+</div></div>
 
             </div>
             <hr class="hr-panel-separator">
@@ -652,6 +663,93 @@ function togglediv(divdata){
 
 <script>
 	$('.editor').jqte();
+</script>
+<script>
+(function() {
+  var timerInterval = null;
+
+  function formatSeconds(total) {
+    var h = Math.floor(total / 3600);
+    var m = Math.floor((total % 3600) / 60);
+    var s = total % 60;
+    return (h < 10 ? '0' + h : h) + ':' +
+           (m < 10 ? '0' + m : m) + ':' +
+           (s < 10 ? '0' + s : s);
+  }
+
+  function startLocalTimer(startTime) {
+    if (!startTime) return;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+    var startMs = Date.parse(startTime.replace(' ', 'T'));
+    if (isNaN(startMs)) {
+      startMs = Date.now();
+    }
+    timerInterval = setInterval(function() {
+      var diffSec = Math.floor((Date.now() - startMs) / 1000);
+      if (diffSec < 0) diffSec = 0;
+      $('#task-timer-display').text(formatSeconds(diffSec));
+    }, 1000);
+  }
+
+  $(function() {
+    var hasRunning = <?php echo isset($current_timer) && !empty($current_timer) ? 'true' : 'false'; ?>;
+    if (hasRunning) {
+      $('#task-timer-start').hide();
+      $('#task-timer-stop').show().data('timer-id', <?php echo isset($current_timer['id']) ? (int)$current_timer['id'] : 0; ?>);
+      startLocalTimer('<?php echo isset($current_timer['start_time']) ? $current_timer['start_time'] : ''; ?>');
+    }
+
+    $('#task-timer-start').on('click', function() {
+      var $btn = $(this);
+      $btn.prop('disabled', true);
+      $.post(admin_url + 'project/task_timer/start', {
+        task_id: <?php echo (int)$task['id']; ?>,
+        project_id: <?php echo (int)$task['project_id']; ?>
+      }).done(function(resp) {
+        try { resp = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch (e) { resp = {success:false}; }
+        if (resp && resp.success) {
+          $('#task-timer-start').hide().prop('disabled', false);
+          $('#task-timer-stop').show().data('timer-id', resp.timer_id);
+          startLocalTimer(resp.start_time);
+        } else {
+          alert(resp && resp.message ? resp.message : 'Failed to start timer');
+          $btn.prop('disabled', false);
+        }
+      }).fail(function() {
+        alert('Failed to start timer');
+        $btn.prop('disabled', false);
+      });
+    });
+
+    $('#task-timer-stop').on('click', function() {
+      var $btn = $(this);
+      var timerId = $btn.data('timer-id');
+      if (!timerId) return;
+      $btn.prop('disabled', true);
+      $.post(admin_url + 'project/task_timer/stop', {
+        timer_id: timerId
+      }).done(function(resp) {
+        try { resp = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch (e) { resp = {success:false}; }
+        if (resp && resp.success) {
+          if (timerInterval) clearInterval(timerInterval);
+          if (resp.formatted_total) {
+            $('#task-timer-display').text(resp.formatted_total);
+          }
+          $('#task-timer-stop').hide().prop('disabled', false);
+          $('#task-timer-start').show();
+        } else {
+          alert(resp && resp.message ? resp.message : 'Failed to stop timer');
+          $btn.prop('disabled', false);
+        }
+      }).fail(function() {
+        alert('Failed to stop timer');
+        $btn.prop('disabled', false);
+      });
+    });
+  });
+})();
 </script>
 <script>
 $('.submit-loader').click(function(e){
