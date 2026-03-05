@@ -348,6 +348,9 @@ $route['admin/drive/personal/excel'] = 'admin/drive/personal_excel';
 $route['admin/drive/personal/create_excel'] = 'admin/drive/personal_create_excel';
 $route['admin/drive/personal/delete_excel'] = 'admin/drive/personal_delete_excel';
 
+// Project notifications overview
+$route['admin/project/notifications'] = 'admin/projects/notifications';
+
 // Leads - standalone Add New Lead page
 $route['admin/leads/add_new_leads'] = 'admin/leads/add_new_leads';
 
