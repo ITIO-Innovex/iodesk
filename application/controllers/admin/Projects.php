@@ -25,6 +25,107 @@ class Projects extends AdminController
         $this->load->view('admin/projects/manage', $data);
     }
 
+    /**
+     * Project & Task Notifications dashboard.
+     * URL: /admin/project/notifications
+     */
+    public function notifications()
+    {
+        if (!is_staff_member()) {
+            access_denied('Projects');
+        }
+
+        $staffId  = get_staff_user_id();
+        $today    = date('Y-m-d');
+        $tomorrow = date('Y-m-d', strtotime('+1 day'));
+
+        // Today added & assigned projects (based on start_date)
+        $this->db->select('p.*, c.company as client_company');
+        $this->db->from(db_prefix() . 'projects p');
+        $this->db->join(db_prefix() . 'project_members pm', 'pm.project_id = p.id', 'inner');
+        $this->db->join(db_prefix() . 'clients c', 'c.userid = p.clientid', 'left');
+        $this->db->where('pm.staff_id', $staffId);
+        $this->db->where('DATE(p.start_date)', $today);
+        $data['today_projects'] = $this->db->get()->result_array();
+
+        // Project deadline = tomorrow (not completed)
+        $this->db->select('p.*, c.company as client_company');
+        $this->db->from(db_prefix() . 'projects p');
+        $this->db->join(db_prefix() . 'project_members pm', 'pm.project_id = p.id', 'inner');
+        $this->db->join(db_prefix() . 'clients c', 'c.userid = p.clientid', 'left');
+        $this->db->where('pm.staff_id', $staffId);
+        $this->db->where('p.deadline IS NOT NULL');
+        $this->db->where('DATE(p.deadline)', $tomorrow);
+        $this->db->where('p.status !=', 4); // 4 = finished/completed in most setups
+        $data['projects_deadline_tomorrow'] = $this->db->get()->result_array();
+
+        // Project deadline = today (not completed)
+        $this->db->select('p.*, c.company as client_company');
+        $this->db->from(db_prefix() . 'projects p');
+        $this->db->join(db_prefix() . 'project_members pm', 'pm.project_id = p.id', 'inner');
+        $this->db->join(db_prefix() . 'clients c', 'c.userid = p.clientid', 'left');
+        $this->db->where('pm.staff_id', $staffId);
+        $this->db->where('p.deadline IS NOT NULL');
+        $this->db->where('DATE(p.deadline)', $today);
+        $this->db->where('p.status !=', 4);
+        $data['projects_deadline_today'] = $this->db->get()->result_array();
+
+        // Project overdue (deadline < today, not completed)
+        $this->db->select('p.*, c.company as client_company');
+        $this->db->from(db_prefix() . 'projects p');
+        $this->db->join(db_prefix() . 'project_members pm', 'pm.project_id = p.id', 'inner');
+        $this->db->join(db_prefix() . 'clients c', 'c.userid = p.clientid', 'left');
+        $this->db->where('pm.staff_id', $staffId);
+        $this->db->where('p.deadline IS NOT NULL');
+        $this->db->where('DATE(p.deadline) <', $today);
+        $this->db->where('p.status !=', 4);
+        $data['projects_overdue'] = $this->db->get()->result_array();
+
+        // Tasks notifications
+        $this->load->model('tasks_model');
+
+        // Today added assigned tasks
+        $this->db->select('t.*');
+        $this->db->from(db_prefix() . 'tasks t');
+        $this->db->join(db_prefix() . 'task_assigned ta', 'ta.taskid = t.id', 'inner');
+        $this->db->where('ta.staffid', $staffId);
+        $this->db->where('DATE(t.dateadded)', $today);
+        $data['today_tasks'] = $this->db->get()->result_array();
+
+        // Task deadline = tomorrow (not completed)
+        $this->db->select('t.*');
+        $this->db->from(db_prefix() . 'tasks t');
+        $this->db->join(db_prefix() . 'task_assigned ta', 'ta.taskid = t.id', 'inner');
+        $this->db->where('ta.staffid', $staffId);
+        $this->db->where('t.duedate IS NOT NULL');
+        $this->db->where('DATE(t.duedate)', $tomorrow);
+        $this->db->where('t.status !=', Tasks_model::STATUS_COMPLETE);
+        $data['tasks_deadline_tomorrow'] = $this->db->get()->result_array();
+
+        // Task deadline = today (not completed)
+        $this->db->select('t.*');
+        $this->db->from(db_prefix() . 'tasks t');
+        $this->db->join(db_prefix() . 'task_assigned ta', 'ta.taskid = t.id', 'inner');
+        $this->db->where('ta.staffid', $staffId);
+        $this->db->where('t.duedate IS NOT NULL');
+        $this->db->where('DATE(t.duedate)', $today);
+        $this->db->where('t.status !=', Tasks_model::STATUS_COMPLETE);
+        $data['tasks_deadline_today'] = $this->db->get()->result_array();
+
+        // Task overdue (deadline < today, not completed)
+        $this->db->select('t.*');
+        $this->db->from(db_prefix() . 'tasks t');
+        $this->db->join(db_prefix() . 'task_assigned ta', 'ta.taskid = t.id', 'inner');
+        $this->db->where('ta.staffid', $staffId);
+        $this->db->where('t.duedate IS NOT NULL');
+        $this->db->where('DATE(t.duedate) <', $today);
+        $this->db->where('t.status !=', Tasks_model::STATUS_COMPLETE);
+        $data['tasks_overdue'] = $this->db->get()->result_array();
+
+        $data['title'] = 'Project Notifications';
+        $this->load->view('admin/project/notifications', $data);
+    }
+
     public function table($clientid = '')
     {
         App_table::find('projects')->output([

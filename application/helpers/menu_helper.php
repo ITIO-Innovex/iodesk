@@ -536,7 +536,15 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'badge'    => [],
         ]);
     }
-	
+	if (staff_can('project_project',  'project')){
+        $CI->app_menu->add_sidebar_children_item('project', [
+            'slug'     => 'notifications',
+            'name'     => 'Notifications',
+            'href'     => admin_url('project/notifications'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+    }
 	 
     
     if (staff_can('project_collaboration',  'project'))
