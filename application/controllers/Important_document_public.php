@@ -38,6 +38,8 @@ class Important_document_public extends CI_Controller
 
     public function save($token)
     {
+        header('Content-Type: application/json; charset=utf-8');
+
         $token = trim((string) $token);
         if ($token === '') {
             echo json_encode(['success' => false, 'message' => 'Invalid token']);
@@ -61,12 +63,12 @@ class Important_document_public extends CI_Controller
         }
 
         $base64 = $this->input->post('file_base64');
-        if (!$base64) {
-            echo json_encode(['success' => false, 'message' => 'Missing file data']);
+        if (!$base64 || !is_string($base64)) {
+            echo json_encode(['success' => false, 'message' => 'Missing file data. If the file is large, try saving with fewer rows/columns.']);
             return;
         }
 
-        $decoded = base64_decode($base64);
+        $decoded = base64_decode($base64, true);
         if ($decoded === false) {
             echo json_encode(['success' => false, 'message' => 'Invalid file data']);
             return;
@@ -78,10 +80,11 @@ class Important_document_public extends CI_Controller
             return;
         }
 
-        $this->db->where('id', (int) $doc['id'])
-            ->update(db_prefix() . 'important_documents', [
-                'updatedon' => date('Y-m-d H:i:s'),
-            ]);
+        $tbl = db_prefix() . 'important_documents';
+        if ($this->db->field_exists('updatedon', $tbl)) {
+            $this->db->where('id', (int) $doc['id'])
+                ->update($tbl, ['updatedon' => date('Y-m-d H:i:s')]);
+        }
 
         echo json_encode(['success' => true, 'message' => 'File saved']);
     }

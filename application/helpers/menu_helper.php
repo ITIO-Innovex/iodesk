@@ -139,7 +139,53 @@ function app_init_admin_sidebar_menu_items()
         }*/
     }
 
+if (is_staff_member()&& staff_can('view',  'leads')) {
+    $CI->app_menu->add_sidebar_menu_item('LeadsDeal', [
+        'collapse' => true,
+        'name'     => _l('Leads / Deal'),
+        'position' => 20,
+        'icon'     => 'fa-solid fa-handshake',
+        'badge'    => [],
+    ]);
+	
+	    $CI->app_menu->add_sidebar_children_item('LeadsDeal', [
+            'slug'     => 'add_new_leads',
+            'name'     => _l('Add New Lead'),
+            'href'     => admin_url('leads/add_new_leads'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('LeadsDeal', [
+            'slug'     => 'Leadss',
+            'name'     => _l('als_leads'),
+            'href'     => admin_url('leads'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('LeadsDeal', [
+            'slug'     => 'Deals',
+            'name'     => _l('Deals'),
+            'href'     => admin_url('leads/deals'),
+            'position' => 15,
+            'badge'    => [],
+        ]);
+		
+	}
 
+    
+
+    /*if (is_staff_member()&& staff_can('view',  'leads')) {
+		$CI->app_menu->add_sidebar_menu_item('leads', [
+			'name'     => 'Add New Leads',
+			'href'     => admin_url('leads/add_new_leads'),
+			'icon'     => 'fa fa-tty',
+			'position' => 45,
+			'badge'    => [],
+		]);
+    }
+	
     if (is_staff_member()&& staff_can('view',  'leads')) {
 		$CI->app_menu->add_sidebar_menu_item('leads', [
 			'name'     => _l('als_leads'),
@@ -158,7 +204,9 @@ function app_init_admin_sidebar_menu_items()
 			'position' => 20,
 			'badge'    => [],
 		]);
-    }
+    }*/
+	
+	
 	
 	 $CI->app_menu->add_sidebar_menu_item('salesD', [
         'collapse' => true,

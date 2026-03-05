@@ -75,7 +75,7 @@ class App_Security extends CI_Security
 
         // parent::csrf_show_error();
         $heading = ' 419 Page Expired!';
-        $message = 'Sorry, the page has expired, return to previous page and refresh to continue.';
+        $message = 'Sorry, the page has expired, return to previous page and refresh to continue.55';
         show_error($message, 403, $heading);
     }
 

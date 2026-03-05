@@ -1597,6 +1597,10 @@ if ($folder->children->count() > 0) {
 		
 		}
 		
+		if(strstr($emaildata['emailSubject'],'DAR Submitted')){
+		$senderName = get_staff_full_name() ?? $senderName;
+		}
+		
 		$mail = new PHPMailer(true);
 		
 		

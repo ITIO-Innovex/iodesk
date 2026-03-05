@@ -21,12 +21,13 @@ class Important_document extends AdminController
         $this->db->from(db_prefix() . 'important_documents as d');
         $this->db->join(db_prefix() . 'staff as s', 's.staffid = d.staff', 'left');
         $this->db->where('d.company_id', $companyId);
+		$this->db->where('d.staff', get_staff_user_id());
         if ($this->db->field_exists('is_deleted', db_prefix() . 'important_documents')) {
             $this->db->where('d.is_deleted', 0);
         }
         $this->db->order_by('d.addedon', 'desc');
+		
         $documents = $this->db->get()->result_array();
-
         $data = [];
         $data['title'] = 'Important Documents';
         $data['documents'] = $documents;
@@ -228,6 +229,8 @@ class Important_document extends AdminController
 
     public function save_excel($id)
     {
+        header('Content-Type: application/json; charset=utf-8');
+
         if (!(is_admin() || staff_can('view', 'hr_department') || staff_can('view_own', 'hr_department'))) {
             echo json_encode(['success' => false, 'message' => 'Access denied']);
             return;

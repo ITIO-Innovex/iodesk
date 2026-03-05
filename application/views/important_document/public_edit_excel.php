@@ -58,7 +58,46 @@
         return name;
       }
 
-      function renderTable(data) {
+      function allowedFormatTags(html) {
+        if (!html || typeof html !== 'string') return '';
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        var allowed = { b: true, i: true, u: true, strong: true, em: true, span: true, font: true };
+        function sanitize(node) {
+          if (node.nodeType === 3) return node.textContent;
+          if (node.nodeType !== 1) return '';
+          var tag = (node.tagName || '').toLowerCase();
+          if (allowed[tag]) {
+            var inner = [];
+            for (var i = 0; i < node.childNodes.length; i++) inner.push(sanitize(node.childNodes[i]));
+            var open = '<' + tag;
+            var fontColor = node.getAttribute && node.getAttribute('color');
+            if (tag === 'font' && fontColor) {
+              open += ' color="' + String(fontColor).replace(/"/g, '&quot;') + '"';
+            }
+            if (tag === 'span' && node.style) {
+              var styles = [];
+              if (node.style.color) {
+                styles.push('color:' + String(node.style.color).replace(/"/g, '&quot;'));
+              }
+              if (node.style.backgroundColor) {
+                styles.push('background-color:' + String(node.style.backgroundColor).replace(/"/g, '&quot;'));
+              }
+              if (styles.length) {
+                open += ' style="' + styles.join(';') + '"';
+              }
+            }
+            return open + '>' + inner.join('') + '</' + tag + '>';
+          }
+          return node.textContent || '';
+        }
+        var out = '';
+        for (var i = 0; i < div.childNodes.length; i++) out += sanitize(div.childNodes[i]);
+        return out;
+      }
+
+      function renderTable(data, formatMap) {
+        formatMap = formatMap || {};
         var $table = $('#excel-table');
         $table.empty();
         var rows = data && data.length ? data.length : 1;
@@ -87,41 +126,88 @@
           tr.append('<th class="row-header">' + (r + 1) + '</th>');
           for (var c = 0; c < cols; c++) {
             var cell = row[c] != null ? row[c] : '';
-            tr.append('<td contenteditable="true">' + $('<div>').text(cell).html() + '</td>');
+            var key = r + ',' + c;
+            var content = formatMap[key];
+            if (content) {
+              content = allowedFormatTags(content);
+              if (!content) content = $('<div>').text(cell).html();
+            } else {
+              content = $('<div>').text(cell).html();
+            }
+            tr.append($('<td contenteditable="true"></td>').html(content));
           }
           tbody.append(tr);
         }
         $table.append(tbody);
       }
 
-      function tableToArray() {
+      function tableToArrayAndFormats() {
         var data = [];
-        $('#excel-table tbody tr').each(function() {
+        var formatMap = {};
+        $('#excel-table tbody tr').each(function(rowIndex) {
           var row = [];
-          $(this).find('td').each(function() {
-            row.push($(this).text());
+          $(this).find('td').each(function(colIndex) {
+            var $td = $(this);
+            var text = $td.text();
+            var html = $td.html();
+            row.push(text);
+            if (html && html !== $('<div>').text(text).html()) {
+              formatMap[rowIndex + ',' + colIndex] = html;
+            }
           });
           data.push(row);
         });
-        return data;
+        return { data: data, formatMap: formatMap };
       }
 
       function saveExcel() {
-        var data = tableToArray();
+        if (typeof XLSX === 'undefined') {
+          $('#save-status').text('Excel library not loaded');
+          return;
+        }
+        var out = tableToArrayAndFormats();
+        var data = out.data;
+        var formatMap = out.formatMap;
         var ws = XLSX.utils.aoa_to_sheet(data);
         var wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+        if (Object.keys(formatMap).length > 0) {
+          var formatJson = JSON.stringify(formatMap);
+          var formatWs = XLSX.utils.aoa_to_sheet([[formatJson]]);
+          XLSX.utils.book_append_sheet(wb, formatWs, '_formatting');
+        }
         var base64 = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
-        $('#save-status').text('Saving...');
-        $.post('<?php echo site_url('important_document_public/save/' . $document['share_token']); ?>', {
-          file_base64: base64
-        }, function(resp) {
-          if (resp && resp.success) {
-            $('#save-status').text('Saved');
-          } else {
-            $('#save-status').text('Save failed');
+        var saveUrl = '<?php echo site_url('important_document_public/save/' . $document['share_token']); ?>';
+        $('#save-status').text('Saving...').removeClass('text-danger');
+        $.ajax({
+          url: saveUrl,
+          type: 'POST',
+          data: { file_base64: base64 },
+          dataType: 'json',
+          success: function(resp) {
+            if (resp && resp.success) {
+              $('#save-status').text('Saved').removeClass('text-danger');
+            } else {
+              $('#save-status').text(resp && resp.message ? resp.message : 'Save failed').addClass('text-danger');
+            }
+          },
+          error: function(xhr, status, err) {
+            var msg = 'Save failed';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              msg = xhr.responseJSON.message;
+            } else if (xhr.responseText) {
+              try {
+                var j = JSON.parse(xhr.responseText);
+                if (j.message) msg = j.message;
+              } catch (e) {
+                if (xhr.status === 403) msg = 'Request blocked (e.g. security). Try refreshing the page.';
+                else if (xhr.status === 404) msg = 'Save URL not found. Check the link.';
+                else if (xhr.status >= 500) msg = 'Server error. Try again later.';
+              }
+            }
+            $('#save-status').text(msg).addClass('text-danger');
           }
-        }, 'json');
+        });
       }
 
       function debounceSave() {
@@ -134,13 +220,25 @@
           alert('Excel library failed to load. Please refresh the page.');
           return;
         }
-        fetch(fileUrl)
+        var url = fileUrl + (fileUrl.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now();
+        fetch(url, { cache: 'no-store' })
           .then(function(res) { return res.arrayBuffer(); })
           .then(function(buf) {
             var wb = XLSX.read(buf, { type: 'array', cellDates: true });
-            var sheet = wb.Sheets[wb.SheetNames[0]];
+            var sheetName = wb.SheetNames[0];
+            var sheet = wb.Sheets[sheetName];
             var data = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: true });
-            renderTable(data);
+            var formatMap = {};
+            if (wb.SheetNames.indexOf('_formatting') !== -1) {
+              var formatSheet = wb.Sheets['_formatting'];
+              var formatCell = formatSheet['A1'];
+              if (formatCell && formatCell.v && typeof formatCell.v === 'string') {
+                try {
+                  formatMap = JSON.parse(formatCell.v) || {};
+                } catch (e) {}
+              }
+            }
+            renderTable(data, formatMap);
           })
           .catch(function() {
             alert('Failed to load file');
