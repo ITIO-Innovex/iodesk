@@ -20,12 +20,12 @@
                         <!-- Tab Navigation -->
                         <ul class="nav nav-tabs" id="collaborationTabs">
                             <li class="active">
-                                <a data-toggle="tab" href="#feedTab">
+                                <a data-toggle="tab" href="#feedTab" id="feedXX">
                                     <i class="fa-solid fa-rss tw-mr-2"></i>Activity Feed
                                 </a>
                             </li>
                             <li>
-                                <a data-toggle="tab" href="#calendarTab">
+                                <a data-toggle="tab" href="#calendarTab" id="calXX">
                                     <i class="fa-solid fa-calendar tw-mr-2"></i>Calendar View
                                 </a>
                             </li>
@@ -437,6 +437,19 @@ $(document).ready(function() {
         console.log('Forcing calendar initialization...');
         initializeCalendar();
     }, 2000);
+});
+
+$(document).on('click', '#feedXX', function(e) {
+
+ $('#calendarTab').removeClass('active');
+ $('#feedTab').addClass('active');
+});
+
+$(document).on('click', '#calXX', function(e) {
+
+
+ $('#feedTab').removeClass('active');
+ $('#calendarTab').addClass('active');
 });
 </script>
 
