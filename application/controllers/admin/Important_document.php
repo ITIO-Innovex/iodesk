@@ -199,10 +199,15 @@ class Important_document extends AdminController
         echo json_encode(['success' => true, 'link' => $link]);
     }
 
-    public function edit_excel($id)
+    public function edit_excel($id="")
     {
         if (!(is_admin() || staff_can('view', 'hr_department') || staff_can('view_own', 'hr_department'))) {
             access_denied('Important Documents');
+        }
+		
+		if (!$id) {
+            set_alert('warning', 'Wrong URL');
+            redirect(admin_url('important_document'));
         }
 
         $companyId = get_staff_company_id();
