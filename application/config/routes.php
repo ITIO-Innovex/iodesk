@@ -351,6 +351,10 @@ $route['admin/drive/personal/delete_excel'] = 'admin/drive/personal_delete_excel
 // Project notifications overview
 $route['admin/project/notifications'] = 'admin/projects/notifications';
 
+// Project task timer (start/stop)
+$route['admin/project/task_timer/start'] = 'admin/project/start_task_timer';
+$route['admin/project/task_timer/stop']  = 'admin/project/stop_task_timer';
+
 // Leads - standalone Add New Lead page
 $route['admin/leads/add_new_leads'] = 'admin/leads/add_new_leads';
 
