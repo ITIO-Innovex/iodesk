@@ -374,7 +374,7 @@ private function refreshAccessToken($client, $tokenData)
         $client->setAccessToken($newToken);
         $companyId = get_staff_company_id();
         // Update DB
-        $this->db->where('company_id', companyId())
+        $this->db->where('company_id', $companyId)
             ->update('it_crm_staff_google_tokens', [
                 'access_token' => json_encode($newToken),
                 'refresh_token' => $newToken['refresh_token']
