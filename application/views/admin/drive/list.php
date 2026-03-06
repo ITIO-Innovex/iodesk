@@ -35,6 +35,10 @@
 			<?php //echo $file->getName(); ?> <?php //echo $file->getCreatedTime(); ?>
 			<div class="col-sm-3">
 			<div class="attachment-card mail-bg">
+			<div class="pull-right">
+<a href="https://docs.google.com/spreadsheets/d/<?php echo $file['file_id']; ?>/edit" target="_blank" class="btn btn-info btn-icon"><i class="fa-solid fa-eye" title="View / Edit sheet"></i></a> 
+<a href="<?php echo admin_url('drive/delete/'.$file['file_id']); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove" title="Delete sheet"></i></a>
+</div>
 <!-- File Icon Preview -->
 <div class="file-icon">
 <?php  echo '<i class="fa-solid fa-file-excel text-success"></i>';?>
@@ -46,7 +50,7 @@
   <a href="https://docs.google.com/spreadsheets/d/<?php echo $file['file_id']; ?>/edit" target="_blank" class="file-name-link">
     <span class="file-name-text"><?php echo html_escape($file['file_name']); ?></span>
   </a>
-  <i class="fa-solid fa-pen tw-mx-2 rename-trigger" title="Rename"></i>
+  <i class="fa-solid fa-pen tw-mx-2 rename-trigger" title="Rename file name"></i>
 
   <?php echo form_open(admin_url('drive/rename_file'), ['class' => 'file-rename-form', 'style' => 'display:none; margin-top:5px;margin-bottom:5px;']); ?>
     <input type="hidden" name="file_id" value="<?php echo html_escape($file['file_id']); ?>">
@@ -60,10 +64,7 @@
     </div>
   <?php echo form_close(); ?>
 </div>
-<div class="pull-right">
-<a href="https://docs.google.com/spreadsheets/d/<?php echo $file['file_id']; ?>/edit" target="_blank" class="btn btn-info btn-icon"><i class="fa fa-pencil"></i></a> 
-<a href="<?php echo admin_url('drive/delete/'.$file['file_id']); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove"></i></a>
-</div>
+
                     
                 
 
