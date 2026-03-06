@@ -155,14 +155,16 @@
                               $fid = (int)$f['id'];
                               $val = isset($valuesById[$fid]) ? $valuesById[$fid] : '';
 							  $ftype="text";
+							  $fieldcss="expand-input";
 							  if(strstr($f['field_title'],"Time")){
 							  $ftype="time";
+							  $fieldcss="";
 							  }
                               ?>
                               <td>
                                 <input type="<?php echo $ftype; ?>"
                                        name="field_<?php echo $fid; ?>[]"
-                                       class="form-control expand-input"
+                                       class="form-control <?php echo $fieldcss; ?>"
                                        value="<?php echo html_escape($val); ?>"
                                        placeholder="<?php echo html_escape($f['field_title']); ?>">
                               </td>
