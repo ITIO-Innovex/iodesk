@@ -295,7 +295,7 @@ public function delete_doc($fileId)
 private function getGoogleClient()
 {
 
-    echo "Not Found 5555";exit;
+    
 
      if(!$_SESSION['GOOGLE_CLIENT_ID']){ 
 	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
