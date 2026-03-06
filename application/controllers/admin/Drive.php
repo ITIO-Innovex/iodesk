@@ -199,7 +199,7 @@ public function create_excel()
     ];
 
     $this->db->insert('it_crm_staff_drive_files', $data);
-    echo $file->webViewLink;exit;
+    //echo $file->webViewLink;exit;
     // THEN REDIRECT
     redirect($file->webViewLink);
 }
