@@ -303,7 +303,7 @@ private function getGoogleClient()
      redirect(admin_url('drive/'));
 	 }
     $token = $this->checkGoogleLogin();
-	echo "Not Found 7777";exit;
+	
 	$companyId = get_staff_company_id();
     $tokenData = $this->db->where('company_id', $companyId)
         ->get('it_crm_staff_google_tokens')
@@ -327,7 +327,7 @@ private function getGoogleClient()
     }
 
     $client->setAccessToken($accessToken);
-
+echo "Not Found 7777";exit;
     // If expired - refresh using separate function
     if ($client->isAccessTokenExpired()) {
         $client = $this->refreshAccessToken($client, $tokenData);
