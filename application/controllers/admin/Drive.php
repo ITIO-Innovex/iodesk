@@ -234,7 +234,52 @@ public function sync_drive_files()
             ]);
 }
 
+public function rename_file()
+{
+    // CHECK GOOGLE CLIENT CONFIG
+    if (!$_SESSION['GOOGLE_CLIENT_ID']) { 
+        set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
+        redirect(admin_url('drive/'));
+    }
 
+    $file_id  = $this->input->post('file_id');
+    $new_name = $this->input->post('file_name');
+
+    if (!$file_id || !$new_name) {
+        set_alert('danger', 'Invalid File Details');
+        redirect(admin_url('drive/'));
+    }
+
+    try {
+
+        // GOOGLE CLIENT
+        $client  = $this->getGoogleClient();
+        $service = new Google_Service_Drive($client);
+
+        // FILE METADATA
+        $fileMetadata = new Google_Service_Drive_DriveFile([
+            'name' => $new_name
+        ]);
+
+        // UPDATE FILE NAME IN GOOGLE DRIVE
+        $service->files->update($file_id, $fileMetadata);
+
+        // UPDATE FILE NAME IN DATABASE
+        $this->db->where('file_id', $file_id);
+        $this->db->update('it_crm_staff_drive_files', [
+            'file_name' => $new_name
+        ]);
+
+        set_alert('success', 'File name updated successfully');
+
+    } catch (Exception $e) {
+
+        set_alert('danger', 'Error: '.$e->getMessage());
+
+    }
+
+    redirect(admin_url('drive/document'));
+}
 
 
  public function create_doc()

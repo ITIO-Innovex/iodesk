@@ -4308,5 +4308,11 @@ $lang['admin_approver'] = 'Admin Approver';
 $lang['hr_approver'] = 'HR Approver';
 $lang['hr_manager_approver'] = 'HR Manager Approver';
 $lang['reporting_approver'] = 'Reporting Approver';
+$lang['Add New Lead'] = 'Add New Lead';
+$lang['Leads / Deal'] = 'Leads / Deal';
+$lang['Department name already exists'] = 'Department name already exists';
+$lang['Need Login?'] = 'Need Login?';
+$lang['Approver'] = 'Approver';
+$lang['Under Writing'] = 'Under Writing';
 ?>
 

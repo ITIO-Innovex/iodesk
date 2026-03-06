@@ -43,7 +43,21 @@
 
                 
 
-<div class="file-name"><a href="<?php echo $file['web_link']; ?>" target="_blank"><?php //echo $file->getName(); ?><?php echo $file['file_name']; ?></a></div>
+<div class="file-name">
+  <span class="file-name-text"><?php echo html_escape($file['file_name']); ?></span>
+  <i class="fa-solid fa-pen tw-mx-2 rename-trigger" title="Rename"></i>
+
+  <?php echo form_open(admin_url('drive/rename_file'), ['class' => 'file-rename-form', 'style' => 'display:none; margin-top:5px;']); ?>
+    <input type="hidden" name="file_id" value="<?php echo html_escape($file['file_id']); ?>">
+    <div class="input-group input-group-sm">
+      <input type="text" name="file_name" class="form-control" value="<?php echo html_escape($file['file_name']); ?>" required>
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary btn-xs"><?php echo _l('submit'); ?></button>
+        <button type="button" class="btn btn-default btn-xs rename-cancel"><?php echo _l('close'); ?></button>
+      </span>
+    </div>
+  <?php echo form_close(); ?>
+</div>
 <div class="pull-right">
 <a href="<?php echo $file['web_link']; ?>" target="_blank" class="btn btn-info btn-icon"><i class="fa fa-pencil"></i></a> 
 <a href="<?php echo admin_url('drive/delete_doc/'.$file['file_id']); ?>" class="btn btn-danger btn-icon _delete"><i class="fa fa-remove"></i></a>
@@ -97,6 +111,28 @@ $('.refreshfolder').click(function(){
 			}
             
         });
+});
+
+// Inline rename behaviour for document cards
+$(function() {
+  // Show rename form
+  $('.content').on('click', '.rename-trigger', function(e) {
+    e.preventDefault();
+    var $card = $(this).closest('.attachment-card');
+    $card.find('.file-name-text').hide();
+    var $form = $card.find('.file-rename-form');
+    $form.show();
+    var $input = $form.find('input[name="file_name"]');
+    $input.focus().select();
+  });
+
+  // Cancel rename
+  $('.content').on('click', '.rename-cancel', function(e) {
+    e.preventDefault();
+    var $card = $(this).closest('.attachment-card');
+    $card.find('.file-rename-form').hide();
+    $card.find('.file-name-text').show();
+  });
 });
 </script>
 </body></html> 
