@@ -171,7 +171,7 @@ public function create_excel()
 	 
     $client  = $this->getGoogleClient(); // auto-refresh token if expired
     $service = new Google_Service_Drive($client);
-
+    echo "XXXXX";exit;
     $fileMetadata = new Google_Service_Drive_DriveFile([
         'name' => 'New Excel File',
         'mimeType' => 'application/vnd.google-apps.spreadsheet'
@@ -327,9 +327,9 @@ private function getGoogleClient()
     }
 
     $client->setAccessToken($accessToken);
-echo "Not Found 7777";exit;
+
     // If expired - refresh using separate function
-    if ($client->isAccessTokenExpired()) {
+    if ($client->isAccessTokenExpired()) { echo "Not Found DDDDD";exit;
         $client = $this->refreshAccessToken($client, $tokenData);
     }
 
