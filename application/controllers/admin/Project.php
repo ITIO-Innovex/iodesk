@@ -942,6 +942,14 @@ class Project extends AdminController
         $project_statuses = $this->project_model->get_project_statuses();
 		$datalogs = $this->project_model->get_project_logs($id);
 		$datacomments = $this->project_model->get_project_comments($id);
+		
+		// Current running timer for this staff & task
+        $getAllTimer = $this->db
+            ->where('project_id', (int)$id)
+            ->where('staff_id', get_staff_user_id())
+            ->order_by('id', 'DESC')
+            ->get(db_prefix() . 'project_task_timer')
+            ->result_array();
         // TODO: Load comments and activity stream if needed
         $data = [
             'project' => $project[0],
@@ -950,6 +958,7 @@ class Project extends AdminController
             'project_statuses' => $project_statuses,
 			'datalogs' => $datalogs,
 			'datacomments' => $datacomments,
+			'get_all_timer' => $getAllTimer,
             'title' => 'Project Details',
         ];
         $this->load->view('admin/project/view', $data);
@@ -1089,6 +1098,15 @@ class Project extends AdminController
 		$project_priority = $this->project_model->project_priority();
 		//print_r($data['project_priority']);exit;
 		$datalogs = $this->project_model->get_task_logs($task_id);
+		
+		// Current running timer for this staff & task
+        $getAllTimer = $this->db
+            ->where('project_id', (int)$task['project_id'])
+            ->where('task_id', (int)$task['id'])
+            ->where('staff_id', get_staff_user_id())
+            ->order_by('id', 'DESC')
+            ->get(db_prefix() . 'project_task_timer')
+            ->result_array();
 
         // Current running timer for this staff & task
         $currentTimer = $this->db
@@ -1102,13 +1120,14 @@ class Project extends AdminController
             ->row_array();
 
         $data = [
-            'task'           => $task,
-            'staff_members'  => $staff_members,
+            'task'             => $task,
+            'staff_members'    => $staff_members,
             'project_statuses' => $project_statuses,
 			'project_priority' => $project_priority,
-			'datalogs'       => $datalogs,
-            'current_timer'  => $currentTimer,
-            'title'          => 'Task Details',
+			'datalogs'         => $datalogs,
+            'current_timer'    => $currentTimer,
+			'get_all_timer'    => $getAllTimer,
+            'title'            => 'Task Details',
         ];
         $this->load->view('admin/project/task_details', $data);
     }
