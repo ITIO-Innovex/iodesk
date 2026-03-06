@@ -6645,7 +6645,7 @@ $emaildetails.="</table>";
                 // Prepare email data
                 $msgdata = [
                     'recipientEmail' => $darEmail,
-                    'recipientCC' => $ccEmails ?? 'vikashg@itio.in',
+                    'recipientCC' => $ccEmails ?? '',
                     'emailSubject' => 'DAR Submitted - ' . $staffName . ' - ' . date('d-m-Y'),
                     'emailBody' => '<h3>Daily Activity Report</h3>'
                         . '<p><strong>Staff:</strong> ' . htmlspecialchars($staffName) . '</p>'
