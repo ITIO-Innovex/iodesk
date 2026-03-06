@@ -131,9 +131,9 @@ class Drive extends AdminController
         ->where('company_id', $companyId)
         ->get('it_crm_staff_google_tokens')
         ->row();
-		print_r($token);
-echo $this->db->last_query();exit;
+		
     if (!$token) {
+	echo "Token111";exit;
         redirect(admin_url('google/connect'));
     }
 
