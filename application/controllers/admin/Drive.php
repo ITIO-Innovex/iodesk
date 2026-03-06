@@ -133,7 +133,7 @@ class Drive extends AdminController
         ->row();
 		
     if (!$token) {
-	echo "Token111";exit;
+	//echo "Token111";exit;
         redirect(admin_url('google/connect'));
     }
 
@@ -182,16 +182,10 @@ public function create_excel()
     ]);
 	
 	// SET PERMISSION
-	/*$permission = new Google_Service_Drive_Permission([
+	$permission = new Google_Service_Drive_Permission([
 		'type' => 'anyone',
 		'role' => 'writer'
-	]);*/
-	
-	$permission = new Google_Service_Drive_Permission([
-    'type' => 'user',
-    'role' => 'writer',
-    'emailAddress' => 'itioinnovax@gmail.com'
-    ]);
+	]);
 	
 	$service->permissions->create($file->id, $permission);
 	
@@ -205,7 +199,7 @@ public function create_excel()
     ];
 
     $this->db->insert('it_crm_staff_drive_files', $data);
-   // echo $file->webViewLink;exit;
+    echo $file->webViewLink;exit;
     // THEN REDIRECT
     redirect($file->webViewLink);
 }
@@ -336,14 +330,14 @@ private function getGoogleClient()
     $accessToken = json_decode($tokenData->access_token, true);
 
     if (!is_array($accessToken)) {
-        //show_error('Invalid token format.');
-		echo "Not Found 222";exit;
+       show_error('Invalid token format.');
+		//echo "Not Found 222";exit;
     }
 
     $client->setAccessToken($accessToken);
 
     // If expired - refresh using separate function
-    if ($client->isAccessTokenExpired()) { echo "Not Found DDDDD";exit;
+    if ($client->isAccessTokenExpired()) { 
         $client = $this->refreshAccessToken($client, $tokenData);
     }
 
