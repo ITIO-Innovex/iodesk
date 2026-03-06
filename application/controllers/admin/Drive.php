@@ -184,8 +184,7 @@ public function create_excel()
 	// SET PERMISSION
 	$permission = new Google_Service_Drive_Permission([
 		'type' => 'anyone',
-		'role' => 'writer',
-		'emailAddress' => 'itioinnovax@gmail.com'
+		'role' => 'writer'
 	]);
 	
 	$service->permissions->create($file->id, $permission);
