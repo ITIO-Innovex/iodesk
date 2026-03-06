@@ -306,7 +306,7 @@ private function getGoogleClient()
         ->row();
 
     if (!$tokenData) {
-	
+	    echo "Not Found 1111";exit;
         //show_error('Google account not connected.');
     }
 
@@ -318,7 +318,8 @@ private function getGoogleClient()
     $accessToken = json_decode($tokenData->access_token, true);
 
     if (!is_array($accessToken)) {
-        show_error('Invalid token format.');
+        //show_error('Invalid token format.');
+		echo "Not Found 222";exit;
     }
 
     $client->setAccessToken($accessToken);
