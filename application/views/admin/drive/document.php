@@ -49,6 +49,7 @@
 
   <?php echo form_open(admin_url('drive/rename_file'), ['class' => 'file-rename-form', 'style' => 'display:none; margin-top:5px;']); ?>
     <input type="hidden" name="file_id" value="<?php echo html_escape($file['file_id']); ?>">
+    <input type="hidden" name="redirect" value="document">
     <div class="input-group input-group-sm">
       <input type="text" name="file_name" class="form-control" value="<?php echo html_escape($file['file_name']); ?>" required>
       <span class="input-group-btn">

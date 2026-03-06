@@ -244,6 +244,7 @@ public function rename_file()
 
     $file_id  = $this->input->post('file_id');
     $new_name = $this->input->post('file_name');
+    $redirect = $this->input->post('redirect');
 
     if (!$file_id || !$new_name) {
         set_alert('danger', 'Invalid File Details');
@@ -276,6 +277,11 @@ public function rename_file()
 
         set_alert('danger', 'Error: '.$e->getMessage());
 
+    }
+
+    // Redirect back to the appropriate listing page
+    if ($redirect === 'excel') {
+        redirect(admin_url('drive/excel'));
     }
 
     redirect(admin_url('drive/document'));
