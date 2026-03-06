@@ -23,7 +23,7 @@
       <div class="col-md-12">
         <div class="tw-mb-2 sm:tw-mb-4"> <a href="<?php echo admin_url('drive/create_excel'); ?>" class="btn btn-sm btn-success" target="_blank"> <i class="fa-solid fa-file-excel tw-mr-1"></i> <?php echo 'Add New Excel Sheet'; ?> </a><button class="btn btn-default btn-sm btn-default-dt-options tw-mx-1 bg-success refreshfolder" 
 			  type="button" title="Refresh Files"><span><i class="fa-solid fa-retweet" id="refresh-loader"></i></span></button>
-<a href="<?php echo admin_url('drive/excel'); ?>" class="btn btn-sm btn-info pull-right  tw-mx-2"  title="Google Sheet Home"> <i class="fa-solid fa-file-excel"></i></a><a href="<?php echo admin_url('drive/document'); ?>" class="btn btn-sm btn-info pull-right"  title="Google Document Home"> <i class="fa-solid fa-file-word tw-mr-1"></i></a>			  
+<a href="<?php echo admin_url('drive/excel'); ?>" class="btn btn-sm btn-success pull-right  tw-mx-2"  title="Google Sheet Home"> <i class="fa-solid fa-file-excel"></i></a><a href="<?php echo admin_url('drive/document'); ?>" class="btn btn-sm btn-primary pull-right"  title="Google Document Home"> <i class="fa-solid fa-file-word tw-mr-1"></i></a>			  
 			  </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
