@@ -40,7 +40,7 @@ class Drive extends AdminController
      * Placeholders for sub-pages, so links don't 404
      */
 	////// Get Document List 
-    public function document()
+    public function document55()
     {
 	if(!$_SESSION['GOOGLE_CLIENT_ID']){ 
 	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
@@ -71,6 +71,82 @@ class Drive extends AdminController
         $data['title'] = 'Drive - Document';
         $this->load->view('admin/drive/document', $data);
     }
+	
+	public function document()
+{
+    //CHECK GOOGLE CONFIG
+    if (!$_SESSION['GOOGLE_CLIENT_ID']) { 
+        set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
+        redirect(admin_url('drive/'));
+    }
+
+    //LOAD GOOGLE CLIENT
+    $client  = $this->getGoogleClient();
+    $service = new Google_Service_Drive($client);
+
+    // GET GOOGLE DOC FILES
+    $files = $service->files->listFiles([
+        'q' => "mimeType='application/vnd.google-apps.document' and trashed=false",
+        'fields' => 'files(id, name, webViewLink, createdTime)'
+    ]);
+
+    $staff_id = get_staff_user_id();
+
+    foreach ($files->getFiles() as $file) {
+
+        //CHECK IF FILE ALREADY EXISTS IN DB
+        $exists = $this->db
+            ->where('file_id', $file->id)
+            ->get('it_crm_staff_drive_files')
+            ->row();
+
+        if (!$exists) {
+
+            // SET PERMISSION ANYONE WRITER
+            try {
+
+                $permission = new Google_Service_Drive_Permission([
+                    'type' => 'anyone',
+                    'role' => 'writer',
+                    'allowFileDiscovery' => false
+                ]);
+
+                $service->permissions->create($file->id, $permission);
+
+            } catch (Exception $e) {
+                // Ignore permission error if already exists
+            }
+
+            // SAVE FILE IN DATABASE
+            $data = [
+                'staff_id'     => $staff_id,
+                'file_id'      => $file->id,
+                'file_name'    => $file->name,
+                'web_link'     => $file->webViewLink,
+                'file_type'    => 'doc',
+                'source'       => 'Google',
+                'is_deleted'   => 1,
+                'created_time' => date('Y-m-d H:i:s', strtotime($file->createdTime))
+            ];
+
+            $this->db->insert('it_crm_staff_drive_files', $data);
+        }
+    }
+
+    // FETCH FROM DATABASE
+    $data['files'] = $this->db
+        ->where('staff_id', $staff_id)
+        ->where('is_deleted', 1)
+        ->where('file_type', 'doc')
+        ->where('source', 'Google')
+        ->get('it_crm_staff_drive_files')
+        ->result_array();
+
+    $data['title'] = 'Drive - Document';
+
+    // LOAD VIEW
+    $this->load->view('admin/drive/document', $data);
+}
 
   
 	/// Get Excel List - shared logic
