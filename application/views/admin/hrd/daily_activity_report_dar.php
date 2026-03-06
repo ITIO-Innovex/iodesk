@@ -71,6 +71,14 @@
     color: #666;
     font-size: 12px;
   }
+  .expand-input {
+    width:150px;
+    transition: width 0.3s;
+}
+
+.expand-input:hover {
+    width:400px;
+}
 </style>
 
 <div id="wrapper">
@@ -154,7 +162,7 @@
                               <td>
                                 <input type="<?php echo $ftype; ?>"
                                        name="field_<?php echo $fid; ?>[]"
-                                       class="form-control"
+                                       class="form-control expand-input"
                                        value="<?php echo html_escape($val); ?>"
                                        placeholder="<?php echo html_escape($f['field_title']); ?>">
                               </td>
@@ -169,7 +177,7 @@
                   </tbody>
                 </table>
               </div>
-              <div class="tw-mt-2 pull-right">
+              <div class="tw-my-2 pull-right">
                 <button type="button" class="btn btn-danger" id="add-dar-row">
                   <i class="fa fa-plus-circle tw-mr-1"></i> Add Row
                 </button>

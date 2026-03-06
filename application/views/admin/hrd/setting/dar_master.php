@@ -77,7 +77,7 @@ $detailstable="No description found";
 if(isset($desc)&&$desc){ 
 $details = json_decode($desc, true) ?? [];
 if (!empty($details) && is_array($details)) {
-$detailstable="<table class='table dt-table' border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;width:100%;'>";
+$detailstable="<table class='table table-bordered' border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;width:100%;'>";
 // ===== Header =====
 if (!empty($details)) {
 $detailstable.="<tr style='background:#f2f2f2;'>";
@@ -146,7 +146,7 @@ $detailstable="No description found";
 if(isset($desc)&&$desc){ 
 $details = json_decode($desc, true) ?? [];
 if (!empty($details) && is_array($details)) {
-$detailstable="<table class='table dt-table' border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;width:100%;'>";
+$detailstable="<table class='table table-bordered' border='1' cellpadding='8' cellspacing='0' style='border-collapse:collapse;width:100%;'>";
 // ===== Header =====
 if (!empty($details)) {
 $detailstable.="<tr style='background:#f2f2f2;'>";

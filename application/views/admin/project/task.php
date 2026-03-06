@@ -327,6 +327,7 @@
   </div>
   <!-- /.modal-dialog -->
 </div>
+<?php init_tail(); ?>
 <!-- /.modal -->
 <script>
 
@@ -664,7 +665,7 @@ $('body').on('click', '.remove_attachment', function() {
 }
 </style>
 
-<?php init_tail(); ?>
+<?php //init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/plugins/chosen/css/chosen.css'); ?>"/>
 <script src="<?php echo base_url('assets/plugins/chosen/js/chosen.jquery.js'); ?>"></script>
 <script>
@@ -698,20 +699,14 @@ $('body').on('click', '.remove_attachment', function() {
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
 <script>
-ClassicEditor
-    .create(document.querySelector('#task_description'))
-    .catch(error => {
-        console.error(error);
-    });
-	ClassicEditor.create(document.querySelector('#editor'), {
-    toolbar: [
-        'heading', '|',
-        'bold', 'italic', 'underline', '|',
-        'link', 'bulletedList', 'numberedList', '|',
-        'blockQuote', 'insertTable', '|',
-        'undo', 'redo'
-    ]
-});
+(function() {
+    var el = document.querySelector('#task_description');
+    if (el) {
+        ClassicEditor.create(el).catch(function(error) {
+            console.error(error);
+        });
+    }
+})();
 </script>
 <!-- Tagify CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">

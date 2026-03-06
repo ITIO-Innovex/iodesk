@@ -127,6 +127,7 @@
     <li><a data-toggle="tab" href="#activity">Activity Stream (<?php echo count($datalogs);?>)</a></li>
 	<li><a data-toggle="tab" href="#custom">Custom Fields</a></li>
 	<li><a data-toggle="tab" href="#Support">Support Files</a></li>
+	<li><a data-toggle="tab" href="#periodX">Project Time Log</a></li>
   </ul>
   
             <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
@@ -298,6 +299,25 @@ $date   = _dt($log['date']);
 	  
 	  </div>
     </div>
+	
+	<div id="periodX" class="tab-pane fade in">
+      <h4>Project Time Log</h4>
+	  <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
+                   <?php //print_r($datalogs);
+				   $totalsec=0;
+					foreach ($get_all_timer as $timer) {
+					$author 	= get_staff_full_name($timer['staff_id']);
+					$date  = date("d F Y",strtotime($timer['start_time']));
+                    $start_time  = date("H:i:s",strtotime($timer['start_time']));
+					$end_time    = date("H:i:s",strtotime($timer['end_time']));
+					$totalsec = ($totalsec + (int)$timer['total_seconds']) ;
+
+echo '<div class="tw-my-2">';
+echo '<h5><i class="fa-regular fa-clock text-warning"></i><span> '.$author.' </span> From <span class="text-info"> '.$start_time.' </span> to <span class="text-info"> '.$end_time.' </span><h5></div>';
+					 }
+					 echo "<span class='btn btn-default btn-icon'>Total Time : ".gmdate("H:i:s", $totalsec)."</span>";
+					 ?>
+					 </div>
   </div>
   
 		
@@ -310,6 +330,8 @@ $date   = _dt($log['date']);
   </div>
 </div>
 </div>
+
+<?php init_tail(); ?>
 <script>
 $(function(){
   $('#projectTabs a').click(function(e){
@@ -328,7 +350,6 @@ $('.toggle-btn').on('click', function() {
 
 
 </script>
-<?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>

@@ -1,5 +1,5 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); //print_r($task); ?>
+<?php init_head(); ?>
 <style>
 .panel-body.panel-table-full.mail-bg {position: relative;}
 .top-left-btn { position: absolute; top: -20px; left: 10px; z-index: 10; padding: 8px 12px; color: white; border: none; border-radius: 4px; cursor: pointer; }
@@ -233,6 +233,7 @@ border-radius: 20px;
                   <li class="active"><a data-toggle="tab" href="#commentsX">Comments</a></li>
                   <li><a data-toggle="tab" href="#documentsX">Documents</a></li>
 				  <li><a data-toggle="tab" href="#activityX">Activity Stream</a></li>
+				  <li><a data-toggle="tab" href="#periodX">Task Time Log</a></li>
                 </ul>
                 <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
                   <div id="commentsX" class="tab-pane fade in active">
@@ -306,6 +307,26 @@ echo staff_profile_image($log['staffid'], ['staff-profile-image-small',]);
 echo '<span class="tw-px-2">'.$author.'</span></h5><div class="tw-text-sm text-danger" style="padding-left: 40px;">'.$date.'</div>';
 echo '<div class="tw-my-2" style="padding-left: 40px;">'. $log['description'].'</div></div></div>';
 					 }
+					 ?>
+					 </div>
+                  </div>
+				  
+				  <div id="periodX" class="tab-pane fade">
+                    <h4>Task Time Log</h4>
+					<div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
+                   <?php //print_r($datalogs);
+				   $totalsec=0;
+					foreach ($get_all_timer as $timer) {
+					$author 	= get_staff_full_name($timer['staff_id']);
+					$date  = date("d F Y",strtotime($timer['start_time']));
+                    $start_time  = date("H:i:s",strtotime($timer['start_time']));
+					$end_time    = date("H:i:s",strtotime($timer['end_time']));
+					$totalsec = ($totalsec + (int)$timer['total_seconds']) ;
+
+echo '<div class="tw-my-2">';
+echo '<h5><i class="fa-regular fa-clock text-warning"></i><span> '.$author.' </span> From <span class="text-info"> '.$start_time.' </span> to <span class="text-info"> '.$end_time.' </span><h5></div>';
+					 }
+					 echo "<span class='btn btn-default btn-icon'>Total Time : ".gmdate("H:i:s", $totalsec)."</span>";
 					 ?>
 					 </div>
                   </div>
