@@ -176,11 +176,12 @@ public function create_excel()
         'name' => 'New Excel File',
         'mimeType' => 'application/vnd.google-apps.spreadsheet'
     ]);
-    echo "XXXXX";exit;
+    
     $file = $service->files->create($fileMetadata, [
         'fields' => 'id, name, webViewLink, createdTime'
     ]);
-
+	print_r($file);
+    echo "XXXXX";exit;
     // SAVE IN DATABASE HERE
     $data = [
         'staff_id'     => get_staff_user_id(),
