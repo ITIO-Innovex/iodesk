@@ -131,7 +131,8 @@ class Drive extends AdminController
         ->where('company_id', $companyId)
         ->get('it_crm_staff_google_tokens')
         ->row();
-//echo $this->db->last_query();exit;
+		print_r($token);
+echo $this->db->last_query();exit;
     if (!$token) {
         redirect(admin_url('google/connect'));
     }
@@ -301,7 +302,6 @@ private function getGoogleClient()
 	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
      redirect(admin_url('drive/'));
 	 }
-	 echo "Not Found 666";exit;
     $token = $this->checkGoogleLogin();
 	echo "Not Found 7777";exit;
 	$companyId = get_staff_company_id();
