@@ -343,6 +343,9 @@ $route['admin/hrd/setting/dar_form'] = 'admin/hrd/dar_form';
 // HRD Daily Activity Report (DAR) entry
 $route['admin/hrd/daily_activity_report_dar'] = 'admin/hrd/daily_activity_report_dar';
 
+// Drive - rename Google Drive file (Docs)
+$route['admin/drive/rename_file'] = 'admin/drive/rename_file';
+
 // Drive - Personal Excel (alias of admin/drive/excel)
 $route['admin/drive/personal/excel'] = 'admin/drive/personal_excel';
 $route['admin/drive/personal/create_excel'] = 'admin/drive/personal_create_excel';
