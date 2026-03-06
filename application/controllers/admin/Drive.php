@@ -171,12 +171,12 @@ public function create_excel()
 	 
     $client  = $this->getGoogleClient(); // auto-refresh token if expired
     $service = new Google_Service_Drive($client);
-    //echo "XXXXX";exit;
+    
     $fileMetadata = new Google_Service_Drive_DriveFile([
         'name' => 'New Excel File',
         'mimeType' => 'application/vnd.google-apps.spreadsheet'
     ]);
-
+    echo "XXXXX";exit;
     $file = $service->files->create($fileMetadata, [
         'fields' => 'id, name, webViewLink, createdTime'
     ]);
