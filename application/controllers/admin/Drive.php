@@ -295,11 +295,15 @@ public function delete_doc($fileId)
 private function getGoogleClient()
 {
 
+    echo "Not Found 5555";exit;
+
      if(!$_SESSION['GOOGLE_CLIENT_ID']){ 
 	 set_alert('warning', 'GOOGLE CLIENT ID NOT CONFIGURED');
      redirect(admin_url('drive/'));
 	 }
+	 echo "Not Found 666";exit;
     $token = $this->checkGoogleLogin();
+	echo "Not Found 7777";exit;
 	$companyId = get_staff_company_id();
     $tokenData = $this->db->where('company_id', $companyId)
         ->get('it_crm_staff_google_tokens')
