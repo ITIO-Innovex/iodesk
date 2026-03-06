@@ -425,8 +425,29 @@ function get_staff_company_id($userid = '')
         $userid = $tmpStaffUserId;
     }
     $CI = & get_instance();
-    $staff = $CI->app_object_cache->get('staff-roll-data-' . $userid);
-    return $staff ? $staff->company_id : '';
+
+    // Fallback: the old cache key `staff-roll-data-{id}` is not guaranteed to contain `company_id`.
+    // Always resolve company_id reliably from DB when current_user is not available.
+    if (!is_numeric($userid) || empty($userid)) {
+        return '';
+    }
+
+    $cacheKey  = 'staff-company-id-' . (int) $userid;
+    $companyId = $CI->app_object_cache->get($cacheKey);
+    if ($companyId !== null && $companyId !== false && $companyId !== '') {
+        return $companyId;
+    }
+
+    $row = $CI->db->select('company_id')
+        ->from(db_prefix() . 'staff')
+        ->where('staffid', (int) $userid)
+        ->get()
+        ->row();
+
+    $companyId = $row && isset($row->company_id) ? $row->company_id : '';
+    $CI->app_object_cache->add($cacheKey, $companyId);
+
+    return $companyId;
 }
 function get_branch_id($staffid='')
 {   
