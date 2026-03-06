@@ -47,7 +47,7 @@
   <span class="file-name-text"><?php echo html_escape($file['file_name']); ?></span>
   <i class="fa-solid fa-pen tw-mx-2 rename-trigger" title="Rename"></i>
 
-  <?php echo form_open(admin_url('drive/rename_file'), ['class' => 'file-rename-form', 'style' => 'display:none; margin-top:5px;']); ?>
+  <?php echo form_open(admin_url('drive/rename_file'), ['class' => 'file-rename-form tw-my-2', 'style' => 'display:none; margin-top:5px;margin-bottom:5px;']); ?>
     <input type="hidden" name="file_id" value="<?php echo html_escape($file['file_id']); ?>">
     <input type="hidden" name="redirect" value="document">
     <div class="input-group input-group-sm">
