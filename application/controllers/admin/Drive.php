@@ -180,8 +180,16 @@ public function create_excel()
     $file = $service->files->create($fileMetadata, [
         'fields' => 'id, name, webViewLink, createdTime'
     ]);
-	print_r($file);
-    echo "XXXXX";exit;
+	
+	// SET PERMISSION
+	$permission = new Google_Service_Drive_Permission([
+		'type' => 'anyone',
+		'role' => 'writer',
+		'emailAddress' => 'itioinnovax@gmail.com'
+	]);
+	
+	$service->permissions->create($file->id, $permission);
+	
     // SAVE IN DATABASE HERE
     $data = [
         'staff_id'     => get_staff_user_id(),
@@ -192,7 +200,7 @@ public function create_excel()
     ];
 
     $this->db->insert('it_crm_staff_drive_files', $data);
-
+    echo $file->webViewLink;exit;
     // THEN REDIRECT
     redirect($file->webViewLink);
 }
