@@ -34,7 +34,7 @@
 			<div class="col-sm-3">
 			<div class="attachment-card mail-bg">
   <div class="pull-right">
-<a href="<?php echo $file['web_link']; ?>" target="_blank" class="btn btn-info btn-icon"><i class="fa fa-pencil" title="View / Edit Document"></i></a> 
+<a href="<?php echo $file['web_link']; ?>" target="_blank" class="btn btn-info btn-icon"><i class="fa-solid fa-eye" title="View / Edit Document"></i></a> 
 <a href="<?php echo admin_url('drive/delete_doc/'.$file['file_id']); ?>" class="btn btn-danger btn-icon _delete" ><i class="fa fa-remove" title="Delete Document"></i></a>
 </div>              
                 
