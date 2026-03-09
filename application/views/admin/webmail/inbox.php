@@ -95,12 +95,17 @@
 					<?php if (!in_array('Outbox', $folderNames)) { ?>
                         <a href="inbox?fd=Outbox" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Outbox'){ echo 'folder-active';} ?>">Outbox</a>
 						<?php } ?>
+						</li>
 						<li role="presentation" class="menu-item-leads ">
-                        <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a>
+                        <a href="draft" class="mail-loader ">Draft</a></li>
+						<li role="presentation" class="menu-item-leads ">
+                        <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a></li>
 						<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Deleted" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Deleted'){ echo 'folder-active';} ?>">Deleted</a>
-                    </li><?php if(count($_SESSION['folderlist']) <= 3 ){?>
-					<li class="tw-p-1" style="display: flex;justify-content: right;"> <a href="<?php echo admin_url('webmail/getfolderlist'); ?>" class="text-danger _delete"><i class="fa-solid fa-folder-plus text-warning fa-2x" title="Fetch all folder"></i></a> </li><?php } ?>
+                    </li>
+					<?php if(count($_SESSION['folderlist']) <= 3 ){?>
+					<li class="tw-p-1" style="display: flex;justify-content: right;"> <a href="<?php echo admin_url('webmail/getfolderlist'); ?>" class="text-danger _delete"><i class="fa-solid fa-folder-plus text-warning fa-2x" title="Fetch all folder"></i></a> </li>
+					<?php } ?>
                 </ul>
             </div>
             <div class="col-md-10">

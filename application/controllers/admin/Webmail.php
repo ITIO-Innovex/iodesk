@@ -132,14 +132,61 @@ class Webmail extends AdminController
 	{
 	    
 		$data = $this->input->post();
+		
+		
+		$draft_id="";
+		if(isset($data['draft_id'])&&$data['draft_id']){
+		$draft_id=$data['draft_id'];
+		unset($data['draft_id']);
+		}
+		//print_r($data);exit;
 		$entry_id=get_staff_user_id();
         $this->webmail_model->reply($data, $entry_id);
         set_alert('success', _l('Email Sent Successfully', _l('Email Sent')));
-		log_message('error', 'Redirect : ' . previous_url() ?: $_SERVER['HTTP_REFERER']);
+		//log_message('error', 'Redirect : ' . previous_url() ?: $_SERVER['HTTP_REFERER']);
 		$_SESSION['replySavedEmail']="1";
+		
+		if(isset($draft_id)&&$draft_id){
+		    $this->db->where('id ', $draft_id);
+			$this->db->where('staffid', get_staff_user_id());
+			$this->db->update('it_crm_email_draft', ['status' => 'sent']);
+		}
+		
+		$url=previous_url() ?: $_SERVER['HTTP_REFERER'];
+		if(strstr($url,'compose/')){
+		redirect('admin/webmail/compose');
+		}
         redirect(previous_url() ?: $_SERVER['HTTP_REFERER']);
 	} 
+	
+	
+    public function save_as_draft()
+	{
+	$data = $this->input->post();
+	$insert = [
+			'company_id'   => get_staff_company_id(),
+			'staffid'      => get_staff_user_id(),
+			'to_email'     => trim($data['recipientEmail'] ?? ''),
+			'cc_emails'    => trim($data['recipientCC'] ?? ''),
+			'bcc_emails'   => trim($data['recipientBCC'] ?? ''),
+			'subject'      => trim($data['emailSubject'] ?? ''),
+			'body'         => $data['emailBody'] ?? '',
+			'status'       => 'outbox',
+			'created_at'   => date('Y-m-d H:i:s'),
+		];
+		
+	//log_message('error', 'Post data - '.print_r($insert, true) );
+	
+	    $this->db->insert(db_prefix() . 'email_draft', $insert);
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['success' => true, 'message' => 'Email save as draft successfully']);
+			return;
+		}
 
+		echo json_encode(['success' => false, 'message' => 'Failed to save as draft email']);
+		
+		
+	}
 	public function schedule_send()
 	{
 		$data = $this->input->post();
@@ -339,6 +386,23 @@ if (!empty($attachments_json)) {
 		$this->db->where('staffid', get_staff_user_id());
 		$this->db->delete('it_crm_email_contact');
 		echo json_encode(['success' => true, 'message' => 'Contact deleted successfully']);
+	}
+	
+	public function delete_draft($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+		$id = (int) $id;
+		if (!$id) {
+			echo json_encode(['success' => false, 'message' => 'Invalid contact']);
+			return;
+		}
+		$this->db->where('id', $id);
+		$this->db->where('staffid', get_staff_user_id());
+		$this->db->delete('it_crm_email_draft');
+		echo json_encode(['success' => true, 'message' => 'Draft deleted successfully']);
 	}
 
 	public function scrub_email()
@@ -625,6 +689,22 @@ See you soon,<br>
 		$data['title'] = 'Email Contacts';
 		$this->load->view('admin/webmail/contacts', $data);
 	}
+	
+	
+	public function draft()
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Contacts');
+		}
+
+		$staffId = get_staff_user_id();
+		$this->db->where('staffid', $staffId);
+		$this->db->where('status != ', 'sent');
+		$this->db->order_by('id', 'desc');
+		$data['contacts'] = $this->db->get('it_crm_email_draft')->result_array();
+		$data['title'] = 'Email Draft';
+		$this->load->view('admin/webmail/draft', $data);
+	}
 
 	/**
 	 * Update scheduled email page
@@ -835,8 +915,10 @@ See you soon,<br>
 
 	
 	 //Display Inbox Listing 
-	public function compose()
+	public function compose($draft_id="")
 	{
+	
+	    
 	    $data['title'] = _l('New Email');
 		$data['email_signature'] = get_staff_signature();
 		//print_r($_SESSION['mailersdropdowns']);
@@ -845,6 +927,17 @@ See you soon,<br>
 		$this->load->view('admin/webmail/compose', $data);
 		}else{
 		////////////////////////////////////////////
+		
+		if(isset($draft_id)&&$draft_id){
+		
+		
+		
+        $this->db->where('id', $draft_id);
+		$this->db->where('staffid', get_staff_user_id());
+        $data['email_draft']=$this->db->from(db_prefix() . 'email_draft')->get()->row(); 
+		//print_r($data['email_draft']);exit;
+		
+		}
 		$this->load->view('admin/webmail/compose', $data);
 		}
 	} 
