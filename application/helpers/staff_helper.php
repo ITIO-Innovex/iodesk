@@ -215,6 +215,20 @@ function get_available_staff_permissions($data = [])
                 'view' => $viewGlobalName,
             ],
         ],
+		
+		'drive' => [
+            'name'         => _l('My Drive'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
+            ],
+        ],
+		
+		'important_document' => [
+            'name'         => _l('My Documents'),
+            'capabilities' => [
+                'view' => $viewGlobalName,
+            ],
+        ],
         /*'checklist_templates' => [
             'name'         => _l('checklist_templates'),
             'capabilities' => [
