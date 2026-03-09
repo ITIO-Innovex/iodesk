@@ -582,6 +582,19 @@ class Project extends AdminController
                         }
                     }
 					
+					//////////////////////////////
+				$notification_data = [
+                    'description'     => 'project_created',
+                    'touserid'        => $data['owner'],
+                    'link'            => 'project/view/' . $id
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification($insert_data['addedby']);
+                }
+
+					
+					//////////////////////////////
+					
                     log_message('debug', 'Project added successfully with ID: ' . $id);
                     echo json_encode(['success' => true, 'id' => $id, 'message' => _l('added_successfully', _l('Project'))]);
                 } else {

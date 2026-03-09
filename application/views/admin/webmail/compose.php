@@ -1,6 +1,24 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
-<?php //print_r($webmaillist);?>
+<?php 
+$to_email="";
+$cc_emails="";
+$bcc_emails="";
+$draft_subject="";
+$draft_body="";
+$draft_id="";
+
+if(isset($email_draft)&&$email_draft){
+$to_email=$email_draft->to_email ?? '';
+$cc_emails=$email_draft->cc_emails ?? '';
+$bcc_emails=$email_draft->bcc_emails ?? '';
+$draft_subject=$email_draft->subject ?? '';
+$draft_body=$email_draft->body ?? '';
+$draft_id=$email_draft->id ?? '';
+}
+
+
+?>
 <style>
 @media (min-width: 768px) {
     .modal-dialogx {
@@ -107,7 +125,11 @@
                         <a href="inbox?fd=<?php echo $val['folder'];?>"><?php echo $val['folder'];?></a>
                     </li>
 					
-				  <?php  } ?>  
+				  <?php  } ?> 
+				  <li role="presentation" class="menu-item-leads ">
+                        <a href="draft" class="mail-loader ">Draft</a></li>
+						<li role="presentation" class="menu-item-leads ">
+                        <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a></li> 
                 </ul>
             </div>
             <div class="col-md-10">
@@ -122,11 +144,14 @@
         <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
                value="<?= $this->security->get_csrf_hash(); ?>">
 	<input type="hidden" name="redirect" value="inbox.php">
+	<?php if(isset($draft_id)&&$draft_id){ ?>
+	<input type="hidden" name="draft_id" value="<?php echo $draft_id; ?>">
+	<?php } ?>
       <div class="mb-3">
         <label for="recipientEmail" class="form-label mtop10">To</label>
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="toEmailTagsContainer">
-                <input type="text" class="email-input-field" id="toEmailInputField" placeholder="Type email and press Enter" autocomplete="off">
+                <input type="text" class="email-input-field" id="toEmailInputField" placeholder="Type email and press Enter" autocomplete="off" >
             </div>
             <div class="email-suggestions" id="toEmailSuggestions"></div>
         </div>
@@ -154,13 +179,13 @@
       </div>
       <div class="mb-3">
 	  <label for="emailSubject" class="form-label mtop10">Subject</label>
-	  <input type="text" class="form-control" id="emailSubjectIT" name="emailSubject" value="" placeholder="Enter email subject"  required>
+	  <input type="text" class="form-control" id="emailSubjectIT" name="emailSubject" value="<?php echo html_escape($draft_subject); ?>" placeholder="Enter email subject"  required>
 	  
 	  </div>
 	  
       <div class="mb-3">
         
-	   <textarea  name="emailBody" id="emailBody" class="form-control editor" required></textarea>
+	   <textarea  name="emailBody" id="emailBody" class="form-control editor" required><?php echo $draft_body;?></textarea>
 	   <div class="checkbox checkbox-primary">
 <input type="checkbox" id="toggleSignature" name="toggleSignature" value="1">
 <label for="SignatureX">Add Signature</label>
@@ -184,6 +209,7 @@
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemail"><i class="fa-solid fa-envelope-circle-check"></i> Send Email</button>
 	  <button type="button" id="openScheduleModal" class="btn btn-primary mtop20"><i class="fa-regular fa-clock"></i> Send Later</button>
+	  <button type="button" id="saveasDraftBtn" class="btn btn-primary mtop20"><i class="fa-solid fa-floppy-disk"></i> Save as Draft</button>
     </form>
 
 </div>
@@ -216,6 +242,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button type="button" id="scheduleSendBtn" class="btn btn-primary">Schedule and Send</button>
+				
             </div>
         </div>
     </div>
@@ -411,6 +438,53 @@ $('#openScheduleModal').on('click', function(){
 	$('#emailScheduleModal').modal('show');
 });
 
+$('#saveasDraftBtn').on('click', function(){
+$('#saveasDraftBtn').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+
+var form = document.getElementById('compose-form-data');
+var formData = new FormData(form);
+
+// remove field
+formData.delete('redirect');
+formData.delete('attachment[]');
+	
+	 var data = '';
+
+    for (var pair of formData.entries()) {
+        data += pair[0] + " : " + pair[1] + "\n";
+    }
+	//alert(data);
+	$.ajax({
+		url: admin_url + 'webmail/save_as_draft',
+		type: 'POST',
+		data: formData,
+		contentType: false,
+		processData: false,
+		success: function(response){
+			var res;
+			try {
+				res = JSON.parse(response); 
+			} catch (e) {
+				res = {success:false, message:'Unexpected response'};
+			}
+			if(res.success){
+				alert(res.message || 'Email save as draft successfully');
+				//$('#saveasDraftBtn').prop('disabled', false).html('Save as Draft');
+				window.location.href = admin_url + 'webmail/draft';
+			}else{
+				alert(res.message || 'Failed to save as draft email');
+				$('#saveasDraftBtn').prop('disabled', false).html('Save as Draft');
+			}
+		},
+		error: function(){
+			alert('Failed to save as draft email');
+			$('#saveasDraftBtn').prop('disabled', false).html('Save as Draft');
+		}
+	});
+
+    
+});
+
 $('#scheduleSendBtn').on('click', function(){
 	if(!validateComposeForm()){
 		return;
@@ -542,7 +616,15 @@ window.addEventListener('beforeunload', function (e) {
 <script>
 (function() {
     var searchEmail = '<?php echo isset($_SESSION['webmail']['mailer_email']) ? addslashes($_SESSION['webmail']['mailer_email']) : ''; ?>';
-    var initialToEmail = '<?php echo isset($_GET['id']) && !empty($_GET['id']) ? addslashes($_GET['id']) : ''; ?>';
+    var initialToEmail = '<?php 
+        $to_val = "";
+        if(isset($_GET['id']) && !empty($_GET['id'])) { 
+            $to_val = $_GET['id']; 
+        } elseif(!empty($to_email)) {
+            $to_val = $to_email;
+        }
+        echo addslashes($to_val); 
+    ?>';
     
     function createEmailTagInput(options) {
         var emailTags = [];
@@ -802,11 +884,32 @@ window.addEventListener('beforeunload', function (e) {
         bccEmailInput.updateHiddenInput();
     };
     
+    var initialCcEmail = '<?php echo !empty($cc_emails) ? addslashes($cc_emails) : ''; ?>';
+    var initialBccEmail = '<?php echo !empty($bcc_emails) ? addslashes($bcc_emails) : ''; ?>';
+    
     if (initialToEmail) {
         var initialEmails = initialToEmail.split(/[,;]+/);
         initialEmails.forEach(function(email) {
             if (email.trim()) {
                 toEmailInput.createTag(email.trim());
+            }
+        });
+    }
+
+    if (initialCcEmail) {
+        var ccEmails = initialCcEmail.split(/[,;]+/);
+        ccEmails.forEach(function(email) {
+            if (email.trim()) {
+                ccEmailInput.createTag(email.trim());
+            }
+        });
+    }
+
+    if (initialBccEmail) {
+        var bccEmails = initialBccEmail.split(/[,;]+/);
+        bccEmails.forEach(function(email) {
+            if (email.trim()) {
+                bccEmailInput.createTag(email.trim());
             }
         });
     }
@@ -821,8 +924,8 @@ window.addEventListener('beforeunload', function (e) {
 
 <script>
 $(document).ready(function () {
-
-    const storageKey = "outbox_email_body";
+localStorage.removeItem("outbox_email_body");
+   <?php /*?> const storageKey = "outbox_email_body";
 
     // Initialize jqte
     //$('#emailBody').jqte();
@@ -838,7 +941,7 @@ $(document).ready(function () {
     $(document).on('keyup', '.jqte_editor', function () {
         let content = $('#emailBody').val();
         localStorage.setItem(storageKey, content);
-    });
+    });<?php */?>
 
 });
 </script>
