@@ -793,6 +793,16 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
     //     ]);
     // }
 
+
+    if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
+        $CI->app_menu->add_sidebar_menu_item('underwriting', [
+            'name'     => 'Under Writing',
+            'href'     => admin_url('underwriting'),
+            'icon'     => 'fa-solid fa-file-pen',
+            'position' => 40,
+            'badge'    => [],
+        ]);
+    }
     if (is_admin() || staff_can('view', 'user_utility')) {
         $CI->app_menu->add_sidebar_menu_item('user-utility', [
             'name'     => 'Team Document',
@@ -803,17 +813,9 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         ]);
     }
 	
-	if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
-        $CI->app_menu->add_sidebar_menu_item('underwriting', [
-            'name'     => 'Under Writing',
-            'href'     => admin_url('underwriting'),
-            'icon'     => 'fa-solid fa-file-zipper',
-            'position' => 40,
-            'badge'    => [],
-        ]);
-    }
 	
-	if (is_admin()) {  // || staff_can('view', 'user_utility')
+	
+	//if (is_admin()) {  // || staff_can('view', 'user_utility')
         $CI->app_menu->add_sidebar_menu_item('drive', [
             'name'     => 'My Drive',
             'href'     => admin_url('drive'),
@@ -821,7 +823,15 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'position' => 40,
             'badge'    => [],
         ]);
-    }
+		
+		$CI->app_menu->add_sidebar_menu_item('important_document', [
+            'name'     => 'My Documents',
+            'href'     => admin_url('important_document'),
+            'icon'     => 'fa-solid fa-file-contract',
+            'position' => 40,
+            'badge'    => [],
+        ]);
+    //}
 
 /*    if (is_admin()) {
     if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
