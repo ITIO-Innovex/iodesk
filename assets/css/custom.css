@@ -778,7 +778,7 @@ body, html {
   color: #fff;
   overflow-y: auto; /* allow scrolling */
   overflow-x: hidden;
-  padding: 20px;
+  padding: 10px;
   max-height: 100vh;
   height: 100vh;
   backdrop-filter: saturate(125%) blur(15px);
