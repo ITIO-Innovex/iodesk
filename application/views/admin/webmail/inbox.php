@@ -1425,6 +1425,11 @@ $(document).ready(function () {
 });
 
 $('#saveasDraftBtnReply').on('click', function(){
+
+if(!confirm("Are you sure you want to save this email as draft?")){
+        return false;
+    }
+	
 $('#saveasDraftBtnReply').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
 
 var form = document.getElementById('draft-reply');
@@ -1473,6 +1478,11 @@ formData.delete('attachment[]');
 });
 
 $('#saveasDraftBtnForward').on('click', function(){
+
+if(!confirm("Are you sure you want to save this email as draft?")){
+        return false;
+    }
+	
 $('#saveasDraftBtnForward').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
 
 var form = document.getElementById('draft-forward');
