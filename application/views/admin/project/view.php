@@ -247,12 +247,15 @@ if(isset($datalogs)&& count($datalogs) >0){
 foreach ($datalogs as $log) {
 $author = get_staff_full_name($log['staffid']);
 $date   = _dt($log['date']);
+$htmls = '<div class="tw-my-2" style="padding-left:40px;">'.$log['description'].'</div>';
 ?>
 <div>
 <div class="media-body"><h5 class="media-heading tw-font-semibold tw-mb-0"><div class="btn-group pull-right mleft5"></div>
 <?php echo staff_profile_image($log['staffid'], ['staff-profile-image-small',]); ?>
 <span class="tw-px-2"><?php echo $author; ?></span></h5><div class="tw-text-sm text-danger" style="padding-left: 40px;"><?php echo $date; ?></div>
-<div class="tw-my-2" style="padding-left: 40px;"><?php echo $log['description']; ?></div></div></div>
+<?php /*?><div class="tw-my-2" style="padding-left: 40px;"><?php echo $log['description']; ?></div><?php */?>
+<iframe width="100%" height="200" srcdoc="<?php echo htmlspecialchars($htmls); ?>"></iframe>
+</div></div>
 <?php
 }
 }else{ ?>
