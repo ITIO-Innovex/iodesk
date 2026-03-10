@@ -121,21 +121,21 @@
 			<div class="">
 			
 			<ul class="nav nav-tabs" id="projectTabs">
-    <li class="active"><a data-toggle="tab" href="#desc">Description</a></li>
-    <li><a data-toggle="tab" href="#info">Project Information</a></li>
-    <li><a data-toggle="tab" href="#comments">Comments (<?php echo count($datacomments);?>)</a></li>
-    <li><a data-toggle="tab" href="#activity">Activity Stream (<?php echo count($datalogs);?>)</a></li>
-	<li><a data-toggle="tab" href="#custom">Custom Fields</a></li>
-	<li><a data-toggle="tab" href="#Support">Support Files</a></li>
+    <li class="active"><a data-toggle="tab" href="#descX">Description</a></li>
+    <li><a data-toggle="tab" href="#infoX">Project Information</a></li>
+    <li><a data-toggle="tab" href="#commentsX">Comments (<?php echo count($datacomments);?>)</a></li>
+    <li><a data-toggle="tab" href="#activityX">Activity Stream (<?php echo count($datalogs);?>)</a></li>
+	<li><a data-toggle="tab" href="#customX">Custom Fields</a></li>
+	<li><a data-toggle="tab" href="#SupportX">Support Files</a></li>
 	<li><a data-toggle="tab" href="#periodX">Project Time Log</a></li>
   </ul>
   
             <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
-    <div id="desc" class="tab-pane fade in active">
+    <div id="descX" class="tab-pane fade in active">
       <h4>Description</h4>
       <div><?php echo !empty($project['project_description']) ? $project['project_description'] : '<em>No description provided.</em>'; ?></div>
     </div>
-    <div id="info" class="tab-pane fade">
+    <div id="infoX" class="tab-pane fade">
       <h4>Project Information</h4>
       <?php echo form_open(admin_url('project/updateproject'), ['id' => 'edit-project-form-details']); ?>
       <input type="hidden" name="project_id" value="<?php echo $project['id']; ?>">
@@ -214,8 +214,8 @@
       <button type="submit" class="btn btn-primary">Save Changes</button>
       <?php echo form_close(); ?>
     </div>
-    <div id="comments" class="tab-pane fade">
-      <h4>Comments</h4>
+    <div id="commentsX" class="tab-pane fade">
+      <h4>commentsx</h4>
       <div class="activity-feed tw-mt-2" style="max-height: 400px; overflow-y: auto;">
 <?php //print_r($datalogs);
 if(isset($datacomments)&& count($datacomments) >0){
@@ -235,7 +235,7 @@ $date   = _dt($com['addedon']);
 <?php } ?>
 					 </div>
     </div>
-    <div id="activity" class="tab-pane fade">
+    <div id="activityX" class="tab-pane fade">
       <h4>Activity Stream</h4>
       <div class="activity-feed tw-mt-2" style="max-height: 400px; overflow-y: auto;">
 <?php //print_r($datalogs);
@@ -256,7 +256,7 @@ $date   = _dt($log['date']);
 <?php } ?>
 					 </div>
     </div>
-	<div id="custom" class="tab-pane fade in">
+	<div id="customX" class="tab-pane fade in">
       <h4>Custom Fields</h4>
       <div><?php //echo !empty($project['custom_field']) ? $project['custom_field'] : '<em>No custom fields.</em>'; 
 	  
@@ -273,7 +273,7 @@ $date   = _dt($log['date']);
 	  
 	  ?></div>
     </div>
-	<div id="Support" class="tab-pane fade in">
+	<div id="SupportX" class="tab-pane fade in">
       <h4>Support Files</h4>
 	  <?php //echo $path = get_upload_path_by_type('project') . $project['id'] . '/support_files/'; ?>
       <div><?php //echo !empty($project['support_files']) ? $project['support_files'] : '<em>No support files.</em>'; ?>
