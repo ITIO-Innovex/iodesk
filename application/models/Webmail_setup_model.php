@@ -152,14 +152,16 @@ class Webmail_setup_model extends App_Model
 	    $sid="";
 	    if (!is_admin()) {
 			$sid=get_staff_user_id();
+			$this->db->where('staffid', $sid);
         }
 
         $this->db->where('id', $id);
-		$this->db->where('staffid', $sid);
+		
 		
         $this->db->update(db_prefix().'webmail_setup', [
             'mailer_status' => $status,
         ]);
+		//echo $this->db->last_query();exit;
 		if ($this->db->affected_rows() > 0) {
 		log_activity('Webmail Setup Status Changed [FieldID: ' . $id . ' - Active: ' . $status . ']');
             return true;

@@ -163,6 +163,8 @@ class Webmail extends AdminController
     public function save_as_draft()
 	{
 	$data = $this->input->post();
+	
+	log_message('error', 'Post data - '.print_r($data, true) );
 	$insert = [
 			'company_id'   => get_staff_company_id(),
 			'staffid'      => get_staff_user_id(),
@@ -171,9 +173,13 @@ class Webmail extends AdminController
 			'bcc_emails'   => trim($data['recipientBCC'] ?? ''),
 			'subject'      => trim($data['emailSubject'] ?? ''),
 			'body'         => $data['emailBody'] ?? '',
-			'status'       => 'outbox',
+			'reply_from_email'         => $data['reply_from_email'] ?? '',
+			'status'       => $data['messagetype'] ?? 'outbox',
+			'messageid'       => $data['messageid'] ?? '',
 			'created_at'   => date('Y-m-d H:i:s'),
 		];
+		
+		
 		
 	//log_message('error', 'Post data - '.print_r($insert, true) );
 	

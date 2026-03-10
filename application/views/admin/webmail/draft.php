@@ -25,6 +25,7 @@
 					?>
                     <tr>
                         <td><a href="<?php echo admin_url('webmail/compose');?>/<?php echo (int) $c['id']; ?>">Draft</a></td>
+						<td><a href="<?php echo admin_url('webmail/compose');?>/<?php echo (int) $c['id']; ?>"><?php echo $c['status'] ?? ''; ?></a></td>
                         <td><?php echo $c['subject'] ?? '(no subject)'; ?></td>
                         <td><?php echo $c['body'] ?? ''; ?></td>
 						<td><?php echo $c['created_at'] ?? ''; ?></td>

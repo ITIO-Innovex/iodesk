@@ -7,6 +7,8 @@ $bcc_emails="";
 $draft_subject="";
 $draft_body="";
 $draft_id="";
+$reply_from_email=$_SESSION['webmail']['id'];
+$messageid="";
 
 if(isset($email_draft)&&$email_draft){
 $to_email=$email_draft->to_email ?? '';
@@ -15,8 +17,10 @@ $bcc_emails=$email_draft->bcc_emails ?? '';
 $draft_subject=$email_draft->subject ?? '';
 $draft_body=$email_draft->body ?? '';
 $draft_id=$email_draft->id ?? '';
+$reply_from_email=$email_draft->reply_from_email ?? '';
+$messageid=$email_draft->messageid ?? $_SESSION['webmail']['id'];
 }
-
+//echo $messageid;exit;
 
 ?>
 <style>
@@ -122,12 +126,12 @@ $draft_id=$email_draft->id ?? '';
 				
 				<?php  foreach ($_SESSION['folderlist'] as $item => $val) { ?>
                     <li role="presentation" class="menu-item-leads">
-                        <a href="inbox?fd=<?php echo $val['folder'];?>"><?php echo $val['folder'];?></a>
+                        <a href="<?=admin_url('webmail/inbox') ?>?fd=<?php echo $val['folder'];?>"><?php echo $val['folder'];?></a>
                     </li>
 					
 				  <?php  } ?> 
 				  <li role="presentation" class="menu-item-leads ">
-                        <a href="draft" class="mail-loader ">Draft</a></li>
+                        <a href="<?=admin_url('webmail/draft') ?>" class="mail-loader ">Draft</a></li>
 						<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a></li> 
                 </ul>
@@ -147,6 +151,20 @@ $draft_id=$email_draft->id ?? '';
 	<?php if(isset($draft_id)&&$draft_id){ ?>
 	<input type="hidden" name="draft_id" value="<?php echo $draft_id; ?>">
 	<?php } ?>
+	<?php if(isset($messageid)&&$messageid){ ?>
+	<input type="hidden" name="messageid" value="<?php echo $messageid; ?>">
+	<?php } ?>
+	
+	<div class="mb-3">
+        <label for="recipientEmail" class="form-label mtop10">Reply From Email</label>
+        <select name="reply_from_email" id="reply_from_email" class="form-control" required>
+    <option value="">Select Email</option>
+    <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
+        <option value="<?php echo $row['id']; ?>" <?php if($row['id']==$reply_from_email){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
+    <?php } ?>
+
+</select>
+      </div>
       <div class="mb-3">
         <label for="recipientEmail" class="form-label mtop10">To</label>
         <div class="email-input-wrapper">
@@ -453,7 +471,7 @@ formData.delete('attachment[]');
     for (var pair of formData.entries()) {
         data += pair[0] + " : " + pair[1] + "\n";
     }
-	//alert(data);
+	alert(data);
 	$.ajax({
 		url: admin_url + 'webmail/save_as_draft',
 		type: 'POST',
