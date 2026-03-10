@@ -424,7 +424,7 @@ if ($nextPage) {
   <div class="card card-body">
 
   
-    <form action="<?=  admin_url('webmail/Reply') ?>" method="post" enctype="multipart/form-data">
+    <form action="<?=  admin_url('webmail/Reply') ?>" method="post" enctype="multipart/form-data" id="draft-reply">
 	<!-- CSRF Token -->
         <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
                value="<?= $this->security->get_csrf_hash(); ?>">
@@ -481,6 +481,7 @@ if ($nextPage) {
         <input type="file" name="attachments[]"  class="form-control" multiple>
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemailxxx">Send Email</button>
+	  <button type="submit" name="send" class="btn btn-primary mtop20" id="saveasDraftBtnReply">Save as Draft 22</button>
     </form>
     <div id="resultMessage" class="mt-4"></div>
   </div>
@@ -490,7 +491,7 @@ if ($nextPage) {
   
   
   
-    <form action="<?=  admin_url('webmail/Reply') ?>" method="post" enctype="multipart/form-data">
+    <form action="<?=  admin_url('webmail/Reply') ?>" method="post" enctype="multipart/form-data" id="draft-forward">
 	<!-- CSRF Token -->
         <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
                value="<?= $this->security->get_csrf_hash(); ?>">
@@ -510,7 +511,7 @@ if ($nextPage) {
 </select>
       </div>
       <div class="mb-3">
-        <label for="recipientEmailFW" class="form-label">Recipient Email</label>
+        <label for="recipientEmailFW" class="form-label mtop10">Recipient Email</label>
         <input type="text" class="form-control" id="recipientEmailFW" name="recipientEmail" value="" placeholder="Enter recipient email" required>
       </div>
 	  <div class="mb-3">
@@ -546,6 +547,7 @@ if ($nextPage) {
         <input type="file" name="attachments[]"  class="form-control" multiple>
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemailforward">Send Email</button>
+	  <button type="submit" name="send" class="btn btn-primary mtop20" id="saveasDraftBtnForward">Save as Draft 11</button>
     </form>
     <div id="resultMessage" class="mt-4"></div>
   </div>
@@ -1421,6 +1423,114 @@ $(document).ready(function () {
     });
 
 });
+
+$('#saveasDraftBtnReply').on('click', function(){
+$('#saveasDraftBtnReply').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+
+var form = document.getElementById('draft-reply');
+var formData = new FormData(form);
+
+// remove field
+formData.delete('redirect');
+formData.delete('attachment[]');
+	
+	 var data = '';
+
+    for (var pair of formData.entries()) {
+        data += pair[0] + " : " + pair[1] + "\n";
+    }
+	//alert(data);
+	//return false;
+	$.ajax({
+		url: admin_url + 'webmail/save_as_draft',
+		type: 'POST',
+		data: formData,
+		contentType: false,
+		processData: false,
+		success: function(response){
+			var res;
+			try {
+				res = JSON.parse(response); 
+			} catch (e) {
+				res = {success:false, message:'Unexpected response'};
+			}
+			if(res.success){
+				alert(res.message || 'Email save as draft successfully');
+				//$('#saveasDraftBtn').prop('disabled', false).html('Save as Draft');
+				window.location.href = admin_url + 'webmail/draft';
+			}else{
+				alert(res.message || 'Failed to save as draft email');
+				$('#saveasDraftBtnReply').prop('disabled', false).html('Save as Draft');
+			}
+		},
+		error: function(){
+			alert('Failed to save as draft email');
+			$('#saveasDraftBtnReply').prop('disabled', false).html('Save as Draft');
+		}
+	});
+
+    
+});
+
+$('#saveasDraftBtnForward').on('click', function(){
+$('#saveasDraftBtnForward').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
+
+var form = document.getElementById('draft-forward');
+var formData = new FormData(form);
+
+// remove field
+formData.delete('redirect');
+formData.delete('attachment[]');
+	
+	 var data = '';
+
+    for (var pair of formData.entries()) {
+        data += pair[0] + " : " + pair[1] + "\n";
+    }
+	//alert(data);
+	//return false;
+	$.ajax({
+		url: admin_url + 'webmail/save_as_draft',
+		type: 'POST',
+		data: formData,
+		contentType: false,
+		processData: false,
+		success: function(response){
+			var res;
+			try {
+				res = JSON.parse(response); 
+			} catch (e) {
+				res = {success:false, message:'Unexpected response'};
+			}
+			if(res.success){
+				alert(res.message || 'Email save as draft successfully');
+				//$('#saveasDraftBtn').prop('disabled', false).html('Save as Draft');
+				window.location.href = admin_url + 'webmail/draft';
+			}else{
+				alert(res.message || 'Failed to save as draft email');
+				$('#saveasDraftBtnForward').prop('disabled', false).html('Save as Draft');
+			}
+		},
+		error: function(){
+			alert('Failed to save as draft email');
+			$('#saveasDraftBtnForward').prop('disabled', false).html('Save as Draft');
+		}
+	});
+
+    
+});
+
+
+</script>
+<script>
+function adjustIframeHeight(iframe) {
+    try {
+        var iframeDoc = iframe.contentWindow.document;
+        iframe.style.height = iframeDoc.body.scrollHeight + 'px';
+    } catch (e) {
+        console.log('Iframe height adjustment failed:', e);
+    }
+}
 </script>
 <?php
 $_SESSION['replySavedEmail'] = $_SESSION['replySavedEmail'] ?? 0;
