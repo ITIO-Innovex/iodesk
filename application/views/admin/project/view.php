@@ -227,7 +227,7 @@ $date   = _dt($com['addedon']);
 <div class="media-body"><h5 class="media-heading tw-font-semibold tw-mb-0"><div class="btn-group pull-right mleft5"></div>
 <?php echo staff_profile_image($com['addedby'], ['staff-profile-image-small',]); ?>
 <span class="tw-px-2"><?php echo $author; ?></span></h5><div class="tw-text-sm text-danger" style="padding-left: 40px;"><?php echo $date; ?></div>
-<div class="tw-my-2" style="padding-left: 40px;"><?php echo $com['comments']; ?></div></div></div>
+<div class="tw-my-2" style="padding-left: 40px;"><?php echo html_entity_decode($com['comments']); ?></div></div></div>
 <?php
 }
 }else{ ?>
