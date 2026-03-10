@@ -17,8 +17,8 @@ $bcc_emails=$email_draft->bcc_emails ?? '';
 $draft_subject=$email_draft->subject ?? '';
 $draft_body=$email_draft->body ?? '';
 $draft_id=$email_draft->id ?? '';
-$reply_from_email=$email_draft->reply_from_email ?? '';
-$messageid=$email_draft->messageid ?? $_SESSION['webmail']['id'];
+$reply_from_email=$email_draft->reply_from_email ?? $_SESSION['webmail']['id'];
+$messageid=$email_draft->messageid ?? '';
 }
 //echo $messageid;exit;
 
@@ -130,8 +130,9 @@ $messageid=$email_draft->messageid ?? $_SESSION['webmail']['id'];
                     </li>
 					
 				  <?php  } ?> 
-				  <li role="presentation" class="menu-item-leads ">
-                        <a href="<?=admin_url('webmail/draft') ?>" class="mail-loader ">Draft</a></li>
+				 
+						<li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/draft') ?>" class="mail-loader ">Draft</a></li>
+<li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/templates') ?>" class="mail-loader ">Templates</a></li>	
 						<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a></li> 
                 </ul>

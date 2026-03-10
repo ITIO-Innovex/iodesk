@@ -918,10 +918,92 @@ See you soon,<br>
 		}
 	}
 	
+ //Display Inbox Listing 
+	public function templates()
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Email Templates');
+		}
 
+		$companyId = get_staff_company_id();
+		$staffId   = get_staff_user_id();
+
+		$this->db->where('company_id', $companyId);
+		$this->db->where('staffid', $staffId);
+		$this->db->where('status', 1);
+		$this->db->order_by('id', 'desc');
+		$data['templates'] = $this->db->get('it_crm_email_template')->result_array();
+
+		$data['title'] = 'Email Templates';
+		$this->load->view('admin/webmail/templates', $data);
+	}
+
+	public function save_template()
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Email Templates');
+		}
+
+		$id      = (int) $this->input->post('id');
+		$subject = trim((string) $this->input->post('subject'));
+		$body    = $this->input->post('body', false);
+
+		if ($subject === '' || $body === '') {
+			set_alert('warning', 'Subject and Description are required');
+			redirect(admin_url('webmail/templates'));
+		}
+
+		$companyId = get_staff_company_id();
+		$staffId   = get_staff_user_id();
+
+		$data = [
+			'company_id' => $companyId ?: null,
+			'staffid'    => $staffId,
+			'subject'    => $subject,
+			'body'       => $body,
+			'status'     => 1,
+		];
+
+		if ($id > 0) {
+			$this->db->where('id', $id);
+			$this->db->where('company_id', $companyId);
+			$this->db->where('staffid', $staffId);
+			$this->db->update('it_crm_email_template', $data);
+			set_alert('success', 'Template updated successfully');
+			redirect(admin_url('webmail/templates'));
+		}
+
+		$data['created_at'] = date('Y-m-d H:i:s');
+		$this->db->insert('it_crm_email_template', $data);
+		set_alert('success', 'Template added successfully');
+		redirect(admin_url('webmail/templates'));
+	}
+
+	public function delete_template($id = 0)
+	{
+		if (!is_staff_logged_in()) {
+			access_denied('Email Templates');
+		}
+
+		$id = (int) $id;
+		if (!$id) {
+			redirect(admin_url('webmail/templates'));
+		}
+
+		$companyId = get_staff_company_id();
+		$staffId   = get_staff_user_id();
+
+		$this->db->where('id', $id);
+		$this->db->where('company_id', $companyId);
+		$this->db->where('staffid', $staffId);
+		$this->db->update('it_crm_email_template', ['status' => 0]);
+
+		set_alert('success', 'Template deleted successfully');
+		redirect(admin_url('webmail/templates'));
+	}
 	
 	 //Display Inbox Listing 
-	public function compose($draft_id="")
+	public function compose($draft_id="",$template_id="")
 	{
 	
 	    
@@ -934,16 +1016,18 @@ See you soon,<br>
 		}else{
 		////////////////////////////////////////////
 		
-		if(isset($draft_id)&&$draft_id){
-		
-		
-		
+		if(isset($draft_id)&&$draft_id){ //echo "temp".$template_id;exit;
         $this->db->where('id', $draft_id);
 		$this->db->where('staffid', get_staff_user_id());
         $data['email_draft']=$this->db->from(db_prefix() . 'email_draft')->get()->row(); 
-		//print_r($data['email_draft']);exit;
-		
 		}
+		
+		if(isset($template_id)&&$template_id){ //echo "temp".$template_id;exit;
+        $this->db->where('id', $template_id);
+		$this->db->where('staffid', get_staff_user_id());
+        $data['email_draft']=$this->db->from(db_prefix() . 'email_template')->get()->row(); 
+		}
+		
 		$this->load->view('admin/webmail/compose', $data);
 		}
 	} 
