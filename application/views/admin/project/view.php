@@ -120,14 +120,14 @@
 			<div class="row">
 			<div class="">
 			
-			<ul class="nav nav-tabs" id="projectTabs">
-    <li class="active"><a data-toggle="tab" href="#descX">Description</a></li>
-    <li><a data-toggle="tab" href="#infoX">Project Information</a></li>
-    <li><a data-toggle="tab" href="#commentsX">Comments (<?php echo count($datacomments);?>)</a></li>
-    <li><a data-toggle="tab" href="#activityX">Activity Stream (<?php echo count($datalogs);?>)</a></li>
-	<li><a data-toggle="tab" href="#customX">Custom Fields</a></li>
-	<li><a data-toggle="tab" href="#SupportX">Support Files</a></li>
-	<li><a data-toggle="tab" href="#periodX">Project Time Log</a></li>
+			<ul class="nav nav-tabs tabs" id="projectTabs">
+    <li class="active"><a class="tabx" data-toggle="descX" href="#descX">Description</a></li>
+    <li><a class="tabx" data-toggle="tab" data-tab="infoX" href="#infoX">Project Information</a></li>
+    <li><a class="tabx" data-toggle="tab" data-tab="commentsX" href="#commentsX">Comments (<?php echo count($datacomments);?>)</a></li>
+    <li><a class="tabx" data-toggle="tab" data-tab="activityX" href="#activityX">Activity Stream (<?php echo count($datalogs);?>)</a></li>
+	<li><a class="tabx" data-toggle="tab" data-tab="customX" href="#customX">Custom Fields</a></li>
+	<li><a class="tabx" data-toggle="tab" data-tab="SupportX" href="#SupportX">Support Files</a></li>
+	<li><a class="tabx" data-toggle="tab" data-tab="periodX" href="#periodX">Project Time Log</a></li>
   </ul>
   
             <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
@@ -376,5 +376,11 @@ $('.toggle-btn').on('click', function() {
 var input = document.querySelector('#tagsInput');
 new Tagify(input);
 </script>
-
+<script>
+$('.tabx').click(function(){ 
+var tab_id = $(this).data('tab'); alert(tab_id);
+ $('.tabs').removeClass('active');
+$(this).addClass('active');
+});
+</script>
 </body></html>
