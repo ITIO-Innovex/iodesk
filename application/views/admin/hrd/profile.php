@@ -2,7 +2,7 @@
 <?php init_head(); ?>
 <div id="wrapper">
   <div class="content">
-    <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">My Profile</h4>
+    <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"> <i class="fa-regular fa-circle-user tw-mr-2"></i> My Profile</h4>
     <div class="row">
       <div class="col-md-12">
         <div class="panel_s">

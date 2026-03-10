@@ -76,7 +76,7 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Daily Activity Report - List
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700"> <i class="fa-solid fa-file-pen tw-mr-2"></i> Daily Activity Report - List
 		<a href="<?php echo admin_url('hrd/dar');?>" class="btn btn-primary pull-right btn-sm" ><i class="fa-regular fa-plus"></i><span class="m-hide" title="Add New DAR"> Add New DAR</span></a>
 		</h4>
 		</div>

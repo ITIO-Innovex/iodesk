@@ -7,7 +7,7 @@ init_head(); ?>
         <div class="panel_s">
           <div class="panel-body">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-4">
-              <h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Designations</h4>
+              <h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutralx-700">Designations</h4>
               <a href="#" class="btn btn-primary" onclick="open_designation_modal(); return false;">
                 <i class="fa-regular fa-plus tw-mr-1"></i> Add New Designation
               </a>

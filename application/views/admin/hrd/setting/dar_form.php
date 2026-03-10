@@ -7,7 +7,7 @@
       <div class="col-md-12">
         <div class="tw-mb-2 sm:tw-mb-4 tw-flex tw-justify-between tw-items-center">
           <h4 class="tw-mb-0 tw-font-semibold tw-text-lg tw-text-neutral-700">
-            DAR Form Custom Fields
+             <i class="fa-brands fa-wpforms tw-mr-2"></i> DAR Form Custom Fields
           </h4>
           <a href="#" onclick="openDarFieldModal(); return false;" class="btn btn-primary">
             <i class="fa-regular fa-plus tw-mr-1"></i> Add New Field

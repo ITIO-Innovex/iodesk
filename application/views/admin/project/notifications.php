@@ -4,7 +4,7 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-white">Project & Task Notifications</h4>
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-white"> <i class="fa-regular fa-bell  tw-mr-2"></i> Project & Task Notifications</h4>
         <div class="panel_s">
           <div class="panel-body">
 

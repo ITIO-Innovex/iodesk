@@ -4,7 +4,7 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-white">DAR Master</h4>
+        <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-white"> <i class="fa-solid fa-file-pen tw-mr-2"></i> DAR Master</h4>
         <div class="panel_s">
           <div class="panel-body">
             <form method="get" action="" class="mbot15">

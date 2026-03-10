@@ -7,7 +7,7 @@
         <div class="panel_s">
           <div class="panel-body panel-table-fullxx">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
-              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Important Documents</h4>
+              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutralx-700">Important Documents</h4>
               <a href="#" class="btn btn-primary" onclick="openDocModal();return false;">Add Document</a>
             </div>
             <div class="table-responsive">
