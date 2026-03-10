@@ -458,6 +458,11 @@ $('#openScheduleModal').on('click', function(){
 });
 
 $('#saveasDraftBtn').on('click', function(){
+
+if(!confirm("Are you sure you want to save this email as draft?")){
+        return false;
+    }
+	
 $('#saveasDraftBtn').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
 
 var form = document.getElementById('compose-form-data');
