@@ -481,7 +481,7 @@ if ($nextPage) {
         <input type="file" name="attachments[]"  class="form-control" multiple>
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemailxxx">Send Email</button>
-	  <button type="submit" name="send" class="btn btn-primary mtop20" id="saveasDraftBtnReply">Save as Draft 22</button>
+	  <button type="submit" name="send" class="btn btn-primary mtop20" id="saveasDraftBtnReply">Save as Draft</button>
     </form>
     <div id="resultMessage" class="mt-4"></div>
   </div>
@@ -547,7 +547,7 @@ if ($nextPage) {
         <input type="file" name="attachments[]"  class="form-control" multiple>
       </div>
       <button type="submit" name="send" class="btn btn-primary mtop20 submitemailforward">Send Email</button>
-	  <button type="submit" name="send" class="btn btn-primary mtop20" id="saveasDraftBtnForward">Save as Draft 11</button>
+	  <button type="submit" name="send" class="btn btn-primary mtop20" id="saveasDraftBtnForward">Save as Draft</button>
     </form>
     <div id="resultMessage" class="mt-4"></div>
   </div>
