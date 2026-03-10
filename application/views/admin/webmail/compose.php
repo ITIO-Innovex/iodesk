@@ -471,7 +471,7 @@ formData.delete('attachment[]');
     for (var pair of formData.entries()) {
         data += pair[0] + " : " + pair[1] + "\n";
     }
-	alert(data);
+	//alert(data);
 	$.ajax({
 		url: admin_url + 'webmail/save_as_draft',
 		type: 'POST',
