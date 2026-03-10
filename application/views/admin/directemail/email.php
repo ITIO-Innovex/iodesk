@@ -132,10 +132,10 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="col-md-12">
-                                <h2 class="no-margin">
+                                <h4 class="no-margin">
                                     <?php echo $title; ?><?php //echo get_staff_email();?>
                                     
-                                </h2>
+                                </h4>
                                 <hr class="hr-panel-heading" />
                             </div>
                     <div class="card-body">
