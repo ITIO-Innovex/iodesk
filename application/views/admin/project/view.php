@@ -120,14 +120,14 @@
 			<div class="row">
 			<div class="">
 			
-			<ul class="nav nav-tabs tabs" id="projectTabs">
-    <li class="active"><a class="tabx" data-toggle="descX" href="#descX">Description</a></li>
-    <li><a class="tabx" data-toggle="tab" data-tab="infoX" href="#infoX">Project Information</a></li>
-    <li><a class="tabx" data-toggle="tab" data-tab="commentsX" href="#commentsX">Comments (<?php echo count($datacomments);?>)</a></li>
-    <li><a class="tabx" data-toggle="tab" data-tab="activityX" href="#activityX">Activity Stream (<?php echo count($datalogs);?>)</a></li>
-	<li><a class="tabx" data-toggle="tab" data-tab="customX" href="#customX">Custom Fields</a></li>
-	<li><a class="tabx" data-toggle="tab" data-tab="SupportX" href="#SupportX">Support Files</a></li>
-	<li><a class="tabx" data-toggle="tab" data-tab="periodX" href="#periodX">Project Time Log</a></li>
+			<ul class="nav nav-tabs" id="projectTabs">
+    <li class="active"><a class="tabx"  href="#descX">Description</a></li>
+    <li><a class="tabx" data-toggle="tab" href="#infoX">Project Information</a></li>
+    <li><a class="tabx" data-toggle="tab"  href="#commentsX">Comments (<?php echo count($datacomments);?>)</a></li>
+    <li><a class="tabx" data-toggle="tab"  href="#activityX">Activity Stream (<?php echo count($datalogs);?>)</a></li>
+	<li><a class="tabx" data-toggle="tab"  href="#customX">Custom Fields</a></li>
+	<li><a class="tabx" data-toggle="tab"  href="#SupportX">Support Files</a></li>
+	<li><a class="tabx" data-toggle="tab"  href="#periodX">Project Time Log</a></li>
   </ul>
   
             <div class="tab-content" style="background:#fff; padding:20px; border:1px solid #ddd; border-top:0;">
@@ -227,7 +227,7 @@ $date   = _dt($com['addedon']);
 <div class="media-body"><h5 class="media-heading tw-font-semibold tw-mb-0"><div class="btn-group pull-right mleft5"></div>
 <?php echo staff_profile_image($com['addedby'], ['staff-profile-image-small',]); ?>
 <span class="tw-px-2"><?php echo $author; ?></span></h5><div class="tw-text-sm text-danger" style="padding-left: 40px;"><?php echo $date; ?></div>
-<div class="tw-my-2" style="padding-left: 40px;"><?php echo $com['comments']; ?></div></div></div>
+<div class="tw-my-2" style="padding-left: 40px;"><?php echo html_escape($com['comments']); ?></div></div></div>
 <?php
 }
 }else{ ?>
@@ -376,15 +376,5 @@ $('.toggle-btn').on('click', function() {
 var input = document.querySelector('#tagsInput');
 new Tagify(input);
 </script>
-<script>
 
-$('.tabx').on('click', function(){ 
-
-    $('.tab-pane').removeClass('active');
-
-    $('#'+$(this).data('tab')).addClass('active');
-
-});
-
-</script>
 </body></html>
