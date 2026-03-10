@@ -378,8 +378,14 @@ new Tagify(input);
 </script>
 <script>
 $('.tabx').click(function(){ 
-var tab_id = $(this).data('tab'); alert(tab_id);
- $('.tabs').removeClass('active');
+var tab_id = $(this).data('tab'); //alert(tab_id);
+ $('#descX').removeClass('active');
+ $('#infoX').removeClass('active');
+ $('#commentsX').removeClass('active');
+ $('#activityX').removeClass('active');
+ $('#customX').removeClass('active');
+ $('#SupportX').removeClass('active');
+ $('#periodX').removeClass('active');
 $(this).addClass('active');
 });
 </script>
