@@ -96,8 +96,8 @@
                         <a href="inbox?fd=Outbox" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Outbox'){ echo 'folder-active';} ?>">Outbox</a>
 						<?php } ?>
 						</li>
-						<li role="presentation" class="menu-item-leads ">
-                        <a href="draft" class="mail-loader ">Draft</a></li>
+<li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/draft') ?>" class="mail-loader ">Draft</a></li>
+<li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/templates') ?>" class="mail-loader ">Templates</a></li>						
 						<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a></li>
 						<li role="presentation" class="menu-item-leads ">
