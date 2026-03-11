@@ -90,6 +90,14 @@ class App_Security extends CI_Security
             return $str;
         }
 
+        // PHP 8.1+: preg_match()/string ops with null are deprecated.
+        // CodeIgniter expects a string here, so normalize null/scalars to string.
+        if ($str === null) {
+            $str = '';
+        } elseif (!is_string($str)) {
+            $str = (string) $str;
+        }
+
         // Remove Invisible Characters
         $str = remove_invisible_characters($str);
 
@@ -108,6 +116,9 @@ class App_Security extends CI_Security
             $search  = ['/\s%/i', '/%\s/i'];
             $replace = ['<p-tmp1></p-tmp1>', '<p-tmp2></p-tmp2>'];
             $str     = preg_replace($search, $replace, $str);
+            if ($str === null) {
+                $str = '';
+            }
 
             do {
                 $oldstr = $str;
@@ -190,6 +201,9 @@ class App_Security extends CI_Security
          * ... however, remove_invisible_characters() above already strips the
          * hex-encoded ones, so we'll skip them below.
          */
+        if ($str === null) {
+            $str = '';
+        }
         do {
             $original = $str;
             if (preg_match('/<a/i', $str)) {

@@ -869,6 +869,8 @@ $client->disconnect();
 	  // function for get inbox mail list
        public function downloadmailbyfolder()
         {
+		
+		
         $result = ['msg' => 'Unable to download emails.', 'cnt' => 0];
         $mailer_imap_host = trim($_SESSION['webmail']['mailer_imap_host'] ?? '');
         $mailer_imap_port = trim($_SESSION['webmail']['mailer_imap_port'] ?? '');
@@ -961,6 +963,8 @@ $client->disconnect();
                 if ($data['body'] === '') {
                     $data['body'] = $message->getTextBody() ?? '';
                 }
+				
+				    
                 $data['uniqid']     = $message->uid;
                 $data['messageid']  = $message->getMessageId();
                 $from               = $message->getFrom();
@@ -1003,6 +1007,15 @@ $client->disconnect();
 
                 $attachments = $message->getAttachments();
                 foreach ($attachments as $attachment) {
+				
+				//$cid = $attachment->getContentId();
+        
+            //if ($cid) { 
+		    //$cid='cid:'.substr($cid, 1, strlen($cid)-2);
+            //$content = base64_encode($attachment->getContent());
+            ////$mime = $attachment->getContentType();
+            //$data['body'] = str_replace($cid,"data:$mime;base64,$content",$data['body']);
+            ///}else{
                     if (!file_exists($filePath)) {
                         mkdir($filePath, 0777, true);
                     }
@@ -1010,6 +1023,7 @@ $client->disconnect();
                     $attachment->save($filePath);
                     $data['isattachments'] = 1;
                     $attachments_paths[]   = $filePath . "/" . $fileName;
+		//}
                 }
                 $data['attachments'] = implode(',', $attachments_paths);
 

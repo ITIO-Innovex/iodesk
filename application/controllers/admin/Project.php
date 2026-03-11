@@ -710,7 +710,24 @@ class Project extends AdminController
                 
                 if ($id) {
                     log_message('debug', 'Task added successfully with ID: ' . $id);
-                    
+					
+                  
+					// For notification					
+					foreach ($data['task_owner'] as $key => $value) {
+					log_message('error', 'Assign Task With: ' . $value);
+					
+					
+						$notification_data = [
+						'description'     => 'task_created',
+						'touserid'        => $value,
+						'link'            => 'project/tasks_details/' . $id
+					];
+						if (add_notification($notification_data)) {
+							pusher_trigger_notification($insert_data['task_addedby']);
+						}
+					
+					}
+					
                     // Handle file uploads using existing helper function
                     $uploaded_files = [];
                     $has_files = isset($_FILES['task_attachments']['name'])

@@ -227,17 +227,18 @@
              </div>
             </div></div>
             <!-- Start Date and End Date -->
+			
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="task_start_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('Start Date'); ?></label>
-                  <input type="datetime-local" class="form-control" id="task_start_date" name="task_start_date" title="Start date" required>
+                  <label for="task_start_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('Start Date'); ?> Time</label>
+                  <input type="datetime-local" class="form-control time_picker" id="task_start_date" name="task_start_date" title="Start date"  required>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="task_end_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('End Date'); ?></label>
-                  <input type="datetime-local" class="form-control" id="task_end_date" name="task_end_date" title="End date" required>
+                  <label for="task_end_date" class="control-label"><small class="req text-danger">* </small><?php echo _l('End Date'); ?> Time</label>
+                  <input type="datetime-local"  class="form-control time_picker" id="task_end_date" name="task_end_date" title="End date" required>
                 </div>
               </div>
             </div>
@@ -715,5 +716,9 @@ $('body').on('click', '.remove_attachment', function() {
 // Initialize Tagify
 var input = document.querySelector('#tagsInput');
 new Tagify(input);
+
+$('.time_picker').datetimepicker({
+    format:'Y-m-d H:i'
+});
 </script>
 </body></html> 
