@@ -156,17 +156,30 @@
                               $val = isset($valuesById[$fid]) ? $valuesById[$fid] : '';
 							  $ftype="text";
 							  $fieldcss="expand-input";
+							  
+							  
 							  if(strstr($f['field_title'],"Time")){
 							  $ftype="time";
 							  $fieldcss="";
 							  }
+							  
                               ?>
                               <td>
+							  <?php if(strstr($f['field_title'],"Status")){ ?>
+  <select name="field_<?php echo $fid; ?>[]"  class="form-control <?php echo $fieldcss; ?>">
+  <option value="">Select Status</option>
+  <option value="Pending" <?php if($val=="Pending"){ ?> selected="selected" <?php } ?>>Pending</option>
+  <option value="completed" <?php if($val=="Completed"){ ?> selected="selected" <?php } ?>>Completed</option>
+  <option value="working" <?php if($val=="working"){ ?> selected="selected" <?php } ?>>working</option>
+  </select>
+							  
+							  <?php }else{ ?>
                                 <input type="<?php echo $ftype; ?>"
                                        name="field_<?php echo $fid; ?>[]"
                                        class="form-control <?php echo $fieldcss; ?>"
                                        value="<?php echo html_escape($val); ?>"
                                        placeholder="<?php echo html_escape($f['field_title']); ?>">
+								<?php } ?>
                               </td>
                           <?php } ?>
                           <td>

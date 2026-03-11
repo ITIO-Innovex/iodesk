@@ -320,7 +320,7 @@ foreach($attachments as $attach){
 if($_SESSION['webmail']['folder']=="Outbox"){
 $filePath = site_url() . 'uploads/email_queue/' . $attach;
 }else{
-$filePath = site_url() . '/' . $attach;
+$filePath = site_url() . '' . $attach;
 }
 ?>
 <i class="fa-solid fa-paperclip"></i> <a href="<?=$filePath;?>" target="_blank" title="Click to view"><?=$filePath;?></a><br>
@@ -1482,7 +1482,7 @@ $('#saveasDraftBtnForward').on('click', function(){
 
     var emailBodyFW='';
 	var isEmpty = true;
-	alert($('#emailBodyFW').length);
+	
 	
 	// Get email body from jqte editor - try multiple methods
 	if($('#emailBodyFW').length) {
