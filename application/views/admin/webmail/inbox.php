@@ -1426,9 +1426,10 @@ $(document).ready(function () {
 
 $('#saveasDraftBtnReply').on('click', function(){
 
+
 if(!confirm("Are you sure you want to save this email as draft?")){
         return false;
-    }
+}
 	
 $('#saveasDraftBtnReply').prop('disabled', true).html("<i class='fa-solid fa-spinner fa-spin-pulse'></i>");
 
@@ -1478,6 +1479,70 @@ formData.delete('attachment[]');
 });
 
 $('#saveasDraftBtnForward').on('click', function(){
+
+    var emailBodyFW='';
+	var isEmpty = true;
+	alert($('#emailBodyFW').length);
+	
+	// Get email body from jqte editor - try multiple methods
+	if($('#emailBodyFW').length) {
+		// First, try to sync content from editor to textarea
+		var $jqteEditor = $('#emailBodyFW').siblings('.jqte_editor');
+		if($jqteEditor.length) {
+			var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+			if($contentEditable.length) {
+				// Sync content from contenteditable to textarea
+				var editorContent = $contentEditable.html() || $contentEditable.text() || '';
+				$('#emailBodyFW').val(editorContent);
+			}
+		}
+		
+		// Method 1: Try jqteVal() function
+		if(typeof $('#emailBodyFW').jqteVal === 'function') {
+			emailBodyFW = $('#emailBodyFW').jqteVal() || '';
+		}
+		
+		// Method 2: Try getting from contenteditable div directly
+		if((!emailBodyFW || emailBodyFW.trim() === '') && $jqteEditor.length) {
+			var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+			if($contentEditable.length) {
+				emailBodyFW = $contentEditable.html() || $contentEditable.text() || '';
+			}
+		}
+		
+		// Method 3: Fallback to textarea value
+		if(!emailBodyFW || emailBodyFW.trim() === '') {
+			emailBodyFW = $('#emailBodyFW').val() || '';
+		}
+		
+		// Strip HTML tags and check actual content
+		if(emailBodyFW) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = emailBodyFW;
+			var textContent = (tempDiv.textContent || tempDiv.innerText || '').trim();
+			textContent = textContent.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+			isEmpty = !textContent || textContent === '' || textContent.length < 6;
+		}
+	}
+	
+	if(isEmpty){
+		    alert('Please check Email body before submit / Min content length 5 character');
+			// Focus on the editor
+			var $jqteEditor = $('#emailBodyFW').siblings('.jqte_editor');
+			if($jqteEditor.length) {
+				var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+				if($contentEditable.length) {
+					$contentEditable[0].focus();
+				} else {
+					$('#emailBodyFW').focus();
+				}
+			} else {
+				$('#emailBodyFW').focus();
+			}
+			return false;
+		}
+	
+
 
 if(!confirm("Are you sure you want to save this email as draft?")){
         return false;
