@@ -363,7 +363,7 @@ if(isset($message['status'])&&$message['status']==1){ $mailcss="isread"; }
 
 
 <?php
-echo '<iframe srcdoc="' . htmlspecialchars($message['body'] ?? '') . '" style="width: 100%; min-height:50px; border: none;" onload="adjustIframeHeight(this)"></iframe>';
+echo '<iframe srcdoc="' . htmlspecialchars($message['body'] ?? '') . '" style="width: 100%; min-height:50px; border: none;" onload="window.adjustIframeHeight && window.adjustIframeHeight(this)"></iframe>';
 // Directory to save attachments
 
 ?>
@@ -2030,7 +2030,7 @@ formData.delete('attachment[]');
 
 
 </script>
-<script>
+<?php /*?><script>
 function adjustIframeHeight(iframe) {
     try {
         var iframeDoc = iframe.contentWindow.document;
@@ -2039,7 +2039,7 @@ function adjustIframeHeight(iframe) {
         console.log('Iframe height adjustment failed:', e);
     }
 }
-</script>
+</script><?php */?>
 <?php
 $_SESSION['replySavedEmail'] = $_SESSION['replySavedEmail'] ?? 0;
 if(isset($_SESSION['replySavedEmail']) && $_SESSION['replySavedEmail']==1){
@@ -2055,6 +2055,7 @@ $_SESSION['replySavedEmail']=0;
 }
 
 ?>
+
 </body>
 
 </html>
