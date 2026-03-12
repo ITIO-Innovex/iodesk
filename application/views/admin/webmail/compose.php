@@ -96,6 +96,7 @@ $messageid=$email_draft->messageid ?? '';
 .email-input-wrapper {
     position: relative;
 }
+.content { max-width: 100% !important; }
 </style>
 
 <div id="wrapper">

@@ -714,7 +714,7 @@ class Project extends AdminController
                   
 					// For notification					
 					foreach ($data['task_owner'] as $key => $value) {
-					log_message('error', 'Assign Task With: ' . $value);
+					//log_message('error', 'Assign Task With: ' . $value);
 					
 					
 						$notification_data = [

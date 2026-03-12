@@ -55,6 +55,72 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.email-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 38px;
+    background: #fff;
+    cursor: text;
+}
+.email-tags-container:focus-within {
+    border-color: #66afe9;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+.email-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e0e0e0;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+.email-tag.invalid {
+    background: #f8d7da;
+    color: #721c24;
+}
+.email-tag .remove-tag {
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+}
+.email-tag .remove-tag:hover { color: #c00; }
+.email-input-field {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 2px 0;
+}
+.email-suggestions {
+    position: absolute;
+    z-index: 1100;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    display: none;
+}
+.email-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.email-suggestion-item:hover, .email-suggestion-item.active {
+    background: #f0f0f0;
+}
+.email-input-wrapper {
+    position: relative;
+}
+.content { max-width: 100% !important; }
 </style>
 
 <div id="wrapper">
@@ -445,16 +511,34 @@ if ($nextPage) {
       </div>
 	  
       <div class="mb-3">
-        <label for="recipientEmail" class="form-label mtop10">Recipient Email</label>
-        <input type="text" class="form-control" id="recipientEmailIT" name="recipientEmail" value="" placeholder="Enter recipient email" required>
+        <label for="recipientEmail" class="form-label mtop10">To</label>
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="toEmailTagsContainerReply">
+                <input type="text" class="email-input-field" id="toEmailInputFieldReply" placeholder="Type email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="toEmailSuggestionsReply"></div>
+        </div>
+        <input type="hidden" id="recipientEmailIT" name="recipientEmail" value="">
       </div>
 	  <div class="mb-3">
         <label for="recipientCCIT" class="form-label mtop10">CC</label>
-        <input type="text" class="form-control" id="recipientCCIT" name="recipientCC" value="" placeholder="Enter CC email" >
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="ccEmailTagsContainerReply">
+                <input type="text" class="email-input-field" id="ccEmailInputFieldReply" placeholder="Type CC email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="ccEmailSuggestionsReply"></div>
+        </div>
+        <input type="hidden" id="recipientCCIT" name="recipientCC" value="">
       </div>
 	  <div class="mb-3">
         <label for="recipientBCCEmail" class="form-label mtop10">BCC</label>
-        <input type="text" class="form-control" id="recipientBCCIT" name="recipientBCC" value="" placeholder="Enter BCC email" >
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="bccEmailTagsContainerReply">
+                <input type="text" class="email-input-field" id="bccEmailInputFieldReply" placeholder="Type BCC email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="bccEmailSuggestionsReply"></div>
+        </div>
+        <input type="hidden" id="recipientBCCIT" name="recipientBCC" value="">
       </div>
       <div class="mb-3">
         <label for="emailSubject" class="form-label mtop10">Subject</label>
@@ -511,16 +595,34 @@ if ($nextPage) {
 </select>
       </div>
       <div class="mb-3">
-        <label for="recipientEmailFW" class="form-label mtop10">Recipient Email</label>
-        <input type="text" class="form-control" id="recipientEmailFW" name="recipientEmail" value="" placeholder="Enter recipient email" required>
+        <label for="recipientEmailFW" class="form-label mtop10">To</label>
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="toEmailTagsContainerFW">
+                <input type="text" class="email-input-field" id="toEmailInputFieldFW" placeholder="Type email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="toEmailSuggestionsFW"></div>
+        </div>
+        <input type="hidden" id="recipientEmailFW" name="recipientEmail" value="">
       </div>
 	  <div class="mb-3">
         <label for="recipientCCFW" class="form-label mtop10">CC</label>
-        <input type="text" class="form-control" id="recipientCCFW" name="recipientCC" value="" placeholder="Enter CC email" >
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="ccEmailTagsContainerFW">
+                <input type="text" class="email-input-field" id="ccEmailInputFieldFW" placeholder="Type CC email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="ccEmailSuggestionsFW"></div>
+        </div>
+        <input type="hidden" id="recipientCCFW" name="recipientCC" value="">
       </div>
 	  <div class="mb-3">
         <label for="recipientBCCFW" class="form-label mtop10">BCC</label>
-        <input type="text" class="form-control" id="recipientBCCFW" name="recipientBCC" value="" placeholder="Enter BCC email" >
+        <div class="email-input-wrapper">
+            <div class="email-tags-container" id="bccEmailTagsContainerFW">
+                <input type="text" class="email-input-field" id="bccEmailInputFieldFW" placeholder="Type BCC email and press Enter" autocomplete="off">
+            </div>
+            <div class="email-suggestions" id="bccEmailSuggestionsFW"></div>
+        </div>
+        <input type="hidden" id="recipientBCCFW" name="recipientBCC" value="">
       </div>
       <div class="mb-3">
         <label for="emailSubjectFW" class="form-label mtop10">Subject</label>
@@ -722,7 +824,7 @@ $('.submitemailxxx').click(function(){
 		
 		 if(recipientEmailIT==''){
 			alert('Please enter to email');
-			$('#recipientEmailIT').focus();
+			$('#toEmailInputFieldReply').focus();
 			return false;
 		}else if(emailSubjectIT==''){
 		    alert('Please enter email subject');
@@ -789,7 +891,7 @@ $('.submitemailforward').click(function(e){
 		
 		 if(recipientEmailFW==''){
 			alert('Please enter to email');
-			$('#recipientEmailFW').focus();
+			$('#toEmailInputFieldFW').focus();
 			return false;
 		}else if(emailSubjectFW==''){
 		    alert('Please enter email subject');
@@ -992,6 +1094,244 @@ $('.isread').click(function(){
     return html;
   }
 
+  (function() {
+    var searchEmail = '<?php echo isset($_SESSION['webmail']['mailer_email']) ? addslashes($_SESSION['webmail']['mailer_email']) : ''; ?>';
+    function createEmailTagInput(options) {
+      var emailTags = [];
+      var $container = $(options.container);
+      var $inputField = $(options.inputField);
+      var $hiddenInput = $(options.hiddenInput);
+      var $suggestions = $(options.suggestions);
+      var searchTimeout = null;
+      var activeSuggestionIndex = -1;
+      var currentSuggestions = [];
+      function isValidEmail(email) {
+        var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+      }
+      function updateHiddenInput() {
+        $hiddenInput.val(emailTags.join(','));
+      }
+      function createTag(email) {
+        email = (email || '').trim();
+        if (!email) return;
+        if (emailTags.indexOf(email) !== -1) return;
+        emailTags.push(email);
+        var isValid = isValidEmail(email);
+        var $tag = $('<span class="email-tag' + (isValid ? '' : ' invalid') + '"></span>');
+        $tag.text(email);
+        var $remove = $('<span class="remove-tag">&times;</span>');
+        $remove.on('click', function() {
+          var idx = emailTags.indexOf(email);
+          if (idx > -1) emailTags.splice(idx, 1);
+          $tag.remove();
+          updateHiddenInput();
+        });
+        $tag.append($remove);
+        $tag.insertBefore($inputField);
+        updateHiddenInput();
+      }
+      function clearTags() {
+        emailTags = [];
+        $container.find('.email-tag').remove();
+        updateHiddenInput();
+      }
+      function setFromString(str) {
+        clearTags();
+        if (!str || !(str + '').trim()) return;
+        var parts = (str + '').split(/[,;]+/);
+        parts.forEach(function(part) {
+          if (part.trim()) createTag(part.trim());
+        });
+      }
+      function hideSuggestions() {
+        $suggestions.hide().empty();
+        currentSuggestions = [];
+        activeSuggestionIndex = -1;
+      }
+      function showSuggestions(emails) {
+        $suggestions.empty();
+        currentSuggestions = emails || [];
+        activeSuggestionIndex = -1;
+        if (currentSuggestions.length === 0) {
+          hideSuggestions();
+          return;
+        }
+        currentSuggestions.forEach(function(email, idx) {
+          var $item = $('<div class="email-suggestion-item"></div>');
+          $item.text(email);
+          $item.attr('data-index', idx);
+          $item.on('mousedown', function(e) {
+            e.preventDefault();
+            $inputField.val('');
+            createTag(email);
+            hideSuggestions();
+            $inputField.focus();
+          });
+          $suggestions.append($item);
+        });
+        $suggestions.show();
+      }
+      function selectActiveSuggestion() {
+        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestions.length) {
+          createTag(currentSuggestions[activeSuggestionIndex]);
+          $inputField.val('');
+          hideSuggestions();
+        }
+      }
+      function updateActiveSuggestion() {
+        $suggestions.find('.email-suggestion-item').removeClass('active');
+        if (activeSuggestionIndex >= 0) {
+          $suggestions.find('.email-suggestion-item[data-index="' + activeSuggestionIndex + '"]').addClass('active');
+        }
+      }
+      function searchEmails(term) {
+        if ((term + '').length < 2 || !searchEmail) {
+          hideSuggestions();
+          return;
+        }
+        $.ajax({
+          url: admin_url + 'webmail/search_emails',
+          type: 'GET',
+          data: { term: term, email: searchEmail },
+          dataType: 'json',
+          success: function(data) {
+            if (Array.isArray(data)) {
+              var filtered = data.filter(function(e) { return emailTags.indexOf(e) === -1; });
+              showSuggestions(filtered);
+            } else {
+              hideSuggestions();
+            }
+          },
+          error: function() { hideSuggestions(); }
+        });
+      }
+      $inputField.on('keydown', function(e) {
+        var val = $(this).val();
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
+            updateActiveSuggestion();
+          }
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+            updateActiveSuggestion();
+          }
+          return;
+        }
+        if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+          e.preventDefault();
+          if (activeSuggestionIndex >= 0) {
+            selectActiveSuggestion();
+          } else if (val.trim()) {
+            createTag(val.trim());
+            $(this).val('');
+            hideSuggestions();
+          }
+          return;
+        }
+        if (e.key === 'Backspace' && val === '') {
+          if (emailTags.length > 0) {
+            emailTags.pop();
+            $container.find('.email-tag').last().remove();
+            updateHiddenInput();
+          }
+          return;
+        }
+        if (e.key === 'Escape') {
+          hideSuggestions();
+          return;
+        }
+      });
+      $inputField.on('input', function() {
+        var val = $(this).val();
+        if (val.indexOf(',') > -1 || val.indexOf(';') > -1) {
+          var parts = val.split(/[,;]+/);
+          parts.forEach(function(part) { if (part.trim()) createTag(part.trim()); });
+          $(this).val('');
+          hideSuggestions();
+          return;
+        }
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() { searchEmails(val.trim()); }, 300);
+      });
+      $inputField.on('blur', function() {
+        var val = $(this).val().trim();
+        if (val) {
+          createTag(val);
+          $(this).val('');
+        }
+        setTimeout(hideSuggestions, 200);
+      });
+      $container.on('click', function(e) {
+        if (e.target === this || $(e.target).hasClass('email-tags-container')) {
+          $inputField.focus();
+        }
+      });
+      $inputField.on('paste', function(e) {
+        e.preventDefault();
+        var pasteData = (e.originalEvent.clipboardData || window.clipboardData).getData('text');
+        var emails = (pasteData || '').split(/[,;\s\n]+/);
+        emails.forEach(function(email) {
+          if (email.trim()) createTag(email.trim());
+        });
+      });
+      return {
+        createTag: createTag,
+        clearTags: clearTags,
+        setFromString: setFromString,
+        updateHiddenInput: updateHiddenInput
+      };
+    }
+    if ($('#toEmailTagsContainerReply').length) {
+      window.replyEmailTagInputs = {
+        to: createEmailTagInput({
+          container: '#toEmailTagsContainerReply',
+          inputField: '#toEmailInputFieldReply',
+          hiddenInput: '#recipientEmailIT',
+          suggestions: '#toEmailSuggestionsReply'
+        }),
+        cc: createEmailTagInput({
+          container: '#ccEmailTagsContainerReply',
+          inputField: '#ccEmailInputFieldReply',
+          hiddenInput: '#recipientCCIT',
+          suggestions: '#ccEmailSuggestionsReply'
+        }),
+        bcc: createEmailTagInput({
+          container: '#bccEmailTagsContainerReply',
+          inputField: '#bccEmailInputFieldReply',
+          hiddenInput: '#recipientBCCIT',
+          suggestions: '#bccEmailSuggestionsReply'
+        })
+      };
+      window.forwardEmailTagInputs = {
+        to: createEmailTagInput({
+          container: '#toEmailTagsContainerFW',
+          inputField: '#toEmailInputFieldFW',
+          hiddenInput: '#recipientEmailFW',
+          suggestions: '#toEmailSuggestionsFW'
+        }),
+        cc: createEmailTagInput({
+          container: '#ccEmailTagsContainerFW',
+          inputField: '#ccEmailInputFieldFW',
+          hiddenInput: '#recipientCCFW',
+          suggestions: '#ccEmailSuggestionsFW'
+        }),
+        bcc: createEmailTagInput({
+          container: '#bccEmailTagsContainerFW',
+          inputField: '#bccEmailInputFieldFW',
+          hiddenInput: '#recipientBCCFW',
+          suggestions: '#bccEmailSuggestionsFW'
+        })
+      };
+    }
+  })();
+
   $('.hrefmodal').click(function(){ 
 
          //alert(11111);
@@ -1070,22 +1410,31 @@ $('.isread').click(function(){
 		 $('#emailSubjectIT').val(tid);
 		 $('#messagetypeIT').val('Reply');
 		 
-		 if($(this).attr('data-folder')=="Sent"){
-		 $('#recipientEmailIT').val(mailtox);
-		 }else{
-		 $('#recipientEmailIT').val(mailto);
+		 var replyToVal = ($(this).attr('data-folder') === 'Sent') ? (mailtox || '') : (mailto || '');
+		 if (window.replyEmailTagInputs) {
+		   window.replyEmailTagInputs.to.setFromString(replyToVal);
+		   window.replyEmailTagInputs.cc.setFromString(mailcc || '');
+		   window.replyEmailTagInputs.bcc.setFromString(mailbcc || '');
+		 } else {
+		   $('#recipientEmailIT').val(replyToVal);
+		   $('#recipientCCIT').val(mailcc || '');
+		   $('#recipientBCCIT').val(mailbcc || '');
 		 }
-		 $('#recipientCCIT').val(mailcc);
-		 $('#recipientBCCIT').val(mailbcc);
 		 $('#messageidIT').val(messageid);
 		 
 		 // Set values for Forward form
 		 var forwardSubject = 'Fwd: ' + tid;
 		 $('#emailSubjectFW').val(forwardSubject);
 		 $('#messagetypeFW').val('Forward');
-		 $('#recipientEmailFW').val('');
-		 $('#recipientCCFW').val('');
-		 $('#recipientBCCFW').val('');
+		 if (window.forwardEmailTagInputs) {
+		   window.forwardEmailTagInputs.to.setFromString('');
+		   window.forwardEmailTagInputs.cc.setFromString('');
+		   window.forwardEmailTagInputs.bcc.setFromString('');
+		 } else {
+		   $('#recipientEmailFW').val('');
+		   $('#recipientCCFW').val('');
+		   $('#recipientBCCFW').val('');
+		 }
 		 $('#messageidFW').val(messageid);
 		 
 		 var contents=$('#'+did).html();
@@ -1131,6 +1480,27 @@ $('#emailBody_ifr').contents().find('#tinymce').html(content);
 	$( "#reply-button" ).click(function() {
     $( "#forward-box" ).hide();
     $( "#reply-box" ).toggle();
+	
+	// Initialize editor when forward box is shown
+    setTimeout(function() {
+        // Check if editor is already initialized
+        if(!$('#emailBodyFW').siblings('.jqte_editor').length) { 
+           // $('#emailBodyFW').jqte();
+        }
+        
+        // Set forward body content if available
+        if(window.forwardBodyContent) {
+            setTimeout(function() {
+                if($('#emailBody').length) {
+                    if(typeof $('#emailBody').jqteVal === 'function') {
+                        $('#emailBody').jqteVal(window.forwardBodyContent);
+                    } else {
+                        $('#emailBody').val(window.forwardBodyContent);
+                    }
+                }
+            }, 200);
+        }
+    }, 50);
 });
 
 	$( "#forward-button" ).click(function() { 
@@ -1425,6 +1795,69 @@ $(document).ready(function () {
 });
 
 $('#saveasDraftBtnReply').on('click', function(){
+
+
+var emailBody='';
+	var isEmpty = true;
+	
+	
+	// Get email body from jqte editor - try multiple methods
+	if($('#emailBody').length) {
+		// First, try to sync content from editor to textarea
+		var $jqteEditor = $('#emailBody').siblings('.jqte_editor');
+		if($jqteEditor.length) {
+			var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+			if($contentEditable.length) {
+				// Sync content from contenteditable to textarea
+				var editorContent = $contentEditable.html() || $contentEditable.text() || '';
+				$('#emailBody').val(editorContent);
+			}
+		}
+		
+		// Method 1: Try jqteVal() function
+		if(typeof $('#emailBody').jqteVal === 'function') {
+			emailBody = $('#emailBody').jqteVal() || '';
+		}
+		
+		// Method 2: Try getting from contenteditable div directly
+		if((!emailBody || emailBody.trim() === '') && $jqteEditor.length) {
+			var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+			if($contentEditable.length) {
+				emailBody = $contentEditable.html() || $contentEditable.text() || '';
+			}
+		}
+		
+		// Method 3: Fallback to textarea value
+		if(!emailBody || emailBody.trim() === '') {
+			emailBody = $('#emailBody').val() || '';
+		}
+		
+		// Strip HTML tags and check actual content
+		if(emailBody) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = emailBody;
+			var textContent = (tempDiv.textContent || tempDiv.innerText || '').trim();
+			textContent = textContent.replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+			isEmpty = !textContent || textContent === '' || textContent.length < 6;
+		}
+	}
+	
+	if(isEmpty){
+		    alert('Please check Email body before submit / Min content length 5 character');
+			// Focus on the editor
+			var $jqteEditor = $('#emailBody').siblings('.jqte_editor');
+			if($jqteEditor.length) {
+				var $contentEditable = $jqteEditor.find('[contenteditable="true"]');
+				if($contentEditable.length) {
+					$contentEditable[0].focus();
+				} else {
+					$('#emailBody').focus();
+				}
+			} else {
+				$('#emailBody').focus();
+			}
+			return false;
+		}
 
 
 if(!confirm("Are you sure you want to save this email as draft?")){

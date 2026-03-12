@@ -4315,6 +4315,8 @@ $lang['Need Login?'] = 'Need Login?';
 $lang['Approver'] = 'Approver';
 $lang['Under Writing'] = 'Under Writing';
 $lang['project_created'] = 'Assign new project';
+$lang['project_added'] = 'Added new project';
 $lang['task_created'] = 'Assign new task';
+$lang['Task'] = 'Task';
 ?>
 
