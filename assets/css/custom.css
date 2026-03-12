@@ -1150,8 +1150,8 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
 
 /* Outer Clock Circle */
   .analog-watch {
-    max-width: 290px;
-    height: 290px;
+    max-width: 250px;
+    height: 240px;
     background: #1e293b;
     border: 8px solid #334155;
     border-radius: 50%;
