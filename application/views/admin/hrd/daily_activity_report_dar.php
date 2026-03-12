@@ -126,7 +126,7 @@
                   <thead>
                     <tr>
                       <?php foreach ($dar_fields as $f) { ?>
-                        <th><?php echo html_escape($f['field_title']); ?></th>
+                        <th><?php echo html_escape($f['field_title']); ?> <small class="req text-danger" title="Required field">* </small></th>
                       <?php } ?>
                       <th style="width:90px;">Action</th>
                     </tr>
@@ -165,12 +165,12 @@
 							  
                               ?>
                               <td>
-							  <?php if(strstr($f['field_title'],"Status")){ ?>
+<?php if(strstr($f['field_title'],"Status")){ ?>
   <select name="field_<?php echo $fid; ?>[]"  class="form-control <?php echo $fieldcss; ?>">
   <option value="">Select Status</option>
+  <option value="Completed" <?php if($val=="Completed"){ ?> selected="selected" <?php } ?>>Completed</option>
   <option value="Pending" <?php if($val=="Pending"){ ?> selected="selected" <?php } ?>>Pending</option>
-  <option value="completed" <?php if($val=="Completed"){ ?> selected="selected" <?php } ?>>Completed</option>
-  <option value="working" <?php if($val=="working"){ ?> selected="selected" <?php } ?>>working</option>
+  <option value="Working" <?php if($val=="Working"){ ?> selected="selected" <?php } ?>>Working</option>
   </select>
 							  
 							  <?php }else{ ?>
