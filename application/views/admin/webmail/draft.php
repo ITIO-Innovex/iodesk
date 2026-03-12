@@ -1,7 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
 <div id="wrapper">
-  <div class="content">
+  <div class="content" style="max-width: 100% !important;">
     <div class="row">
       <div class="col-md-12">
         <div class=" tw-mb-3">
@@ -27,7 +28,7 @@
                         <td><a href="<?php echo admin_url('webmail/compose');?>/<?php echo (int) $c['id']; ?>">Draft</a></td>
 						<td><a href="<?php echo admin_url('webmail/compose');?>/<?php echo (int) $c['id']; ?>"><?php echo $c['status'] ?? ''; ?></a></td>
                         <td><?php echo $c['subject'] ?? '(no subject)'; ?></td>
-                        <td><?php echo $c['body'] ?? ''; ?></td>
+                        <td><?php echo html_entity_decode($c['body']) ?? ''; ?></td>
 						<td><?php echo $c['created_at'] ?? ''; ?></td>
                         <td>
 <button type="button" class="btn btn-xs btn-danger delete-draft" data-id="<?php echo (int) $c['id']; ?>">Delete</button>
