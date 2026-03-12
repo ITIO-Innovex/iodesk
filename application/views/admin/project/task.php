@@ -22,7 +22,7 @@
   }
 
   .second-col {
-    left: 100px; /* Width of first column */
+    left: 140px; /* Width of first column */
   }
     .sticks{
   position: sticky !important;
@@ -74,7 +74,7 @@
                 <thead>
                   <tr>
 					<th class="sticky-col first-col sticks" ><?php echo 'ID'; ?></th>
-                    <th class="sticky-col second-col sticks" style="left: 100px;min-width: 200px;"><?php echo 'Task Name'; ?></th>
+                    <th class="sticky-col second-col sticks" style="left: 140px;min-width: 200px;"><?php echo 'Task Name'; ?></th>
                      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
                     <th ><?php echo 'Assign To'; ?></th>
                     <th><?php echo 'Status'; ?></th>
@@ -94,7 +94,7 @@
 					//print_r($status);exit;
                   ?>
                   <tr>
-					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo $status['id']; ?></td>
+					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo generateTaskID($status['project_id']); ?><?php echo $status['id']; ?></td>
                     <td  class="sticky-col second-col" style="width: 300px;
     max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 30) . '...' : '-'; ?>
 	<?php //echo get_project_title($project_id);?>
