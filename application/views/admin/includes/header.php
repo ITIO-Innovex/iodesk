@@ -93,7 +93,7 @@
                         class="dropdown notifications-wrapper header-notifications tw-block ltr:tw-mr-1.5 rtl:tw-ml-1.5">
                         <?php $this->load->view('admin/includes/notifications'); ?>
                     </li>
-                    <li class="header-timers ltr:tw-mr-1.5 rtl:tw-ml-1.5">
+                    <?php /*?><li class="header-timers ltr:tw-mr-1.5 rtl:tw-ml-1.5">
                         <a href="#" id="top-timers" class="dropdown-toggle top-timers tw-block tw-h-5 tw-w-5"
                             data-toggle="dropdown">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -107,7 +107,7 @@
                         <ul class="dropdown-menu animated fadeIn started-timers-top width300" id="started-timers-top">
                             <?php $this->load->view('admin/tasks/started_timers', ['startedTimers' => $startedTimers]); ?>
                         </ul>
-                    </li>
+                    </li><?php */?>
                     <?php } ?>
                 </ul>
                 <div class="mobile-navbar collapse" id="mobile-collapse" aria-expanded="false" style="height: 0px;"
