@@ -182,7 +182,7 @@ function printDiv(divId) {
 						
 						
 						$label = $fhTitle !== '' ? $fhTitle : (isset($sc['first_half']) ? e($sc['first_half']) : '-');
-						echo "<a class='btn btn-default mx-2'>".$label." (".$sc['total_count'].")&nbsp;</a>&nbsp;";
+						echo "<a class='btn btn-default mx-2 tw-my-2'>".$label." (".$sc['total_count'].")&nbsp;</a>&nbsp;";
 					}
 					?>
                   <table class="table table-bordered" border="1" style="background:#fff;">

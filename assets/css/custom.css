@@ -1223,6 +1223,17 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
 
     /* responsive */
     @media (max-width:420px){
-      .digital-clock { font-size: 0.95rem; padding: 8px 12px; }
-      .dc-time { font-size: 1.05rem; }
+      /*.digital-clock { font-size: 0.95rem; padding: 8px 12px; }
+      .dc-time { font-size: 1.05rem; }*/
+    }
+	
+	 /* responsive */
+    @media (max-width:562px){
+      .screen-options-btn.m-hide{ display: none !important; }
+    }
+	  /* responsive */
+    @media (max-width:900px){
+		  .navbar-right {
+			display: none !important;
+		}
     }
