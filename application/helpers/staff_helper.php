@@ -1696,6 +1696,11 @@ function formatEmailName($email) {
     return strstr($email, '@', true);
 }
 
+function generateTaskID($num) {
+     return str_pad($num,6,"0",STR_PAD_RIGHT);
+    
+}
+
 function get_maintenance_notice() {
 
     $CI = & get_instance();
