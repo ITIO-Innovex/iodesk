@@ -22,7 +22,7 @@
   }
 
   .second-col {
-    left: 140px; /* Width of first column */
+    left: 100px; /* Width of first column */
   }
     .sticks{
   position: sticky !important;
@@ -68,13 +68,13 @@
 		</div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <?php if (isset($listdata) && count($listdata) > 0) { ?>
+            <?php $i=0; if (isset($listdata) && count($listdata) > 0) {  ?>
             <div class="table-responsivexxx tw-mx-2" >
-              <table class="table dt-table customizable-table" id="myTable" data-order-col="0" data-order-type="desc" style="overflow-x:auto; white-space:nowrap; max-width:100%;">
+              <table class="table dt-table customizable-table" id="myTable" data-order-col="0" data-order-type="asc" style="overflow-x:auto; white-space:nowrap; max-width:100%;">
                 <thead>
                   <tr>
 					<th class="sticky-col first-col sticks" ><?php echo 'ID'; ?></th>
-                    <th class="sticky-col second-col sticks" style="left: 140px;min-width: 200px;"><?php echo 'Task Name'; ?></th>
+                    <th class="sticky-col second-col sticks" style="left: 100px;min-width: 200px;"><?php echo 'Task Name'; ?></th>
                      <th>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
                     <th ><?php echo 'Assign To'; ?></th>
                     <th><?php echo 'Status'; ?></th>
@@ -85,16 +85,18 @@
                     <th><?php echo 'Created By'; ?></th>
 					<th><?php echo 'Completion Percentage'; ?></th>
 					<th><?php echo 'Tags'; ?></th>
+					<th><?php echo 'Task ID'; ?></th>
                     
                   </tr>
                 </thead>
                 <tbody>
                   <?php foreach ($listdata as $status) { 
                     $prod_status=proj_status_translate($status['task_status']);
-					//print_r($status);exit;
+					//print_r($status);exit; 
+					$i++;
                   ?>
                   <tr>
-					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo generateTaskID($status['project_id']); ?><?php echo $status['id']; ?></td>
+					<td  class="sticky-col first-col"  style="border-left: 5px solid <?php echo $prod_status->color; ?>;"><?php echo $i; ?></td>
                     <td  class="sticky-col second-col" style="width: 300px;
     max-width: 300px;"><?php echo isset($status['task_name']) ? substr($status['task_name'], 0, 30) . '...' : '-'; ?>
 	<?php //echo get_project_title($project_id);?>
@@ -150,6 +152,7 @@
                     <td><?php echo isset($status['task_addedby']) ? get_staff_full_name($status['task_addedby']) : '-'; ?></td>
 					<td><?php echo get_task_percentage($status['id']); ?> %</td>
 					<td><?php echo isset($status['task_tags']) ? _d($status['task_tags']) : '-'; ?></td>
+					<td><?php echo generateTaskID($status['project_id']); ?><strong><?php echo $status['id']; ?></strong></td>
                   </tr>
                   <?php } ?>
                 </tbody>
@@ -248,7 +251,7 @@
             
                          <!-- Description -->
 			<div class="form-group">
-                  <label for="task_start_date" class="control-label"><small class="req text-danger">* </small>Project Description</label>
+                  <label for="task_start_date" class="control-label"><small class="req text-danger">* </small>Task Description</label>
              <?php echo render_textarea('task_description', '', '', [], [], '', ''); ?>
              </div>
                            <!-- Tags -->
@@ -697,17 +700,15 @@ $('body').on('click', '.remove_attachment', function() {
       toggleReminderFields();
     });
 </script>
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.css"
+/>
+<script src="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.js"></script>
 
 <script>
-(function() {
-    var el = document.querySelector('#task_description');
-    if (el) {
-        ClassicEditor.create(el).catch(function(error) {
-            console.error(error);
-        });
-    }
-})();
+const editor = Jodit.make('#task_description');
+editor.value = '';
 </script>
 <!-- Tagify CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.17.8/tagify.css">

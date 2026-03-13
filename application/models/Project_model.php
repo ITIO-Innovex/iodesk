@@ -437,13 +437,26 @@ return $result = $this->db->get()->result_array();
     {
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'project_master', $data);
-
         if ($this->db->affected_rows() > 0) {
 		   
 			$changes = [];
             foreach ($data as $field => $value) {
 			    if($field=='owner'){
 				$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_staff_full_name($value);
+				}elseif($field=='project_group'){
+			    $changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_project_group($value);
+				}elseif($field=='make_this_a_strict_project'){
+				  $pstatus="No";
+				  if($value==1) {
+				  $pstatus="Yes";
+				  }
+			    $changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $pstatus;
+				}elseif($field=='project_access'){
+				  $pastatus="Public";
+				  if($value==1) {
+				  $pstatus="Private";
+				  }
+			    $changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $pastatus;
 				}else{
                 $changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $value;
 				}
@@ -915,9 +928,26 @@ return $result = $this->db->get()->result_array();
             // Log the activity
             $project_type = 2; // Task
             $changes = [];
-            foreach ($data as $field => $value) {
+           /* foreach ($data as $field => $value) {
                 $changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $value;
-            }			
+				
+				
+            }*/		
+			
+			foreach ($data as $field => $value) {
+			if(($field=='task_owner') || ($field=='task_addedby')){
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_staff_full_name($value);
+			}elseif($field=='task_priority'){
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_project_priority($value);
+			}elseif($field=='project_id'){
+			$changes[] = ucwords(str_replace("_"," ","Project Title")) . ': ' . get_project_title($value);
+			}elseif($field=='task_status'){
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . get_project_status_title($value);
+			}else{
+			$changes[] = ucwords(str_replace("_"," ",$field)) . ': ' . $value;
+			}
+			}
+	
 			$project_type=2; //Project=1, Task=2, Issues=3, Milestone=4
 			
             
