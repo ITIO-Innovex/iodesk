@@ -271,7 +271,9 @@ if (is_super()) {
 $this->db->where('pt.task_is_deleted', 0);
 $this->db->order_by('pt.id', 'desc');
 
-return $result = $this->db->get()->result_array();
+$result = $this->db->get()->result_array();
+log_message('error', 'Task Query : ' . $this->db->last_query());
+return $result;
 		 
 //echo $this->db->last_query();exit;//return
     }
