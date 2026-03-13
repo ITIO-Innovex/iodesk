@@ -838,7 +838,6 @@ class Project extends AdminController
 		
        //log_message('error', 'Update Project - Received tags: ' . $tags); // Debug log
 		
-		
         $data = [
             'project_title' => $this->input->post('project_title'),
             'owner' => $this->input->post('owner'),
@@ -846,12 +845,11 @@ class Project extends AdminController
             'start_date' => $this->input->post('start_date'),
             'deadline' => $this->input->post('deadline'),
             // Use edit_project_description from edit modal
-            'project_description' => $this->input->post('edit_project_description'),
+            'project_description' => $this->input->post('project_description'),
             'tags' => $tags,
             'make_this_a_strict_project' => $this->input->post('make_this_a_strict_project') ? 1 : 0,
             'project_access' => $this->input->post('project_access') ? $this->input->post('project_access') : 1,
         ];
-
         // Handle custom fields in edit (same POST names as add)
         $customFields = [];
         $names  = $this->input->post('custom_field_name');
@@ -872,7 +870,6 @@ class Project extends AdminController
         if (!empty($customFields)) {
             $data['custom_field'] = json_encode($customFields);
         }
-		
 		//log_message('error', 'Update Project - Received tags: ' . print_r($data, true)); // Debug log
         $this->load->model('project_model');
         $success = $this->project_model->update($data, $project_id);
