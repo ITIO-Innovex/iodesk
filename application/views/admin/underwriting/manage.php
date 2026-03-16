@@ -15,14 +15,14 @@
                   <th>ID</th>
                   <th>For Company</th>
                   <th>Website</th>
-                  <th>MDR</th>
-                  <th>Setup Fee</th>
+                  <th>MDR (%)</th>
+                  <th>Setup Fee (USD)</th>
                   <th>Hold Back</th>
                   <th>Card Type</th>
                   <th>Settlement</th>
                   <th>Settlement Fee</th>
                   <th>Min Settlement</th>
-                  <th>Monthly Fee</th>
+                  <th>Monthly Fee (USD)</th>
                   <th>Status</th>
                   <th>Date Added</th>
                   <th><?php echo _l('options'); ?></th>
@@ -45,8 +45,8 @@
                   <td><?php echo htmlspecialchars($u['HoldBack']); ?></td>
                   <td><?php echo htmlspecialchars($u['CardType']); ?></td>
                   <td><?php echo htmlspecialchars($u['Settlement']); ?></td>
-                  <td><?php echo htmlspecialchars($u['SettlementFee']); ?></td>
-                  <td><?php echo htmlspecialchars($u['MinSettlement']); ?></td>
+                  <td><?php echo htmlspecialchars($u['SettlementFee']); ?>%</td>
+                  <td><?php echo htmlspecialchars($u['MinSettlement']); ?>K</td>
                   <td><?php echo htmlspecialchars($u['MonthlyFee']); ?></td>
                   <td><?php
                                                     $statusLabel = 'Pending';
@@ -79,7 +79,9 @@
                                                         data-minsettlement="<?php echo htmlspecialchars($u['MinSettlement'], ENT_QUOTES); ?>"
                                                         data-monthlyfee="<?php echo htmlspecialchars($u['MonthlyFee'], ENT_QUOTES); ?>"
                                                         data-descriptor="<?php echo htmlspecialchars($u['Descriptor'], ENT_QUOTES); ?>"
-                                                        data-cc_email="<?php echo htmlspecialchars($u['cc_email'] ?? '', ENT_QUOTES); ?>"
+														data-remarks="<?php echo htmlspecialchars($u['Remarks']??'', ENT_QUOTES); ?>"
+                                                        
+														data-cc_email="<?php echo htmlspecialchars($u['cc_email'] ?? '', ENT_QUOTES); ?>"
                                                         data-status="<?php echo (int) $u['status']; ?>"
                                                         data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <i class="fa fa-eye"></i> </button>
 														
@@ -100,6 +102,7 @@
                                                         data-minsettlement="<?php echo htmlspecialchars($u['MinSettlement'], ENT_QUOTES); ?>"
                                                         data-monthlyfee="<?php echo htmlspecialchars($u['MonthlyFee'], ENT_QUOTES); ?>"
                                                         data-descriptor="<?php echo htmlspecialchars($u['Descriptor'], ENT_QUOTES); ?>"
+														data-remarks="<?php echo htmlspecialchars($u['Remarks'] ?? '', ENT_QUOTES); ?>"
                                                         data-cc_email="<?php echo htmlspecialchars($u['cc_email'] ?? '', ENT_QUOTES); ?>"
                                                         data-status="<?php echo (int) $u['status']; ?>"
                                                         data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <i class="fa fa-pencil"></i> </button>
@@ -145,13 +148,13 @@
           </div>
           <div class="col-md-6">
             <div class="form-group">
-              <label for="uw_MDR" class="control-label">MDR</label>
+              <label for="uw_MDR" class="control-label">MDR (%)</label>
               <input type="text" name="MDR" id="uw_MDR" class="form-control" required>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
-              <label for="uw_SetupFee" class="control-label">Setup Fee</label>
+              <label for="uw_SetupFee" class="control-label">Setup Fee (USD)</label>
               <input type="text" name="SetupFee" id="uw_SetupFee" class="form-control" required>
             </div>
           </div>
@@ -178,25 +181,36 @@
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              <label for="uw_Settlement" class="control-label">Settlement</label>
+              <label for="uw_Settlement" class="control-label">Settlement (No of working days)</label>
               <input type="text" name="Settlement" id="uw_Settlement" class="form-control" required>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="uw_SettlementFee" class="control-label">Settlement Fee</label>
-              <input type="text" name="SettlementFee" id="uw_SettlementFee" class="form-control" required>
+			  <select name="SettlementFee" id="uw_SettlementFee" class="form-control" required>
+			  <option value="">Select Settlement Fee</option>
+			  <option value="2">2%</option>
+			  <option value="3">3%</option>
+			  <option value="4">4%</option>
+			  <option value="5">5%</option>
+			  </select>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="uw_MinSettlement" class="control-label">Min Settlement</label>
-              <input type="text" name="MinSettlement" id="uw_MinSettlement" class="form-control" required>
+			  <select name="MinSettlement" id="uw_MinSettlement" class="form-control" required>
+			  <option value="">Select Min Settlement</option>
+			  <option value="5">5K</option>
+			  <option value="10">10K</option>
+			  <option value="20">20K</option>
+			  </select>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
-              <label for="uw_MonthlyFee" class="control-label">Monthly Fee</label>
+              <label for="uw_MonthlyFee" class="control-label">Monthly Fee (USD)</label>
               <input type="text" name="MonthlyFee" id="uw_MonthlyFee" class="form-control" required>
             </div>
           </div>
@@ -206,6 +220,13 @@
             <div class="form-group">
               <label for="uw_Descriptor" class="control-label">Descriptor</label>
               <textarea name="Descriptor" id="uw_Descriptor" rows="3" class="form-control" required></textarea>
+            </div>
+          </div>
+		  
+		  <div class="col-md-12">
+            <div class="form-group">
+              <label for="uw_Remarks" class="control-label">Remarks</label>
+              <textarea name="Remarks" id="uw_Remarks" rows="3" class="form-control" required></textarea>
             </div>
           </div>
           <div class="col-md-12">
@@ -249,21 +270,26 @@
       </div>
       <div class="modal-body">
         <div class="row">
+<div class="panel-body panel-table-full">
+<table class="table dt-table" data-order-col="1" data-order-type="asc">
+<tr><td><strong>For Company:</strong></td><td><span id="view_for_company"></span></td></tr>
+<tr><td><strong>Website:</strong></td><td><span id="view_web_link"></span></td></tr>
+<tr><td><strong>MDR:</strong></td><td><span id="view_MDR"></span></td></tr>
+<tr><td><strong>Setup Fee:</strong></td><td><span id="view_SetupFee"></span></td></tr>
+<tr><td><strong>Hold Back:</strong></td><td><span id="view_HoldBack"></span></td></tr>
+<tr><td><strong>Card Type:</strong></td><td><span id="view_CardType"></span></td></tr>
+<tr><td><strong>Settlement:</strong></td><td><span id="view_Settlement"></span></td></tr>
+<tr><td><strong>Settlement Fee:</strong></td><td><span id="view_SettlementFee"></span></td></tr>
 
-<div class="col-md-4"><p><strong>For Company:</strong></div><div class="col-md-8"> <span id="view_for_company"></span></p></div>
-<div class="col-md-4"><p><strong>Website:</strong></div><div class="col-md-8"> <span id="view_web_link"></span></p></div>
-<div class="col-md-4"><p><strong>MDR:</strong></div><div class="col-md-8"><span id="view_MDR"></span></p></div>
-<div class="col-md-4"><p><strong>Setup Fee:</strong></div><div class="col-md-8"><span id="view_SetupFee"></span></p></div>
-<div class="col-md-4"><p><strong>Hold Back:</strong></div><div class="col-md-8"><span id="view_HoldBack"></span></p></div>
-<div class="col-md-4"><p><strong>Card Type:</strong></div><div class="col-md-8"><span id="view_CardType"></span></p></div>
-<div class="col-md-4"><p><strong>Settlement:</strong></div><div class="col-md-8"><span id="view_Settlement"></span></p></div>
-<div class="col-md-4"><p><strong>Settlement Fee:</strong></div><div class="col-md-8"><span id="view_SettlementFee"></span></p></div>
-<div class="col-md-4"><p><strong>Min Settlement:</strong></div><div class="col-md-8"><span id="view_MinSettlement"></span></p></div>
-<div class="col-md-4"><p><strong>Monthly Fee:</strong></div><div class="col-md-8"><span id="view_MonthlyFee"></span></p></div>
-<div class="col-md-4"><p><strong>Descriptor:</strong></div><div class="col-md-8"><span id="view_Descriptor"></span></p></div>
-<div class="col-md-4"><p><strong>CC Email:</strong></div><div class="col-md-8"><span id="view_cc_email"></span></p></div>
-<div class="col-md-4"><p><strong>Status:</strong></div><div class="col-md-8"><span id="view_status"></span></p></div>
-<div class="col-md-4"><p><strong>Reason:</strong></div><div class="col-md-8"><span id="view_Reason"></span></p></div>
+<tr><td><strong>Min Settlement:</strong></td><td><span id="view_MinSettlement"></span></td></tr>
+<tr><td><strong>Monthly Fee:</strong></td><td><span id="view_MonthlyFee"></span></td></tr>
+<tr><td><strong>Descriptor:</strong></td><td><span id="view_Descriptor"></span></td></tr>
+<tr><td><strong>Remarks:</strong></td><td><span id="view_Remarks"></span></td></tr>
+<?php /*?><tr><td><strong>CC Email:</strong></td><td><span id="view_cc_email"></span></td></tr>
+<?php */?><tr><td><strong>Status:</strong></td><td><span id="view_status"></span></td></tr>
+<tr><td><strong>Reason:</strong></td><td><span id="view_Reason"></span></td></tr>
+</table>
+
 </div>
 
 <?php if(staff_can('approver', 'under_writing')){ ?>
@@ -318,6 +344,7 @@
         $('#uw_MinSettlement').val('');
         $('#uw_MonthlyFee').val('');
         $('#uw_Descriptor').val('');
+		$('#uw_Remarks').val('');
         $('#uw_cc_email').val('');
         $('#uw_status').val('2');
         $('#uw_Reason').val('');
@@ -344,6 +371,7 @@
         $('#uw_MinSettlement').val(button.data('minsettlement'));
         $('#uw_MonthlyFee').val(button.data('monthlyfee'));
         $('#uw_Descriptor').val(button.data('descriptor'));
+		$('#uw_Remarks').val(button.data('remarks'));
         $('#uw_cc_email').val(button.data('cc_email'));
         $('#uw_status').val(button.data('status'));
         $('#uw_Reason').val(button.data('reason'));
@@ -362,6 +390,7 @@
         $('#view_MinSettlement').text(button.data('minsettlement') || '');
         $('#view_MonthlyFee').text(button.data('monthlyfee') || '');
         $('#view_Descriptor').text(button.data('descriptor') || '');
+		$('#view_Remarks').text(button.data('remarks') || '');
         $('#view_cc_email').text(button.data('cc_email') || '');
 		$('#uw_idx').val(button.data('id'));
 

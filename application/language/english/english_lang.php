@@ -4318,5 +4318,7 @@ $lang['project_created'] = 'Assign new project';
 $lang['project_added'] = 'Added new project';
 $lang['task_created'] = 'Assign new task';
 $lang['Task'] = 'Task';
+$lang['My Drive'] = 'My Drive';
+$lang['My Documents'] = 'My Documents';
 ?>
 
