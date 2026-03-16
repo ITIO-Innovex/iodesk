@@ -8,7 +8,7 @@ function app_init_admin_sidebar_menu_items()
 
     $CI->app_menu->add_sidebar_menu_item('dashboard', [
         'name'     => _l('als_dashboard'),
-        'href'     => admin_url(),
+        'href'     => admin_url(''),
         'position' => 1,
         'icon'     => 'fa fa-home',
         'badge'    => [],
@@ -624,13 +624,13 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 
       if (staff_can('view_own',  'hr_department')){
         $CI->app_menu->add_sidebar_children_item('hr_department', [
-            'slug'     => 'dashboard',
+            'slug'     => 'Dashboard',
             'name'     => _l('Dashboard'),
             'href'     => admin_url('hrd/dashboard'),
             'position' => 10,
             'badge'    => [],
         ]);
-      }
+      } 
 	  if (staff_can('view_own',  'hr_department')){
         $CI->app_menu->add_sidebar_children_item('hr_department', [
             'slug'     => 'self_service',
@@ -1407,6 +1407,15 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'icon'     => 'fa-solid fa-users',
             'badge'    => [],
         ]);
+		
+		$CI->app_menu->add_setup_menu_item('staff_type', [
+            'href'     => admin_url('menu_setup/main_menu'),
+            'name'     => 'Main Menu',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-bars-staggered',
+            'badge'    => [],
+        ]);
+		
 		
     }
 }

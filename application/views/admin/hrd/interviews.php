@@ -163,8 +163,8 @@
       <div class="modal-body">
         <div id="additional"></div>
         <div class="row">
-          <div class="col-md-6"><div class="form-group"><label>Full Name</label><input type="text" name="full_name" class="form-control" required></div></div>
-          <div class="col-md-6"><div class="form-group"><label>Phone</label><input type="text" name="phone_number" class="form-control" required></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Full Name <small class="req text-danger">* </small></label><input type="text" name="full_name" class="form-control" required></div></div>
+          <div class="col-md-6"><div class="form-group"><label>Phone <small class="req text-danger">* </small></label><input type="text" name="phone_number" class="form-control" required></div></div>
           <div class="col-md-6"><div class="form-group"><label>Email</label><input type="email" name="email_id" class="form-control"></div></div>
         
           <div class="col-md-6"><div class="form-group"><label>Qualification</label><input type="text" name="qualification" class="form-control"></div></div>
