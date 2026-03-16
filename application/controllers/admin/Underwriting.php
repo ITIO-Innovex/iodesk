@@ -57,6 +57,7 @@ class Underwriting extends AdminController
         $MinSettlement = trim($this->input->post('MinSettlement', true));
         $MonthlyFee    = trim($this->input->post('MonthlyFee', true));
         $Descriptor    = $this->input->post('Descriptor', true);
+		$Remarks    = $this->input->post('Remarks', true);
         $ccEmail       = trim($this->input->post('cc_email', true));
         $status        = (int) $this->input->post('status');
         $Reason        = $this->input->post('Reason', true);
@@ -91,6 +92,7 @@ class Underwriting extends AdminController
             'MinSettlement' => $MinSettlement,
             'MonthlyFee'    => $MonthlyFee,
             'Descriptor'    => $Descriptor,
+			'Remarks'    	=> $Remarks,
             'cc_email'      => $ccEmail,
             'status'        => $status,
             'Reason'        => $Reason,
@@ -145,6 +147,7 @@ class Underwriting extends AdminController
 						. '<p><strong>Min Settlement:</strong> ' . $MinSettlement . '</p>'
 						. '<p><strong>Monthly fee:</strong> ' . $MonthlyFee . '</p>'
 						. '<p><strong>Descriptor:</strong> ' . $Descriptor . '</p>'
+						. '<p><strong>Remarks:</strong> ' . $Remarks . '</p>'
 						. '<p><strong>Best Regards, <br><br></strong> ' . $staffName . '</p>',
                 ];
 				 

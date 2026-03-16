@@ -181,8 +181,9 @@ $detailstable.="</table>";
 
           <div class="form-group">
             <label>Description <span class="text-danger" id="desc-required" style="display:none;">*</span></label>
+			<div class="table-responsive">
             <div class="dataDisplay" style="min-height:120px;"></div>
-              
+            </div>  
             
           </div>
           
