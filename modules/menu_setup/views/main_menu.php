@@ -32,6 +32,16 @@
                                 </div>
                             </div>
                             <?php } ?>
+                            <div class="form-group">
+                                <label class="control-label">Custom Title</label>
+                                <?php
+                                    $customTitle = '';
+                                    if (isset($menu_options->{$item['slug']}) && isset($menu_options->{$item['slug']}->title)) {
+                                        $customTitle = $menu_options->{$item['slug']}->title;
+                                    }
+                                ?>
+                                <input type="text" value="<?php echo e($customTitle); ?>" class="form-control" id="title-<?php echo e($item['slug']); ?>" placeholder="Leave blank to use default title">
+                            </div>
                             <label class="control-label"><?php echo _l('utilities_menu_icon'); ?></label>
                             <div class="input-group">
                                 <?php
@@ -67,6 +77,17 @@
                                        } ?>>
                                             <label for="menu_disabled_<?php echo e($submenu['slug']); ?>">Disabled?</label>
                                         </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">Custom Title</label>
+                                        <?php
+                                            $childTitle = '';
+                                            if (isset($menu_options->{$item['slug']}->children->{$submenu['slug']})
+                                                && isset($menu_options->{$item['slug']}->children->{$submenu['slug']}->title)) {
+                                                $childTitle = $menu_options->{$item['slug']}->children->{$submenu['slug']}->title;
+                                            }
+                                        ?>
+                                        <input type="text" value="<?php echo e($childTitle); ?>" class="form-control" id="title-<?php echo e($submenu['slug']); ?>" placeholder="Leave blank to use default title">
                                     </div>
                                     <label class="control-label"><?php echo _l('utilities_menu_icon'); ?></label>
                                     <div class="input-group">
@@ -136,6 +157,7 @@ function save_menu() {
         }
         main_menu.data('icon', main_menu.find('#icon-' + main_menu.data('id')).val());
         main_menu.data('disabled', main_menu.find('.is-disabled-main').prop('checked') === true);
+        main_menu.data('title', main_menu.find('#title-' + main_menu.data('id')).val());
         main_menu.data('position', mainPosition);
 
         var sub_items = main_menu.find('.dd-list-sub-items li');
@@ -149,6 +171,7 @@ function save_menu() {
             var sub_item = $(this);
             sub_item.data('disabled', sub_item.find('.is-disabled-child').prop('checked') === true);
             sub_item.data('icon', sub_item.find('#icon-' + sub_item.data('id')).val());
+            sub_item.data('title', sub_item.find('#title-' + sub_item.data('id')).val());
             sub_item.data('position', subPosition);
         });
     });

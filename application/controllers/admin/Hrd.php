@@ -3001,8 +3001,9 @@ class Hrd extends AdminController
             'notice_period_in_days' => ($this->input->post('notice_period_in_days')!=='') ? (int)$this->input->post('notice_period_in_days') : null,
             'location'              => $this->input->post('location'),
             'city'                  => $this->input->post('city'),
-            'source'                => ($this->input->post('source')!=='') ? (int)$this->input->post('source') : null,
-            'process_status'        => ($this->input->post('process_status')!=='') ? (int)$this->input->post('process_status') : null,
+            // If source/process_status are empty, store 0 instead of NULL to avoid DB errors on NOT NULL columns
+            'source'                => ($this->input->post('source')!=='') ? (int)$this->input->post('source') : 0,
+            'process_status'        => ($this->input->post('process_status')!=='') ? (int)$this->input->post('process_status') : 0,
             'comments'              => $this->input->post('comments'),
             'addedby'               => get_staff_user_id(),
         ];

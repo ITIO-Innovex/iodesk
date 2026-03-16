@@ -6,12 +6,53 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 function app_admin_sidebar_custom_options($items)
 {
-    return _apply_menu_items_options($items, json_decode(get_option('aside_menu_active')));
+    $CI = &get_instance();
+
+    // Superadmin uses global menu options
+    if (is_super()) {
+        $options = json_decode(get_option('aside_menu_active'));
+    } else {
+        // Load company-specific menu options from dedicated table
+        $companyId = function_exists('get_staff_company_id') ? get_staff_company_id() : '';
+        if ($companyId) {
+            $CI->load->model('menu_setup_company_model');
+            $raw = $CI->menu_setup_company_model->get_menu($companyId, 'aside');
+            if ($raw === null || $raw === '') {
+                // Fallback to global if not set
+                $options = json_decode(get_option('aside_menu_active'));
+            } else {
+                $options = json_decode($raw);
+            }
+        } else {
+            $options = json_decode(get_option('aside_menu_active'));
+        }
+    }
+
+    return _apply_menu_items_options($items, $options);
 }
 
 function app_admin_sidebar_custom_positions($items)
 {
-    return _apply_menu_items_position($items, json_decode(get_option('aside_menu_active')));
+    $CI = &get_instance();
+
+    if (is_super()) {
+        $options = json_decode(get_option('aside_menu_active'));
+    } else {
+        $companyId = function_exists('get_staff_company_id') ? get_staff_company_id() : '';
+        if ($companyId) {
+            $CI->load->model('menu_setup_company_model');
+            $raw = $CI->menu_setup_company_model->get_menu($companyId, 'aside');
+            if ($raw === null || $raw === '') {
+                $options = json_decode(get_option('aside_menu_active'));
+            } else {
+                $options = json_decode($raw);
+            }
+        } else {
+            $options = json_decode(get_option('aside_menu_active'));
+        }
+    }
+
+    return _apply_menu_items_position($items, $options);
 }
 
 function app_admin_setup_menu_custom_options($items)
@@ -40,6 +81,11 @@ function _apply_menu_items_options($items, $options)
                 } elseif (!empty($options->{$item['slug']}->icon)) {
                     $items[$key]['icon'] = $options->{$item['slug']}->icon;
                 }
+
+                // Main item has custom title
+                if (isset($options->{$item['slug']}->title) && $options->{$item['slug']}->title !== '') {
+                    $items[$key]['name'] = $options->{$item['slug']}->title;
+                }
             }
 
             foreach ($item['children'] as $childKey => $child) {
@@ -50,10 +96,18 @@ function _apply_menu_items_options($items, $options)
                         unset($items[$key]['children'][$childKey]);
                     } else {
                         // Has custom icon
-                        if ($options->{$item['slug']}->children->{$child['slug']}->icon === false) {
-                            $items[$key]['children'][$childKey]['icon'] = '';
-                        } elseif (!empty($options->{$item['slug']}->children->{$child['slug']}->icon)) {
-                            $items[$key]['children'][$childKey]['icon'] = $options->{$item['slug']}->children->{$child['slug']}->icon;
+                        if (isset($options->{$item['slug']}->children->{$child['slug']}->icon)) {
+                            if ($options->{$item['slug']}->children->{$child['slug']}->icon === false) {
+                                $items[$key]['children'][$childKey]['icon'] = '';
+                            } elseif (!empty($options->{$item['slug']}->children->{$child['slug']}->icon)) {
+                                $items[$key]['children'][$childKey]['icon'] = $options->{$item['slug']}->children->{$child['slug']}->icon;
+                            }
+                        }
+
+                        // Has custom title
+                        if (isset($options->{$item['slug']}->children->{$child['slug']}->title)
+                            && $options->{$item['slug']}->children->{$child['slug']}->title !== '') {
+                            $items[$key]['children'][$childKey]['name'] = $options->{$item['slug']}->children->{$child['slug']}->title;
                         }
                     }
                 }

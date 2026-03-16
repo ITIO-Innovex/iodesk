@@ -429,7 +429,9 @@ function get_staff_rolex($userid = '')
 
 function get_staff_company_id($userid = '')
 {   
-
+if(isset($userid)&&$userid){
+ $CI->db->reset_query(); // important
+}
 
     $tmpStaffUserId = get_staff_user_id();
     if ($userid == '' || $userid == $tmpStaffUserId) {
@@ -451,6 +453,10 @@ function get_staff_company_id($userid = '')
     if ($companyId !== null && $companyId !== false && $companyId !== '') {
         return $companyId;
     }
+	
+if(isset($userid)&&$userid){
+ $CI->db->reset_query(); // important
+}
 
     $row = $CI->db->select('company_id')
         ->from(db_prefix() . 'staff')

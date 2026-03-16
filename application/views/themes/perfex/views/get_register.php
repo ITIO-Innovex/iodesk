@@ -38,7 +38,7 @@
           <input type="text" class="form-control" name="companyname" id="companyname" value="" required>
           </div>
         <div class="form-group register-contact-website-group">
-          <label class="tw-text-white" for="website"> <span class="text-danger">*</span>Website </label>
+          <label class="tw-text-white" for="website"> <span class="text-danger">*</span>Website (Start with http:// or https://)</label>
           <input type="url" class="form-control" name="website" id="website" value="" required>
           <?php echo form_error('website'); ?> </div>
         <?php if (is_gdpr() && get_option('gdpr_enable_terms_and_conditions') == 1) { ?>
@@ -81,15 +81,31 @@ $(document).ready(function () {
                 }
             }
         },
-        phonenumber: 'required',
+        phonenumber: {
+    required: true,
+    digits: true,
+    minlength: 10,
+    maxlength: 10
+},
         companyname: 'required',
-        website: 'required'
+         website: {
+        required: true,
+        url: true
+    }
     }, function(form) {
         form.submit();
     });
 
     $('input[name="<?php echo e($fields['email']); ?>"]').attr('data-msg-remote', 'Email already registered . Please change');
 	//$("#email-error").addClass("tw-font-bold");
+	
+	// Alert if form not valid
+    $('#company-form').on('submit', function(e){
+        if(!$(this).valid()){
+            alert('Please fill all required fields correctly.\n\nEmail must be in valid format (example: name@example.com).\nMobile number must be 10 digits.\nWebsite must include http:// or https://');
+            e.preventDefault();
+        }
+    });
 
 
 });

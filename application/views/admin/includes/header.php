@@ -176,8 +176,8 @@
                     </a>
                 </li>
 
-                <li class="icon header-user-profile" data-toggle="tooltip" title="<?php echo e(get_staff_full_name()); ?>"
-                    data-placement="bottom">
+                <li class="icon header-user-profile" data-toggle="tooltip" title="<?php echo e(get_staff_full_name()); ?> - <?=get_user_type();?>"
+                    data-placement="left">
                     <a href="#" class="dropdown-toggle profile tw-block rtl:!tw-px-0.5 !tw-py-1" data-toggle="dropdown"
                         aria-expanded="false">
                         <?php echo staff_profile_image($current_user->staffid, ['img', 'img-responsive', 'staff-profile-image-small', 'tw-ring-1 tw-ring-offset-2 tw-ring-primary-500 tw-mx-1 tw-mt-2.5']); ?>

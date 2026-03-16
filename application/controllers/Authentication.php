@@ -130,7 +130,7 @@ class Authentication extends ClientsController
         if ($this->db->affected_rows() > 0) {
             log_activity('Company Status Updated [CompanyID: ' . $company_id . ']');
         }else{
-		$data['title'] = '404';
+		//$data['title'] = '404';
 		}
 		
 		
