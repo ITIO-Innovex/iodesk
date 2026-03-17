@@ -535,13 +535,19 @@ return $result;
     {
         $this->db->where('id', $id);
         $this->db->update(db_prefix() . 'project_master', ['project_status' => $status]);
-		
+		//log_message('error', 'status_id - '.$this->db->last_query() );
 		if($status==10){
+		$this->db->where('id', $id);
 		$currdate=date("Y-m-d H:i:s");
         $this->db->update(db_prefix() . 'project_master', ['project_status' => $status, 'date_finished' => $currdate, 'progress' => 100 ]);
-		}else{
-		$this->db->update(db_prefix() . 'project_master', ['project_status' => $status, 'date_finished' => NULL ]);
+		//log_message('error', 'Status - '.$this->db->last_query() );
 		}
+		
+		/*else{
+		$this->db->where('id', $id);
+		$this->db->update(db_prefix() . 'project_master', ['project_status' => $status, 'date_finished' => NULL ]);
+		log_message('error', 'Status - '.$this->db->last_query() );
+		}*/
 		
 
         if ($this->db->affected_rows() > 0) {

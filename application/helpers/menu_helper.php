@@ -6,9 +6,9 @@ function app_init_admin_sidebar_menu_items()
 {
     $CI = &get_instance();
 
-    $CI->app_menu->add_sidebar_menu_item('dashboard', [
-        'name'     => _l('als_dashboard'),
-        'href'     => admin_url(''),
+    $CI->app_menu->add_sidebar_menu_item('home', [
+        'name'     => 'Home',
+        'href'     => admin_url(),
         'position' => 1,
         'icon'     => 'fa fa-home',
         'badge'    => [],
@@ -624,7 +624,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 
       if (staff_can('view_own',  'hr_department')){
         $CI->app_menu->add_sidebar_children_item('hr_department', [
-            'slug'     => 'Dashboard',
+            'slug'     => 'hrd_dashboard',
             'name'     => _l('Dashboard'),
             'href'     => admin_url('hrd/dashboard'),
             'position' => 10,
