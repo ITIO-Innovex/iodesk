@@ -76,7 +76,7 @@
     transition: width 0.3s;
 }
 
-.expand-input:hover {
+.expand-input:focus {
     width:400px;
 }
 </style>
@@ -112,7 +112,7 @@
                   <label for="cc_email">CC</label>
                   <div class="email-input-wrapper">
                     <div class="email-tags-container" id="ccEmailTagsContainer">
-                      <input type="text" class="email-input-field" id="ccEmailInputField" placeholder="Type name or email to search" autocomplete="off">
+                      <input type="text" name="cc_email_ip" class="email-input-field" id="ccEmailInputField" placeholder="Type name or email to search and press enter" autocomplete="off">
                     </div>
                     <div class="email-suggestions" id="ccEmailSuggestions"></div>
                   </div>
@@ -207,8 +207,8 @@
                   <i class="fa fa-save tw-mr-1"></i> Save DAR
                 </button><?php */?>
 				<?php if (!isset($existing_status) || (int)$existing_status !== 1) { ?>
-                  <button type="button" class="btn btn-default" data-status="2" id="dar-save-later" onclick="return confirm('Data can be saved as draft. Once submitted, editing is disabled.')">Save as Draft & Submit Later</button>
-                  <button type="button" class="btn btn-primary" data-status="1" id="dar-save-submit" onclick="return confirm('Once submitted, you won\'t be able to edit this data. Do you want to continue?')">Submit</button>
+                  <button type="button" class="btn btn-default" data-status="2" id="dar-save-later" onclick="return confirm('Data will be saved as a draft. You can edit it anytime before final submission.')">Save Draft</button>
+                  <button type="button" class="btn btn-primary" data-status="1" id="dar-save-submit" onclick="return confirm('Please confirm your submission. Once submitted, the data cannot be modified.')">Submit Now</button>
                 <?php } else { ?>
                   <span class="btn btn-success">DAR Submitted </span>
                 <?php } ?>

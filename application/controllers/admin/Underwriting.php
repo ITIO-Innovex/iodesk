@@ -62,6 +62,11 @@ class Underwriting extends AdminController
         $status        = (int) $this->input->post('status');
         $Reason        = $this->input->post('Reason', true);
 
+        // status: 1 = Approved, 2 = Pending, 3 = Rejected
+        if (!in_array($status, [1, 2, 3], true)) {
+            $status = 1; // default Approve
+        }
+        $isRejected = ($status === 3);
        
         if ($forCompany === '') {
             set_alert('danger', 'Please enter Company Name.');
@@ -75,9 +80,22 @@ class Underwriting extends AdminController
             $CardType = trim((string) $CardTypePost);
         }
 
-        if ($MDR === '' && $SetupFee === '' && $HoldBack === '' && $CardType === '') {
-            set_alert('danger', 'Please fill at least MDR, Setup Fee, Hold Back or Card Type.');
-            redirect(admin_url('underwriting'));
+        if (!$isRejected) {
+            if ($MDR === '' && $SetupFee === '' && $HoldBack === '' && $CardType === '') {
+                set_alert('danger', 'Please fill at least MDR, Setup Fee, Hold Back or Card Type.');
+                redirect(admin_url('underwriting'));
+            }
+        } else {
+            // On rejection, these fields are hidden/optional
+            $MDR = '';
+            $SetupFee = '';
+            $HoldBack = '';
+            $CardType = '';
+            $Settlement = '';
+            $SettlementFee = '';
+            $MinSettlement = '';
+            $MonthlyFee = '';
+            $Descriptor = '';
         }
 
         $data = [
@@ -115,7 +133,7 @@ class Underwriting extends AdminController
         } else {
             // Insert
             $data['addedby'] = get_staff_user_id();
-			$data['status'] = 2;
+			$data['status'] = $status;
 			$data['company_id'] = $company_id;
             $this->db->insert($table, $data);
             $insert_id = $this->db->insert_id();

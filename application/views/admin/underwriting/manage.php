@@ -146,25 +146,38 @@
               <input type="text" name="web_link" id="web_link" class="form-control" placeholder="https://example.com">
             </div>
           </div>
-          <div class="col-md-6">
+
+          <div class="col-md-12">
+            <div class="form-group">
+              <label class="control-label">Approve / Reject</label><br>
+              <label class="radio-inline">
+                <input type="radio" name="decision" value="approve" class="uw-decision" checked> Approve
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="decision" value="reject" class="uw-decision"> Reject
+              </label>
+              <input type="hidden" name="status" id="uw_status_hidden" value="1">
+            </div>
+          </div>
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_MDR" class="control-label">MDR (%)</label>
               <input type="text" name="MDR" id="uw_MDR" class="form-control" required>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_SetupFee" class="control-label">Setup Fee (USD)</label>
               <input type="text" name="SetupFee" id="uw_SetupFee" class="form-control" required>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_HoldBack" class="control-label">Hold Back</label>
               <input type="text" name="HoldBack" id="uw_HoldBack" class="form-control" required>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_CardType" class="control-label">Card Type</label>
               <select name="CardType[]" id="uw_CardType" class="form-control selectpicker" multiple data-none-selected-text="Select card types">
@@ -179,13 +192,13 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_Settlement" class="control-label">Settlement (No of working days)</label>
               <input type="text" name="Settlement" id="uw_Settlement" class="form-control" required>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_SettlementFee" class="control-label">Settlement Fee</label>
 			  <select name="SettlementFee" id="uw_SettlementFee" class="form-control" required>
@@ -197,7 +210,7 @@
 			  </select>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_MinSettlement" class="control-label">Min Settlement</label>
 			  <select name="MinSettlement" id="uw_MinSettlement" class="form-control" required>
@@ -208,7 +221,7 @@
 			  </select>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6 uw-approval-field">
             <div class="form-group">
               <label for="uw_MonthlyFee" class="control-label">Monthly Fee (USD)</label>
               <input type="text" name="MonthlyFee" id="uw_MonthlyFee" class="form-control" required>
@@ -216,10 +229,10 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-md-12 uw-approval-field">
             <div class="form-group">
               <label for="uw_Descriptor" class="control-label">Descriptor</label>
-              <textarea name="Descriptor" id="uw_Descriptor" rows="3" class="form-control" required></textarea>
+              <textarea name="Descriptor" id="uw_Descriptor" rows="3" class="form-control" required>Generic / Shared, with the provision to opt for a dedicated descriptor in the future</textarea>
             </div>
           </div>
 		  
@@ -274,6 +287,7 @@
 <table class="table dt-table" data-order-col="1" data-order-type="asc">
 <tr><td><strong>For Company:</strong></td><td><span id="view_for_company"></span></td></tr>
 <tr><td><strong>Website:</strong></td><td><span id="view_web_link"></span></td></tr>
+<tr><td><strong>Status:</strong></td><td><span id="view_status"></span></td></tr>
 <tr><td><strong>MDR:</strong></td><td><span id="view_MDR"></span></td></tr>
 <tr><td><strong>Setup Fee:</strong></td><td><span id="view_SetupFee"></span></td></tr>
 <tr><td><strong>Hold Back:</strong></td><td><span id="view_HoldBack"></span></td></tr>
@@ -286,14 +300,14 @@
 <tr><td><strong>Descriptor:</strong></td><td><span id="view_Descriptor"></span></td></tr>
 <tr><td><strong>Remarks:</strong></td><td><span id="view_Remarks"></span></td></tr>
 <?php /*?><tr><td><strong>CC Email:</strong></td><td><span id="view_cc_email"></span></td></tr>
-<?php */?><tr><td><strong>Status:</strong></td><td><span id="view_status"></span></td></tr>
+<?php */?>
 <tr><td><strong>Reason:</strong></td><td><span id="view_Reason"></span></td></tr>
 </table>
 
 </div>
 
 <?php if(staff_can('approver', 'under_writing')){ ?>
-<hr />
+<?php /*?><hr />
 <div class="row tw-mx-2"><div class="panel-body panel-table-full">
 <h4 class="">Underwriting Approval</h4>
 <?php echo form_open(admin_url('underwriting/approve'), ['id' => 'underwriting-approval-form']); ?>
@@ -318,7 +332,7 @@
                         <div class="form-group">
 					<button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
 					</div></div>
-<?php echo form_close(); ?> </div></div></div>
+<?php echo form_close(); ?> </div></div></div><?php */?>
 <?php } ?>
         
       </div>
@@ -330,6 +344,30 @@
 </div>
 <?php init_tail(); ?>
 <script>
+    function toggleUwDecision() {
+        var decision = $('.uw-decision:checked').val();
+        if (decision === 'reject') {
+            $('#uw_status_hidden').val('3');
+            $('.uw-approval-field').hide();
+            // Disable required validation for hidden fields
+            $('.uw-approval-field').find('input, select, textarea').prop('required', false);
+
+            // Clear values so backend doesn't validate them
+            $('#uw_MDR, #uw_SetupFee, #uw_HoldBack, #uw_Settlement, #uw_MonthlyFee').val('');
+            $('#uw_SettlementFee, #uw_MinSettlement').val('');
+            $('#uw_Descriptor').val('');
+            $('#uw_CardType').val([]).change();
+            if ($('#uw_CardType').hasClass('selectpicker')) {
+                $('#uw_CardType').selectpicker('refresh');
+            }
+        } else {
+            $('#uw_status_hidden').val('1');
+            $('.uw-approval-field').show();
+            // Restore required validation for approval fields
+            $('#uw_MDR, #uw_SetupFee, #uw_HoldBack, #uw_Settlement, #uw_SettlementFee, #uw_MinSettlement, #uw_MonthlyFee, #uw_Descriptor').prop('required', true);
+        }
+    }
+
     function openUnderwritingModal() {
         $('#underwriting_modal_label').text('Add Underwriting');
         $('#uw_id').val('');
@@ -346,8 +384,8 @@
         $('#uw_Descriptor').val('');
 		$('#uw_Remarks').val('');
         $('#uw_cc_email').val('');
-        $('#uw_status').val('2');
-        $('#uw_Reason').val('');
+        $('.uw-decision[value="approve"]').prop('checked', true);
+        toggleUwDecision();
     }
 
     $('#underwriting_modal').on('show.bs.modal', function (event) {
@@ -373,8 +411,22 @@
         $('#uw_Descriptor').val(button.data('descriptor'));
 		$('#uw_Remarks').val(button.data('remarks'));
         $('#uw_cc_email').val(button.data('cc_email'));
-        $('#uw_status').val(button.data('status'));
-        $('#uw_Reason').val(button.data('reason'));
+
+        var st = parseInt(button.data('status'), 10);
+        if (st === 3) {
+            $('.uw-decision[value="reject"]').prop('checked', true);
+        } else {
+            $('.uw-decision[value="approve"]').prop('checked', true);
+        }
+        toggleUwDecision();
+    });
+
+    $(document).on('change', '.uw-decision', function () {
+        toggleUwDecision();
+    });
+
+    $(function () {
+        toggleUwDecision();
     });
 
     $('#view_underwriting_modal').on('show.bs.modal', function (event) {
