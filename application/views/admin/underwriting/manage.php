@@ -232,7 +232,7 @@
           <div class="col-md-12 uw-approval-field">
             <div class="form-group">
               <label for="uw_Descriptor" class="control-label">Descriptor</label>
-              <textarea name="Descriptor" id="uw_Descriptor" rows="3" class="form-control" required>Generic / Shared, with the provision to opt for a dedicated descriptor in the future</textarea>
+              <input type="text" name="Descriptor" id="uw_Descriptor"  class="form-control" required>
             </div>
           </div>
 		  
@@ -381,7 +381,7 @@
         $('#uw_SettlementFee').val('');
         $('#uw_MinSettlement').val('');
         $('#uw_MonthlyFee').val('');
-        $('#uw_Descriptor').val('');
+        $('#uw_Descriptor').val('Generic / Shared, with the provision to opt for a dedicated descriptor in the future');
 		$('#uw_Remarks').val('');
         $('#uw_cc_email').val('');
         $('.uw-decision[value="approve"]').prop('checked', true);
