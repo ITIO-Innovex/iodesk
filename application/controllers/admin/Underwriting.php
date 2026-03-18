@@ -176,7 +176,7 @@ $emailBody .= '<p><strong>Remarks:</strong> ' . $Remarks . '</p>'
                 $msgdata = [
                     'recipientEmail' => $email_underwriting,
                     'recipientCC' => $ccEmails,
-                    'emailSubject' => 'Under Writing - ' . $forWebLink . ' - ' . date('d-m-Y'),
+                    'emailSubject' => 'Under Writing - ' . $forWebLink ,
                     'emailBody' => $emailBody,
                 ];
 				 
