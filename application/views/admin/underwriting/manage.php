@@ -9,7 +9,7 @@
         <div class="tw-mb-2 sm:tw-mb-4"> <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#underwriting_modal" onclick="openUnderwritingModal(); return false;"> <i class="fa-regular fa-plus tw-mr-1"></i> Add New Underwriting </a> </div>
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <table class="table dt-table" data-order-col="1" data-order-type="asc">
+            <table class="table dt-table" data-order-col="0" data-order-type="desc">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -63,27 +63,26 @@
                   <td><?php echo date("d-m-Y",strtotime($u['dateadded'])); ?></td>
                   <td>
 				  
-				    <button type="button"
-                                                        class="btn btn-default btn-xs"
-                                                        data-toggle="modal"
-                                                        data-target="#view_underwriting_modal"
-                                                        data-id="<?php echo (int) $u['id']; ?>"
-                                                        data-for_company="<?php echo htmlspecialchars($u['for_company'] ?? '', ENT_QUOTES); ?>"
-                                                        data-web_link="<?php echo htmlspecialchars($u['web_link'] ?? '', ENT_QUOTES); ?>"
-                                                        data-mdr="<?php echo htmlspecialchars($u['MDR'], ENT_QUOTES); ?>"
-                                                        data-setupfee="<?php echo htmlspecialchars($u['SetupFee'], ENT_QUOTES); ?>"
-                                                        data-holdback="<?php echo htmlspecialchars($u['HoldBack'], ENT_QUOTES); ?>"
-                                                        data-cardtype="<?php echo htmlspecialchars($u['CardType'], ENT_QUOTES); ?>"
-                                                        data-settlement="<?php echo htmlspecialchars($u['Settlement'], ENT_QUOTES); ?>"
-                                                        data-settlementfee="<?php echo htmlspecialchars($u['SettlementFee'], ENT_QUOTES); ?>"
-                                                        data-minsettlement="<?php echo htmlspecialchars($u['MinSettlement'], ENT_QUOTES); ?>"
-                                                        data-monthlyfee="<?php echo htmlspecialchars($u['MonthlyFee'], ENT_QUOTES); ?>"
-                                                        data-descriptor="<?php echo htmlspecialchars($u['Descriptor'], ENT_QUOTES); ?>"
-														data-remarks="<?php echo htmlspecialchars($u['Remarks']??'', ENT_QUOTES); ?>"
-                                                        
-														data-cc_email="<?php echo htmlspecialchars($u['cc_email'] ?? '', ENT_QUOTES); ?>"
-                                                        data-status="<?php echo (int) $u['status']; ?>"
-                                                        data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <i class="fa fa-eye"></i> </button>
+<button type="button"
+class="btn btn-default btn-xs"
+data-toggle="modal"
+data-target="#view_underwriting_modal"
+data-id="<?php echo (int) $u['id']; ?>"
+data-for_company="<?php echo htmlspecialchars($u['for_company'] ?? '', ENT_QUOTES); ?>"
+data-web_link="<?php echo htmlspecialchars($u['web_link'] ?? '', ENT_QUOTES); ?>"
+data-mdr="<?php echo htmlspecialchars($u['MDR'], ENT_QUOTES); ?>"
+data-setupfee="<?php echo htmlspecialchars($u['SetupFee'], ENT_QUOTES); ?>"
+data-holdback="<?php echo htmlspecialchars($u['HoldBack'], ENT_QUOTES); ?>"
+data-cardtype="<?php echo htmlspecialchars($u['CardType'], ENT_QUOTES); ?>"
+data-settlement="<?php echo htmlspecialchars($u['Settlement'], ENT_QUOTES); ?>"
+data-settlementfee="<?php echo htmlspecialchars($u['SettlementFee'], ENT_QUOTES); ?>"
+data-minsettlement="<?php echo htmlspecialchars($u['MinSettlement'], ENT_QUOTES); ?>"
+data-monthlyfee="<?php echo htmlspecialchars($u['MonthlyFee'], ENT_QUOTES); ?>"
+data-descriptor="<?php echo htmlspecialchars($u['Descriptor'], ENT_QUOTES); ?>"
+data-remarks="<?php echo htmlspecialchars($u['Remarks']??'', ENT_QUOTES); ?>"
+data-cc_email="<?php echo htmlspecialchars($u['cc_email'] ?? '', ENT_QUOTES); ?>"
+data-status="<?php echo (int) $u['status']; ?>"
+data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <i class="fa fa-eye"></i> </button>
 														
 					<?php if(staff_can('adder', 'under_writing')){ ?>								
                     <button type="button"
@@ -288,20 +287,19 @@
 <tr><td><strong>For Company:</strong></td><td><span id="view_for_company"></span></td></tr>
 <tr><td><strong>Website:</strong></td><td><span id="view_web_link"></span></td></tr>
 <tr><td><strong>Status:</strong></td><td><span id="view_status"></span></td></tr>
-<tr><td><strong>MDR:</strong></td><td><span id="view_MDR"></span></td></tr>
-<tr><td><strong>Setup Fee:</strong></td><td><span id="view_SetupFee"></span></td></tr>
-<tr><td><strong>Hold Back:</strong></td><td><span id="view_HoldBack"></span></td></tr>
-<tr><td><strong>Card Type:</strong></td><td><span id="view_CardType"></span></td></tr>
-<tr><td><strong>Settlement:</strong></td><td><span id="view_Settlement"></span></td></tr>
-<tr><td><strong>Settlement Fee:</strong></td><td><span id="view_SettlementFee"></span></td></tr>
-
-<tr><td><strong>Min Settlement:</strong></td><td><span id="view_MinSettlement"></span></td></tr>
-<tr><td><strong>Monthly Fee:</strong></td><td><span id="view_MonthlyFee"></span></td></tr>
-<tr><td><strong>Descriptor:</strong></td><td><span id="view_Descriptor"></span></td></tr>
+<tr class="datahide"><td><strong>MDR:</strong></td><td><span id="view_MDR"></span></td></tr>
+<tr class="datahide"><td><strong>Setup Fee:</strong></td><td><span id="view_SetupFee"></span></td></tr>
+<tr class="datahide"><td><strong>Hold Back:</strong></td><td><span id="view_HoldBack"></span></td></tr>
+<tr class="datahide"><td><strong>Card Type:</strong></td><td><span id="view_CardType"></span></td></tr>
+<tr class="datahide"><td><strong>Settlement:</strong></td><td><span id="view_Settlement"></span></td></tr>
+<tr class="datahide"><td><strong>Settlement Fee:</strong></td><td><span id="view_SettlementFee"></span></td></tr>
+<tr class="datahide"><td><strong>Min Settlement:</strong></td><td><span id="view_MinSettlement"></span></td></tr>
+<tr class="datahide"><td><strong>Monthly Fee:</strong></td><td><span id="view_MonthlyFee"></span></td></tr>
+<tr class="datahide"><td><strong>Descriptor:</strong></td><td><span id="view_Descriptor"></span></td></tr>
 <tr><td><strong>Remarks:</strong></td><td><span id="view_Remarks"></span></td></tr>
 <?php /*?><tr><td><strong>CC Email:</strong></td><td><span id="view_cc_email"></span></td></tr>
 <?php */?>
-<tr><td><strong>Reason:</strong></td><td><span id="view_Reason"></span></td></tr>
+<?php /*?><tr><td><strong>Reason:</strong></td><td><span id="view_Reason"></span></td></tr><?php */?>
 </table>
 
 </div>
@@ -452,6 +450,7 @@
             statusLabel = 'Approved';
         } else if (status === 3) {
             statusLabel = 'Rejected';
+			$('.datahide').hide();
         }
         $('#view_status').text(statusLabel);
         $('#view_Reason').text(button.data('reason') || '');
