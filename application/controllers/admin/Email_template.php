@@ -134,7 +134,7 @@ class Email_template extends AdminController
         }
 
         $this->load->model('webmail_model');
-        $ok = $this->webmail_model->compose_email([
+        $ok = $this->webmail_model->compose_email_super([
             'recipientEmail' => $toEmail,
             'recipientCC'    => $ccEmail,
             'recipientBCC'   => '',
