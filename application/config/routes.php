@@ -258,6 +258,24 @@ $route['admin/services/my_subscriptions'] = 'admin/services/my_subscriptions';
 $route['admin/services/payment_status'] = 'admin/services/payment_status';
 $route['admin/services/upgrade_staff'] = 'admin/services/upgrade_staff';
 
+// Web Form listing
+$route['admin/web_form'] = 'admin/web_form/index';
+
+// Web Form builder & management
+$route['admin/web_form/create']              = 'admin/web_form/create';
+$route['admin/web_form/create/(:num)']       = 'admin/web_form/create/$1';
+$route['admin/web_form/save']                = 'admin/web_form/save';
+$route['admin/web_form/delete/(:num)']       = 'admin/web_form/delete/$1';
+$route['admin/web_form/manage/(:num)']       = 'admin/web_form/manage/$1';
+$route['admin/web_form/manage/(:num)/(:num)'] = 'admin/web_form/save_entry/$1/$2';
+$route['admin/web_form/save_entry/(:num)']   = 'admin/web_form/save_entry/$1';
+$route['admin/web_form/delete_entry/(:num)/(:num)'] = 'admin/web_form/delete_entry/$1/$2';
+$route['admin/web_form/save_assign_to']      = 'admin/web_form/save_assign_to';
+$route['admin/web_form/delete_entry_file']   = 'admin/web_form/delete_entry_file';
+$route['admin/web_form/upload_csv/(:num)']   = 'admin/web_form/upload_csv/$1';
+$route['admin/web_form/download_entry_excel/(:num)/(:num)'] = 'admin/web_form/download_entry_excel/$1/$2';
+$route['admin/web_form/download_entry_pdf/(:num)/(:num)']   = 'admin/web_form/download_entry_pdf/$1/$2';
+
 // Services - User Subscriptions routes
 $route['admin/services/user_subscriptions'] = 'admin/services/user_subscriptions';
 $route['admin/services/user_subscriptions/manage'] = 'admin/services/user_subscriptions_manage';

@@ -226,6 +226,17 @@ function kyc_form_pdf($record = [], $tag = '')
 }
 
 /**
+ * Prepare Web Form Entry PDF
+ * @param  array  $data ['form'=>[], 'fields'=>[], 'entry'=>[], 'entry_data'=>[]]
+ * @param  string $tag  Optional tag for bulk exporter
+ * @return mixed object
+ */
+function web_form_entry_pdf($data = [], $tag = '')
+{
+    return app_pdf('web_form_entry', LIBSPATH . 'pdf/Web_form_entry_pdf', $data, $tag);
+}
+
+/**
  * Prepare sales invoice PDF
  * @param  array  $data Invoice data with items, payments, bank_details
  * @param  string $tag  Optional tag for bulk exporter

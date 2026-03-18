@@ -6527,6 +6527,16 @@ $data['notifications'] = $this->db->get()->result_array();
         $existing_dar = $this->db->get('it_crm_dar')->row_array();
 
         if ($this->input->method() === 'post') {
+		
+		
+		//print_r($this->input->post());exit;
+		
+		$ccEmails = !empty($this->input->post('cc_email')) ? $this->input->post('cc_email') : '';
+		$ccEmailsIP = !empty($this->input->post('cc_email_ip')) ? $this->input->post('cc_email_ip') : '';
+		
+		if($ccEmails=="" && $ccEmailsIP !=""){
+		$ccEmails = $ccEmailsIP; 
+		}
             $date = $this->input->post('date');
             if (!$date) {
                 $date = date('Y-m-d');
@@ -6612,7 +6622,7 @@ $data['notifications'] = $this->db->get()->result_array();
                 $companySettings = $this->db->where('company_id', $companyId)->get('it_crm_company_master')->row_array();
                 $darEmail = !empty($companySettings['email_dar']) ? $companySettings['email_dar'] : '';
 				$companyname = !empty($companySettings['companyname']) ? $companySettings['companyname'] : 'CRM';
-                //$ccEmails = !empty($companySettings['email_cc']) ? $companySettings['email_cc'] : '';
+                
                
                 
 $emaildetails="<table width='100%' border='1' cellpadding='8' cellspacing='0' 
