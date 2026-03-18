@@ -261,6 +261,12 @@ $route['admin/services/upgrade_staff'] = 'admin/services/upgrade_staff';
 // Web Form listing
 $route['admin/web_form'] = 'admin/web_form/index';
 
+// Email Template (standalone)
+$route['admin/email_template'] = 'admin/email_template/index';
+$route['admin/email_template/save'] = 'admin/email_template/save';
+$route['admin/email_template/send'] = 'admin/email_template/send';
+$route['admin/email_template/delete/(:num)'] = 'admin/email_template/delete/$1';
+
 // Web Form builder & management
 $route['admin/web_form/create']              = 'admin/web_form/create';
 $route['admin/web_form/create/(:num)']       = 'admin/web_form/create/$1';

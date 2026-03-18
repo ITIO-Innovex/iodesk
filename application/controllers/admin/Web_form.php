@@ -8,7 +8,7 @@ class Web_form extends AdminController
     {
         parent::__construct();
 
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
     }
@@ -39,7 +39,7 @@ class Web_form extends AdminController
 
     public function save_assign_to()
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -115,7 +115,7 @@ class Web_form extends AdminController
      */
     public function save()
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -264,7 +264,7 @@ class Web_form extends AdminController
      */
     public function delete($id)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -284,7 +284,7 @@ class Web_form extends AdminController
      */
     public function manage($formId)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -328,7 +328,7 @@ class Web_form extends AdminController
      */
     public function save_entry($formId, $entryId = null)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -469,7 +469,7 @@ class Web_form extends AdminController
      */
     public function delete_entry($formId, $entryId)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -490,7 +490,7 @@ class Web_form extends AdminController
      */
     public function upload_csv($formId)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -622,7 +622,7 @@ class Web_form extends AdminController
 
     public function download_entry_excel($formId, $entryId)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -699,7 +699,7 @@ class Web_form extends AdminController
 //<td>' . nl2br(html_entity_decode((string)$val)) . '</td>
     public function download_entry_pdf($formId, $entryId)
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
@@ -748,7 +748,7 @@ class Web_form extends AdminController
      */
     public function delete_entry_file()
     {
-        if (!is_admin()) {
+        if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
 
