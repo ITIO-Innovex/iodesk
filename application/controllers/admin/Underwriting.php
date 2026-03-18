@@ -148,25 +148,36 @@ class Underwriting extends AdminController
 		$email_underwriting=get_company_fields($company_id ,'email_underwriting');
 		$staffName = get_staff_full_name() ?? 'Staff';
 		$ccEmails = $ccEmail ?? "";
+		$statusVal = ($status == 1) ? 'Approved' : 'Rejected';
+		$emailBody = '<h3>Please find under writing the approval for the website: '.$forWebLink.'</h3>'
+    . '<p><strong>Company Name:</strong> ' . $forCompany . '</p>'
+    . '<p><strong>Website:</strong> ' . $forWebLink . '</p>'
+    . '<p><strong>Status:</strong> ' . $statusVal . '</p>';
+
+// Condition block
+if ($status == 1) {
+    $emailBody .= '<p><strong>MDR:</strong> ' . $MDR . '</p>'
+        . '<p><strong>Setup Fee:</strong> ' . $SetupFee . '</p>'
+        . '<p><strong>Hold Back:</strong> ' . $HoldBack . '</p>'
+        . '<p><strong>Card Type:</strong> ' . $CardType . '</p>'
+        . '<p><strong>Settlement:</strong> ' . $Settlement . '</p>'
+        . '<p><strong>Settlement Fee:</strong> ' . $SettlementFee . '</p>'
+        . '<p><strong>Min Settlement:</strong> ' . $MinSettlement . '</p>'
+        . '<p><strong>Monthly Fee:</strong> ' . $MonthlyFee . '</p>'
+        . '<p><strong>Descriptor:</strong> ' . $Descriptor . '</p>';
+}
+
+// Always add remarks
+$emailBody .= '<p><strong>Remarks:</strong> ' . $Remarks . '</p>'
+    . '<p><strong>Best Regards,<br><br></strong> ' . $staffName . '</p>';
+	
+	
 		 // Prepare email data
                 $msgdata = [
                     'recipientEmail' => $email_underwriting,
                     'recipientCC' => $ccEmails,
                     'emailSubject' => 'Under Writing Send By - ' . $staffName . ' - ' . date('d-m-Y'),
-                    'emailBody' => '<h3>Please find under writing  the approval for the website: '.$forWebLink.'</h3>'
-                        . '<p><strong>Company Name:</strong> ' . $forCompany . '</p>'
-                        . '<p><strong>Website:</strong> ' . $forWebLink . '</p>'
-						. '<p><strong>MDR:</strong> ' . $MDR . '</p>'
-                        . '<p><strong>Setup Fee:</strong> ' . $SetupFee . '</p>'
-						. '<p><strong>Hold Back:</strong> ' . $HoldBack . '</p>'
-						. '<p><strong>Card Type:</strong> ' . $CardType . '</p>'
-						. '<p><strong>Settlement:</strong> ' . $Settlement . '</p>'
-						. '<p><strong>Settlement Fee:</strong> ' . $SettlementFee . '</p>'
-						. '<p><strong>Min Settlement:</strong> ' . $MinSettlement . '</p>'
-						. '<p><strong>Monthly fee:</strong> ' . $MonthlyFee . '</p>'
-						. '<p><strong>Descriptor:</strong> ' . $Descriptor . '</p>'
-						. '<p><strong>Remarks:</strong> ' . $Remarks . '</p>'
-						. '<p><strong>Best Regards, <br><br></strong> ' . $staffName . '</p>',
+                    'emailBody' => $emailBody,
                 ];
 				 
        
