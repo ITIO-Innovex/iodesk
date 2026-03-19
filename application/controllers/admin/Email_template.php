@@ -16,6 +16,7 @@ class Email_template extends AdminController
     public function index()
     {
         $companyId = get_staff_company_id();
+		$staffId = get_staff_user_id();
 
         $this->db->from(db_prefix() . 'email_template');
         $this->db->where('status', 1);
@@ -23,7 +24,7 @@ class Email_template extends AdminController
         if (!(function_exists('is_super') && is_super())) {
             $this->db->where('company_id', $companyId);
         }
-
+        $this->db->where('staffid', $staffId);
         $this->db->order_by('id', 'desc');
         $data['templates'] = $this->db->get()->result_array();
         $data['title']     = 'Email Templates';
