@@ -166,11 +166,19 @@
 </div>
 
 <?php init_tail(); ?>
-<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
-<script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.css"
+/>
+<script src="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.js"></script>
+
+<script>
+const editor = Jodit.make('#template_body');
+
+</script>
 <script>
 $(function() {
-  $('#template_body').jqte();
+  //$('#template_body').jqte();
 
   var currentTpl = { id: 0, subject: '', body: '' };
   var currentVars = [];
@@ -277,7 +285,7 @@ $(function() {
     $('#templateModalTitle').text('Add Template');
     $('#template_id').val(0);
     $('#template_subject').val('');
-    $('#template_body').jqteVal('');
+    $('#template_body').val('');
     $('#templateModal').modal('show');
   }
 
@@ -286,7 +294,8 @@ $(function() {
     $('#template_id').val($btn.data('id') || 0);
     $('#template_subject').val($btn.data('subject') || '');
     var body = $btn.data('body') || '';
-    $('#template_body').jqteVal(body);
+    //$('#template_body').val(body);
+	editor.value = body;
     $('#templateModal').modal('show');
   }
 
@@ -337,8 +346,8 @@ $(function() {
   }
 
   $('#templateForm').on('submit', function(e) {
-    var subject = $.trim($('#template_subject').val()); alert(subject);
-    var bodyHtml = $('#template_body').val(); alert(bodyHtml);
+    var subject = $.trim($('#template_subject').val());
+    var bodyHtml = $('#template_body').val();
     $('#template_body').val(bodyHtml);
     if (!subject || _tplIsEmptyHtml(bodyHtml)) {
       e.preventDefault();

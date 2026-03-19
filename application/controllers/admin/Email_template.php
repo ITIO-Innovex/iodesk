@@ -134,14 +134,14 @@ class Email_template extends AdminController
         }
 
         $this->load->model('webmail_model');
-        $ok = $this->webmail_model->compose_email_super([
+        $ok = $this->webmail_model->compose_email([
             'recipientEmail' => $toEmail,
             'recipientCC'    => $ccEmail,
             'recipientBCC'   => '',
             'emailSubject'   => $subject,
             'emailBody'      => $body,
             // Try company SMTP first if configured
-            'company_email'  => 1,
+            //'company_email'  => 1,
         ]);
 
         if ($ok) {
