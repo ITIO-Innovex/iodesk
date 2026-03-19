@@ -20,12 +20,20 @@ class Web_form extends AdminController
     public function index()
     {
         $companyId = get_staff_company_id();
-
+        $staffId = get_staff_user_id();
+		
         $this->db->where('company_id', $companyId);
         $this->db->where('is_deleted', 0);
+		$this->db->group_start();
+		
+		$this->db->where('staffid', $staffId);
+		$this->db->or_like('assign_to', '"' . $staffId . '"'); // for JSON string
+		$this->db->or_like('assign_to', $staffId); // fallback
+		$this->db->group_end();
+
         $this->db->order_by('id', 'desc');
         $data['forms'] = $this->db->get(db_prefix() . 'web_forms')->result_array();
-
+        //echo $this->db->last_query();exit;
         // Staff list for share modal
         $this->db->select('staffid, firstname, lastname, email');
         $this->db->where('company_id', $companyId);
