@@ -96,6 +96,51 @@
           <h4 class="modal-title" id="templateModalTitle">Add Template</h4>
         </div>
         <div class="modal-body">
+		<div class="alert alert-info">
+    <strong>Instruction:</strong> 
+<p>Use dynamic fields like {{Name}}, {{CompanyName}} in Subject and Email Body. </p>
+<p>These will be replaced automatically when sending email</p>
+<div class="btn btn-primary btn-sm tw-my-2" id="toggleBtn">View More</div>
+<div id="myDiv" style="display:none;">
+    <div style="background:#f4f6f9; padding:12px; border-radius:6px; font-size:13px;">
+
+<b>Dynamic Fields Usage:</b><br><br>
+
+You can use dynamic fields in the <b>Subject</b> and <b>Email Body</b> using <code>{{ }}</code>.
+
+<br><br>
+
+<b>Examples:</b><br>
+<code>{{Name}}</code> - Name<br>
+<code>{{CompanyName}}</code> - Company Name<br>
+<code>{{Email}}</code> - Email Address
+
+<br><br>
+
+<b>Sample:</b><br>
+Subject: <code>Welcome {{Name}} to {{CompanyName}}</code><br><br>
+
+Body:<br>
+<code>
+Dear {{Name}},<br>
+Welcome to {{CompanyName}}.
+</code>
+
+<br><br>
+
+<b>Note:</b><br>
+
+Field names must match exactly<br>
+
+Do not use spaces inside brackets ( <i class="fa-solid fa-circle-xmark text-danger"></i> {{ Name }})<br>
+
+Empty values will appear blank in email
+
+</div>
+</div>
+</div>
+
+		
           <input type="hidden" name="id" id="template_id" value="0">
 
           <div class="form-group">
@@ -168,7 +213,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-          <button type="submit" class="btn btn-primary" id="sendTemplateBtn"><?php echo _l('submit'); ?></button>
+          <button type="submit" class="btn btn-primary" id="sendTemplateBtn">Send</button>
         </div>
       <?php echo form_close(); ?>
     </div>
@@ -366,6 +411,10 @@ $(function() {
     }
     return true;
   });
+});
+
+$('#toggleBtn').on('click', function() {
+    $('#myDiv').toggle();
 });
 </script>
 
