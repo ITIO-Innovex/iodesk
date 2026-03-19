@@ -14,12 +14,22 @@
   <div class="content">
     <div class="row">
       <div class="col-md-12">
-        <div class="tw-flex tw-items-center tw-justify-between tw-mb-3">
-          <h4 class="tw-my-0 tw-font-semibold tw-text-lg tw-text-neutral-700">Email Templates</h4>
-          <button type="button" class="btn btn-primary" id="addTemplateBtn">
+	  <div class="tw-mb-2 sm:tw-mb-4 tw-flex tw-items-center tw-justify-between">
+          <div>
+            <h4 class="tw-m-0 tw-text-white">Email Templates</h4>
+          </div>
+          <div class="tw-flex tw-items-center tw-gap-2">
+            <button type="button" class="btn btn-primary" id="addTemplateBtn">
             <i class="fa fa-plus"></i> Add Template
           </button>
+			
+            <a href="<?php echo admin_url('webmail/compose');?>" class="btn btn-primary">
+              <i class="fa-regular fa-paper-plane tw-mr-1"></i> New Email
+            </a>
+          </div>
         </div>
+		
+        
 
         <div class="panel_s">
           <div class="panel-body panel-table-fullx">
@@ -53,7 +63,7 @@
                         <button
                           type="button"
                           class="btn btn-success btn-xs send-template"
-                          title="Send Email"
+                          title="Send Template Email"
                           data-id="<?php echo (int) $t['id']; ?>"
                           data-subject="<?php echo html_escape($t['subject'] ?? ''); ?>"
                           data-body="<?php echo htmlspecialchars($t['body'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
