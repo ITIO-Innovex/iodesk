@@ -141,6 +141,7 @@ class Email_template extends AdminController
             'emailSubject'   => $subject,
             'emailBody'      => $body,
             // Try company SMTP first if configured
+			
             //'company_email'  => 1,
         ]);
 
