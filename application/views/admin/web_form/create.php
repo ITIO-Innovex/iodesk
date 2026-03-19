@@ -60,6 +60,87 @@
             <h4 class="tw-m-0"><?php echo isset($edit_form) && $edit_form ? 'Edit Form' : 'Add New Form'; ?></h4>
           </div>
           <div class="panel-body">
+		  <div class="alert alert-info">
+    <strong>Instruction:</strong> 
+<p>Enter form name, add optional description, then add multiple fields (text, textarea, editor, dropdown, radio, checkbox, file, date, etc.). </p>
+<p>You can drag and drop fields to reorder them before saving.</p>
+<div class="btn btn-primary btn-sm tw-my-2" id="toggleBtn">View More</div>
+<div id="myDiv" style="display:none;">
+    <div style="background:#f4f6f9; padding:12px; border-radius:6px; font-size:13px;">
+
+<b>Step 1: Basic Details</b><br>
+
+Enter the <b>Form Name</b> (required)
+
+Add <b>Description</b> (optional)
+
+<br>
+
+<b>Step 2: Add Form Fields</b><br>
+You can add multiple fields using the <b>Add Field</b> option.
+
+<br><br>
+
+<b>Supported Field Types:</b><br>
+
+Text Field
+
+Textarea
+
+Editor (Rich Text)
+
+List Box (Dropdown)
+
+Radio Button
+
+Checkbox
+
+File Upload
+
+Date / Date-Time
+
+<br>
+
+<b>Step 3: Configure Fields</b><br>
+For each field, you can:
+
+Set <b>Field Label</b>
+
+Define <b>Field Name</b> (unique key)
+
+Select <b>Field Type</b>
+
+Mark as <b>Required</b> if needed
+
+Add options for dropdown, radio, or checkbox fields
+
+<br>
+
+<b>Step 4: Reorder Fields</b><br>
+
+You can <b>drag and drop fields up or down</b> to arrange them in the desired order
+
+<br>
+
+<b>Step 5: Save Form</b><br>
+
+Click <b>Save</b> to create the form
+
+The form will be available for data entry and usage in the system
+
+<br>
+
+<b>Note:</b><br>
+
+Field names should be unique and without spaces (e.g., <code>company_name</code>)
+
+For multiple options (dropdown/radio/checkbox), enter values separated by commas
+
+Ensure required fields are properly marked before saving
+
+</div>
+</div>
+</div>
             <?php $lockFields = !empty($has_entries); ?>
             <?php
               $actionUrl = admin_url('web_form/save');
@@ -368,6 +449,9 @@
     }
   });
 })();
+$('#toggleBtn').on('click', function() {
+    $('#myDiv').toggle();
+});
 </script>
 </body>
 </html>
