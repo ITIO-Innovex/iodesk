@@ -45,6 +45,9 @@
   echo e(implode(',', $headerCols));
 ?>
                 </div>
+				<a href="<?php echo admin_url('web_form/download_csv_format/' . (int)$form['id']); ?>" class="btn btn-default tw-mt-6" title="Download CSV Template & Upload with your data"><i class="fa-solid fa-download tw-mr-1 "></i> Download CSV Format </a>
+                  
+                
               </div>
               <div class="col-md-6">
                 <h5>Instructions</h5>

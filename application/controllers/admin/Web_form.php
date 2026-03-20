@@ -330,6 +330,60 @@ class Web_form extends AdminController
 
         $this->load->view('admin/web_form/manage', $data);
     }
+	
+	
+	/**
+     * Download csv Format
+     * URL: /admin/web_form/download_csv_format/{form_id}
+     */
+    public function download_csv_format($formId)
+    {
+        if (!is_staff_logged_in()) {
+            access_denied('Web Form');
+        }
+        $companyId = get_staff_company_id();
+        $formId    = (int) $formId;
+
+        // Load form
+		$this->db->select('name');
+        $this->db->where('id', $formId);
+        $this->db->where('company_id', $companyId);
+        $this->db->where('is_deleted', 0);
+        $form = $this->db->get(db_prefix() . 'web_forms')->row_array();
+        if (!$form) {
+            show_404();
+        }
+//generate file name
+$formname=$form['name'];
+// remove special characters
+$filename = preg_replace('/[^A-Za-z0-9\-]/', '_', $formname);
+// convert to lowercase
+$filename = strtolower($filename);
+// remove multiple underscores
+$filename = preg_replace('/_+/', '_', $filename);
+// final filename
+$filename .= '_'.date("YmdHis").'.csv';
+
+        // Load fields
+        $this->db->where('form_id', $formId);
+        $this->db->where('is_deleted', 0);
+        $this->db->order_by('sort_order', 'asc');
+        $fields = $this->db->get(db_prefix() . 'web_form_fields')->result_array();
+        $headerCols = [];
+		  foreach ($fields as $f) {
+			  if ($f['type'] === 'file') { continue; } // files not supported in CSV
+			  $headerCols[] = $f['name'];
+		  }
+if (ob_get_length()) ob_end_clean();
+header('Content-Type: text/csv');
+header('Content-Disposition: attachment; filename="'.$filename.'"');
+header('Pragma: no-cache');
+header('Expires: 0');
+$output = fopen('php://output', 'w');
+fputcsv($output, $headerCols);
+fclose($output);
+exit;   
+}
 
     /**
      * Save entry (add/edit) for a form
