@@ -32,6 +32,12 @@ $('#toggleSignature').change(function() {
 
 // End Add / Remove Signature
 
+
+$(document).on('click', '.toggleBtn', function() {
+    var ids = $(this).data('id'); // "1,2,3"
+    $('#' + ids).toggle();
+});
+
 // Project ellipsis dropdown toggle
 $(document).on('click', '.project-dropdown-toggle', function(e) {
   e.stopPropagation();
