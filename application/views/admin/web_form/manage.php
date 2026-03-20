@@ -1,5 +1,9 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); 
+$tablefields=$fields;
+
+$hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
+?>
 
 <div id="wrapper">
   <div class="content">
@@ -84,14 +88,26 @@
         <div class="panel_s mtop20">
           <div class="panel-heading">
             <div class="tw-flex tw-items-center tw-justify-between">
-              <h4 class="tw-m-0">Entries</h4>
+              <h4 class="tw-m-0"><?php echo e($form['name']); ?> - List</h4>
+			  <div>
               <button type="button" class="btn btn-default btn-sm" id="openAdvancedSearchBtn" data-toggle="modal" data-target="#advancedSearchModal">
-                <i class="fa fa-filter"></i> Advanced Search
+                <i class="fa fa-filter" title="Advanced Search"></i> 
               </button>
+			  <button type="button" class="btn btn-default btn-sm" id="openTableSettingBtn" data-toggle="modal" data-target="#openTableSettingModal">
+                <i class="fa-solid fa-table" title="Table Setting"></i> 
+              </button>
+			  </div>
             </div>
           </div>
           <div class="panel-body">
-            <?php if (!empty($entries)) { ?>
+    <?php if (!empty($entries)) { 
+	foreach ($fields as $key => $row) {
+    /*if (in_array($row['name'], $hidecols)) { unset($fields[$key]); }*/
+	if(isset($hidecols)&&$hidecols){
+	 if (!in_array($row['name'], $hidecols)) { unset($fields[$key]); }
+	 }
+    }
+	?>
               <table id="webFormEntriesTable" class="table dt-table" data-order-col="0" data-order-type="desc">
                 <thead>
                   <tr>
@@ -121,7 +137,17 @@
                                   <?php } ?>
                                 <?php } ?>
                               <?php } else { ?>
-                                <?php echo (string)$val; ?>
+                                <?php
+                                  $emailVal = trim((string) $val);
+                                  $isEmailField = isset($field['type']) && $field['type'] === 'email';
+                                  $isEmailValue = $isEmailField && $emailVal !== '' && filter_var($emailVal, FILTER_VALIDATE_EMAIL);
+                                ?>
+                                <?php if ($isEmailValue) { ?>
+                                  <?php echo e($emailVal); ?>
+                                  <i class="fa-regular fa-envelope" title="Email"></i>
+                                <?php } else { ?>
+                                  <?php echo (string)$val; ?>
+                                <?php } ?>
                               <?php } ?>
                             </td>
                         <?php } ?>
@@ -288,6 +314,35 @@
         <button type="button" class="btn btn-default" id="clearAdvancedSearchBtn">Clear</button>
         <button type="button" class="btn btn-primary" id="applyAdvancedSearchBtn">Search</button>
       </div>
+    </div>
+  </div>
+</div>
+<!-- Table Setting Modal -->
+<div class="modal fade" id="openTableSettingModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Table Setting</h4>
+      </div>
+<?php echo form_open_multipart(admin_url('web_form/update_table_field/' . (int)$form['id']), ['id' => 'update-table-field']); ?>
+      <div class="modal-body">
+<div class="form-group">       
+<?php foreach ($tablefields as $row): ?>
+
+<?php if(isset($hidecols)&&$hidecols){ ?>
+<input type="checkbox" name="fields[]" class="customized-stage-check" value="<?php echo $row['name']; ?>" <?php echo in_array($row['name'], $hidecols) ? 'checked' : ''; ?>> <?php echo $row['label']; ?>
+<?php }else{ ?>
+<input type="checkbox" name="fields[]" class="customized-stage-check" value="<?php echo $row['name']; ?>"  checked="checked"> <?php echo $row['label']; ?>
+<?php } ?>
+<?php endforeach; ?>
+</div>		
+        
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+<?php echo form_close(); ?>
     </div>
   </div>
 </div>
@@ -511,18 +566,18 @@
       var $valCol = $('<div class="col-md-3"></div>');
       var $btnCol = $('<div class="col-md-1 tw-flex tw-items-center"></div>');
 
-      var $fieldSelect = $('<select class="form-control criterion-field" required></select>');
+      var $fieldSelect = $('<select class="form-control criterion-field tw-mb-2" required></select>');
       searchFields.forEach(function(f) {
         var $opt = $('<option></option>').val(f.name).text(f.label);
         if (c.field === f.name) $opt.attr('selected', 'selected');
         $fieldSelect.append($opt);
       });
 
-      var $opSelect = $('<select class="form-control criterion-op"></select>');
+      var $opSelect = $('<select class="form-control tw-mb-2 criterion-op"></select>');
       $opSelect.append('<option value="contains" ' + (c.op === 'contains' ? 'selected' : '') + '>Contains</option>');
       $opSelect.append('<option value="equals" ' + (c.op === 'equals' ? 'selected' : '') + '>Equals</option>');
 
-      var $valueInput = $('<input type="text" class="form-control criterion-value" placeholder="Enter value">');
+      var $valueInput = $('<input type="text" class="form-control criterion-value tw-mb-2" placeholder="Enter value">');
       $valueInput.val(c.value || '');
 
       var $removeBtn = $('<button type="button" class="btn btn-danger btn-xs remove-criterion-btn" title="Remove filter"><i class="fa fa-trash-can"></i></button>');

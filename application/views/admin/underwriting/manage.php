@@ -283,7 +283,7 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
       <div class="modal-body">
         <div class="row">
 <div class="panel-body panel-table-full">
-<table class="table dt-table" data-order-col="1" data-order-type="asc">
+<table class="table" data-order-col="1" data-order-type="asc">
 <tr><td><strong>For Company:</strong></td><td><span id="view_for_company"></span></td></tr>
 <tr><td><strong>Website:</strong></td><td><span id="view_web_link"></span></td></tr>
 <tr><td><strong>Status:</strong></td><td><span id="view_status"></span></td></tr>
@@ -355,7 +355,7 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
             $('#uw_SettlementFee, #uw_MinSettlement').val('');
             $('#uw_Descriptor').val('');
             $('#uw_CardType').val([]).change();
-            if ($('#uw_CardType').hasClass('selectpicker')) {
+            if ($.fn && $.fn.selectpicker && $('#uw_CardType').hasClass('selectpicker')) {
                 $('#uw_CardType').selectpicker('refresh');
             }
         } else {

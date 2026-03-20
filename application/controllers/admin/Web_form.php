@@ -264,7 +264,8 @@ class Web_form extends AdminController
 
         set_alert('success', 'Form saved successfully');
         //redirect(admin_url('web_form/create/' . $formId));
-		redirect(admin_url('web_form'));
+		//redirect(admin_url('web_form'));
+		redirect(admin_url('web_form/manage/' . $formId));
     }
 
     /**
@@ -385,6 +386,16 @@ fclose($output);
 exit;   
 }
 
+      /**
+     * Save table column setting
+     */
+
+    public function update_table_field($formId){
+	$fields = $this->input->post('fields');
+    $_SESSION['selected_fields'][$formId] = !empty($fields) ? $fields : [];
+	set_alert('success', 'Table column field updated successfully');
+	redirect(admin_url('web_form/manage/' . $formId));
+	}
     /**
      * Save entry (add/edit) for a form
      */
