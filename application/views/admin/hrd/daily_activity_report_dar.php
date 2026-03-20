@@ -161,7 +161,11 @@
 							  if(strstr($f['field_title'],"Time")){
 							  $ftype="time";
 							  $fieldcss="";
+							  }elseif(strstr($f['field_title'],"Date")){
+							  $ftype="date";
+							  $fieldcss="";
 							  }
+							  
 							  
                               ?>
                               <td>
@@ -193,8 +197,11 @@
                 </table>
               </div>
               <div class="tw-my-2 pull-right">
-                <button type="button" class="btn btn-danger" id="add-dar-row">
-                  <i class="fa fa-plus-circle tw-mr-1"></i> Add Row
+                <button type="button" class="btn btn-danger add-dar-row" id="add-dar-row" mode='new'>
+                  <i class="fa fa-plus-circle tw-mr-1"></i> Add New Row
+                </button>
+				<button type="button" class="btn btn-warning add-dar-row" mode='copy'>
+                  <i class="fa fa-plus-circle tw-mr-1"></i> Copy Same Row
                 </button>
               </div>
             <?php } else { ?>
@@ -269,14 +276,17 @@
       $('#dar-entry-form').submit();
     });
 
-    $('#add-dar-row').on('click', function () {
+    $('.add-dar-row').on('click', function () {
       var $tbody = $('#dar-rows');
       var $first = $tbody.find('tr.dar-row:first');
       if ($first.length === 0) {
         return;
       }
+	  var mode = $(this).attr('mode');
       var $clone = $first.clone();
+	  if (mode === 'new') {
       $clone.find('input').val('');
+	  }
       $tbody.append($clone);
     });
 
