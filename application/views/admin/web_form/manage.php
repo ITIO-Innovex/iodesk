@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <?php init_head(); ?>
+
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -82,18 +83,23 @@
 
         <div class="panel_s mtop20">
           <div class="panel-heading">
-            <h4 class="tw-m-0">Entries</h4>
+            <div class="tw-flex tw-items-center tw-justify-between">
+              <h4 class="tw-m-0">Entries</h4>
+              <button type="button" class="btn btn-default btn-sm" id="openAdvancedSearchBtn" data-toggle="modal" data-target="#advancedSearchModal">
+                <i class="fa fa-filter"></i> Advanced Search
+              </button>
+            </div>
           </div>
           <div class="panel-body">
             <?php if (!empty($entries)) { ?>
-              <table class="table dt-table" data-order-col="0" data-order-type="desc">
+              <table id="webFormEntriesTable" class="table dt-table" data-order-col="0" data-order-type="desc">
                 <thead>
                   <tr>
-                    <th class="tw-hidden">ID</th>
+                    <th class="tw-hidden" >ID</th>
                     <?php foreach ($fields as $field) { ?>
-                      <th><?php echo e($field['label']); ?></th>
+                      <th data-field-name="<?php echo e($field['name']); ?>" class="expand-input"><?php echo e($field['label']); ?></th>
                     <?php } ?>
-                    <th>Created At</th>
+                    <th class="expand-input">Created At</th>
                     <th><?php echo _l('options'); ?></th>
                   </tr>
                 </thead>
@@ -107,7 +113,7 @@
                             $fname = $field['name'];
                             $val   = isset($data[$fname]) ? $data[$fname] : '';
                             ?>
-                            <td>
+                            <td data-field-name="<?php echo e($fname); ?>">
                               <?php if (is_array($val)) { ?>
                                 <?php foreach ($val as $p) { ?>
                                   <?php if ($p) { ?>
@@ -235,6 +241,52 @@
           <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
         </div>
         <?php echo form_close(); ?>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Advanced Search Modal -->
+<div class="modal fade" id="advancedSearchModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Advanced Search</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label>Match Mode</label>
+              <select class="form-control" id="advancedSearchMatchMode">
+                <option value="all" selected>Match All (AND)</option>
+                <option value="any">Match Any (OR)</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="alert alert-info mtop25" style="margin-bottom:0;">
+              Add multiple filters to search by one or more fields.
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div id="advancedSearchCriteriaContainer">
+          <!-- rows injected by JS -->
+        </div>
+
+        <div class="tw-text-right">
+          <button type="button" class="btn btn-default btn-sm" id="addAdvancedCriterionBtn">
+            <i class="fa fa-plus"></i> Add Field Filter
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" id="clearAdvancedSearchBtn">Clear</button>
+        <button type="button" class="btn btn-primary" id="applyAdvancedSearchBtn">Search</button>
       </div>
     </div>
   </div>
@@ -372,12 +424,183 @@
     });
   })();
   
-  
+  // Advanced search for entries table (client-side, via DataTables ext.search)
+  (function() {
+    var $table = $('#webFormEntriesTable');
+    if (!$table.length) return;
+
+    var fieldNameToColIndex = {};
+    var dtInstance = null;
+    var extSearchAdded = false;
+
+    var state = {
+      matchMode: 'all', // all|any
+      criteria: []      // { field, op, value }
+    };
+
+    function normalizeText(v) {
+      return String(v || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    }
+
+    function buildFieldColIndex() {
+      fieldNameToColIndex = {};
+      $table.find('thead th[data-field-name]').each(function() {
+        var fieldName = $(this).attr('data-field-name');
+        fieldNameToColIndex[fieldName] = $(this).index();
+      });
+    }
+
+    function initDataTableIfReady() {
+      if (!$.fn.DataTable) return;
+
+      if ($.fn.dataTable && $.fn.dataTable.isDataTable($table)) {
+        dtInstance = $table.DataTable();
+        buildFieldColIndex();
+
+        if (!extSearchAdded) {
+          $.fn.dataTable.ext.search.push(function(settings, data) {
+            if (!dtInstance) return true;
+            if (settings.nTable !== dtInstance.table().node()) return true;
+
+            if (!state.criteria.length) return true;
+
+            var results = state.criteria.map(function(c) {
+              var colIndex = fieldNameToColIndex[c.field];
+              if (colIndex === undefined) return false;
+
+              var cellText = normalizeText(data[colIndex]);
+              var target = normalizeText(c.value);
+
+              if (!target) return false;
+
+              if (c.op === 'equals') {
+                return cellText === target;
+              }
+              // contains (default)
+              return cellText.indexOf(target) !== -1;
+            });
+
+            if (state.matchMode === 'any') return results.some(Boolean);
+            return results.every(Boolean);
+          });
+
+          extSearchAdded = true;
+        }
+      } else {
+        setTimeout(initDataTableIfReady, 300);
+      }
+    }
+
+    var searchFields = [];
+    <?php foreach ($fields as $f) { ?>
+      searchFields.push({
+        name: <?php echo json_encode($f['name']); ?>,
+        label: <?php echo json_encode($f['label']); ?>
+      });
+    <?php } ?>
+
+    function makeCriterionRow(criterion) {
+      var c = criterion || { field: (searchFields[0] ? searchFields[0].name : ''), op: 'contains', value: '' };
+
+      var $row = $('<div class="row advanced-criterion-row tw-mb-2"></div>');
+      var $fieldCol = $('<div class="col-md-5"></div>');
+      var $opCol = $('<div class="col-md-3"></div>');
+      var $valCol = $('<div class="col-md-3"></div>');
+      var $btnCol = $('<div class="col-md-1 tw-flex tw-items-center"></div>');
+
+      var $fieldSelect = $('<select class="form-control criterion-field" required></select>');
+      searchFields.forEach(function(f) {
+        var $opt = $('<option></option>').val(f.name).text(f.label);
+        if (c.field === f.name) $opt.attr('selected', 'selected');
+        $fieldSelect.append($opt);
+      });
+
+      var $opSelect = $('<select class="form-control criterion-op"></select>');
+      $opSelect.append('<option value="contains" ' + (c.op === 'contains' ? 'selected' : '') + '>Contains</option>');
+      $opSelect.append('<option value="equals" ' + (c.op === 'equals' ? 'selected' : '') + '>Equals</option>');
+
+      var $valueInput = $('<input type="text" class="form-control criterion-value" placeholder="Enter value">');
+      $valueInput.val(c.value || '');
+
+      var $removeBtn = $('<button type="button" class="btn btn-danger btn-xs remove-criterion-btn" title="Remove filter"><i class="fa fa-trash-can"></i></button>');
+      $removeBtn.on('click', function() {
+        $row.remove();
+      });
+
+      $fieldCol.append($fieldSelect);
+      $opCol.append($opSelect);
+      $valCol.append($valueInput);
+      $btnCol.append($removeBtn);
+
+      $row.append($fieldCol).append($opCol).append($valCol).append($btnCol);
+      return $row;
+    }
+
+    function renderCriteriaUi() {
+      var $c = $('#advancedSearchCriteriaContainer');
+      $c.empty();
+
+      if (!state.criteria.length) {
+        $c.append(makeCriterionRow({ field: (searchFields[0] ? searchFields[0].name : ''), op: 'contains', value: '' }));
+        return;
+      }
+
+      state.criteria.forEach(function(c) {
+        $c.append(makeCriterionRow(c));
+      });
+    }
+
+    $('#openAdvancedSearchBtn, #advancedSearchModal').on('show.bs.modal', function() {
+      renderCriteriaUi();
+      $('#advancedSearchMatchMode').val(state.matchMode || 'all');
+    });
+
+    $('#addAdvancedCriterionBtn').on('click', function() {
+      $('#advancedSearchCriteriaContainer').append(makeCriterionRow());
+    });
+
+    $('#clearAdvancedSearchBtn').on('click', function() {
+      state.criteria = [];
+      state.matchMode = 'all';
+      $('#advancedSearchMatchMode').val('all');
+      renderCriteriaUi();
+      if (dtInstance) dtInstance.draw();
+    });
+
+    $('#applyAdvancedSearchBtn').on('click', function() {
+      state.matchMode = $('#advancedSearchMatchMode').val() || 'all';
+      var newCriteria = [];
+
+      $('#advancedSearchCriteriaContainer .advanced-criterion-row').each(function() {
+        var field = $(this).find('.criterion-field').val();
+        var op = $(this).find('.criterion-op').val() || 'contains';
+        var value = $(this).find('.criterion-value').val();
+
+        if (field && $.trim(value) !== '') {
+          newCriteria.push({ field: field, op: op, value: value });
+        }
+      });
+
+      state.criteria = newCriteria;
+      if (dtInstance) dtInstance.draw();
+      $('#advancedSearchModal').modal('hide');
+    });
+
+    initDataTableIfReady();
+  })();
+
 // toggle csv upload box 
 $('#toggleBtn').on('click', function() {
     $('#myCsvBox').slideToggle();
 });
 
+$(document).on('click', '.expand-input', function () {
+    $('th.expand-input').removeClass('active-expand');
+    $(this).addClass('active-expand');
+});
 </script>
 
 </body>

@@ -287,6 +287,12 @@
         alert('At least one row is required.');
         return;
       }
+	  
+	   // confirm before delete
+    if (!confirm('Are you sure you want to remove this row?')) {
+        return;
+    }
+	
       $(this).closest('tr.dar-row').remove();
     });
   
