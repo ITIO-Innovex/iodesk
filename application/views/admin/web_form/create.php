@@ -183,9 +183,12 @@ Ensure required fields are properly marked before saving
                       ?>
                       <div class="panel panel-default field-row mtop10">
 
-                        <div class="panel-body">
-                          <input type="hidden" name="fields[<?php echo $idx; ?>][field_id]" value="<?php echo (int)$field['id']; ?>"><div ><span class="pull-right tw-my-2 tw-mx-2" style="position: relative;z-index: 9999999;" ><i class="fa fa-arrows" title="You can reorder the form fields by dragging and dropping them up or down to arrange them in the desired order."></i></span></div>
+                        <div class="panel-body mail-bg">
+                          <input type="hidden" name="fields[<?php echo $idx; ?>][field_id]" value="<?php echo (int)$field['id']; ?>"><?php /*?><div ><span class=" tw-my-2 tw-mx-2" style="position: relative;z-index: 9999999;" ><i class="fa fa-arrows" title="You can reorder the form fields by dragging and dropping them up or down to arrange them in the desired order."></i></span></div><?php */?>
                           <div class="row">
+						  <div class="col-md-1">
+						  <i class="fa-solid fa-grip-vertical tw-mt-6 fa-2x" title="Drag to change field position up/down"></i>
+						  </div>
                             <div class="col-md-4">
                               <div class="form-group">
                                 <label>Label <small class="req text-danger">*</small></label>
@@ -198,7 +201,7 @@ Ensure required fields are properly marked before saving
                                 <input type="text" class="form-control" name="fields[<?php echo $idx; ?>][name]" value="<?php echo e($field['name']); ?>" required <?php echo $lockFields ? 'readonly' : ''; ?>>
                               </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                               <div class="form-group">
                                 <label>Type</label>
                                 <select name="fields[<?php echo $idx; ?>][type]" class="form-control field-type">
