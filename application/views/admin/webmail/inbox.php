@@ -512,6 +512,7 @@ if ($nextPage) {
 	  
       <div class="mb-3">
         <label for="recipientEmail" class="form-label mtop10">To</label>
+		
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="toEmailTagsContainerReply">
                 <input type="text" class="email-input-field" id="toEmailInputFieldReply" placeholder="Type email and press Enter" autocomplete="off">
@@ -520,21 +521,23 @@ if ($nextPage) {
         </div>
         <input type="hidden" id="recipientEmailIT" name="recipientEmail" value="">
       </div>
-	  <div class="mb-3">
-        <label for="recipientCCIT" class="form-label mtop10">CC</label>
+	  <span class="pull-right">
+		<a class="tw-px-0 toggleBtn" data-id="toggleCc" title="Add Cc">Cc</a> <a class="tw-px-2 toggleBtn" data-id="toggleBcc" title="Add Bcc">Bcc</a></span>
+	  <div class="mb-3" id="toggleCc" style="display:none;">
+        <label for="recipientCCIT" class="form-label mtop10">Cc</label>
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="ccEmailTagsContainerReply">
-                <input type="text" class="email-input-field" id="ccEmailInputFieldReply" placeholder="Type CC email and press Enter" autocomplete="off">
+                <input type="text" class="email-input-field" id="ccEmailInputFieldReply" placeholder="Type Cc email and press Enter" autocomplete="off">
             </div>
             <div class="email-suggestions" id="ccEmailSuggestionsReply"></div>
         </div>
         <input type="hidden" id="recipientCCIT" name="recipientCC" value="">
       </div>
-	  <div class="mb-3">
-        <label for="recipientBCCEmail" class="form-label mtop10">BCC</label>
+	  <div class="mb-3" id="toggleBcc" style="display:none;">
+        <label for="recipientBCCEmail" class="form-label mtop10">Bcc</label>
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="bccEmailTagsContainerReply">
-                <input type="text" class="email-input-field" id="bccEmailInputFieldReply" placeholder="Type BCC email and press Enter" autocomplete="off">
+                <input type="text" class="email-input-field" id="bccEmailInputFieldReply" placeholder="Type Bcc email and press Enter" autocomplete="off">
             </div>
             <div class="email-suggestions" id="bccEmailSuggestionsReply"></div>
         </div>
@@ -596,6 +599,7 @@ if ($nextPage) {
       </div>
       <div class="mb-3">
         <label for="recipientEmailFW" class="form-label mtop10">To</label>
+		
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="toEmailTagsContainerFW">
                 <input type="text" class="email-input-field" id="toEmailInputFieldFW" placeholder="Type email and press Enter" autocomplete="off">
@@ -604,7 +608,9 @@ if ($nextPage) {
         </div>
         <input type="hidden" id="recipientEmailFW" name="recipientEmail" value="">
       </div>
-	  <div class="mb-3">
+	  <span class="pull-right">
+		<a class="tw-px-0 toggleBtn" data-id="toggleCcFW" title="Add Cc">Cc</a> <a class="tw-px-2 toggleBtn" data-id="toggleBccFW" title="Add Bcc">Bcc</a></span>
+	  <div class="mb-3" id="toggleCcFW" style="display:none;">
         <label for="recipientCCFW" class="form-label mtop10">CC</label>
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="ccEmailTagsContainerFW">
@@ -614,7 +620,7 @@ if ($nextPage) {
         </div>
         <input type="hidden" id="recipientCCFW" name="recipientCC" value="">
       </div>
-	  <div class="mb-3">
+	  <div class="mb-3" id="toggleBccFW" style="display:none;">
         <label for="recipientBCCFW" class="form-label mtop10">BCC</label>
         <div class="email-input-wrapper">
             <div class="email-tags-container" id="bccEmailTagsContainerFW">

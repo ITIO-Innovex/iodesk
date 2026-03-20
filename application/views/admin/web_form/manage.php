@@ -181,6 +181,12 @@
                   <label><?php echo e($label); ?><?php if ($required) { ?><small class="req text-danger">* </small><?php } ?></label>
                   <?php if ($type === 'text') { ?>
                     <input type="text" class="form-control web-entry-field" data-field-name="<?php echo e($fname); ?>" name="<?php echo e($fname); ?>" <?php echo $required ? 'required' : ''; ?>>
+                  <?php } elseif ($type === 'email') { ?>
+                    <input type="email" class="form-control web-entry-field" data-field-name="<?php echo e($fname); ?>" name="<?php echo e($fname); ?>" <?php echo $required ? 'required' : ''; ?>>
+                  <?php } elseif ($type === 'url') { ?>
+                    <input type="url" class="form-control web-entry-field" data-field-name="<?php echo e($fname); ?>" name="<?php echo e($fname); ?>" <?php echo $required ? 'required' : ''; ?>>
+                  <?php } elseif ($type === 'number') { ?>
+                    <input type="number" class="form-control web-entry-field" data-field-name="<?php echo e($fname); ?>" name="<?php echo e($fname); ?>" <?php echo $required ? 'required' : ''; ?>>
                   <?php } elseif ($type === 'textarea') { ?>
                     <textarea class="form-control web-entry-field" data-field-name="<?php echo e($fname); ?>" name="<?php echo e($fname); ?>" rows="3" <?php echo $required ? 'required' : ''; ?>></textarea>
                   <?php } elseif ($type === 'editor') { ?>

@@ -37,7 +37,7 @@ $messageid=$email_draft->messageid ?? '';
     padding: 6px 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    min-height: 38px;
+    min-height: 36px;
     background: #fff;
     cursor: text;
 }
@@ -97,6 +97,7 @@ $messageid=$email_draft->messageid ?? '';
     position: relative;
 }
 .content { max-width: 100% !important; }
+.to_label { width:45px; margin-bottom: unset !important; }
 </style>
 
 <div id="wrapper">
@@ -158,8 +159,11 @@ $messageid=$email_draft->messageid ?? '';
 	<?php } ?>
 	
 	<div class="mb-3">
-        <label for="recipientEmail" class="form-label mtop10">Reply From Email</label>
-        <select name="reply_from_email" id="reply_from_email" class="form-control" required>
+        <div class="email-input-wrapper">
+		
+            <div class="email-tags-container mtop10" id="toEmailTagsContainer" >
+			<label class="to_label">From</label>
+        <select name="reply_from_email" id="reply_from_email" class="email-input-field" required>
     <option value="">Select Email</option>
     <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
         <option value="<?php echo $row['id']; ?>" <?php if($row['id']==$reply_from_email){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
@@ -167,39 +171,46 @@ $messageid=$email_draft->messageid ?? '';
 
 </select>
       </div>
+	  </div>
+	  </div>
       <div class="mb-3">
-        <label for="recipientEmail" class="form-label mtop10">To</label>
+        
         <div class="email-input-wrapper">
-            <div class="email-tags-container" id="toEmailTagsContainer">
-                <input type="text" class="email-input-field" id="toEmailInputField" placeholder="Type email and press Enter" autocomplete="off" >
+		
+            <div class="email-tags-container mtop10" id="toEmailTagsContainer" >
+			<label class="to_label">To</label>
+                <input type="text" class="email-input-field" id="toEmailInputField" placeholder="Type email and press Enter" autocomplete="off"  >
+				
             </div>
+			<div class="text-right"><a class="tw-px-0 toggleBtn" data-id="toggleCc" title="Add Cc">Cc</a> <a class="tw-px-2 toggleBtn" data-id="toggleBcc" title="Add Bcc">Bcc</a></div>
             <div class="email-suggestions" id="toEmailSuggestions"></div>
         </div>
         <input type="hidden" id="recipientEmailIT" name="recipientEmail" value="<?php if(isset($_GET['id']) && !empty($_GET['id'])){ echo htmlspecialchars($_GET['id']); } ?>">
       </div>
-	  <div class="mb-3">
-        <label for="recipientCC" class="form-label mtop10">CC</label>
+	  <div class="mb-3" id="toggleCc" style="display:none;">
         <div class="email-input-wrapper">
-            <div class="email-tags-container" id="ccEmailTagsContainer">
-                <input type="text" class="email-input-field" id="ccEmailInputField" placeholder="Type CC email and press Enter" autocomplete="off">
+			<div class="email-tags-container mtop10" id="ccEmailTagsContainer" >
+			<label class="to_label">Cc</label>
+			
+                <input type="text" class="email-input-field" id="ccEmailInputField" placeholder="Type Cc email and press Enter" autocomplete="off">
             </div>
             <div class="email-suggestions" id="ccEmailSuggestions"></div>
         </div>
         <input type="hidden" id="recipientCCIT" name="recipientCC" value="">
       </div>
-	  <div class="mb-3">
-        <label for="recipientBCCEmail" class="form-label mtop10">BCC</label>
+	  <div class="mb-3" id="toggleBcc" style="display:none;">
         <div class="email-input-wrapper">
-            <div class="email-tags-container" id="bccEmailTagsContainer">
-                <input type="text" class="email-input-field" id="bccEmailInputField" placeholder="Type BCC email and press Enter" autocomplete="off">
+			<div class="email-tags-container mtop10" id="bccEmailTagsContainer" >
+			<label class="to_label">Bcc</label>
+                <input type="text" class="email-input-field" id="bccEmailInputField" placeholder="Type Bcc email and press Enter" autocomplete="off">
             </div>
             <div class="email-suggestions" id="bccEmailSuggestions"></div>
         </div>
         <input type="hidden" id="recipientBCCIT" name="recipientBCC" value="">
       </div>
       <div class="mb-3">
-	  <label for="emailSubject" class="form-label mtop10">Subject</label>
-	  <input type="text" class="form-control" id="emailSubjectIT" name="emailSubject" value="<?php echo html_escape($draft_subject); ?>" placeholder="Enter email subject"  required>
+	  <?php /*?><label for="emailSubject" class="form-label mtop10">Subject</label><?php */?>
+	  <input type="text" class="form-control mtop10" id="emailSubjectIT" name="emailSubject" value="<?php echo html_escape($draft_subject); ?>" placeholder="Subject"  required>
 	  
 	  </div>
 	  

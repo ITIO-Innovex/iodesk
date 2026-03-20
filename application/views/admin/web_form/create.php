@@ -64,8 +64,8 @@
     <strong>Instruction:</strong> 
 <p>Enter form name, add optional description, then add multiple fields (text, textarea, editor, dropdown, radio, checkbox, file, date, etc.). </p>
 <p>You can drag and drop fields to reorder them before saving.</p>
-<div class="btn btn-primary btn-sm tw-my-2" id="toggleBtn">View More</div>
-<div id="myDiv" style="display:none;">
+<div class="btn btn-primary btn-sm tw-my-2 toggleBtn" data-id="toggleDiv">View More</div>
+<div id="toggleDiv" style="display:none;">
     <div style="background:#f4f6f9; padding:12px; border-radius:6px; font-size:13px;">
 
 <b>Step 1: Basic Details</b><br>
@@ -205,6 +205,9 @@ Ensure required fields are properly marked before saving
                                   <?php
                                   $types = [
                                       'text'     => 'Text',
+                                      'email'    => 'Email',
+                                      'url'      => 'URL',
+                                      'number'   => 'Number',
                                       'textarea' => 'Textarea',
                                       'editor'   => 'Editor',
                                       'select'   => 'Listbox',
@@ -305,6 +308,9 @@ Ensure required fields are properly marked before saving
   function getFieldRowHtml(idx) {
     var types = {
       text: 'Text',
+      email: 'Email',
+      url: 'URL',
+      number: 'Number',
       textarea: 'Textarea',
       editor: 'Editor',
       select: 'Listbox',
@@ -449,9 +455,8 @@ Ensure required fields are properly marked before saving
     }
   });
 })();
-$('#toggleBtn').on('click', function() {
-    $('#myDiv').toggle();
-});
+
+
 </script>
 </body>
 </html>

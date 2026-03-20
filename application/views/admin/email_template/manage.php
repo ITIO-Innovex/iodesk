@@ -8,6 +8,73 @@
   .tpl-vars-wrap { max-height: 220px; overflow: auto; border: 1px solid #e5e5e5; padding: 10px; border-radius: 4px; background: #fafafa; }
   .tpl-preview-wrap { border: 1px solid #e5e5e5; padding: 12px; border-radius: 4px; background: #fff; }
   .tpl-preview-subject { font-weight: 600; margin-bottom: 10px; }
+  .email-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 36px;
+    background: #fff;
+    cursor: text;
+}
+.email-tags-container:focus-within {
+    border-color: #66afe9;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+.email-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e0e0e0;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+.email-tag.invalid {
+    background: #f8d7da;
+    color: #721c24;
+}
+.email-tag .remove-tag {
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+}
+.email-tag .remove-tag:hover {
+    color: #c00;
+}
+.email-input-field {
+    flex: 1;
+    min-width: 150px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 2px 0;
+}
+.email-suggestions {
+    position: absolute;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    display: none;
+}
+.email-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+.email-suggestion-item:hover, .email-suggestion-item.active {
+    background: #f0f0f0;
+}
+.email-input-wrapper {
+    position: relative;
+}
 </style>
 
 <div id="wrapper">
@@ -100,8 +167,9 @@
     <strong>Instruction:</strong> 
 <p>Use dynamic fields like {{Name}}, {{CompanyName}} in Subject and Email Body. </p>
 <p>These will be replaced automatically when sending email</p>
-<div class="btn btn-primary btn-sm tw-my-2" id="toggleBtn">View More</div>
-<div id="myDiv" style="display:none;">
+<div class="btn btn-primary btn-sm tw-my-2 toggleBtn" data-id="toggleDiv">View More</div> 
+
+<div id="toggleDiv" style="display:none;">
     <div style="background:#f4f6f9; padding:12px; border-radius:6px; font-size:13px;">
 
 <b>Dynamic Fields Usage:</b><br><br>
@@ -178,20 +246,7 @@ Empty values will appear blank in email
           <input type="hidden" name="final_subject" id="send_final_subject" value="">
           <input type="hidden" name="final_body" id="send_final_body" value="">
 
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>To Email <span class="text-danger">*</span></label>
-                <input type="text" name="to_email" id="send_to_email" class="form-control" placeholder="example@domain.com, example2@domain.com" required>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label>CC Email</label>
-                <input type="text" name="cc_email" id="send_cc_email" class="form-control" placeholder="example@domain.com, example2@domain.com">
-              </div>
-            </div>
-          </div>
+          
 
           <div class="row">
             <div class="col-md-4">
@@ -202,6 +257,48 @@ Empty values will appear blank in email
               <small class="text-muted">Use variables like <code>{{client_name}}</code> in subject/description.</small>
             </div>
             <div class="col-md-8">
+			<div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label>To Email <span class="text-danger">*</span></label>
+                <div class="email-input-wrapper">
+                  <div class="email-tags-container" id="tplToTagsContainer">
+                    <input type="text" class="email-input-field" id="tplToInputField" placeholder="Type email and press Enter" autocomplete="off">
+                  </div>
+                  <div class="email-suggestions" id="tplToSuggestions"></div>
+                </div>
+                <input type="hidden" name="to_email" id="send_to_email">
+              </div>
+              <span class="pull-right">
+                <a class="tw-px-0 toggleBtn" data-id="tplToggleCc" title="Add Cc">Cc</a>
+                <a class="tw-px-2 toggleBtn" data-id="tplToggleBcc" title="Add Bcc">Bcc</a>
+              </span>
+            </div>
+            <div class="col-md-12" id="tplToggleCc" style="display:none;">
+              <div class="form-group">
+                <label>Cc Email</label>
+                <div class="email-input-wrapper">
+                  <div class="email-tags-container" id="tplCcTagsContainer">
+                    <input type="text" class="email-input-field" id="tplCcInputField" placeholder="Type Cc email and press Enter" autocomplete="off">
+                  </div>
+                  <div class="email-suggestions" id="tplCcSuggestions"></div>
+                </div>
+                <input type="hidden" name="cc_email" id="send_cc_email">
+              </div>
+            </div>
+            <div class="col-md-12" id="tplToggleBcc" style="display:none;">
+              <div class="form-group">
+                <label>Bcc Email</label>
+                <div class="email-input-wrapper">
+                  <div class="email-tags-container" id="tplBccTagsContainer">
+                    <input type="text" class="email-input-field" id="tplBccInputField" placeholder="Type Bcc email and press Enter" autocomplete="off">
+                  </div>
+                  <div class="email-suggestions" id="tplBccSuggestions"></div>
+                </div>
+                <input type="hidden" name="bcc_email" id="send_bcc_email">
+              </div>
+            </div>
+          </div>
               <label>Preview</label>
               <div class="tpl-preview-wrap">
                 <div class="tpl-preview-subject" id="tplPreviewSubject"></div>
@@ -290,8 +387,267 @@ $(function() {
     return values;
   }
 
+  // --- Email tag + autosuggest (reuse logic from webmail compose) ---
+  var searchEmail = '<?php echo isset($_SESSION["webmail"]["mailer_email"]) ? addslashes($_SESSION["webmail"]["mailer_email"]) : ""; ?>';
+
+  function createEmailTagInput(options) {
+    var emailTags = [];
+    var $container = $(options.container);
+    var $inputField = $(options.inputField);
+    var $hiddenInput = $(options.hiddenInput);
+    var $suggestions = $(options.suggestions);
+    var searchTimeout = null;
+    var activeSuggestionIndex = -1;
+    var currentSuggestions = [];
+
+    function isValidEmail(email) {
+      var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return regex.test(email);
+    }
+
+    function updateHiddenInput() {
+      $hiddenInput.val(emailTags.join(','));
+    }
+
+    function createTag(email) {
+      email = email.trim();
+      if (!email) return;
+      if (emailTags.indexOf(email) !== -1) {
+        return;
+      }
+      emailTags.push(email);
+
+      var isValid = isValidEmail(email);
+      var $tag = $('<span class="email-tag' + (isValid ? '' : ' invalid') + '"></span>');
+      $tag.text(email);
+      var $remove = $('<span class="remove-tag">&times;</span>');
+      $remove.on('click', function() {
+        var idx = emailTags.indexOf(email);
+        if (idx > -1) {
+          emailTags.splice(idx, 1);
+        }
+        $tag.remove();
+        updateHiddenInput();
+      });
+      $tag.insertBefore($inputField);
+      updateHiddenInput();
+    }
+
+    function hideSuggestions() {
+      $suggestions.hide().empty();
+      currentSuggestions = [];
+      activeSuggestionIndex = -1;
+    }
+
+    function showSuggestions(emails) {
+      $suggestions.empty();
+      currentSuggestions = emails;
+      activeSuggestionIndex = -1;
+
+      if (emails.length === 0) {
+        hideSuggestions();
+        return;
+      }
+
+      emails.forEach(function(email, idx) {
+        var $item = $('<div class="email-suggestion-item"></div>');
+        $item.text(email);
+        $item.attr('data-index', idx);
+        $item.on('mousedown', function(e) {
+          e.preventDefault();
+          $inputField.val('');
+          createTag(email);
+          hideSuggestions();
+          $inputField.focus();
+        });
+        $suggestions.append($item);
+      });
+
+      $suggestions.show();
+    }
+
+    function selectActiveSuggestion() {
+      if (activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestions.length) {
+        createTag(currentSuggestions[activeSuggestionIndex]);
+        $inputField.val('');
+        hideSuggestions();
+      }
+    }
+
+    function updateActiveSuggestion() {
+      $suggestions.find('.email-suggestion-item').removeClass('active');
+      if (activeSuggestionIndex >= 0) {
+        $suggestions
+          .find('.email-suggestion-item[data-index="' + activeSuggestionIndex + '"]')
+          .addClass('active');
+      }
+    }
+
+    function searchEmails(term) {
+      if (term.length < 2 || !searchEmail) {
+        hideSuggestions();
+        return;
+      }
+
+      $.ajax({
+        url: admin_url + 'webmail/search_emails',
+        type: 'GET',
+        data: { term: term, email: searchEmail },
+        dataType: 'json',
+        success: function(data) {
+          if (Array.isArray(data)) {
+            var filtered = data.filter(function(e) {
+              return emailTags.indexOf(e) === -1;
+            });
+            showSuggestions(filtered);
+          } else {
+            hideSuggestions();
+          }
+        },
+        error: function() {
+          hideSuggestions();
+        },
+      });
+    }
+
+    $inputField.on('keydown', function(e) {
+      var val = $(this).val();
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (currentSuggestions.length > 0) {
+          activeSuggestionIndex = Math.min(
+            activeSuggestionIndex + 1,
+            currentSuggestions.length - 1
+          );
+          updateActiveSuggestion();
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (currentSuggestions.length > 0) {
+          activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+          updateActiveSuggestion();
+        }
+        return;
+      }
+
+      if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+        e.preventDefault();
+        if (activeSuggestionIndex >= 0) {
+          selectActiveSuggestion();
+        } else if (val.trim()) {
+          createTag(val.trim());
+          $(this).val('');
+          hideSuggestions();
+        }
+        return;
+      }
+
+      if (e.key === 'Backspace' && val === '') {
+        if (emailTags.length > 0) {
+          emailTags.pop();
+          $container.find('.email-tag').last().remove();
+          updateHiddenInput();
+        }
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        hideSuggestions();
+        return;
+      }
+    });
+
+    $inputField.on('input', function() {
+      var val = $(this).val();
+
+      if (val.indexOf(',') > -1 || val.indexOf(';') > -1) {
+        var parts = val.split(/[,;]+/);
+        parts.forEach(function(part) {
+          if (part.trim()) {
+            createTag(part.trim());
+          }
+        });
+        $(this).val('');
+        hideSuggestions();
+        return;
+      }
+
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      searchTimeout = setTimeout(function() {
+        searchEmails(val.trim());
+      }, 300);
+    });
+
+    $inputField.on('blur', function() {
+      var val = $(this).val().trim();
+      if (val) {
+        createTag(val);
+        $(this).val('');
+      }
+      setTimeout(hideSuggestions, 200);
+    });
+
+    $container.on('click', function(e) {
+      if (e.target === this || $(e.target).hasClass('email-tags-container')) {
+        $inputField.focus();
+      }
+    });
+
+    $inputField.on('paste', function(e) {
+      e.preventDefault();
+      var pasteData = (e.originalEvent.clipboardData || window.clipboardData).getData('text');
+      var emails = pasteData.split(/[,;\s\n]+/);
+      emails.forEach(function(email) {
+        if (email.trim()) {
+          createTag(email.trim());
+        }
+      });
+    });
+
+    return {
+      createTag: createTag,
+      getTags: function() {
+        return emailTags;
+      },
+      updateHiddenInput: updateHiddenInput,
+    };
+  }
+
+  var tplToInput = createEmailTagInput({
+    container: '#tplToTagsContainer',
+    inputField: '#tplToInputField',
+    hiddenInput: '#send_to_email',
+    suggestions: '#tplToSuggestions',
+  });
+
+  var tplCcInput = createEmailTagInput({
+    container: '#tplCcTagsContainer',
+    inputField: '#tplCcInputField',
+    hiddenInput: '#send_cc_email',
+    suggestions: '#tplCcSuggestions',
+  });
+
+  var tplBccInput = createEmailTagInput({
+    container: '#tplBccTagsContainer',
+    inputField: '#tplBccInputField',
+    hiddenInput: '#send_bcc_email',
+    suggestions: '#tplBccSuggestions',
+  });
+
   function validateSend() {
     var warn = [];
+    // ensure hidden inputs updated from tag components
+    tplToInput.updateHiddenInput();
+    tplCcInput.updateHiddenInput();
+    tplBccInput.updateHiddenInput();
+
     var toEmail = $.trim($('#send_to_email').val());
     if (!toEmail) warn.push('To Email is required.');
 
@@ -371,6 +727,9 @@ $(function() {
     $('#send_template_id').val(currentTpl.id);
     $('#send_to_email').val('');
     $('#send_cc_email').val('');
+    $('#send_bcc_email').val('');
+    // clear any existing tags
+    $('#tplToTagsContainer .email-tag, #tplCcTagsContainer .email-tag, #tplBccTagsContainer .email-tag').remove();
 
     currentVars = extractVars(currentTpl.subject + ' ' + currentTpl.body);
     buildVarsUi(currentVars);
@@ -413,9 +772,7 @@ $(function() {
   });
 });
 
-$('#toggleBtn').on('click', function() {
-    $('#myDiv').toggle();
-});
+
 </script>
 
 </body>

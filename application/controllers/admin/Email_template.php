@@ -93,9 +93,12 @@ class Email_template extends AdminController
 
     public function send()
     {
+	
+	//print_r($this->input->post());exit;
         $templateId = (int) $this->input->post('template_id');
-        $toEmail    = trim((string) $this->input->post('to_email'));
-        $ccEmail    = trim((string) $this->input->post('cc_email'));
+        $toEmail  = trim((string) ($this->input->post('to_email') ?? ''));
+        $ccEmail  = trim((string) ($this->input->post('cc_email') ?? ''));
+        $bccEmail = trim((string) ($this->input->post('bcc_email') ?? ''));
         $subject    = trim((string) $this->input->post('final_subject'));
         $body       = $this->input->post('final_body', false);
 
@@ -138,7 +141,7 @@ class Email_template extends AdminController
         $ok = $this->webmail_model->compose_email_super([
             'recipientEmail' => $toEmail,
             'recipientCC'    => $ccEmail,
-            'recipientBCC'   => '',
+            'recipientBCC'   => $bccEmail,
             'emailSubject'   => $subject,
             'emailBody'      => $body,
             // Try company SMTP first if configured
