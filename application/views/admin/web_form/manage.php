@@ -35,14 +35,15 @@
                 <p class="text-muted">
                   First row must be the header with field names. Each next row is one entry.
                 </p>
-                <div class="well well-sm" style="white-space:pre-wrap;">
+                <div class="well well-sm table-responsive" style="white-space:pre-wrap;">
 <?php
   $headerCols = [];
   foreach ($fields as $f) {
       if ($f['type'] === 'file') { continue; } // files not supported in CSV
       $headerCols[] = $f['name'];
   }
-  echo e(implode(',', $headerCols));
+  echo $headerdata=e(implode(',', $headerCols));
+  //echo $headerdata=str_replace(',', ',<br>', $headerdata);
 ?>
                 </div>
 				<a href="<?php echo admin_url('web_form/download_csv_format/' . (int)$form['id']); ?>" class="btn btn-default tw-mt-6" title="Download CSV Template & Upload with your data"><i class="fa-solid fa-download tw-mr-1 "></i> Download CSV Format </a>
