@@ -1219,6 +1219,8 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
     margin-left: -2px;
     transform-origin: center 100px;
   }
+  
+  .active-expand { width: 400px !important;}
 
 
     /* responsive */
