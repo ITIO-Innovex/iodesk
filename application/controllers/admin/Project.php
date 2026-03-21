@@ -655,7 +655,7 @@ class Project extends AdminController
             $data = $this->input->post();
             
             // Debug: Log the received data
-            log_message('debug', 'Project form data: ' . print_r($data, true));
+            //log_message('debug', 'Project form data: ' . print_r($data, true));
 			 //print_r($data);exit;
             
             // Prepare data for database insertion
@@ -702,7 +702,7 @@ class Project extends AdminController
 			$insert_data['task_addedby'] = get_staff_user_id();
             
             // Debug: Log the final data
-            log_message('debug', 'Final insert data: ' . print_r($insert_data, true));
+            //log_message('debug', 'Final insert data: ' . print_r($insert_data, true));
             
             // Add the task
             try {
