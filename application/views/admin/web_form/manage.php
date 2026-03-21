@@ -434,7 +434,7 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
             <input type="radio" name="wf_email_mode" value="new" checked> Send New Email
           </label>
           <label class="radio-inline tw-ml-3">
-            <input type="radio" name="wf_email_mode" value="template"> Send Email from Email Template
+            <input type="radio" name="wf_email_mode" value="template"> Send Template Email
           </label>
         </div>
 

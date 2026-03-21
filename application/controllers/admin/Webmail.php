@@ -75,7 +75,7 @@ class Webmail extends AdminController
 		if(isset($_GET['lead'])&&$_GET['lead']==1){
 		redirect(admin_url('webmail/webmail_leads?stype=TEXT&skey='.$_GET['ekey']));
 		}else{
-		redirect(admin_url('webmail/inbox'));
+		//redirect(admin_url('webmail/inbox'));
 		}
 		
 		}else{
@@ -918,9 +918,11 @@ See you soon,<br>
 		}
 	}
 	
- //Display Inbox Listing 
+    //Display Inbox Listing 
 	public function templates()
 	{
+	
+	redirect(admin_url('email_template'));
 		if (!is_staff_logged_in()) {
 			access_denied('Email Templates');
 		}
@@ -1026,6 +1028,9 @@ See you soon,<br>
         $this->db->where('id', $template_id);
 		$this->db->where('staffid', get_staff_user_id());
         $data['email_draft']=$this->db->from(db_prefix() . 'email_template')->get()->row(); 
+		}
+		if (!isset($_SESSION['folderlist']) || empty($_SESSION['folderlist'])) {
+		$data['inboxemail']=$this->webmail_model->getinboxemail();
 		}
 		
 		$this->load->view('admin/webmail/compose', $data);

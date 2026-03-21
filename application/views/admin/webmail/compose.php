@@ -134,7 +134,7 @@ $messageid=$email_draft->messageid ?? '';
 				  <?php  } ?> 
 				 
 						<li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/draft') ?>" class="mail-loader ">Draft</a></li>
-<li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/templates') ?>" class="mail-loader ">Templates</a></li>	
+<?php /*?><li role="presentation" class="menu-item-leads "><a href="<?=admin_url('webmail/templates') ?>" class="mail-loader ">Templates</a></li><?php */?>	
 						<li role="presentation" class="menu-item-leads ">
                         <a href="inbox?fd=Flagged" class="mail-loader <?php if($_SESSION['webmail']['folder']=='Flagged'){ echo 'folder-active';} ?>">Flagged</a></li> 
                 </ul>
@@ -150,7 +150,7 @@ $messageid=$email_draft->messageid ?? '';
 <div class="panel-body panel-table-full mail-bg">
 <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
 <h4 class="tw-mt-0 tw-font-semibold tw-text-lg"><i class="fa-solid fa-file-pen tw-mr-2"></i> Sent New Email</h4>
-<a href="#" class="btn btn-primary btn-sm" onclick="$('#template_modal').modal('show');return false;">Templates</a>
+<a href="#" class="btn btn-primary btn-sm" onclick="$('#template_modal').modal('show');return false;" title="Choose Template to Send">Send Template Email</a>
             </div>
 <form action="<?=  admin_url('webmail/reply') ?>" method="post" enctype="multipart/form-data" id="compose-form-data">
 	<!-- CSRF Token -->
@@ -291,11 +291,11 @@ $messageid=$email_draft->messageid ?? '';
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="composeTemplateModalLabel">Email template</h4>
+                <h4 class="modal-title" id="composeTemplateModalLabel">Email Template</h4>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="composeTemplateSelect">Select template</label>
+                    <label for="composeTemplateSelect">Select Email Template</label>
                     <select id="composeTemplateSelect" class="form-control">
                         <option value="">— Select email template —</option>
                     </select>
