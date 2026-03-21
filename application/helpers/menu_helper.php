@@ -286,7 +286,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
 			'name'     => 'Web Form',
 			'href'     => admin_url('web_form'),
-			'icon'     => 'fa-solid fa-envelopes-bulk',
+			'icon'     => 'fa-brands fa-wpforms',
 			'position' => 45,
 			'badge'    => [],
 		]);
