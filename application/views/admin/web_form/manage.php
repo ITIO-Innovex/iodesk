@@ -123,7 +123,7 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
                   <?php foreach ($entries as $entry) {
                       $data = json_decode($entry['data_json'], true) ?: [];
                       ?>
-                      <tr>
+                      <tr data-entry-json="<?php echo e($entry['data_json']); ?>">
                         <td class="tw-hidden"><?php echo (int)$entry['id']; ?></td>
                         <?php foreach ($fields as $field) {
                             $fname = $field['name'];
@@ -144,7 +144,9 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
                                 ?>
                                 <?php if ($isEmailValue) { ?>
                                   <?php echo e($emailVal); ?>
-                                  <i class="fa-regular fa-envelope" title="Email"></i>
+                                  <a href="#" class="web-email-trigger tw-ml-1 tw-inline-block tw-text-primary" title="<?php echo _l('email'); ?> — Send / compose" data-email="<?php echo e($emailVal); ?>" role="button">
+                                    <i class="fa-regular fa-envelope"></i>
+                                  </a>
                                 <?php } else { ?>
                                   <?php echo (string)$val; ?>
                                 <?php } ?>
@@ -346,12 +348,415 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
     </div>
   </div>
 </div>
+
+<style>
+  #webFormEmailModal .wf-tpl-var-input.wf-tpl-var-missing {
+    border-color: #dc3545 !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px rgba(220, 53, 69, .35);
+  }
+  #webFormEmailModal .email-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-height: 36px;
+    background: #fff;
+    cursor: text;
+  }
+  #webFormEmailModal .email-tags-container:focus-within {
+    border-color: #66afe9;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+  }
+  #webFormEmailModal .email-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e0e0e0;
+    color: #333;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+  #webFormEmailModal .email-tag.invalid {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  #webFormEmailModal .email-tag .remove-tag {
+    margin-left: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #666;
+  }
+  #webFormEmailModal .email-tag .remove-tag:hover { color: #c00; }
+  #webFormEmailModal .email-input-field {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 2px 0;
+  }
+  #webFormEmailModal .email-suggestions {
+    position: absolute;
+    z-index: 1050;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    display: none;
+  }
+  #webFormEmailModal .email-suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  #webFormEmailModal .email-suggestion-item:hover,
+  #webFormEmailModal .email-suggestion-item.active {
+    background: #f0f0f0;
+  }
+  #webFormEmailModal .email-input-wrapper { position: relative; }
+</style>
+<!-- Send email from row (compose or template) -->
+<div class="modal fade" id="webFormEmailModal" tabindex="-1" role="dialog" aria-labelledby="webFormEmailModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="webFormEmailModalLabel">Send email <span id="wfModalEmailLabel"></span></h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group tw-mb-3">
+          <label class="radio-inline">
+            <input type="radio" name="wf_email_mode" value="new" checked> Send New Email
+          </label>
+          <label class="radio-inline tw-ml-3">
+            <input type="radio" name="wf_email_mode" value="template"> Send Email from Email Template
+          </label>
+        </div>
+
+        <div id="wfTemplateOnlyBlock" style="display:none;">
+          <div class="form-group">
+            <label>Template</label>
+            <select id="wfTemplateSelect" class="form-control">
+              <option value="">— Select template —</option>
+            </select>
+          </div>
+
+          <div id="wfTplVarsWrap" class="tw-mb-3" style="display:none;">
+            <label>Template variables</label>
+            <p class="text-muted tw-text-sm tw-mb-2">Fill or change values for dynamic fields (e.g. <code>{{FromDate}}</code>, <code>{{ToDate}}</code>) before sending. Row data is used when it matches the name.</p>
+            <div id="wfTplVarsContainer" class="well well-sm" style="max-height:220px; overflow:auto;"></div>
+          </div>
+
+          <div class="alert alert-warning hide tw-mb-3" id="wfPlaceholderWarning"></div>
+        </div>
+
+        <hr class="tw-my-3" />
+        <div id="wfCommonEmailFields">
+          <div class="form-group">
+            <label>To <span class="text-danger">*</span></label>
+            <input type="text" id="wfEmailTo" class="form-control" placeholder="recipient@example.com">
+          </div>
+		  <span class="pull-right">
+		<a class="tw-px-0 toggleBtn" data-id="toggleCc" title="Add Cc">Cc</a> <a class="tw-px-2 toggleBtn" data-id="toggleBcc" title="Add Bcc">Bcc</a></span>
+          <div class="form-group" id="toggleCc" style="display:none;">
+            <label>Cc</label>
+            <input type="hidden" id="wfEmailCc" value="">
+            <div class="email-input-wrapper">
+              <div class="email-tags-container" id="wfCcTagsContainer">
+                <input type="text" class="email-input-field" id="wfCcInputField" placeholder="Type email — suggestions from your mail history" autocomplete="off">
+              </div>
+              <div class="email-suggestions" id="wfCcEmailSuggestions"></div>
+            </div>
+          </div>
+          <div class="form-group" id="toggleBcc" style="display:none;">
+            <label>Bcc</label>
+            <input type="hidden" id="wfEmailBcc" value="">
+            <div class="email-input-wrapper">
+              <div class="email-tags-container" id="wfBccTagsContainer">
+                <input type="text" class="email-input-field" id="wfBccInputField" placeholder="Type email — suggestions from your mail history" autocomplete="off">
+              </div>
+              <div class="email-suggestions" id="wfBccEmailSuggestions"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Subject <span class="text-danger">*</span></label>
+            <input type="text" id="wfFinalSubject" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Body <span class="text-danger">*</span></label>
+            <textarea id="wfFinalBody" class="form-control email_editor" rows="8"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="button" class="btn btn-primary" id="wfSendEmailBtn">
+          <i class="fa-regular fa-paper-plane tw-mr-1"></i> Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
-<script>$('.editor').jqte();</script>
+<script>//$('.editor').jqte();</script>
+
+<link rel="stylesheet" href="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.css"/>
+<script src="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.js"></script>
+
+<script>
+window.email_editor = Jodit.make('#wfFinalBody');
+window.editor = Jodit.make('.editor');
+</script>
+
 <script>
   (function() {
+    var webFormFieldsMeta = <?php echo json_encode(array_map(function ($f) {
+      return ['name' => $f['name'], 'label' => $f['label'] ?? ''];
+    }, $tablefields)); ?>;
+
+    var wfSearchMailerEmail = '<?php echo isset($_SESSION['webmail']['mailer_email']) ? addslashes($_SESSION['webmail']['mailer_email']) : ''; ?>';
+
+    /** Cc/Bcc tag inputs + webmail/search_emails autosuggest (same pattern as email templates) */
+    function wfCreateEmailTagInput(options) {
+      var emailTags = [];
+      var $container = $(options.container);
+      var $inputField = $(options.inputField);
+      var $hiddenInput = $(options.hiddenInput);
+      var $suggestions = $(options.suggestions);
+      var searchTimeout = null;
+      var activeSuggestionIndex = -1;
+      var currentSuggestions = [];
+
+      function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      }
+
+      function updateHiddenInput() {
+        $hiddenInput.val(emailTags.join(','));
+      }
+
+      function createTag(email) {
+        email = (email || '').trim();
+        if (!email) return;
+        if (emailTags.indexOf(email) !== -1) return;
+        emailTags.push(email);
+        var isValid = isValidEmail(email);
+        var $tag = $('<span class="email-tag' + (isValid ? '' : ' invalid') + '"></span>');
+        $tag.text(email);
+        var $remove = $('<span class="remove-tag">&times;</span>');
+        $remove.on('click', function() {
+          var idx = emailTags.indexOf(email);
+          if (idx > -1) emailTags.splice(idx, 1);
+          $tag.remove();
+          updateHiddenInput();
+        });
+        $tag.append($remove);
+        $tag.insertBefore($inputField);
+        updateHiddenInput();
+      }
+
+      function hideSuggestions() {
+        $suggestions.hide().empty();
+        currentSuggestions = [];
+        activeSuggestionIndex = -1;
+      }
+
+      function showSuggestions(emails) {
+        $suggestions.empty();
+        currentSuggestions = emails;
+        activeSuggestionIndex = -1;
+        if (!emails.length) {
+          hideSuggestions();
+          return;
+        }
+        emails.forEach(function(email, idx) {
+          var $item = $('<div class="email-suggestion-item"></div>');
+          $item.text(email);
+          $item.attr('data-index', idx);
+          $item.on('mousedown', function(e) {
+            e.preventDefault();
+            $inputField.val('');
+            createTag(email);
+            hideSuggestions();
+            $inputField.focus();
+          });
+          $suggestions.append($item);
+        });
+        $suggestions.show();
+      }
+
+      function selectActiveSuggestion() {
+        if (activeSuggestionIndex >= 0 && activeSuggestionIndex < currentSuggestions.length) {
+          createTag(currentSuggestions[activeSuggestionIndex]);
+          $inputField.val('');
+          hideSuggestions();
+        }
+      }
+
+      function updateActiveSuggestion() {
+        $suggestions.find('.email-suggestion-item').removeClass('active');
+        if (activeSuggestionIndex >= 0) {
+          $suggestions.find('.email-suggestion-item[data-index="' + activeSuggestionIndex + '"]').addClass('active');
+        }
+      }
+
+      function searchEmails(term) {
+        if (term.length < 2 || !wfSearchMailerEmail) {
+          hideSuggestions();
+          return;
+        }
+        $.ajax({
+          url: admin_url + 'webmail/search_emails',
+          type: 'GET',
+          data: { term: term, email: wfSearchMailerEmail },
+          dataType: 'json',
+          success: function(data) {
+            if (Array.isArray(data)) {
+              var filtered = data.filter(function(e) {
+                return emailTags.indexOf(e) === -1;
+              });
+              showSuggestions(filtered);
+            } else {
+              hideSuggestions();
+            }
+          },
+          error: function() {
+            hideSuggestions();
+          }
+        });
+      }
+
+      $inputField.on('keydown', function(e) {
+        var val = $(this).val();
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, currentSuggestions.length - 1);
+            updateActiveSuggestion();
+          }
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (currentSuggestions.length > 0) {
+            activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+            updateActiveSuggestion();
+          }
+          return;
+        }
+        if (e.key === 'Enter' || e.key === ',' || e.key === ';') {
+          e.preventDefault();
+          if (activeSuggestionIndex >= 0) {
+            selectActiveSuggestion();
+          } else if (val.trim()) {
+            createTag(val.trim());
+            $(this).val('');
+            hideSuggestions();
+          }
+          return;
+        }
+        if (e.key === 'Backspace' && val === '') {
+          if (emailTags.length > 0) {
+            emailTags.pop();
+            $container.find('.email-tag').last().remove();
+            updateHiddenInput();
+          }
+          return;
+        }
+        if (e.key === 'Escape') {
+          hideSuggestions();
+          return;
+        }
+      });
+
+      $inputField.on('input', function() {
+        var val = $(this).val();
+        if (val.indexOf(',') > -1 || val.indexOf(';') > -1) {
+          val.split(/[,;]+/).forEach(function(part) {
+            if (part.trim()) createTag(part.trim());
+          });
+          $(this).val('');
+          hideSuggestions();
+          return;
+        }
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(function() {
+          searchEmails(val.trim());
+        }, 300);
+      });
+
+      $inputField.on('blur', function() {
+        var val = $(this).val().trim();
+        if (val) {
+          createTag(val);
+          $(this).val('');
+        }
+        setTimeout(hideSuggestions, 200);
+      });
+
+      $container.on('click', function(e) {
+        if (e.target === this || $(e.target).hasClass('email-tags-container')) {
+          $inputField.focus();
+        }
+      });
+
+      $inputField.on('paste', function(e) {
+        e.preventDefault();
+        var pasteData = (e.originalEvent.clipboardData || window.clipboardData).getData('text');
+        pasteData.split(/[,;\s\n]+/).forEach(function(email) {
+          if (email.trim()) createTag(email.trim());
+        });
+      });
+
+      return {
+        createTag: createTag,
+        updateHiddenInput: updateHiddenInput,
+        reset: function() {
+          emailTags = [];
+          $container.find('.email-tag').remove();
+          $inputField.val('');
+          updateHiddenInput();
+          hideSuggestions();
+        }
+      };
+    }
+
+    var wfCcTagInst = wfCreateEmailTagInput({
+      container: '#wfCcTagsContainer',
+      inputField: '#wfCcInputField',
+      hiddenInput: '#wfEmailCc',
+      suggestions: '#wfCcEmailSuggestions'
+    });
+    var wfBccTagInst = wfCreateEmailTagInput({
+      container: '#wfBccTagsContainer',
+      inputField: '#wfBccInputField',
+      hiddenInput: '#wfEmailBcc',
+      suggestions: '#wfBccEmailSuggestions'
+    });
+
+    function wfFlushCcBccInputsToTags() {
+      var v = $('#wfCcInputField').val().trim();
+      if (v) {
+        wfCcTagInst.createTag(v);
+        $('#wfCcInputField').val('');
+      }
+      v = $('#wfBccInputField').val().trim();
+      if (v) {
+        wfBccTagInst.createTag(v);
+        $('#wfBccInputField').val('');
+      }
+      wfCcTagInst.updateHiddenInput();
+      wfBccTagInst.updateHiddenInput();
+    }
+
     function resetEntryModal() {
       $('#entry_id').val('');
       $('#entryModalTitle').text('Add Entry');
@@ -422,8 +827,8 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
 
         if ($el.is('input') || $el.is('textarea') || $el.is('select')) {
           // jqte editor support
-          if ($el.hasClass('editor') && typeof $el.jqteVal === 'function') {
-            $el.jqteVal(val);
+          if ($el.hasClass('editor')) {
+            window.editor.value = val;
           } else {
             $el.val(val);
           }
@@ -475,6 +880,373 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
         }
       }).fail(function() {
         alert_float('danger', 'Failed to delete file');
+      });
+    });
+
+    // --- Row email: compose link or send from CRM email template ---
+    var wfTemplatesLoaded = false;
+    var wfCurrentTemplateId = 0;
+    var wfRebuildTimer = null;
+
+    function wfBuildMapFromEntry(entryData, fieldsMeta) {
+      var map = {};
+      Object.keys(entryData || {}).forEach(function(k) {
+        var v = entryData[k];
+        if (Array.isArray(v)) v = v.join(', ');
+        map[k] = (v === null || v === undefined) ? '' : String(v);
+      });
+      (fieldsMeta || []).forEach(function(f) {
+        var name = f.name;
+        var labelKey = (f.label || '').replace(/\s+/g, '');
+        if (labelKey && map[name] !== undefined) {
+          map[labelKey] = map[name];
+        }
+      });
+      return map;
+    }
+
+    function wfApplyPlaceholdersMap(text, map) {
+      if (!text) return '';
+      return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g, function(_, raw) {
+        var k = raw.trim();
+        if (map[k] !== undefined) return map[k];
+        var lower = k.toLowerCase();
+        for (var ek in map) {
+          if (ek.toLowerCase() === lower) return map[ek];
+        }
+        return '';
+      });
+    }
+
+    function wfApplyPlaceholders(text, entryData, fieldsMeta) {
+      return wfApplyPlaceholdersMap(text, wfBuildMapFromEntry(entryData, fieldsMeta));
+    }
+
+    function wfExtractVarNames(subject, body) {
+      var text = (subject || '') + '\n' + (body || '');
+      var vars = [];
+      var re = /\{\{\s*([^}]+?)\s*\}\}/g;
+      var m;
+      while ((m = re.exec(text)) !== null) {
+        var key = (m[1] || '').trim();
+        if (key && vars.indexOf(key) === -1) {
+          vars.push(key);
+        }
+      }
+      return vars;
+    }
+
+    function wfRenderTemplateVarInputs(tpl) {
+      var names = wfExtractVarNames(tpl.subject, tpl.body);
+      var $wrap = $('#wfTplVarsWrap');
+      var $c = $('#wfTplVarsContainer');
+      $c.empty();
+      if (!names.length) {
+        $wrap.hide();
+        return;
+      }
+      var baseMap = wfBuildMapFromEntry(window._wfModalEntryData || {}, webFormFieldsMeta);
+      names.forEach(function(name) {
+        var val = '';
+        if (baseMap[name] !== undefined) {
+          val = baseMap[name];
+        } else {
+          var lower = name.toLowerCase();
+          for (var ek in baseMap) {
+            if (ek.toLowerCase() === lower) {
+              val = baseMap[ek];
+              break;
+            }
+          }
+        }
+        var $div = $('<div class="form-group tw-mb-2"></div>');
+        $div.append($('<label class="tw-text-sm tw-mb-1" style="font-weight:normal;"></label>').text('{{' + name + '}}'));
+        var $inp = $('<input type="text" class="form-control input-sm wf-tpl-var-input" autocomplete="off"/>');
+        $inp.attr('data-var', name);
+        $inp.val(val);
+        $div.append($inp);
+        $c.append($div);
+      });
+      $wrap.show();
+    }
+
+    function wfRebuildFromTemplateVars() {
+      var raw = window._wfRawTpl;
+      if (!raw) {
+        return;
+      }
+      var merged = wfBuildMapFromEntry(window._wfModalEntryData || {}, webFormFieldsMeta);
+      $('.wf-tpl-var-input').each(function() {
+        var k = $(this).attr('data-var');
+        if (k) {
+          merged[k] = $(this).val();
+        }
+      });
+      var subj = wfApplyPlaceholdersMap(raw.subject || '', merged);
+      var body = wfApplyPlaceholdersMap(raw.body || '', merged);
+      $('#wfFinalSubject').val(subj);
+      if (typeof window.email_editor !== 'undefined' && window.email_editor) {
+        window.email_editor.value = body;
+      } else {
+        $('#wfFinalBody').val(body);
+      }
+      wfShowPlaceholderWarning(subj, body);
+    }
+
+    function wfScheduleRebuildFromVars() {
+      clearTimeout(wfRebuildTimer);
+      wfRebuildTimer = setTimeout(function() {
+        wfRebuildFromTemplateVars();
+      }, 120);
+    }
+
+    function wfShowPlaceholderWarning(subject, body) {
+      var combined = (subject || '') + ' ' + (body || '');
+      if (/\{\{\s*[^}]+\s*\}\}/.test(combined)) {
+        $('#wfPlaceholderWarning').removeClass('hide').text('Some {{placeholders}} are still in the text. Use the Template variables fields above, or edit Subject/Body below.');
+      } else {
+        $('#wfPlaceholderWarning').addClass('hide').text('');
+      }
+    }
+
+    function wfLoadTemplates() {
+      if (wfTemplatesLoaded) return;
+      $.getJSON(admin_url + 'email_template/templates_json')
+        .done(function(resp) {
+          wfTemplatesLoaded = true;
+          if (!resp || !resp.success || !resp.templates) return;
+          var $sel = $('#wfTemplateSelect');
+          $sel.find('option:not(:first)').remove();
+          resp.templates.forEach(function(t) {
+            $sel.append($('<option></option>').attr('value', t.id).text(t.subject || ('Template #' + t.id)));
+          });
+        });
+    }
+
+    function wfFetchTemplateAndApply(id) {
+      id = parseInt(id, 10) || 0;
+      if (!id) {
+        window._wfRawTpl = null;
+        $('#wfTplVarsWrap').hide();
+        $('#wfTplVarsContainer').empty();
+        wfCurrentTemplateId = 0;
+        $('#wfFinalSubject').val('');
+        if (typeof window.email_editor !== 'undefined' && window.email_editor) {
+          window.email_editor.value = '';
+        } else {
+          $('#wfFinalBody').val('');
+        }
+        $('#wfPlaceholderWarning').addClass('hide');
+        return;
+      }
+      $.getJSON(admin_url + 'email_template/template_json/' + id)
+        .done(function(resp) {
+          if (!resp || !resp.success || !resp.template) {
+            alert_float('danger', 'Could not load template');
+            return;
+          }
+          var tpl = resp.template;
+          wfCurrentTemplateId = tpl.id;
+          window._wfRawTpl = {
+            subject: tpl.subject || '',
+            body: tpl.body || ''
+          };
+          wfRenderTemplateVarInputs(tpl);
+          wfRebuildFromTemplateVars();
+        });
+    }
+
+    $('body').on('click', '.web-email-trigger', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var email = $(this).data('email') || '';
+      var jsonStr = $(this).closest('tr').attr('data-entry-json') || '{}';
+      var entryData = {};
+      try { entryData = JSON.parse(jsonStr) || {}; } catch (err) { entryData = {}; }
+      window._wfModalEntryData = entryData;
+      $('#wfModalEmailLabel').text('To: ' + email);
+      $('#wfEmailTo').val(email);
+      $('input[name="wf_email_mode"][value="new"]').prop('checked', true);
+      $('#wfTemplateOnlyBlock').hide();
+      $('#wfTemplateSelect').val('');
+      window._wfRawTpl = null;
+      $('#wfTplVarsWrap').hide();
+      $('#wfTplVarsContainer').empty();
+      wfCcTagInst.reset();
+      wfBccTagInst.reset();
+      $('#wfFinalSubject').val('');
+      $('#wfFinalBody').val('');
+      if (typeof window.email_editor !== 'undefined' && window.email_editor) {
+        window.email_editor.value = '';
+      }
+      $('#wfPlaceholderWarning').addClass('hide');
+      wfCurrentTemplateId = 0;
+      wfTemplatesLoaded = false;
+      $('#wfTemplateSelect').find('option:not(:first)').remove();
+      $('#webFormEmailModal').appendTo('body').modal('show');
+    });
+
+    function wfValidateDynamicFieldsBeforeSend() {
+      if ($('input[name="wf_email_mode"]:checked').val() !== 'template') {
+        return { ok: true };
+      }
+      $('.wf-tpl-var-input').removeClass('wf-tpl-var-missing');
+      var emptyNames = [];
+      $('.wf-tpl-var-input').each(function() {
+        var $inp = $(this);
+        var name = $inp.attr('data-var') || '';
+        if ($.trim($inp.val()) === '') {
+          emptyNames.push(name ? ('{{' + name + '}}') : '?');
+          $inp.addClass('wf-tpl-var-missing');
+        }
+      });
+      if (emptyNames.length) {
+        var $first = $('#wfTplVarsContainer').find('.wf-tpl-var-missing').first();
+        if ($first.length) {
+          $('#wfTplVarsWrap').show();
+          $first.focus();
+        }
+        return {
+          ok: false,
+          message: 'Fill all template variables before sending: ' + emptyNames.join(', ')
+        };
+      }
+      var subj = $('#wfFinalSubject').val() || '';
+      var bodyStr = '';
+      if (typeof window.email_editor !== 'undefined' && window.email_editor) {
+        bodyStr = window.email_editor.value || '';
+      } else {
+        bodyStr = $('#wfFinalBody').val() || '';
+      }
+      if (/\{\{\s*[^}]+\s*\}\}/.test(subj + ' ' + bodyStr)) {
+        return {
+          ok: false,
+          message: 'Unresolved {{placeholders}} remain. Fill all template variables or remove placeholders from subject/body.'
+        };
+      }
+      return { ok: true };
+    }
+
+    $('body').on('input change', '.wf-tpl-var-input', function() {
+      $(this).removeClass('wf-tpl-var-missing');
+      wfScheduleRebuildFromVars();
+    });
+
+    $('input[name="wf_email_mode"]').on('change', function() {
+      var v = $('input[name="wf_email_mode"]:checked').val();
+      if (v === 'template') {
+        $('#wfTemplateOnlyBlock').show();
+        wfLoadTemplates();
+        wfFetchTemplateAndApply($('#wfTemplateSelect').val());
+      } else {
+        $('#wfTemplateOnlyBlock').hide();
+        window._wfRawTpl = null;
+        wfCurrentTemplateId = 0;
+        $('#wfTplVarsWrap').hide();
+        $('#wfTplVarsContainer').empty();
+        $('#wfTemplateSelect').val('');
+        $('#wfPlaceholderWarning').addClass('hide');
+      }
+    });
+
+    $('#wfTemplateSelect').on('change', function() {
+      wfFetchTemplateAndApply($(this).val());
+    });
+
+    $('#wfSendEmailBtn').on('click', function() {
+      var mode = $('input[name="wf_email_mode"]:checked').val();
+      var to = $('#wfEmailTo').val().trim();
+      if (!to) {
+        alert_float('warning', 'To is required');
+        return;
+      }
+      var subj = $('#wfFinalSubject').val().trim();
+      var body = '';
+      if (typeof window.email_editor !== 'undefined' && window.email_editor) {
+        body = window.email_editor.value;
+      } else {
+        body = $('#wfFinalBody').val();
+      }
+      body = body || '';
+      if (!subj || !body) {
+        alert_float('warning', 'Subject and body are required');
+        return;
+      }
+
+      wfFlushCcBccInputsToTags();
+
+      var $btn = $(this);
+      $btn.prop('disabled', true);
+
+      if (mode === 'template') {
+        var tid = parseInt(wfCurrentTemplateId, 10) || parseInt($('#wfTemplateSelect').val(), 10);
+        if (!tid) {
+          alert_float('warning', 'Select a template');
+          $btn.prop('disabled', false);
+          return;
+        }
+        var dynCheck = wfValidateDynamicFieldsBeforeSend();
+        if (!dynCheck.ok) {
+          alert_float('warning', dynCheck.message);
+          $btn.prop('disabled', false);
+          return;
+        }
+        $.ajax({
+          url: admin_url + 'email_template/send',
+          type: 'POST',
+          dataType: 'json',
+          data: {
+            template_id: tid,
+            to_email: to,
+            cc_email: $('#wfEmailCc').val(),
+            bcc_email: $('#wfEmailBcc').val(),
+            final_subject: subj,
+            final_body: body,
+            <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+          }
+        }).done(function(resp) {
+          if (resp && resp.success) {
+            alert_float('success', resp.message || 'Sent');
+            $('#webFormEmailModal').modal('hide');
+          } else {
+            alert_float('danger', (resp && resp.message) ? resp.message : 'Failed to send');
+          }
+        }).fail(function(xhr) {
+          var msg = 'Request failed';
+          if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+          alert_float('danger', msg);
+        }).always(function() {
+          $btn.prop('disabled', false);
+        });
+        return;
+      }
+
+      // Send New Email — plain send (no compose URL)
+      $.ajax({
+        url: admin_url + 'web_form/send_row_email',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+          to_email: to,
+          cc_email: $('#wfEmailCc').val(),
+          bcc_email: $('#wfEmailBcc').val(),
+          final_subject: subj,
+          final_body: body,
+          <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+        }
+      }).done(function(resp) {
+        if (resp && resp.success) {
+          alert_float('success', resp.message || 'Sent');
+          $('#webFormEmailModal').modal('hide');
+        } else {
+          alert_float('danger', (resp && resp.message) ? resp.message : 'Failed to send');
+        }
+      }).fail(function(xhr) {
+        var msg = 'Request failed';
+        if (xhr.responseJSON && xhr.responseJSON.message) msg = xhr.responseJSON.message;
+        alert_float('danger', msg);
+      }).always(function() {
+        $btn.prop('disabled', false);
       });
     });
   })();

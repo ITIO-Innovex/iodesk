@@ -93,32 +93,48 @@ class Email_template extends AdminController
 
     public function send()
     {
-	
-	//print_r($this->input->post());exit;
+        $ajax = $this->input->is_ajax_request();
+
         $templateId = (int) $this->input->post('template_id');
-        $toEmail  = trim((string) ($this->input->post('to_email') ?? ''));
-        $ccEmail  = trim((string) ($this->input->post('cc_email') ?? ''));
-        $bccEmail = trim((string) ($this->input->post('bcc_email') ?? ''));
+        $toEmail    = trim((string) ($this->input->post('to_email') ?? ''));
+        $ccEmail    = trim((string) ($this->input->post('cc_email') ?? ''));
+        $bccEmail   = trim((string) ($this->input->post('bcc_email') ?? ''));
         $subject    = trim((string) $this->input->post('final_subject'));
         $body       = $this->input->post('final_body', false);
 
         if ($templateId <= 0) {
+            if ($ajax) {
+                $this->email_send_ajax_response(false, 'Invalid template.');
+                return;
+            }
             set_alert('danger', 'Invalid template.');
             redirect(admin_url('email_template'));
         }
 
         if ($toEmail === '') {
+            if ($ajax) {
+                $this->email_send_ajax_response(false, 'To Email is required');
+                return;
+            }
             set_alert('warning', 'To Email is required');
             redirect(admin_url('email_template'));
         }
 
         if ($subject === '' || $body === '') {
+            if ($ajax) {
+                $this->email_send_ajax_response(false, 'Subject and Description are required');
+                return;
+            }
             set_alert('warning', 'Subject and Description are required');
             redirect(admin_url('email_template'));
         }
 
         // Prevent sending if placeholders still exist
         if (preg_match('/\{\{\s*[^}]+\s*\}\}/', $subject . ' ' . $body)) {
+            if ($ajax) {
+                $this->email_send_ajax_response(false, 'Please fill all template variables before sending');
+                return;
+            }
             set_alert('warning', 'Please fill all template variables before sending');
             redirect(admin_url('email_template'));
         }
@@ -133,6 +149,10 @@ class Email_template extends AdminController
         $tpl = $this->db->get(db_prefix() . 'email_template')->row_array();
 
         if (empty($tpl)) {
+            if ($ajax) {
+                $this->email_send_ajax_response(false, 'Template not found.');
+                return;
+            }
             set_alert('danger', 'Template not found.');
             redirect(admin_url('email_template'));
         }
@@ -144,10 +164,15 @@ class Email_template extends AdminController
             'recipientBCC'   => $bccEmail,
             'emailSubject'   => $subject,
             'emailBody'      => $body,
-            // Try company SMTP first if configured
-			
-            //'company_email'  => 1,
         ]);
+
+        if ($ajax) {
+            $this->email_send_ajax_response(
+                (bool) $ok,
+                $ok ? 'Email sent successfully' : 'Failed to send email'
+            );
+            return;
+        }
 
         if ($ok) {
             set_alert('success', 'Email sent successfully');
@@ -156,6 +181,83 @@ class Email_template extends AdminController
         }
 
         redirect(admin_url('email_template'));
+    }
+
+    /**
+     * JSON list of templates (id + subject) for dropdowns — same scope as index().
+     */
+    public function templates_json()
+    {
+        $companyId = get_staff_company_id();
+        $staffId   = get_staff_user_id();
+
+        $this->db->select('id, subject');
+        $this->db->from(db_prefix() . 'email_template');
+        $this->db->where('status', 1);
+        if (!(function_exists('is_super') && is_super())) {
+            $this->db->where('company_id', $companyId);
+        }
+        $this->db->where('staffid', $staffId);
+        $this->db->order_by('id', 'desc');
+        $rows = $this->db->get()->result_array();
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success'    => true,
+            'templates'  => $rows,
+        ]);
+    }
+
+    /**
+     * Single template JSON (for preview / placeholder resolution in UI).
+     */
+    public function template_json($id = 0)
+    {
+        $id = (int) $id;
+        if ($id <= 0) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Invalid id']);
+            return;
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId   = get_staff_user_id();
+
+        $this->db->where('id', $id);
+        $this->db->where('status', 1);
+        if (!(function_exists('is_super') && is_super())) {
+            $this->db->where('company_id', $companyId);
+        }
+        $this->db->where('staffid', $staffId);
+        $tpl = $this->db->get(db_prefix() . 'email_template')->row_array();
+
+        header('Content-Type: application/json');
+        if (empty($tpl)) {
+            echo json_encode(['success' => false, 'message' => 'Template not found']);
+            return;
+        }
+
+        echo json_encode([
+            'success'  => true,
+            'template' => [
+                'id'      => (int) $tpl['id'],
+                'subject' => $tpl['subject'] ?? '',
+                'body'    => $tpl['body'] ?? '',
+            ],
+        ]);
+    }
+
+    /**
+     * @param bool   $success
+     * @param string $message
+     */
+    private function email_send_ajax_response($success, $message)
+    {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => $success,
+            'message' => $message,
+        ]);
     }
 }
 
