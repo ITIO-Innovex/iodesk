@@ -58,7 +58,7 @@ class Webmail_model extends App_Model
 	    $this->db->select('folder,');
         $this->db->where('email', $mailer_email);
 		$this->db->where('folder !=', 'Drafts');
-		$this->db->where('folder !=', 'Templates');
+		//$this->db->where('folder !=', 'Templates');
         $this->db->order_by('id', 'asc');
 		$this->db->group_by('folder');
 		//$this->db->limit(1);
