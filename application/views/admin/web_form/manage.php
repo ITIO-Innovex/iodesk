@@ -504,9 +504,9 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
 </div>
 
 <?php init_tail(); ?>
-<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
+<?php /*?><link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
 <script src="<?php echo base_url('assets/editor/js/jquery-te-1.4.0.min.js'); ?>"></script>
-<script>//$('.editor').jqte();</script>
+<script>//$('.editor').jqte();</script><?php */?>
 
 <link rel="stylesheet" href="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.css"/>
 <script src="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.js"></script>
@@ -768,7 +768,8 @@ window.editor = Jodit.make('.editor');
       // clear jqte editors if available
       if (typeof $.fn.jqteVal === 'function') {
         $('#web-form-entry').find('.editor').each(function() {
-          $(this).jqteVal('');
+          //$(this).jqteVal('');
+		  window.editor.value = '';
         });
       }
     }

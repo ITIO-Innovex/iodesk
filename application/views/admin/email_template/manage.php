@@ -648,8 +648,8 @@ $(function() {
     tplCcInput.updateHiddenInput();
     tplBccInput.updateHiddenInput();
 
-    var toEmail = $.trim($('#send_to_email').val());
-    if (!toEmail) warn.push('To Email is required.');
+    //var toEmail = $.trim($('#send_to_email').val());
+    //if (!toEmail) warn.push('To Email is required.');
 
     // All vars must be filled
     var missing = [];
@@ -771,7 +771,17 @@ $(function() {
     return true;
   });
 });
+// To Email Validation
+$('#sendTemplateBtn').on('click', function (e) {
+    var email = $('#send_to_email').val().trim(); // change #email to your input ID
 
+    if (email === '') {
+        alert('Email is required.');
+        $('#tplToInputField').focus();
+        return false;
+    }
+
+});
 
 </script>
 
