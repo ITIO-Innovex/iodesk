@@ -886,5 +886,51 @@ exit;
         echo json_encode(['success' => true, 'data' => $data[$fieldName]]);
         exit;
     }
+
+    /**
+     * Send plain email from web form entry modal (Send New Email — no template).
+     * POST (AJAX): to_email, cc_email, bcc_email, final_subject, final_body
+     */
+    public function send_row_email()
+    {
+        if (!is_staff_logged_in()) {
+            access_denied('Web Form');
+        }
+
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+        }
+
+        $toEmail  = trim((string) ($this->input->post('to_email') ?? ''));
+        $ccEmail  = trim((string) ($this->input->post('cc_email') ?? ''));
+        $bccEmail = trim((string) ($this->input->post('bcc_email') ?? ''));
+        $subject  = trim((string) ($this->input->post('final_subject') ?? ''));
+        $body     = $this->input->post('final_body', false);
+
+        header('Content-Type: application/json');
+
+        if ($toEmail === '') {
+            echo json_encode(['success' => false, 'message' => 'To is required']);
+            return;
+        }
+        if ($subject === '' || $body === '') {
+            echo json_encode(['success' => false, 'message' => 'Subject and body are required']);
+            return;
+        }
+
+        $this->load->model('webmail_model');
+        $ok = $this->webmail_model->compose_email_super([
+            'recipientEmail' => $toEmail,
+            'recipientCC'    => $ccEmail,
+            'recipientBCC'   => $bccEmail,
+            'emailSubject'   => $subject,
+            'emailBody'      => $body,
+        ]);
+
+        echo json_encode([
+            'success' => (bool) $ok,
+            'message' => $ok ? 'Email sent successfully' : 'Failed to send email',
+        ]);
+    }
 }
 
