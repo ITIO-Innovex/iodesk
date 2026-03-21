@@ -6547,6 +6547,9 @@ $data['notifications'] = $this->db->get()->result_array();
                 $status = 2;
             }
 
+            $isAutoSave = (int) $this->input->post('dar_autosave') === 1;
+            $isAjax      = $this->input->is_ajax_request();
+
             $details = [];
             // Build row-wise details from array fields
             // Each field_X[] corresponds to multiple rows
@@ -6593,6 +6596,7 @@ $data['notifications'] = $this->db->get()->result_array();
                 // Update existing DAR for this date
                 $this->db->where('id', (int) $existing_for_date['id']);
                 $success = $this->db->update('it_crm_dar', $data);
+                $darId = (int) $existing_for_date['id'];
                 if ($success) {
                     set_alert('success', 'Daily Activity Report updated successfully.');
                 } else {
@@ -6604,11 +6608,20 @@ $data['notifications'] = $this->db->get()->result_array();
                 $data['staffid']    = get_staff_user_id();
                 $this->db->insert('it_crm_dar', $data);
                 $insert_id = $this->db->insert_id();
+                $darId = (int) $insert_id;
                 if ($insert_id) {
                     set_alert('success', 'Daily Activity Report saved successfully.');
                 } else {
                     set_alert('danger', 'Failed to save Daily Activity Report.');
                 }
+            }
+
+            // For AJAX autosave draft: return JSON and avoid redirect/emails
+            if ($isAjax && $isAutoSave && (int) $status === 2) {
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode(['success' => true, 'dar_id' => (int) $darId]));
+                return;
             }
 			$companyId = get_staff_company_id();
 			$darEmail=get_company_fields($companyId ,'email_dar');
