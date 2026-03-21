@@ -4320,5 +4320,9 @@ $lang['task_created'] = 'Assign new task';
 $lang['Task'] = 'Task';
 $lang['My Drive'] = 'My Drive';
 $lang['My Documents'] = 'My Documents';
+$lang['New Project Custom Field'] = 'New Project Custom Field';
+$lang['Field Title'] = 'Field Title';
+$lang['Active'] = 'Active';
+$lang['Inactive'] = 'Inactive';
 ?>
 
