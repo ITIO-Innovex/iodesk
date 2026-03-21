@@ -281,6 +281,26 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 			'badge'    => [],
 		]);
     }
+	
+	if (is_staff_member() && staff_can('view',  'web_form')) {
+		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
+			'name'     => 'Web Form',
+			'href'     => admin_url('web_form'),
+			'icon'     => 'fa-solid fa-envelopes-bulk',
+			'position' => 45,
+			'badge'    => [],
+		]);
+    }
+	
+	if (is_staff_member() && staff_can('view',  'email_template')) {
+		$CI->app_menu->add_sidebar_menu_item('Email-Template', [
+			'name'     => 'Email Template',
+			'href'     => admin_url('email_template'),
+			'icon'     => 'fa-solid fa-envelopes-bulk',
+			'position' => 45,
+			'badge'    => [],
+		]);
+    }
     // End Direct Email
 
     if (is_staff_member() && staff_can('webmail',  'webmail')) {
