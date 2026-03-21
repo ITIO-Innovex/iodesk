@@ -8,7 +8,7 @@
         <div class="panel_s">
           <div class="panel-body panel-table-fullxx">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
-              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg tw-text-neutral-700">My Documents</h4>
+              <h4 class="tw-mt-0 tw-font-semibold tw-text-lg ">My Documents</h4>
               <a href="#" class="btn btn-primary" onclick="$('#doc_modal').modal('show');return false;">Add Document</a>
             </div>
             <div class="table-responsive">
