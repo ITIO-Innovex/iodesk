@@ -2270,6 +2270,19 @@ class Hrd extends AdminController
         $this->db->where('staffid', $staffid);
         $this->db->update(db_prefix() . 'staff', $data);
 
+		if ($this->db->affected_rows() > 0) {
+		
+		// Advance query check wnen inser than update else insert
+		$this->db->replace(db_prefix() . 'staff_departments', [
+        'staffid'      => $staffid,
+        'departmentid' => $data['department_id']
+        ]);
+
+		//log_message('error', 'staff_departments Display data - '.$this->db->last_query() );
+        }
+		
+		
+
         // If AJAX, set alert and return JSON so it shows after client-side redirect
         if ($this->input->is_ajax_request()) {
             set_alert('success', 'Staff updated successfully');
