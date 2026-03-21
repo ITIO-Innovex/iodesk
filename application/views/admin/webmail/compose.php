@@ -285,7 +285,42 @@ $messageid=$email_draft->messageid ?? '';
     </div>
 </div>
 
-
+<!-- CRM Email Template picker → apply to compose (emailSubjectIT / emailBody jqte) -->
+<div class="modal fade" id="template_modal" tabindex="-1" role="dialog" aria-labelledby="composeTemplateModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="composeTemplateModalLabel">Email template</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="composeTemplateSelect">Select template</label>
+                    <select id="composeTemplateSelect" class="form-control">
+                        <option value="">— Select email template —</option>
+                    </select>
+                </div>
+                <div id="composeTplVarsWrap" class="form-group" style="display:none;">
+                    <label>Template variables</label>
+                    <p class="text-muted small">Fill values for placeholders like <code>{{Name}}</code> (names must match exactly).</p>
+                    <div id="composeTplVarsContainer" class="well well-sm" style="max-height:200px;overflow:auto;"></div>
+                </div>
+                <div class="form-group">
+                    <label>Preview</label>
+                    <div class="well well-sm" style="max-height:220px;overflow:auto;">
+                        <div id="composeTplPreviewSubject" class="tw-font-semibold tw-mb-2"></div>
+                        <div id="composeTplPreviewBody" class="compose-tpl-preview-body"></div>
+                    </div>
+                </div>
+                <div class="alert alert-warning hide" id="composeTplPreviewWarning"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+                <button type="button" class="btn btn-primary" id="composeUseTemplateBtn">Use this template</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php init_tail(); ?>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/editor/css/jquery-te.css'); ?>"/>
@@ -1003,6 +1038,195 @@ $_SESSION['replySavedEmail']=0;
 }
 
 ?>
+
+<script>
+(function() {
+  var composeTplRaw = null;
+  var composeTemplatesLoaded = false;
+
+  function composeExtractVars(subject, body) {
+    var text = (subject || '') + '\n' + (body || '');
+    var vars = [];
+    var re = /\{\{\s*([^}]+?)\s*\}\}/g;
+    var m;
+    while ((m = re.exec(text)) !== null) {
+      var key = (m[1] || '').trim();
+      if (key && vars.indexOf(key) === -1) {
+        vars.push(key);
+      }
+    }
+    return vars;
+  }
+
+  function composeApplyPlaceholders(text, map) {
+    if (!text) {
+      return '';
+    }
+    return text.replace(/\{\{\s*([^}]+?)\s*\}\}/g, function(_, raw) {
+      var k = raw.trim();
+      if (map[k] !== undefined) {
+        return map[k];
+      }
+      var lower = k.toLowerCase();
+      for (var ek in map) {
+        if (ek.toLowerCase() === lower) {
+          return map[ek];
+        }
+      }
+      return '';
+    });
+  }
+
+  function composeGetVarMap() {
+    var map = {};
+    $('.compose-tpl-var-input').each(function() {
+      var k = $(this).attr('data-var');
+      if (k) {
+        map[k] = $(this).val() || '';
+      }
+    });
+    return map;
+  }
+
+  function composeRenderTplVars() {
+    if (!composeTplRaw) {
+      return;
+    }
+    var names = composeExtractVars(composeTplRaw.subject, composeTplRaw.body);
+    var $wrap = $('#composeTplVarsWrap');
+    var $c = $('#composeTplVarsContainer');
+    $c.empty();
+    if (!names.length) {
+      $wrap.hide();
+      return;
+    }
+    names.forEach(function(name) {
+      var $div = $('<div class="form-group" style="margin-bottom:8px;"></div>');
+      $div.append($('<label class="small" style="font-weight:normal;"></label>').text('{{' + name + '}}'));
+      var $inp = $('<input type="text" class="form-control input-sm compose-tpl-var-input" autocomplete="off"/>');
+      $inp.attr('data-var', name);
+      $div.append($inp);
+      $c.append($div);
+    });
+    $wrap.show();
+  }
+
+  function composeRebuildPreview() {
+    if (!composeTplRaw) {
+      return null;
+    }
+    var map = composeGetVarMap();
+    var subj = composeApplyPlaceholders(composeTplRaw.subject || '', map);
+    var body = composeApplyPlaceholders(composeTplRaw.body || '', map);
+    $('#composeTplPreviewSubject').text(subj);
+    $('#composeTplPreviewBody').html(body);
+    var combined = subj + ' ' + (body || '');
+    if (/\{\{\s*[^}]+\s*\}\}/.test(combined)) {
+      $('#composeTplPreviewWarning').removeClass('hide').text('Fill all template variables before applying, or placeholders will stay in the email.');
+    } else {
+      $('#composeTplPreviewWarning').addClass('hide').text('');
+    }
+    return { subject: subj, body: body };
+  }
+
+  $('#template_modal').on('show.bs.modal', function() {
+    if (!composeTemplatesLoaded) {
+      $.getJSON((typeof admin_url !== 'undefined' ? admin_url : '') + 'email_template/templates_json')
+        .done(function(resp) {
+          if (resp && resp.success && resp.templates) {
+            var $sel = $('#composeTemplateSelect');
+            $sel.find('option:not(:first)').remove();
+            resp.templates.forEach(function(t) {
+              $sel.append($('<option></option>').attr('value', t.id).text(t.subject || ('Template #' + t.id)));
+            });
+            composeTemplatesLoaded = true;
+          }
+        })
+        .fail(function() {
+          if (typeof alert_float === 'function') {
+            alert_float('danger', 'Could not load templates.');
+          } else {
+            alert('Could not load templates.');
+          }
+        });
+    }
+  });
+
+  $('#composeTemplateSelect').on('change', function() {
+    var id = parseInt($(this).val(), 10) || 0;
+    if (!id) {
+      composeTplRaw = null;
+      $('#composeTplVarsWrap').hide();
+      $('#composeTplVarsContainer').empty();
+      $('#composeTplPreviewSubject').empty();
+      $('#composeTplPreviewBody').empty();
+      $('#composeTplPreviewWarning').addClass('hide').text('');
+      return;
+    }
+    $.getJSON((typeof admin_url !== 'undefined' ? admin_url : '') + 'email_template/template_json/' + id)
+      .done(function(resp) {
+        if (!resp || !resp.success || !resp.template) {
+          if (typeof alert_float === 'function') {
+            alert_float('danger', 'Could not load template');
+          }
+          return;
+        }
+        composeTplRaw = {
+          subject: resp.template.subject || '',
+          body: resp.template.body || ''
+        };
+        composeRenderTplVars();
+        composeRebuildPreview();
+      });
+  });
+
+  $(document).on('input change', '.compose-tpl-var-input', function() {
+    composeRebuildPreview();
+  });
+
+  $('#composeUseTemplateBtn').on('click', function() {
+    if (!composeTplRaw) {
+      if (typeof alert_float === 'function') {
+        alert_float('warning', 'Select a template first.');
+      } else {
+        alert('Select a template first.');
+      }
+      return;
+    }
+    var result = composeRebuildPreview();
+    if (!result) {
+      return;
+    }
+    if (/\{\{\s*[^}]+\s*\}\}/.test(result.subject + ' ' + result.body)) {
+      if (typeof alert_float === 'function') {
+        alert_float('warning', 'Please fill all template variables before using this template.');
+      } else {
+        alert('Please fill all template variables.');
+      }
+      return;
+    }
+    $('#emailSubjectIT').val(result.subject);
+    $('#emailBody').val(result.body);
+    if (typeof $.fn.jqteVal === 'function') {
+      $('#emailBody').jqteVal(result.body);
+    }
+    $('#template_modal').modal('hide');
+    if (typeof alert_float === 'function') {
+      alert_float('success', 'Template applied to subject and body.');
+    }
+  });
+
+  $('#template_modal').on('hidden.bs.modal', function() {
+    $('#composeTemplateSelect').val('');
+    composeTplRaw = null;
+    $('#composeTplVarsWrap').hide();
+    $('#composeTplVarsContainer').empty();
+    $('#composeTplPreviewSubject').empty();
+    $('#composeTplPreviewBody').empty();
+    $('#composeTplPreviewWarning').addClass('hide').text('');
+  });
+})();
+</script>
 
 </body>
 
