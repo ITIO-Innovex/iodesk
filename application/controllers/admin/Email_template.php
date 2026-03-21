@@ -62,12 +62,37 @@ class Email_template extends AdminController
                 $this->db->where('company_id', $companyId);
             }
             $this->db->update($table, $data);
+			/////////////////////Notification & log//////////////
+		         $notification_data = [
+                    'description'     => 'update_email_template',
+                    'touserid'        => $staffId,
+                    'link'            => 'email_template',
+					'additional_data' => serialize([$subject,]),
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification([$staffId]);
+                }
+				//echo "Email sent successfully!";
+	      log_activity('Email Template updated successfully -  [ Subject: ' . $subject . ']');
+		////////////////////////////////////////////////
             set_alert('success', 'Template updated successfully');
             redirect(admin_url('email_template'));
         }
 
         $data['created_at'] = date('Y-m-d H:i:s');
         $this->db->insert($table, $data);
+		/////////////////////Notification & log//////////////
+		         $notification_data = [
+                    'description'     => 'add_email_template',
+                    'touserid'        => $staffId,
+                    'link'            => 'email_template',
+					'additional_data' => serialize([$subject,]),
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification([$staffId]);
+                }
+				log_activity('Email Template added successfully -  [ Subject: ' . $subject . ']');
+		////////////////////////////////////////////////
         set_alert('success', 'Template added successfully');
         redirect(admin_url('email_template'));
     }
@@ -80,13 +105,24 @@ class Email_template extends AdminController
         }
 
         $companyId = get_staff_company_id();
-
+        $staffId   = get_staff_user_id();
         $this->db->where('id', $id);
         if (!(function_exists('is_super') && is_super())) {
             $this->db->where('company_id', $companyId);
         }
         $this->db->update(db_prefix() . 'email_template', ['status' => 0]);
-
+        /////////////////////Notification & log//////////////
+		         $notification_data = [
+                    'description'     => 'delete_email_template',
+                    'touserid'        => $staffId,
+                    'link'            => 'email_template',
+					'additional_data' => serialize([$id,]),
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification([$staffId]);
+                }
+				log_activity('Email Template deleted successfully -  [ ID: ' . $id . ']');
+		////////////////////////////////////////////////
         set_alert('success', 'Template deleted successfully');
         redirect(admin_url('email_template'));
     }

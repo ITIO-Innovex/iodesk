@@ -4325,5 +4325,13 @@ $lang['Add New Project Custom Field'] = 'Add New Project Custom Field';
 $lang['Field Title'] = 'Field Title';
 $lang['Active'] = 'Active';
 $lang['Inactive'] = 'Inactive';
+$lang['add_email_template'] = 'Add New Email Template';
+$lang['update_email_template'] = 'Update Email Template';
+$lang['delete_email_template'] = 'Email Template Deleted';
+$lang['add_web_form'] = 'Add New Web Form';
+$lang['update_web_form'] = 'Update Web Form';
+$lang['assign_web_form'] = 'Assign Web Form';
+$lang['email'] = 'email';
+$lang['No Webmail Setup Entries'] = 'No Webmail Setup Entries';
 ?>
 

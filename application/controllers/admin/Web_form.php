@@ -54,7 +54,7 @@ class Web_form extends AdminController
         $companyId = get_staff_company_id();
         $formId    = (int) $this->input->post('form_id');
         $assignTo  = $this->input->post('assign_to');
-
+        $staffId = get_staff_user_id();
         if (!is_array($assignTo)) {
             $assignTo = [];
         }
@@ -67,6 +67,27 @@ class Web_form extends AdminController
             'assign_to'  => json_encode($assignTo),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
+		
+		if (!empty($assignTo)) {
+        foreach ($assignTo as $assignid) {
+		log_message('error', 'Display data'.$assignid );
+		
+		        /////////////////////Notification & log//////////////
+		         $notification_data = [
+                    'description'     => 'assign_web_form',
+                    'touserid'        => $assignid,
+                    'link'            => 'web_form',
+					'fromuserid'      => 0,
+					'additional_data' => serialize([$formId,]),
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification([$assignid]);
+                }
+				log_activity(_l('assign_web_form').' -  [ Form ID: ' . $formId . ']');
+		        ////////////////////////////////////////////////
+		
+        }
+}
 
         echo json_encode(['success' => true]);
         exit;
@@ -139,7 +160,8 @@ class Web_form extends AdminController
         $companyId = get_staff_company_id();
 		$staffId   = get_staff_user_id();
         $formId    = (int) $this->input->post('form_id');
-
+		$formnamex    = $this->input->post('name') ?? '-';
+        $log_msg="add_web_form";
         $formData = [
             'company_id' => $companyId,
 			'staffid' 	 => $staffId,
@@ -150,6 +172,7 @@ class Web_form extends AdminController
         ];
 
         if ($formId > 0) {
+		   $log_msg="update_web_form";
             // Update existing
             $this->db->where('id', $formId);
             $this->db->where('company_id', $companyId);
@@ -236,6 +259,7 @@ class Web_form extends AdminController
             }
 
             if ($hasEntries && $fieldId > 0) {
+			$log_msg="update_web_form";
                 // Update existing field (do not change name when entries exist)
                 $this->db->where('id', $fieldId);
                 $this->db->where('form_id', $formId);
@@ -261,7 +285,18 @@ class Web_form extends AdminController
                 ]);
             }
         }
-
+        /////////////////////Notification & log//////////////
+		         $notification_data = [
+                    'description'     => $log_msg,
+                    'touserid'        => $staffId,
+                    'link'            => 'web_form',
+					'additional_data' => serialize([$formnamex,]),
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification([$staffId]);
+                }
+				log_activity(_l($log_msg).' -  [ Form Name: ' . $formnamex . ']');
+		////////////////////////////////////////////////
         set_alert('success', 'Form saved successfully');
         //redirect(admin_url('web_form/create/' . $formId));
 		//redirect(admin_url('web_form'));
@@ -404,7 +439,7 @@ exit;
         if (!is_staff_logged_in()) {
             access_denied('Web Form');
         }
-
+        print_r($this->input->post());
         $companyId = get_staff_company_id();
         $formId    = (int) $formId;
         $entryId   = (int) $entryId;
@@ -436,8 +471,10 @@ exit;
 
         $data = [];
         foreach ($fields as $field) {
-            $name = $field['name'];
+            echo $name = $field['name'];
             $type = $field['type'];
+log_message('error', 'f Type - '.$type );
+
 
             // File fields handled via $_FILES below
             if ($type === 'file') {
@@ -445,8 +482,11 @@ exit;
                 $data[$name] = isset($existingData[$name]) ? $existingData[$name] : [];
                 continue;
             }
-
+            if ($type === 'editor') {
+			$val  = $this->input->post($name, false);
+			}else{
             $val  = $this->input->post($name);
+			}
 
             // Normalize checkbox/radio/select values
             if (is_array($val)) {
