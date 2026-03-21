@@ -276,6 +276,57 @@
       $('#dar-entry-form').submit();
     });
 
+    // Auto save DAR as draft on leaving each field (debounced to avoid many requests)
+    var darAutoSaveTimer = null;
+    var darAutoSaveInProgress = false;
+
+    function darScheduleAutoSave() {
+      if (darAutoSaveTimer) {
+        clearTimeout(darAutoSaveTimer);
+      }
+      darAutoSaveTimer = setTimeout(function() {
+        darAutoSaveDraft();
+      }, 700);
+    }
+
+    function darAutoSaveDraft() {
+      if (darAutoSaveInProgress) return;
+
+      var dateVal = $('#dar_date').val();
+      if (!dateVal) return;
+
+      darAutoSaveInProgress = true;
+
+      var $form = $('#dar-entry-form');
+      var postData = $form.serialize();
+
+      // Ensure draft status
+      $('#dar-status').val('2');
+
+      // Mark as autosave so controller returns JSON (no redirect)
+      postData += '&dar_autosave=1';
+
+      $.ajax({
+        url: $form.attr('action'),
+        type: 'POST',
+        data: postData,
+        dataType: 'json',
+        success: function(resp) {
+          darAutoSaveInProgress = false;
+          // Optional: show a small UI indicator
+          // console.log(resp);
+        },
+        error: function() {
+          darAutoSaveInProgress = false;
+        }
+      });
+    }
+
+    // Trigger autosave when user leaves field or changes value
+    $('#dar-rows').on('blur change mouseleave', 'input, select, textarea', function() {
+      darScheduleAutoSave();
+    });
+
     $('.add-dar-row').on('click', function () {
       var $tbody = $('#dar-rows');
       var $first = $tbody.find('tr.dar-row:first');
