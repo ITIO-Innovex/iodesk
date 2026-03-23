@@ -183,8 +183,14 @@
                         <?php echo staff_profile_image($current_user->staffid, ['img', 'img-responsive', 'staff-profile-image-small', 'tw-ring-1 tw-ring-offset-2 tw-ring-primary-500 tw-mx-1 tw-mt-2.5']); ?>
                     </a>
                     <ul class="dropdown-menu animated fadeIn">
-                        <li class="header-my-profile"><a
-                                href="<?php echo admin_url('profile'); ?>"><?php echo _l('nav_my_profile'); ?></a></li>
+					
+<?php
+$profileURL="profile";
+if(staff_can('view_own',  'hr_department')) {
+$profileURL="hrd/profile";
+}
+?>
+<li class="header-my-profile"><a href="<?php echo admin_url($profileURL); ?>"><?php echo _l('nav_my_profile'); ?></a></li>
                         <?php /*?><li class="header-my-timesheets"><a
                                 href="<?php echo admin_url('staff/timesheets'); ?>"><?php echo _l('my_timesheets'); ?></a>
                         </li><?php */?>

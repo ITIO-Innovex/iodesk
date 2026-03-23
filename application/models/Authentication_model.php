@@ -839,7 +839,7 @@ class Authentication_model extends App_Model
 	$senderName			= e(get_staff_full_name());
 	
 	//exit;
-$activation_link=site_url('authentication/acticate_account?salt='.base64_encode($data['company_id']));
+$activation_link=site_url('authentication/activate_account?salt='.base64_encode($data['company_id']));
 
 $mailbody='<!DOCTYPE html>
 <html>
