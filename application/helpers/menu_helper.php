@@ -161,7 +161,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 	
 		if (is_staff_member() && staff_can('webmail',  'webmail')) {
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
-            'slug'     => 'webmail_1',
+            'slug'     => 'webmail_2',
             'name'     => 'Webmail',
             'href'     => admin_url('webmail'),
             'position' => 15,
