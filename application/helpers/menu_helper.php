@@ -175,7 +175,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
             'slug'     => 'direct_email_1',
             'name'     => 'Direct Email',
-            'href'     => admin_url('webmail'),
+            'href'     => admin_url('direct_email'),
             'position' => 15,
 			'icon'     => 'fa-solid fa-envelopes-bulk',
             'badge'    => [],
