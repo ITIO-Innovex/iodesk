@@ -108,7 +108,7 @@ class Authentication extends ClientsController
         $this->layout();
     }
 	
-	public function acticate_account()
+	public function activate_account()
     {
         
 		$salt = $this->input->get('salt');
@@ -138,7 +138,7 @@ class Authentication extends ClientsController
 		
         //$data['bodyclass'] = 'customers_verify';
         $this->data($data);
-        $this->view('acticate_account');
+        $this->view('activate_account');
         $this->disableNavigation();
         $this->disableSubMenu();
         $this->layout();
