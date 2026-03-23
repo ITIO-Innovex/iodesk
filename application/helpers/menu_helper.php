@@ -14,130 +14,7 @@ function app_init_admin_sidebar_menu_items()
         'badge'    => [],
     ]);
 	
-    /*if (staff_can('view',  'customers') || (have_assigned_customers() || (!have_assigned_customers() && staff_can('create',  'customers')))) {
-        $CI->app_menu->add_sidebar_menu_item('customers', [
-            'name'     => _l('als_clients'),
-            'href'     => admin_url('clients'),
-            'position' => 5,
-            'icon'     => 'fa-regular fa-user',
-            'badge'    => [],
-        ]);
-    }*/
-
-   
-
-    // if ((staff_can('view',  'proposals') || staff_can('view_own',  'proposals'))
-    //     || (staff_has_assigned_proposals() && get_option('allow_staff_view_proposals_assigned') == 1)
-    // ) {
-    //     $CI->app_menu->add_sidebar_children_item('sales', [
-    //         'slug'     => 'proposals',
-    //         'name'     => _l('proposals'),
-    //         'href'     => admin_url('proposals'),
-    //         'position' => 5,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    // if ((staff_can('view',  'estimates') || staff_can('view_own',  'estimates'))
-    //     || (staff_has_assigned_estimates() && get_option('allow_staff_view_estimates_assigned') == 1)
-    // ) {
-    //     $CI->app_menu->add_sidebar_children_item('sales', [
-    //         'slug'     => 'estimates',
-    //         'name'     => _l('estimates'),
-    //         'href'     => admin_url('estimates'),
-    //         'position' => 10,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-     
-
-    // if (staff_can('view',  'credit_notes') || staff_can('view_own',  'credit_notes')) {
-    //     $CI->app_menu->add_sidebar_children_item('sales', [
-    //         'slug'     => 'credit_notes',
-    //         'name'     => _l('credit_notes'),
-    //         'href'     => admin_url('credit_notes'),
-    //         'position' => 25,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-
-    // if (staff_can('view',  'subscriptions') || staff_can('view_own',  'subscriptions')) {
-    //     $CI->app_menu->add_sidebar_menu_item('subscriptions', [
-    //         'name'     => _l('subscriptions'),
-    //         'href'     => admin_url('subscriptions'),
-    //         'icon'     => 'fa fa-repeat',
-    //         'position' => 15,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    // if (staff_can('view',  'expenses') || staff_can('view_own',  'expenses')) {
-    //     $CI->app_menu->add_sidebar_menu_item('expenses', [
-    //         'name'     => _l('expenses'),
-    //         'href'     => admin_url('expenses'),
-    //         'icon'     => 'fa-regular fa-file-lines',
-    //         'position' => 20,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    // if (staff_can('view',  'contracts') || staff_can('view_own',  'contracts')) {
-    //     $CI->app_menu->add_sidebar_menu_item('contracts', [
-    //         'name'     => _l('contracts'),
-    //         'href'     => admin_url('contracts'),
-    //         'icon'     => 'fa-solid fa-file-contract',
-    //         'position' => 25,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    /*$CI->app_menu->add_sidebar_menu_item('projects', [
-        'name'     => _l('projects'),
-        'href'     => admin_url('projects'),
-        'icon'     => 'fa-solid fa-chart-gantt',
-        'position' => 30,
-        'badge'    => [],
-    ]);
-*/
-    /*$CI->app_menu->add_sidebar_menu_item('tasks', [
-        'name'     => _l('als_tasks'),
-        'href'     => admin_url('tasks'),
-        'icon'     => 'fa-regular fa-circle-check',
-        'position' => 35,
-        'badge'    => [],
-    ]);*/
-
-    if ((!is_staff_member() && get_option('access_tickets_to_none_staff_members') == 1) || (is_staff_member() && staff_can('view',  'tickets'))) {
-        /*$enable_badge = get_option('enable_support_menu_badges');
-        $CI->app_menu->add_sidebar_menu_item('support', [
-            'collapse' => $enable_badge ? true : null,
-            'name'     => _l('support'),
-            'href'     => admin_url('tickets'),
-            'icon'     => 'fa-regular fa-life-ring',
-            'position' => 40,
-            'badge'    => [],
-        ]);*/
-
-        /*$CI->load->model('tickets_model');
-        $statuses = $CI->tickets_model->get_ticket_status();
-
-        if ($enable_badge) {
-            foreach ($statuses as $status) {
-                $CI->app_menu->add_sidebar_children_item('support', [
-                    'slug'     => 'support-' . $status['ticketstatusid'],
-                    'name'     => ticket_status_translate($status['ticketstatusid']),
-                    'href'     => admin_url('tickets/index/' . $status['ticketstatusid']),
-                    'position' => $status['statusorder'],
-                    'badge'    => [
-                        'value' => $CI->tickets_model->ticket_count($status['ticketstatusid']),
-                        'color' => $status['statuscolor'],
-                    ],
-                ]);
-            }
-        }*/
-    }
+ 	//////////////////////////// Leads / Seals Sections //////////////   
 
 if (is_staff_member()&& staff_can('view',  'leads')) {
     $CI->app_menu->add_sidebar_menu_item('LeadsDeal', [
@@ -174,38 +51,8 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 	}
 
-    
 
-    /*if (is_staff_member()&& staff_can('view',  'leads')) {
-		$CI->app_menu->add_sidebar_menu_item('leads', [
-			'name'     => 'Add New Leads',
-			'href'     => admin_url('leads/add_new_leads'),
-			'icon'     => 'fa fa-tty',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
-	
-    if (is_staff_member()&& staff_can('view',  'leads')) {
-		$CI->app_menu->add_sidebar_menu_item('leads', [
-			'name'     => _l('als_leads'),
-			'href'     => admin_url('leads'),
-			'icon'     => 'fa fa-tty',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
-	
-	    if (is_staff_member()&& staff_can('view',  'leads')) {
-		$CI->app_menu->add_sidebar_menu_item('deals', [
-			'name'     => _l('Deals'),
-			'href'     => admin_url('leads/deals'),
-			'icon'     => 'fa-solid fa-handshake',
-			'position' => 20,
-			'badge'    => [],
-		]);
-    }*/
-	
+	//////////////////////////// Sales Sections //////////////
 	
 	
 	 $CI->app_menu->add_sidebar_menu_item('salesD', [
@@ -248,6 +95,131 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         ]);
     }
 	
+	/////////////////////////////// Workspace Sections ///////////
+
+		 $CI->app_menu->add_sidebar_menu_item('Workspace', [
+        'collapse' => true,
+        'name'     => 'Workspace',
+        'position' => 20,
+        'icon'     => 'fa fa-briefcase',
+        'badge'    => [],
+        ]);
+    
+	    //if (is_staff_member() && staff_can('view',  'web_form')) {
+        $CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'web_form_1',
+            'name'     => 'Web Form',
+            'href'     => admin_url('web_form'),
+            'position' => 15,
+			'icon'     => 'fa-brands fa-wpforms',
+            'badge'    => [],
+        ]);
+		//}
+		
+		if (is_admin() || staff_can('view', 'user_utility')) {
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'user_utility_1',
+            'name'     => 'Team Document',
+            'href'     => admin_url('user_utility'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-file-zipper',
+            'badge'    => [],
+        ]);
+		}
+		
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'important_document_1',
+            'name'     => 'My Document',
+            'href'     => admin_url('important_document'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-file-contract',
+            'badge'    => [],
+        ]);
+		
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'drive_1',
+            'name'     => 'My Drive',
+            'href'     => admin_url('drive'),
+            'position' => 15,
+			'icon'     => 'fa-brands fa-google-drive',
+            'badge'    => [],
+        ]);
+		
+		if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
+		
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'underwriting_1',
+            'name'     => 'Under Writing',
+            'href'     => admin_url('underwriting'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-file-pen',
+            'badge'    => [],
+        ]);
+		
+      
+    }
+	
+		if (is_staff_member() && staff_can('webmail',  'webmail')) {
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'webmail_1',
+            'name'     => 'Webmail',
+            'href'     => admin_url('webmail'),
+            'position' => 15,
+			'icon'     => 'fa-regular fa-envelope',
+            'badge'    => [],
+        ]);
+		}
+		
+		if (is_staff_member() && staff_can('view',  'direct_email')) {
+		
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'direct_email_1',
+            'name'     => 'Direct Email',
+            'href'     => admin_url('webmail'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-envelopes-bulk',
+            'badge'    => [],
+        ]);
+    }
+		
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'email_template',
+            'name'     => 'Email Template',
+            'href'     => admin_url('email_template'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-envelope-open-text',
+            'badge'    => [],
+        ]);
+		
+		
+		 if (is_staff_member() && staff_can('view',  'ai_support')) {
+		 
+		 $CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'ai_content_generator_1',
+            'name'     => 'AI Support',
+            'href'     => admin_url('ai_content_generator'),
+            'position' => 15,
+			'icon'     => 'fa-regular fa-newspaper',
+            'badge'    => [],
+        ]);
+        }
+		
+		if (is_staff_member() && staff_can('webmail_setup',  'webmail')) {
+		
+		$CI->app_menu->add_sidebar_children_item('Workspace', [
+            'slug'     => 'webmail_setup_1',
+            'name'     => 'Webmail Setup',
+            'href'     => admin_url('webmail_setup'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-at',
+            'badge'    => [],
+        ]);
+		
+		
+    }
+	
+	//////////////////////////////
+	
 	    if(isset($_SESSION['company_form_type'])&& $_SESSION['company_form_type']<>1){
 	
 		if (is_staff_member() && get_staff_rolex()<>3) {
@@ -262,68 +234,11 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
     }
 	
-	  /*  if (is_staff_member()) {
-		$CI->app_menu->add_sidebar_menu_item('task', [
-			'name'     => _l('Deal Task'),
-			'href'     => admin_url('deal_task'),
-			'icon'     => 'fa-solid fa-file-signature',
-			'position' => 20,
-			'badge'    => [],
-		]);
-    }*/
-    // Direct Email
-    if (is_staff_member() && staff_can('view',  'direct_email')) {
-		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
-			'name'     => 'Direct Email',
-			'href'     => admin_url('direct_email'),
-			'icon'     => 'fa-solid fa-envelopes-bulk',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
-	
-	if (is_staff_member() && staff_can('view',  'web_form')) {
-		$CI->app_menu->add_sidebar_menu_item('Direct-Email', [
-			'name'     => 'Web Form',
-			'href'     => admin_url('web_form'),
-			'icon'     => 'fa-brands fa-wpforms',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
-	
-	if (is_staff_member() && staff_can('view',  'email_template')) {
-		$CI->app_menu->add_sidebar_menu_item('Email-Template', [
-			'name'     => 'Email Template',
-			'href'     => admin_url('email_template'),
-			'icon'     => 'fa-solid fa-envelopes-bulk',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
-    // End Direct Email
 
-    if (is_staff_member() && staff_can('webmail',  'webmail')) {
-		$CI->app_menu->add_sidebar_menu_item('webmail', [
-			'name'     => _l('Webmail'),
-			'href'     => admin_url('webmail'),
-			'icon'     => 'fa-regular fa-envelope',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
 
     
 
-    if (is_staff_member() && staff_can('view',  'ai_support')) {
-		$CI->app_menu->add_sidebar_menu_item('ai-content-generator', [
-			'name'     => _l('AI Support'),
-			'href'     => admin_url('ai_content_generator'),
-			'icon'     => 'fa-regular fa-newspaper',
-			'position' => 45,
-			'badge'    => [],
-		]);
-    }
+   
 	
 	if (is_super()) {
 	
@@ -345,7 +260,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 	
 	}
 	
-	
+////////////////////////////////////////// User Setup Sections ////////////////	
 	
 	if (is_admin()) {
 		$CI->app_menu->add_sidebar_menu_item('crm_setup', [
@@ -380,6 +295,8 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 			],
 		]);
     }
+	
+////////////////////////////////////////// Invoice Sections ////////////////
 	
 	   if (staff_can('view',  'invoices')) {
 	   
@@ -453,10 +370,11 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 		}
 		
+////////////////////////////////////////// End Invoice Sections ////////////////		
 		
-
+////////////////////////////////////////// Subscriptions Sections ////////////////
     
-        $CI->app_menu->add_sidebar_menu_item('subscriptions_menu', [
+    $CI->app_menu->add_sidebar_menu_item('subscriptions_menu', [
             'collapse' => true,
             'name'     => 'Subscriptions',
             'position' => 55,
@@ -515,9 +433,9 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         ]);
 	}
 	
+////////////////////////////////////////// End Subscriptions Sections ////////////////	
 	
-	
-	//////////////////////////////////////////
+////////////////////////////////////////// Project Sections ////////////////
 	
 	 $CI->app_menu->add_sidebar_menu_item('project', [
         'collapse' => true,
@@ -629,10 +547,9 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 		
     }
+////////////////////////////////////////// End Project Sections ////////////////	
 	
-	
-	////////////////////////////////////////
-//////////////////////////////////////////
+////////////////////////////////////////// HRMS Staff Sections ////////////////
 	
 	 $CI->app_menu->add_sidebar_menu_item('hr_department', [
         'collapse' => true,
@@ -681,12 +598,9 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         ]);
       }
 	  
-	  
+////////////////////////////////////////// END HRMS Staff Sections ////////////////	  
 	 
-   
-	 
-    
-
+////////////////////////////////////////// Conversation Sections ////////////////
 
     if (is_staff_member() && staff_can('view',  'conversation')) {
 		$CI->app_menu->add_sidebar_menu_item('conversion', [
@@ -720,198 +634,13 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 			'icon'     => 'fa-brands fa-whatsapp',
 			'badge'    => [],
 		]);
-		/*$CI->app_menu->add_sidebar_children_item('conversion', [
-			'slug'     => 'als_webchat',
-			'name'     => _l('als_webchat'),
-			'href'     => admin_url('leads/webchat'),
-			'position' => 2,
-			'icon'     => 'far fa-comment-dots',
-			'badge'    => [],
-		]);*/
-    }
-
-
-    // if ((staff_can('view',  'estimate_request') || staff_can('view_own',  'estimate_request'))) {
-    //     $CI->app_menu->add_sidebar_menu_item('estimate_request', [
-    //         'name'     => _l('estimate_request'),
-    //         'href'     => admin_url('estimate_request'),
-    //         'position' => 46,
-    //         'icon'     => 'fa-regular fa-file',
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    // if (staff_can('view',  'knowledge_base')) {
-    //     $CI->app_menu->add_sidebar_menu_item('knowledge-base', [
-    //         'name'     => _l('als_kb'),
-    //         'href'     => admin_url('knowledge_base'),
-    //         'icon'     => 'fa-regular fa-folder-closed',
-    //         'position' => 50,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    // Utilities
-    // $CI->app_menu->add_sidebar_menu_item('utilities', [
-    //     'collapse' => true,
-    //     'name'     => _l('als_utilities'),
-    //     'position' => 55,
-    //     'icon'     => 'fa fa-cogs',
-    //     'badge'    => [],
-    // ]);
-
-    // $CI->app_menu->add_sidebar_children_item('utilities', [
-    //     'slug'     => 'media',
-    //     'name'     => _l('als_media'),
-    //     'href'     => admin_url('utilities/media'),
-    //     'position' => 5,
-    //     'badge'    => [],
-    // ]);
-
-    // if (staff_can('view',  'bulk_pdf_exporter')) {
-    //     $CI->app_menu->add_sidebar_children_item('utilities', [
-    //         'slug'     => 'bulk-pdf-exporter',
-    //         'name'     => _l('bulk_pdf_exporter'),
-    //         'href'     => admin_url('utilities/bulk_pdf_exporter'),
-    //         'position' => 10,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-    // $CI->app_menu->add_sidebar_children_item('utilities', [
-    //     'slug'     => 'calendar',
-    //     'name'     => _l('als_calendar_submenu'),
-    //     'href'     => admin_url('utilities/calendar'),
-    //     'position' => 15,
-    //     'badge'    => [],
-    // ]);
-
-
-    // if (is_admin()) {
-    //     $CI->app_menu->add_sidebar_children_item('utilities', [
-    //         'slug'     => 'announcements',
-    //         'name'     => _l('als_announcements_submenu'),
-    //         'href'     => admin_url('announcements'),
-    //         'position' => 20,
-    //         'badge'    => [],
-    //     ]);
-
-    //     $CI->app_menu->add_sidebar_children_item('utilities', [
-    //         'slug'     => 'activity-log',
-    //         'name'     => _l('als_activity_log_submenu'),
-    //         'href'     => admin_url('utilities/activity_log'),
-    //         'position' => 25,
-    //         'badge'    => [],
-    //     ]);
-
-    //     $CI->app_menu->add_sidebar_children_item('utilities', [
-    //         'slug'     => 'ticket-pipe-log',
-    //         'name'     => _l('ticket_pipe_log'),
-    //         'href'     => admin_url('utilities/pipe_log'),
-    //         'position' => 30,
-    //         'badge'    => [],
-    //     ]);
-    // }
-
-
-    if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
-        $CI->app_menu->add_sidebar_menu_item('underwriting', [
-            'name'     => 'Under Writing',
-            'href'     => admin_url('underwriting'),
-            'icon'     => 'fa-solid fa-file-pen',
-            'position' => 40,
-            'badge'    => [],
-        ]);
-    }
-    if (is_admin() || staff_can('view', 'user_utility')) {
-        $CI->app_menu->add_sidebar_menu_item('user-utility', [
-            'name'     => 'Team Document',
-            'href'     => admin_url('user_utility'),
-            'icon'     => 'fa-solid fa-file-zipper',
-            'position' => 40,
-            'badge'    => [],
-        ]);
     }
 	
+////////////////////////////////////////// End Conversation Sections ////////////////
+
+    
+
 	
-	
-	//if (is_admin()) {  // || staff_can('view', 'user_utility')
-        $CI->app_menu->add_sidebar_menu_item('drive', [
-            'name'     => 'My Drive',
-            'href'     => admin_url('drive'),
-            'icon'     => 'fa-brands fa-google-drive',
-            'position' => 40,
-            'badge'    => [],
-        ]);
-		
-		$CI->app_menu->add_sidebar_menu_item('important_document', [
-            'name'     => 'My Documents',
-            'href'     => admin_url('important_document'),
-            'icon'     => 'fa-solid fa-file-contract',
-            'position' => 40,
-            'badge'    => [],
-        ]);
-    //}
-
-/*    if (is_admin()) {
-    if (staff_can('view-timesheets', 'reports') || staff_can('view', 'reports')) {
-        $CI->app_menu->add_sidebar_menu_item('reports', [
-            'name'     => _l('als_reports'),
-            'href'     => admin_url('reports'),
-            'icon'     => 'fa-regular fa-chart-bar',
-            'position' => 40,
-            'badge'    => [],
-        ]);
-    }
-	}*/
-
-   /* if (staff_can('view-timesheets', 'reports')) {
-        $CI->app_menu->add_sidebar_children_item('reports', [
-            'slug'     => 'timesheets-reports',
-            'name'     => _l('timesheets_overview'),
-            'href'     => admin_url('staff/timesheets?view=all'),
-            'position' => 25,
-            'badge'    => [],
-        ]);
-    }*/
-
-    /*if (staff_can('view',  'reports')) {
-        $CI->app_menu->add_sidebar_children_item('reports', [
-            'slug'     => 'sales-reports',
-            'name'     => _l('als_reports_sales_submenu'),
-            'href'     => admin_url('reports/sales'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-        $CI->app_menu->add_sidebar_children_item('reports', [
-            'slug'     => 'expenses-reports',
-            'name'     => _l('als_reports_expenses'),
-            'href'     => admin_url('reports/expenses'),
-            'position' => 10,
-            'badge'    => [],
-        ]);
-        $CI->app_menu->add_sidebar_children_item('reports', [
-            'slug'     => 'expenses-vs-income-reports',
-            'name'     => _l('als_expenses_vs_income'),
-            'href'     => admin_url('reports/expenses_vs_income'),
-            'position' => 15,
-            'badge'    => [],
-        ]);
-        $CI->app_menu->add_sidebar_children_item('reports', [
-            'slug'     => 'leads-reports',
-            'name'     => _l('als_reports_leads_submenu'),
-            'href'     => admin_url('reports/leads'),
-            'position' => 20,
-            'badge'    => [],
-        ]);
-        $CI->app_menu->add_sidebar_children_item('reports', [
-            'slug'     => 'knowledge-base-reports',
-            'name'     => _l('als_kb_articles_submenu'),
-            'href'     => admin_url('reports/knowledge_base_articles'),
-            'position' => 30,
-            'badge'    => [],
-        ]);
-    }*/
 
     // Setup menu
 	if(get_staff_user_id()==1 && empty($_SESSION['super_view_company_id'])){
@@ -1323,24 +1052,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         ]);
 		}
 		
-		if (staff_can('view_interviews',  'hr_department')) {
-		$CI->app_menu->add_setup_children_item('hr_department', [
-            'slug'     => 'important_document',
-            'name'     => 'Important Document',
-            'href'     => admin_url('important_document'),
-            'position' => 5,
-            'badge'    => [],
-        ]);
-		}
 		
-		
-		
-		
-		
-		
-		
-        
-  
 	
 
     if (staff_can('view',  'finance')) {
@@ -1380,15 +1092,6 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         ]);
     }
 	
-	if (is_staff_member() && staff_can('webmail_setup',  'webmail')) {
-		$CI->app_menu->add_setup_menu_item('webmail-setup', [
-			'name'     => _l('Webmail Setup'),
-			'href'     => admin_url('webmail_setup'),
-			'icon'     => 'fa-solid fa-at',
-			'position' => 60,
-			'badge'    => [],
-		]);
-    }
 
     // Database Backup menu item (Super only)
     if (is_admin()) {
