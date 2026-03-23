@@ -104,7 +104,7 @@ class Webmail_model extends App_Model
 		//$this->db->where('uniqid >=', 1); hide on 23032026
         $counter=$this->db->get(db_prefix() . 'emails')->result_array(); //return
 		$_SESSION['inbox-total-email']=$counter[0]['total_email'];
-		echo $this->db->last_query();exit;
+		//echo $this->db->last_query();exit;
 		//print_r($counter);exit;
 		///////////////////////////END Count Total Email BY Folder//////////////
 		 
@@ -149,28 +149,7 @@ $mails = $this->db->get(db_prefix() . 'emails')->result_array();
  //echo $this->db->last_query();exit;
 
 return $mails;
-		
-		/*$this->db->select('*,');
-        $this->db->order_by('uniqid', 'desc');
-		//$this->db->group_by('uniqid');
-		if($folder=="Deleted"){
-		$this->db->where('is_deleted', 1);
-		}elseif($folder=="Flagged"){
-		$this->db->where('isfalg', 1);
-		}elseif($search==1){
-		$this->db->or_like($_SESSION['stype'], $_SESSION['skey']);
-		$this->db->where('is_deleted', 0);
-		
-		}else{
-		$this->db->where('is_deleted', 0);
-		$this->db->where('folder', $folder);
-		}
-		$this->db->where('email', $mailer_email);
-		$this->db->where('uniqid >=', 1); // hide on 23032026
-		$this->db->limit($_SESSION['mail_limit'],$page);
-        $mails=$this->db->get(db_prefix() . 'emails')->result_array(); //return
-		echo $this->db->last_query();//exit;
-		 return  $mails;exit;*/
+
 		///////////////////////////END Fetch Email//////////////
 		
 	  
