@@ -58,7 +58,9 @@ class Hrd extends AdminController
         } elseif ($type == 'attendance_request') {
             $this->attendance_request();
         } elseif ($type == 'dar_master') {
-            $this->dar_master();
+        	$this->dar_master();
+		} elseif ($type == 'download_dar_master_excel') {
+            $this->download_dar_master_excel();
         } elseif ($type == 'dar_form') {
             $this->dar_form();
         } elseif ($type == 'shift_manager') {
@@ -2278,7 +2280,7 @@ class Hrd extends AdminController
         'departmentid' => $data['department_id']
         ]);
 
-		//log_message('error', 'staff_departments Display data - '.$this->db->last_query() );
+		log_message('error', 'staff_departments Display data - '.$this->db->last_query() );
         }
 		
 		
@@ -6324,6 +6326,115 @@ $data['notifications'] = $this->db->get()->result_array();
         ];
         $data['title'] = 'DAR Master';
         $this->load->view('admin/hrd/setting/dar_master', $data);
+    } 
+	
+	
+	public function download_dar_master_excel()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Master');
+        }
+
+        $date    = $this->input->get('date');
+        $month   = $this->input->get('month'); // format: YYYY-MM from <input type="month">
+        $staffId = $this->input->get('staffid');
+
+        // Default to today only when no date/month filter is provided
+        if (empty($date) && empty($month)) {
+            $date = date('Y-m-d');
+        }
+
+        $this->db->select('d.*, s.firstname, s.lastname');
+        $this->db->from('it_crm_dar d');
+        $this->db->join(db_prefix().'staff s', 's.staffid = d.staffid', 'left');
+        // Filter by specific day or by whole month
+        if (!empty($month)) {
+            // Expecting YYYY-MM, e.g. 2026-03
+            $year  = (int) substr($month, 0, 4);
+            $m     = (int) substr($month, 5, 2);
+            if ($year > 0 && $m > 0) {
+                $this->db->where('YEAR(d.date)', $year);
+                $this->db->where('MONTH(d.date)', $m);
+            }
+        } else {
+            $this->db->where('d.date', $date);
+        }
+        if (!empty($staffId)) {
+            $this->db->where('d.staffid', (int) $staffId);
+        }
+        $this->db->order_by('d.date', 'desc');
+        $dars = $this->db->get()->result_array();
+		//print_r($data['dars']);
+		
+		// IMPORTANT: no space before this
+
+header("Content-Type: application/vnd.ms-excel");
+header("Content-Disposition: attachment; filename=DAR_Master_" . date("YmdHis") . ".xls");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+		echo "<table border='1' cellpadding='5' cellspacing='0'>";
+
+// header
+echo "<tr>
+        <th>Date</th>
+        <th>Staff</th>
+        <th>Status</th>
+        <th>Details</th>
+        <th>Details Old</th>
+      </tr>";
+
+// rows
+foreach ($dars as $dar) {
+
+    $statusLabel = ((int)($dar['status'] ?? 2) === 1) ? 'Submitted' : 'Draft';
+
+    echo "<tr>";
+    echo "<td>" . date('d-m-Y', strtotime($dar['addedon'] ?? $dar['date'])) . "</td>";
+    echo "<td>" . trim(($dar['firstname'] ?? '') . ' ' . ($dar['lastname'] ?? '')) . "</td>";
+    echo "<td>" . $statusLabel . "</td>";
+
+    // DETAILS (nested table safe)
+    $desc = $dar['details'] ?? '';
+    $detailstable = '';
+
+    if ($desc) {
+        $details = json_decode($desc, true);
+
+        if (!empty($details)) {
+            $detailstable .= "<table border='1'>";
+
+            // header
+            $detailstable .= "<tr>";
+            foreach ($details[0] as $field) {
+                $detailstable .= "<th>{$field['title']}</th>";
+            }
+            $detailstable .= "</tr>";
+
+            // rows
+            foreach ($details as $project) {
+                $detailstable .= "<tr>";
+                foreach ($project as $field) {
+                    $detailstable .= "<td>{$field['value']}</td>";
+                }
+                $detailstable .= "</tr>";
+            }
+
+            $detailstable .= "</table>";
+        }
+    }
+
+    echo "<td>" . $detailstable . "</td>";
+    echo "<td>" . ($dar['descriptions'] ?? '') . "</td>";
+
+    echo "</tr>";
+}
+
+echo "</table>";
+exit;
+
+
+        
     }
 
     /**
