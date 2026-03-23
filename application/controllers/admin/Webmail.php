@@ -1232,7 +1232,19 @@ See you soon,<br>
         }
         
         $companyId = get_staff_company_id();
-        $this->db->distinct();
+		
+$this->db->distinct();
+$this->db->select('to_emails');
+$this->db->from(db_prefix() . 'emails');
+$this->db->where('from_email', $email);
+$this->db->like('to_emails', $term, 'after');
+$this->db->where('to_emails IS NOT NULL', null, false);
+$this->db->where('to_emails !=', '');
+$this->db->order_by('to_emails', 'ASC'); // optional for sorted result
+$this->db->limit(50);
+$results = $this->db->get()->result_array();
+
+        /*$this->db->distinct();
         $this->db->select('to_emails');
         $this->db->from(db_prefix() . 'emails');
         //$this->db->where('company_id', $companyId);
@@ -1242,7 +1254,7 @@ See you soon,<br>
         $this->db->where('to_emails !=', '');
         $this->db->limit(50);
         
-        $results = $this->db->get()->result_array();
+        $results = $this->db->get()->result_array();*/
         //log_message('error', 'Emails - '.$this->db->last_query() );
         $emails = [];
         $seen = [];
