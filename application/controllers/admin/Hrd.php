@@ -2280,7 +2280,7 @@ class Hrd extends AdminController
         'departmentid' => $data['department_id']
         ]);
 
-		log_message('error', 'staff_departments Display data - '.$this->db->last_query() );
+		//log_message('error', 'staff_departments Display data - '.$this->db->last_query() );
         }
 		
 		
@@ -2573,7 +2573,7 @@ class Hrd extends AdminController
         }
 
         $department_id = (int)$this->input->get('department_id');
-        log_message('error', 'department_id333-' . $department_id);
+        //log_message('error', 'department_id333-' . $department_id);
         // Company scope
         if (is_super()) {
             if (isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
@@ -4009,7 +4009,7 @@ class Hrd extends AdminController
             $portion = isset($item['portion']) ? trim($item['portion']) : '';
             $second_half = isset($item['second_half']) ? trim($item['second_half']) : '';
 			
-			log_message('error', 'portion - '.$portion );
+			//log_message('error', 'portion - '.$portion );
 
             if ($staffid <= 0 || !$date || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
                 continue;
@@ -4035,7 +4035,7 @@ class Hrd extends AdminController
             $this->db->where('staffid', $staffid);
             $this->db->where('entry_date', $date);
             $existing = $this->db->get(db_prefix() . 'hrd_attendance')->row_array();
-            log_message('error', 'portionXX - '.$portion );
+            //log_message('error', 'portionXX - '.$portion );
             $data = [
                 'first_half' => $first_half !== '' ? (int)$first_half : null,
                 'position' => $portion,
@@ -4060,7 +4060,7 @@ class Hrd extends AdminController
                 $this->db->where('entry_date', $date);
                 $this->db->where('status !=', 1); // Extra safety check
                 $this->db->update(db_prefix() . 'hrd_attendance', $data);
-				log_message('error', 'Qry - '.$this->db->last_query() );
+				//log_message('error', 'Qry - '.$this->db->last_query() );
 				
                 if ($this->db->affected_rows() >= 0) {
                     $saved++;
@@ -5717,7 +5717,7 @@ $data['notifications'] = $this->db->get()->result_array();
             $this->db->where('staffid', $staffId);
         }
         $dar = $this->db->get('it_crm_dar')->row_array();
-        log_message('error', 'Display data - '.print_r($dar , true) );
+        //log_message('error', 'Display data - '.print_r($dar , true) );
         if (!$dar) {
             echo json_encode(['success' => false, 'message' => 'DAR not found']);
             return;
@@ -6200,7 +6200,7 @@ $data['notifications'] = $this->db->get()->result_array();
 
         // If validation errors exist, return JSON response
         if (!empty($validation_errors)) {
-            log_message('error', 'Validation errors: ' . implode(', ', $validation_errors));
+            //log_message('error', 'Validation errors: ' . implode(', ', $validation_errors));
             if ($this->input->is_ajax_request()) {
                 echo json_encode([
                     'success' => false,
@@ -6220,7 +6220,7 @@ $data['notifications'] = $this->db->get()->result_array();
         $interview = $this->db->get('it_crm_hrd_interviews_master')->row();
 
         if (!$interview) {
-            log_message('error', 'Interview not found: ' . $data['interview_id']);
+            //log_message('error', 'Interview not found: ' . $data['interview_id']);
             if ($this->input->is_ajax_request()) {
                 echo json_encode(['success' => false, 'message' => 'Interview not found']);
                 exit;
@@ -6265,7 +6265,7 @@ $data['notifications'] = $this->db->get()->result_array();
                 redirect(admin_url('hrd/interviews'));
             }
         } else {
-            log_message('error', 'Failed to insert into database');
+            //log_message('error', 'Failed to insert into database');
             if ($this->input->is_ajax_request()) {
                 echo json_encode(['success' => false, 'message' => 'Failed to schedule interview']);
                 exit;
