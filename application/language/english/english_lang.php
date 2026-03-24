@@ -4333,5 +4333,7 @@ $lang['update_web_form'] = 'Update Web Form';
 $lang['assign_web_form'] = 'Assign Web Form';
 $lang['email'] = 'email';
 $lang['No Webmail Setup Entries'] = 'No Webmail Setup Entries';
+$lang['smtp_details_wrong'] = 'SMTP details wrong - correct from webmail setup';
+$lang['Add New Staff Type'] = 'Add New Staff Type';
 ?>
 

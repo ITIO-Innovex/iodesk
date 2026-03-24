@@ -6,7 +6,7 @@
       <div class="panel_s">
         <div class="panel-body panel-table-full">
 		  <div class="row ">
-<h4>Disk Space (Total / Free / Used) <?php echo round(disk_free_space("/") / 1073741824, 2);?></h4>
+<h4>Disk Space (Total / Free / Used) : Free Disk ( <?php echo round(disk_free_space("/") / 1073741824, 2);?> GB )</h4>
 <?php
 $totalDisk = disk_total_space("/");
 $freeDisk  = disk_free_space("/");
