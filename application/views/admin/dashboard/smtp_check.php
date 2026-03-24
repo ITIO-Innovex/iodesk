@@ -1,131 +1,92 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php 
+use app\services\imap\Imap;
+use app\services\imap\ConnectionErrorException;
+use Ddeboer\Imap\Exception\MailboxDoesNotExistException;
+
+defined('BASEPATH') or exit('No direct script access allowed'); 
+
+?>
+<?php init_head(); 
+$this->db->select('id, mailer_email, mailer_username, mailer_password, mailer_imap_host, encryption, staffid');
+$this->db->where('company_id', get_staff_company_id());
+$this->db->where('mailer_status', 1);
+$webmaillist=$this->db->get(db_prefix().'webmail_setup')->result_array();
+
+ ?>
 <div id="wrapper">
   <div class="content">
     <div class="row mb-2">
       <div class="panel_s">
         <div class="panel-body panel-table-full">
-		<?php
-		function get_folder_size($path) {
-    $size = 0;
-
-    if (!is_dir($path)) {
-        return 0;
-    }
-
-    foreach (new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS)
-    ) as $file) {
-        $size += $file->getSize();
-    }
-
-    return $size;
-}
-
-function format_bytes($bytes, $precision = 2) {
-    $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    $bytes = max($bytes, 0);
-    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-    $pow = min($pow, count($units) - 1);
-    return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
-}
-		$base = FCPATH;
-
-$folders = scandir($base);
-$result = [];
-
-foreach ($folders as $folder) {
-    if ($folder === '.' || $folder === '..') continue;
-
-    $path = $base . $folder;
-    if (is_dir($path)) {
-        $result[$folder] = format_bytes(get_folder_size($path));
-    }
-}
-
-arsort($result);
-//print_r($result);
-
-		?>
-          <div class="row ">
-            <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Name : <?php echo e(get_staff_full_name()); ?></span> </div>
-            <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Email : <?php echo $GLOBALS['current_user']->email; ?></span> </div>
-            <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Role :
-              <?php  if(isset($GLOBALS['current_user']->role)&&$GLOBALS['current_user']->role) { echo get_staff_role_name($GLOBALS['current_user']->role);} ?>
-              <?php  if(isset($GLOBALS['current_user']->designation_id)&&$GLOBALS['current_user']->designation_id) { echo get_staff_designations_name($GLOBALS['current_user']->designation_id);} ?>
-              [
-              <?=get_user_type();?>
-              ] </span> </div>
-            <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6 "> <i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Company Name : <?php echo get_staff_company_name(); ?></span> </div>
-            <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon  tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Created At : <?php echo $GLOBALS['current_user']->datecreated; ?></span> </div>
-            <div class="tw-font-medium tw-inline-flex text-neutral-600 tw-items-center tw-truncate tw-my-2 col-sm-6"> <i class="fa-regular fa-circle-check menu-icon tw-mx-2 text-success"></i> <span class="tw-truncate tw-text-sm">Last Login : <?php echo $GLOBALS['current_user']->last_login; ?></span> </div>
-            </span> </div>
+		
+          
 		  <div class="row ">
 
 
-<h4>Disk Space</h4>
+<h4>SMTP Details</h4>
 <table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
   <thead>
     <tr>
-      <th>Field</th>
-      <th>Value</th>
+      <th>Email ID</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody>
-    <?php foreach ($result as $key => $value): ?>
-      <?php if (!is_array($value)): ?>
+    <?php if (!empty($webmaillist)) { ?>
+    <?php foreach ($webmaillist as $row) { 
+	app_check_imap_open_function();
+    $username=$row['mailer_username'] ? $row['mailer_username'] : $row['email'];
+	$password=$row['mailer_password'];
+	$host=$row['mailer_imap_host'];
+	$staffid=$row['staffid'];
+	$encryption=$row['encryption'];
+        $imap = new Imap(
+           $username,
+           $password,
+           $host,
+           $encryption
+        );
+		$status="";
+		try {
+            $connection = $imap->testConnection();
+
+            try {
+                $folder = $this->input->post('folder');
+                $connection->getMailbox(empty($folder) ? 'INBOX' : $folder);
+            } catch (MailboxDoesNotExistException $e) {
+                $status="Error : ".$e->getMessage();
+            }
+            $status="Success";
+        } catch (ConnectionErrorException $e) {
+            $status="Error : ".$e->getMessage();
+        }
+	
+	if($status != 'Success' && isset($staffid)&&$staffid){
+	            $notification_data = [
+                    'description'     => 'smtp_details_wrong',
+                    'touserid'        => $staffid,
+                    'link'            => 'webmail_setup'
+                ];
+                if (add_notification($notification_data)) {
+                    pusher_trigger_notification($staffid);
+                }
+
+	log_activity($username.' SMTP Details Not Working -  [ ' . $status . ']' , $staffid);
+	}
+	
+	
+	?>
         <tr>
-          <td><?= htmlspecialchars($key) ?></td>
-          <td><?= htmlspecialchars((string)$value) ?></td>
+          <td><?php echo $staffid; ?> - <?php echo $row['mailer_email']; ?></td>
+          <td><strong><?php echo $status;?></strong></td>
         </tr>
-      <?php endif; ?>
-    <?php endforeach; ?>
+     <?php } ?>
+    <?php } ?>
   </tbody>
 </table>
 
-<h4>Global Variable</h4>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
-  <thead>
-    <tr>
-      <th>Field</th>
-      <th>Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($GLOBALS['current_user'] as $key => $value): ?>
-      <?php if (!is_array($value)): ?>
-        <tr>
-          <td><?= htmlspecialchars($key) ?></td>
-          <td><?= htmlspecialchars((string)$value) ?></td>
-        </tr>
-      <?php endif; ?>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-		</div>
-          <h4>Session Stored Value</h4>
-          <table border="1" cellpadding="8" cellspacing="0" class="table table-clients number-index-2 dataTable no-footer">
-            <thead>
-              <tr>
-                <th>Key</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php foreach ($_SESSION as $key => $value): ?>
-              <tr>
-                <td><?= htmlspecialchars($key) ?></td>
-                <td><?php
-        if (is_array($value) || is_object($value)) {
-            echo htmlspecialchars(json_encode($value, JSON_PRETTY_PRINT));
-        } else {
-            echo htmlspecialchars((string) $value);
-        }
-        ?></td>
-              </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
+
+          
         </div>
       </div>
     </div>
