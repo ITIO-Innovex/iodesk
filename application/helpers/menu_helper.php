@@ -66,7 +66,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         || (staff_has_assigned_invoices() && get_option('allow_staff_view_invoices_assigned') == 1)
     ) {
         $CI->app_menu->add_sidebar_children_item('salesD', [
-            'slug'     => 'invoices',
+            'slug'     => 'invoices_1',
             'name'     => _l('invoices'),
             'href'     => admin_url('invoices'),
             'position' => 15,
@@ -87,7 +87,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         || (get_option('allow_staff_view_invoices_assigned') == 1 && staff_has_assigned_invoices())
     ) {
         $CI->app_menu->add_sidebar_children_item('salesD', [
-            'slug'     => 'payments',
+            'slug'     => 'payments_1',
             'name'     => _l('payments'),
             'href'     => admin_url('payments'),
             'position' => 20,
@@ -312,7 +312,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 		
 		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
-            'slug'     => 'invoices',
+            'slug'     => 'invoices_1',
             'name'     => 'Invoices',
             'href'     => admin_url('invoice_manager/invoices'),
             'position' => 5,
