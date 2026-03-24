@@ -135,7 +135,21 @@ if (!empty($data['departmentsID']) && isset($data['departmentsID'][0])) {
 	$data['title'] = "Eindia";
 	$this->load->view('admin/dashboard/eindia', $data);
 	}
-
+	
+	
+    public function server_info() 
+    {
+	$data['title'] = "Server Info";
+	$this->load->view('admin/dashboard/server_info', $data);
+	}
+	
+	public function smtp_check() 
+    {
+	$data['title'] = "Server Info";
+	$this->load->view('admin/dashboard/smtp_check', $data);
+	}
+	
+	
     // Chart weekly payments statistics on home page / ajax
     public function weekly_payments_statistics($currency)
     {
