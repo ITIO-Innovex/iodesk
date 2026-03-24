@@ -1003,6 +1003,7 @@ $client->disconnect();
 				
                 $attachments_paths   = [];
                 $data['isattachments'] = 0;
+				$data['attachments'] = ''; // IMPORTANT reset
                 $uid                = uniqid();
                 $attachmentDir      = 'attachments';
                 $filePath           = $attachmentDir . '/' . $uid;
