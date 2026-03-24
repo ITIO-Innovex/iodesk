@@ -58,19 +58,19 @@
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">
-              <label>From Date</label>
+              <label>From Date <small class="req text-danger">*</small></label>
               <input type="date" name="from_date" class="form-control" required>
             </div>
           </div>
           <div class="col-md-4">
             <div class="form-group">
-              <label>To Date</label>
+              <label>To Date <small class="req text-danger">*</small></label>
               <input type="date" name="to_date" class="form-control" required>
             </div>
           </div>
           <div class="col-md-4">
             <div class="form-group">
-              <label>Leave For</label>
+              <label>Leave For <small class="req text-danger">*</small></label>
               <select name="leave_for" class="form-control" required>
                 <option value="1">Full Day</option>
                 <option value="2">Half Day</option>
@@ -79,7 +79,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Reason</label>
+          <label>Reason <small class="req text-danger">*</small></label>
           <textarea name="leave_reson" class="form-control" rows="4" required></textarea>
         </div>
       </div>

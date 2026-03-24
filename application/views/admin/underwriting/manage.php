@@ -135,14 +135,14 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
 		
 		   <div class="col-md-12">
             <div class="form-group">
-              <label for="for_company" class="control-label">For Company</label>
+              <label for="for_company" class="control-label">For Company <small class="req text-danger">*</small></label>
               <input type="text" name="for_company" id="for_company" class="form-control" required>
             </div>
           </div>
 		   <div class="col-md-12">
             <div class="form-group">
-              <label for="web_link" class="control-label">Website</label>
-              <input type="text" name="web_link" id="web_link" class="form-control" placeholder="https://example.com">
+              <label for="web_link" class="control-label">Website <small class="req text-danger">*</small></label>
+              <input type="text" name="web_link" id="web_link" class="form-control" placeholder="https://example.com" required>
             </div>
           </div>
 
@@ -160,25 +160,25 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_MDR" class="control-label">MDR (%)</label>
+              <label for="uw_MDR" class="control-label">MDR (%) <small class="req text-danger">*</small></label>
               <input type="text" name="MDR" id="uw_MDR" class="form-control" required>
             </div>
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_SetupFee" class="control-label">Setup Fee (USD)</label>
+              <label for="uw_SetupFee" class="control-label">Setup Fee (USD) <small class="req text-danger">*</small></label>
               <input type="text" name="SetupFee" id="uw_SetupFee" class="form-control" required>
             </div>
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_HoldBack" class="control-label">Hold Back</label>
+              <label for="uw_HoldBack" class="control-label">Hold Back <small class="req text-danger">*</small></label>
               <input type="text" name="HoldBack" id="uw_HoldBack" class="form-control" required>
             </div>
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_CardType" class="control-label">Card Type</label>
+              <label for="uw_CardType" class="control-label">Card Type <small class="req text-danger">*</small></label>
               <select name="CardType[]" id="uw_CardType" class="form-control selectpicker" multiple data-none-selected-text="Select card types">
                 <option value="VISA 3ds">VISA 3ds</option>
                 <option value="MASTER 3ds">MASTER 3ds</option>
@@ -193,13 +193,13 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
         <div class="row">
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_Settlement" class="control-label">Settlement (No of working days)</label>
+              <label for="uw_Settlement" class="control-label">Settlement (No of working days) <small class="req text-danger">*</small></label>
               <input type="text" name="Settlement" id="uw_Settlement" class="form-control" required>
             </div>
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_SettlementFee" class="control-label">Settlement Fee</label>
+              <label for="uw_SettlementFee" class="control-label">Settlement Fee <small class="req text-danger">*</small></label>
 			  <select name="SettlementFee" id="uw_SettlementFee" class="form-control" required>
 			  <option value="">Select Settlement Fee</option>
 			  <option value="2">2%</option>
@@ -211,7 +211,7 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_MinSettlement" class="control-label">Min Settlement</label>
+              <label for="uw_MinSettlement" class="control-label">Min Settlement <small class="req text-danger">*</small></label>
 			  <select name="MinSettlement" id="uw_MinSettlement" class="form-control" required>
 			  <option value="">Select Min Settlement</option>
 			  <option value="5">5K</option>
@@ -222,7 +222,7 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
           </div>
           <div class="col-md-6 uw-approval-field">
             <div class="form-group">
-              <label for="uw_MonthlyFee" class="control-label">Monthly Fee (USD)</label>
+              <label for="uw_MonthlyFee" class="control-label">Monthly Fee (USD) <small class="req text-danger">*</small></label>
               <input type="text" name="MonthlyFee" id="uw_MonthlyFee" class="form-control" required>
             </div>
           </div>
@@ -230,14 +230,14 @@ data-reason="<?php echo htmlspecialchars($u['Reason'] ?? '', ENT_QUOTES); ?>"> <
         <div class="row">
           <div class="col-md-12 uw-approval-field">
             <div class="form-group">
-              <label for="uw_Descriptor" class="control-label">Descriptor</label>
+              <label for="uw_Descriptor" class="control-label">Descriptor <small class="req text-danger">*</small></label>
               <input type="text" name="Descriptor" id="uw_Descriptor"  class="form-control" required>
             </div>
           </div>
 		  
 		  <div class="col-md-12">
             <div class="form-group">
-              <label for="uw_Remarks" class="control-label">Remarks</label>
+              <label for="uw_Remarks" class="control-label">Remarks <small class="req text-danger">*</small></label>
               <textarea name="Remarks" id="uw_Remarks" rows="3" class="form-control" required></textarea>
             </div>
           </div>
