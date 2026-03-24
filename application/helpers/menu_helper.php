@@ -1095,31 +1095,25 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 
     // Database Backup menu item (Super only)
     if (is_admin()) {
-        $CI->app_menu->add_setup_menu_item('database_backups', [
-            'href'     => admin_url('database_backups'),
-            'name'     => 'DB Backup',
-            'position' => 60,
-            'icon'     => 'fa fa-database',
-            'badge'    => [],
-        ]);
+        
 		$CI->app_menu->add_setup_menu_item('department', [
             'href'     => admin_url('departments'),
             'name'     => 'departments',
-            'position' => 65,
+            'position' => 60,
             'icon'     => 'fa-solid fa-address-card',
             'badge'    => [],
         ]);
 		$CI->app_menu->add_setup_menu_item('designation', [
             'href'     => admin_url('designation'),
             'name'     => 'Designation',
-            'position' => 65,
+            'position' => 60,
             'icon'     => 'fa-solid fa-users-rectangle',
             'badge'    => [],
         ]);
 		$CI->app_menu->add_setup_menu_item('branch_manager', [
             'href'     => admin_url('hrd/setting/branch_manager'),
             'name'     => 'Branch',
-            'position' => 65,
+            'position' => 60,
             'icon'     => 'fa-solid fa-code-branch',
             'badge'    => [],
         ]);
@@ -1130,6 +1124,22 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'icon'     => 'fa-solid fa-users',
             'badge'    => [],
         ]);
+		$CI->app_menu->add_setup_menu_item('database_backups', [
+            'href'     => admin_url('database_backups'),
+            'name'     => 'DB Backup',
+            'position' => 65,
+            'icon'     => 'fa fa-database',
+            'badge'    => [],
+        ]);
+		if (!is_super()) {
+		$CI->app_menu->add_setup_menu_item('smtp_check', [
+            'href'     => admin_url('dashboard/smtp_check'),
+            'name'     => 'Staff SMTP Status',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-at',
+            'badge'    => [],
+        ]);
+		}
 		
 		$CI->app_menu->add_setup_menu_item('staff_type', [
             'href'     => admin_url('menu_setup/main_menu'),
@@ -1141,4 +1151,13 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 		
     }
+	   if (is_super()) {
+		$CI->app_menu->add_setup_menu_item('server_info', [
+            'href'     => admin_url('dashboard/server_info'),
+            'name'     => 'Server Status',
+            'position' => 65,
+            'icon'     => 'fa-solid fa-at',
+            'badge'    => [],
+        ]);
+		}
 }
