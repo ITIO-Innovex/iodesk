@@ -89,11 +89,11 @@
       <div class="modal-body">
         <input type="hidden" name="id" id="doc_id">
         <div class="form-group">
-          <label>Document Title</label>
+          <label>Document Title <small class="req text-danger">*</small></label>
           <input type="text" name="document_title" id="document_title" class="form-control" required>
         </div>
         <div class="form-group">
-          <label>Document</label>
+          <label>Document <small class="req text-danger">*</small></label>
           <input type="file" name="document[]" id="document_file" class="form-control" multiple required>
           <small class="text-muted">You can select multiple files. A separate entry will be created per file.</small>
         </div>

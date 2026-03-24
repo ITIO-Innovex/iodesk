@@ -144,7 +144,7 @@
                                 <div class="col">
                                     <div class="form-group">
                                         <div class="label">
-                                           <span class="text-dark">To</span>
+                                           <span class="text-dark">To <small class="req text-danger">*</small></span>
                                         </div>
                                         <div class="email-input-wrapper">
                                             <div class="email-tags-container" id="emailTagsContainer">
@@ -158,7 +158,7 @@
                                 <div class="col">
                                     <div class="form-group">
                                         <div class="label">
-                                           <span class="text-dark">Subject</span>
+                                           <span class="text-dark">Subject <small class="req text-danger">*</small></span>
                                         </div>
                                         <input type="text" id="subject" name="subject" class="form-control" placeholder="Subject..." required>
                                     </div>

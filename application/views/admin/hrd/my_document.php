@@ -61,11 +61,11 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label>Document Name</label>
+          <label>Document Name <small class="req text-danger">*</small></label>
           <input type="text" name="document_title" class="form-control" required>
         </div>
         <div class="form-group">
-          <label>Document</label>
+          <label>Document <small class="req text-danger">*</small></label>
           <input type="file" name="document[]" class="form-control" multiple required>
           <small class="text-muted">You can select multiple files. A separate entry will be created per file.</small>
         </div>
