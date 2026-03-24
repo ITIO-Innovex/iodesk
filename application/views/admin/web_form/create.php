@@ -330,8 +330,11 @@ Ensure required fields are properly marked before saving
 
     return '' +
       '<div class=\"panel panel-default field-row mtop10\">' +
-      ' <div class=\"panel-body\">' +
+      ' <div class=\"panel-body mail-bg\">' +
       '  <div class=\"row\">' +
+	  '      <div class=\"col-md-1\">' +
+      '      <i class=\"fa-solid fa-grip-vertical tw-mt-6 fa-2x\" title="Drag to change field position updown"></i>' +
+      '      </div>' +
       '    <div class=\"col-md-4\">' +
       '      <div class=\"form-group\"><label>Label <small class=\"req text-danger\">* </small></label>' +
       '        <input type=\"text\" class=\"form-control\" name=\"fields[' + idx + '][label]\" required>' +
@@ -342,7 +345,7 @@ Ensure required fields are properly marked before saving
       '        <input type=\"text\" class=\"form-control\" name=\"fields[' + idx + '][name]\" required>' +
       '      </div>' +
       '    </div>' +
-      '    <div class=\"col-md-3\">' +
+      '    <div class=\"col-md-2\">' +
       '      <div class=\"form-group\"><label>Type</label>' +
       '        <select name=\"fields[' + idx + '][type]\" class=\"form-control field-type\">' + typeOptions + '</select>' +
       '      </div>' +
