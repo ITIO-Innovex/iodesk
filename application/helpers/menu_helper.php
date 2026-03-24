@@ -322,7 +322,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 		
 		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
-            'slug'     => 'payments',
+            'slug'     => 'payments_2',
             'name'     => 'Payments',
             'href'     => admin_url('invoice_manager/payments'),
             'position' => 15,
@@ -336,13 +336,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'badge'    => [],
         ]);
 		
-		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
-            'slug'     => 'payments',
-            'name'     => 'Payments',
-            'href'     => admin_url('invoice_manager/payments'),
-            'position' => 15,
-            'badge'    => [],
-        ]);
+		
 		
 		$CI->app_menu->add_sidebar_children_item('invoice_manager', [
             'slug'     => 'paymentmodes',
