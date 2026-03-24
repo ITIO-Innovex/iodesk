@@ -13,7 +13,9 @@
 
         <div class="panel_s">
           <div class="panel-body panel-table-full">
-            <?php if (!empty($forms)) { ?>
+            <?php if (!empty($forms)) { 
+			
+			?>
               <table class="table dt-table" data-order-col="4" data-order-type="desc">
                 <thead>
                   <tr>
@@ -27,10 +29,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <?php foreach ($forms as $form) { ?>
+                  <?php foreach ($forms as $form) { echo  $formid=(int)$form['id']; ?>
                     <tr>
                       <td><?php echo (int)$form['id']; ?></td>
-                      <td><?php echo e($form['name']); ?></td>
+                      <td><?php echo e($form['name']); ?> <? //echo $formid;?></td>
                       <td><?php echo e($form['description']); ?></td>
                       <td>
                         <?php if (!empty($form['is_active'])) { ?>
