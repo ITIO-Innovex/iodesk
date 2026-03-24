@@ -12,7 +12,7 @@ $totalDisk = disk_total_space("/");
 $freeDisk  = disk_free_space("/");
 $usedDisk  = $totalDisk - $freeDisk;
 ?>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table">
   <thead>
     <tr>
       <th>Total Disk</th>
@@ -24,7 +24,7 @@ $usedDisk  = $totalDisk - $freeDisk;
     </tr>
 	<tr>
       <th>Used Disk</th>
-      <th><?php echo round($freeDisk  / 1024 / 1024 / 1024, 2);?> GB</th>
+      <th><?php echo round($usedDisk  / 1024 / 1024 / 1024, 2);?> GB</th>
     </tr>
   </thead>
   
@@ -41,7 +41,7 @@ $totalRAM = $total[1] / 1024 / 1024;
 $freeRAM  = $available[1] / 1024 / 1024;
 $usedRAM  = $totalRAM - $freeRAM;
 ?>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table">
   <thead>
     <tr>
       <th>Total RAM:</th>
@@ -61,7 +61,7 @@ $usedRAM  = $totalRAM - $freeRAM;
 
 <h4>CPU Info</h4>
 
-<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table">
   <thead>
     <tr>
       <th>CPU Cores:</th>
@@ -74,22 +74,47 @@ $usedRAM  = $totalRAM - $freeRAM;
   </thead>
 </table>
 
+<h4>Server Info (Basic PHP)</h4>
+
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table">
+  <thead>
+    <tr>
+      <th>Server:</th>
+      <th><?php echo $_SERVER['SERVER_SOFTWARE'];?></th>
+    </tr>
+	<tr>
+      <th>PHP Version:</th>
+      <th><?php echo phpversion();?></th>
+    </tr>
+	<tr>
+      <th>OS:</th>
+      <th><?php echo php_uname();?></th>
+    </tr>
+  </thead>
+</table>
+
+<h4>Disk Usage (Detailed like df -h)</h4>
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table">
+  <thead>
+    <tr>
+      <th><?php echo "<pre>";
+echo shell_exec("df -h");
+echo "</pre>";?></th>
+    </tr>
+  </thead>
+</table>
+
 <h4>Server Load (CPU Load)</h4>
-<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table table-clients number-index-2 dataTable no-footer">
+<table border="1" cellpadding="8" cellspacing="0" width="100%" class="table">
   <thead>
     <tr>
       <th>Load Average:</th>
       <th><?php $load = sys_getloadavg(); echo implode(", ", $load);?></th>
     </tr>
   </thead>
-  
 </table>
 		
-		
-		
 		</div>
-
-          
         </div>
       </div>
     </div>
