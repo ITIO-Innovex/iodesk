@@ -55,7 +55,7 @@ class Webmail_model extends App_Model
 	
 	    if(isset($mailer_email)&&$mailer_email&&isset($folder)&&$folder){
 	  
-	    /*$this->db->select('folder,');
+	    $this->db->select('folder,');
         $this->db->where('email', $mailer_email);
 		$this->db->where('folder !=', 'Drafts');
 		//$this->db->where('folder !=', 'Templates');
@@ -64,15 +64,6 @@ class Webmail_model extends App_Model
 		//$this->db->limit(1);
         $_SESSION['folderlist']=$this->db->get(db_prefix() . 'emails')->result_array();
 		//echo $this->db->last_query();exit;
-		
-		/*///New Optimized codeeeeeee
-		$this->db->select('DISTINCT(folder)', false);
-		$this->db->from(db_prefix() . 'emails');
-		$this->db->where('email', $mailer_email);
-		$this->db->where('folder !=', 'Drafts');
-		// $this->db->where('folder !=', 'Templates'); // optional
-		$this->db->order_by('id', 'ASC');
-		$_SESSION['folderlist'] = $this->db->get()->result_array();
 
 
         ///////////////////////////Search Query//////////////
@@ -110,7 +101,7 @@ class Webmail_model extends App_Model
 		}
 		$this->db->where('email', $mailer_email);
 		//$this->db->group_by('id');
-		//$this->db->where('uniqid >=', 1); hide on 23032026
+		$this->db->where('uniqid >=', 1);
         $counter=$this->db->get(db_prefix() . 'emails')->result_array(); //return
 		$_SESSION['inbox-total-email']=$counter[0]['total_email'];
 		//echo $this->db->last_query();exit;
@@ -119,46 +110,33 @@ class Webmail_model extends App_Model
 		 
 		
 		///////////////////////////Fetch Email//////////////
-		// Select only required columns (exclude timezone, email, body for speed)
-$this->db->select('id, subject, from_email, from_name, to_emails, cc_emails, bcc_emails, date, isattachments, attachments, uniqid, folder, isfalg, messageid, status, is_deleted, body');
-
-// Filters
-if ($folder == "Deleted") {
-    $this->db->where('is_deleted', 1);
-
-} elseif ($folder == "Flagged") {
-    $this->db->where('isfalg', 1);
-    $this->db->where('is_deleted', 0);
-
-} elseif ($search == 1 && !empty($_SESSION['stype']) && !empty($_SESSION['skey'])) {
-    $this->db->where('is_deleted', 0);
-    $this->db->group_start(); // fix OR condition issue
-    $this->db->like($_SESSION['stype'], $_SESSION['skey']);
-    $this->db->group_end();
-
-} else {
-    $this->db->where('is_deleted', 0);
-    $this->db->where('folder', $folder);
-}
-
-// Always filter by email
-$this->db->where('email', $mailer_email);
-
-// Removed (no use)
-// $this->db->where('uniqid >=', 1);
-
-// Order + limit
-$this->db->order_by('uniqid', 'DESC');
-$this->db->limit($_SESSION['mail_limit'], $page);
-
-// Execute
-$mails = $this->db->get(db_prefix() . 'emails')->result_array();
-
-// Debug (optional)
- //echo $this->db->last_query();exit;
-
-return $mails;
-
+		
+		
+		$this->db->select('*,');
+		
+		
+        
+		
+        $this->db->order_by('uniqid', 'desc');
+		//$this->db->group_by('uniqid');
+		if($folder=="Deleted"){
+		$this->db->where('is_deleted', 1);
+		}elseif($folder=="Flagged"){
+		$this->db->where('isfalg', 1);
+		}elseif($search==1){
+		$this->db->or_like($_SESSION['stype'], $_SESSION['skey']);
+		$this->db->where('is_deleted', 0);
+		
+		}else{
+		$this->db->where('is_deleted', 0);
+		$this->db->where('folder', $folder);
+		}
+		$this->db->where('email', $mailer_email);
+		$this->db->where('uniqid >=', 1);
+		$this->db->limit($_SESSION['mail_limit'],$page);
+        $mails=$this->db->get(db_prefix() . 'emails')->result_array(); //return
+		//echo $this->db->last_query();//exit;
+		 return  $mails;exit;
 		///////////////////////////END Fetch Email//////////////
 		
 	  
@@ -1086,22 +1064,14 @@ $client->disconnect();
 
     public function lastemailid($email, $folder)
     {
-        /*$this->db->select('uniqid'); // Remove Extra Comma after  uniqid,
+        $this->db->select('uniqid,');
 		$this->db->where('email', $email);
         $this->db->where('folder', $folder);
         $this->db->limit(1);
 		$this->db->order_by('uniqid', 'DESC');
-        $result=$this->db->get(db_prefix() . 'emails')->row_array(); //return 
-		return $result;*/
-		
-		// New Optimezed Query		
-		$this->db->select_max('uniqid');
-		$this->db->where([
-		'email'  => $email,
-		'folder' => $folder
-		]);
-		$row = $this->db->get(db_prefix() . 'emails')->row_array();
-		return $row['uniqid'] ?? null;
+        $result=$this->db->get(db_prefix() . 'emails')->result_array(); //return 
+		//log_message('error', 'Last Email ID - ' . print_r($result, true));
+		return $result;
 		
     }
 	
