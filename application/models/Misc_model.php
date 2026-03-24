@@ -517,10 +517,14 @@ class Misc_model extends App_Model
                   if (!is_super()) {
 				  $this->db->where('company_id', get_staff_company_id());
 				  }
+				  if (!is_admin()) {
+				  $this->db->where('touserid', $staff_id);
+				  }
         $this->db->limit($total);
         $this->db->order_by('date', 'desc');
 
         return $this->db->get(db_prefix() . 'notifications')->result_array();
+		//echo $this->db->last_query();exit; //return 
 		//echo $this->db->last_query();exit;
 		
     }

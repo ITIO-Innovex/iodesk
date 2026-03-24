@@ -1262,7 +1262,9 @@ $this->db->select('mailer_name, mailer_email, mailer_username, mailer_password, 
 
 			$attachments_paths = [];
 			$data['isattachments']=0;
-			$uid=uniqid();
+			$data['attachments'] = ''; // IMPORTANT reset
+
+			/*$uid=uniqid();
 			$attachmentDir = 'attachments';
 			$filePath = $attachmentDir . '/' . $uid;
 			foreach ($message->getAttachments() as $attachment) {
@@ -1277,7 +1279,34 @@ $this->db->select('mailer_name, mailer_email, mailer_username, mailer_password, 
 					$attachments_paths[] = $filePath."/".$fileName;
 				}
 				$data['attachments'] = implode(',', $attachments_paths);
-			}
+			}*/
+			
+			$attachments = $message->getAttachments();
+
+if (!empty($attachments) && count($attachments) > 0) {
+
+    $uid = uniqid();
+    $attachmentDir = 'attachments';
+    $filePath = $attachmentDir . '/' . $uid;
+
+    foreach ($attachments as $attachment) {
+
+        if (!file_exists($filePath)) {
+            mkdir($filePath, 0777, true);
+        }
+
+        $fileName = $attachment->name;
+        $attachment->save($filePath);
+
+        $attachments_paths[] = $filePath . "/" . $fileName;
+    }
+
+    if (!empty($attachments_paths)) {
+        $data['isattachments'] = 1;
+        $data['attachments'] = implode(',', $attachments_paths);
+    }
+}
+
 			$cnt++;
 			$data['isfalg']=0;
 			$data['status']=1;
