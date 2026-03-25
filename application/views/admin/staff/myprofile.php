@@ -193,6 +193,9 @@ $(function() {
                         notifications +=
                             '<span class="text-muted tw-text-sm text-right text-has-action" data-placement="right" data-toggle="tooltip" data-title="' +
                             obj.full_date + '">' + obj.date + '</span>';
+							notifications +=
+                            '<span class="text-muted tw-text-sm text-right text-has-action" data-placement="right" data-toggle="tooltip" data-title="' +
+                            obj.full_date + '">' + obj.date + '</span>';
                         if (obj.isread_inline == 0) {
                             notifications +=
                                 '<a href="#" class="text-muted pull-right not-mark-as-read-inline notification-profile" onclick="set_notification_read_inline(' +
@@ -209,7 +212,7 @@ $(function() {
                 });
 
                 if (page >= total_pages - 1) {
-                    $(".loader").addClass("disabled33");
+                    $(".loader").addClass("disabled");
                 }
             }
         });

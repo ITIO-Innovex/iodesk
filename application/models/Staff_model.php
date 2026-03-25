@@ -370,7 +370,7 @@ class Staff_model extends App_Model
             // Build the notifications subquery safely
             $notifications_where = "isread=0 AND company_id=" . $companyid;
             if (!empty($fetch_via_staff_id)) {
-                $notifications_where .= $fetch_via_staff_id;
+                $notifications_where .= " AND touserid='" . get_staff_user_id() . "'";
             }
             
             // Build the todos subquery safely

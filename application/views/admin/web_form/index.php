@@ -66,7 +66,7 @@ $list = json_decode($list, true);  // convert to array
                           <a href="<?php echo admin_url('web_form/create/' . (int)$form['id']); ?>" class="btn btn-default btn-xs" title="Edit Form">
                             <i class="fa-regular fa-pen-to-square"></i>
                           </a>
-                          <a href="<?php echo admin_url('web_form/delete/' . (int)$form['id']); ?>" class="btn btn-danger btn-xs _delete" title="Delete (soft)">
+                          <a href="#" class="btn btn-danger btn-xs webform-delete-trigger" title="Delete (soft)" data-form-id="<?php echo (int)$form['id']; ?>" data-form-name="<?php echo e($form['name']); ?>">
                             <i class="fa-regular fa-trash-can"></i>
                           </a>
                           <button type="button"
@@ -129,6 +129,32 @@ $list = json_decode($list, true);  // convert to array
   </div>
 </div>
 
+<!-- Delete form modal (reason required) -->
+<div class="modal fade" id="deleteFormModal" tabindex="-1" role="dialog" aria-labelledby="deleteFormModalLabel">
+  <div class="modal-dialog" role="document" style="max-width:600px;">
+    <div class="modal-content">
+      <?php echo form_open('', ['id' => 'delete-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="deleteFormModalLabel">Delete Web Form</h4>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="delete_form_id" value="">
+        <p class="text-muted" id="delete_form_help"></p>
+        <div class="form-group">
+          <label>Reason for Delete <span class="text-danger">*</span></label>
+          <textarea class="form-control" name="reason_for_delete" id="reason_for_delete" rows="3" required placeholder="Enter reason..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-danger" id="confirmDeleteBtn"><?php echo _l('delete'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
 <script>
 (function() {
   function parseAssignTo(raw) {
@@ -179,6 +205,47 @@ $list = json_decode($list, true);  // convert to array
       .fail(function() {
         alert_float('danger', 'Failed to update assign staff');
       });
+  });
+
+  // Delete modal
+  $('body').on('click', '.webform-delete-trigger', function(e) {
+    e.preventDefault();
+    var formId = $(this).data('form-id');
+    var formName = $(this).data('form-name') || '';
+    $('#delete_form_id').val(formId);
+    $('#reason_for_delete').val('');
+    $('#delete_form_help').text('You are deleting: ' + formName);
+    $('#deleteFormModal').appendTo('body').modal('show');
+    setTimeout(function() { $('#reason_for_delete').focus(); }, 200);
+  });
+
+  $('#delete-form').on('submit', function(e) {
+    e.preventDefault();
+    var formId = parseInt($('#delete_form_id').val(), 10) || 0;
+    var reason = $.trim($('#reason_for_delete').val());
+    if (!formId) {
+      alert_float('danger', 'Invalid form');
+      return false;
+    }
+    if (!reason) {
+      alert_float('warning', 'Reason for Delete is required');
+      $('#reason_for_delete').focus();
+      return false;
+    }
+    var $btn = $('#confirmDeleteBtn');
+    $btn.prop('disabled', true);
+    $.post(admin_url + 'web_form/delete/' + formId, {
+      reason_for_delete: reason,
+      <?php echo $this->security->get_csrf_token_name(); ?>: '<?php echo $this->security->get_csrf_hash(); ?>'
+    }).done(function() {
+      $('#deleteFormModal').modal('hide');
+	  alert_float('success', 'Failed to delete form');
+      location.reload();
+    }).fail(function() {
+      alert_float('danger', 'Failed to delete form');
+    }).always(function() {
+      $btn.prop('disabled', false);
+    });
   });
 })();
 </script>
