@@ -1001,47 +1001,27 @@ $client->disconnect();
 				$data['bcc_emails']=$data['bcc_emails'].', '.$bcc_list[2]->mail;
 				}
 				
-                $attachments_paths = [];
-$data['isattachments'] = 0;
-$data['attachments'] = ''; // reset
+                $attachments_paths   = [];
+                $data['isattachments'] = 0;
+				$data['attachments'] = ''; // IMPORTANT reset
+                $uid                = uniqid();
+                $attachmentDir      = 'attachments';
+                $filePath           = $attachmentDir . '/' . $uid;
 
-$attachments = $message->getAttachments();
-
-if (!empty($attachments) && count($attachments) > 0) {
-
-    $uid = uniqid();
-    $attachmentDir = 'attachments';
-    $filePath = $attachmentDir . '/' . $uid;
-
-    // Create folder once
-    if (!file_exists($filePath)) {
-        mkdir($filePath, 0777, true);
-    }
-
-    foreach ($attachments as $attachment) {
-
-        // Skip if no file name
-        if (empty($attachment->name)) {
-            continue;
-        }
-
-        $fileName = $attachment->name;
-
-        // Save file
-        $attachment->save($filePath);
-
-        // Check file exists after save
-        if (file_exists($filePath . '/' . $fileName)) {
-            $attachments_paths[] = $filePath . '/' . $fileName;
-        }
-    }
-
-    // Only set if real files saved
-    if (!empty($attachments_paths)) {
-        $data['isattachments'] = 1;
-        $data['attachments'] = implode(',', $attachments_paths);
-    }
-}
+                $attachments = $message->getAttachments();
+                foreach ($attachments as $attachment) {
+				
+                    if (!file_exists($filePath)) {
+                        mkdir($filePath, 0777, true);
+                    }
+                    $fileName = $attachment->name;
+                    $attachment->save($filePath);
+                    $data['isattachments'] = 1;
+                    $attachments_paths[]   = $filePath . "/" . $fileName;
+                   }
+				
+				
+                $data['attachments'] = implode(',', $attachments_paths);
 
                 $cnt++;
                 $this->db->insert(db_prefix() . 'emails', $data);
