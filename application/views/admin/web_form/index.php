@@ -19,7 +19,7 @@
               <table class="table dt-table" data-order-col="4" data-order-type="desc">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <?php /*?><th>ID</th><?php */?>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Status</th>
@@ -29,10 +29,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <?php foreach ($forms as $form) { echo  $formid=(int)$form['id']; ?>
+                  <?php foreach ($forms as $form) { $formid=(int)$form['id']; ?>
                     <tr>
-                      <td><?php echo (int)$form['id']; ?></td>
-                      <td><?php echo e($form['name']); ?> <? //echo $formid;?></td>
+                      <?php /*?><td><?php echo (int)$form['id']; ?></td><?php */?>
+                      <td><a href="<?php echo admin_url('web_form/manage/' . (int)$form['id']); ?>" title="Manage Data"><?php echo e($form['name']); ?></a> (<?php echo count_total_web_form($formid);?>)</td>
                       <td><?php echo e($form['description']); ?></td>
                       <td>
                         <?php if (!empty($form['is_active'])) { ?>

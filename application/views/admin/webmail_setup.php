@@ -233,9 +233,61 @@
     <strong>Instruction:</strong> Please enter all required SMTP details correctly and click the `Save` button to store the configuration.
 </div>
 
-
-
+<h4><i class="fa-solid fa-circle-right text-success"></i> SMTP / IMAP Setup Instructions</h4>
 <ol>
+    <li class="tw-my-2">
+<ul>
+    <li> - Enter your <b>SMTP Host, Port, Username, and Password</b>.</li>
+    <li> - Select the appropriate <b>encryption type</b> (TLS / SSL / None).</li>
+    <li> - Verify all the details carefully.</li>
+    <li> - Click on <b>"Test IMAP Details"</b> to check the connection.</li>
+    <li> - Click <b>Save</b> to apply the SMTP configuration.</li>
+    <li> - Ensure all fields are completed accurately to enable email functionality.</li>
+  </ul>
+  </li>
+  </ol>
+
+  <h4><i class="fa-solid fa-circle-right text-success"></i> IMAP Access (Important)</h4>
+  <ul>
+    <li> - Make sure <b>IMAP access is enabled</b> in your email account settings.</li>
+    <li> - (Email Settings → IMAP/POP → Enable IMAP)</li>
+  </ul>
+
+  <h4><i class="fa-solid fa-circle-right text-success"></i> 2FA (Two-Factor Authentication)</h4>
+  <ul>
+    <li> - If 2FA is enabled, your normal email password will <b>not work</b>.</li>
+    <li> - You must generate an <b>App Password</b> from your email provider.</li>
+    <li> - Use the generated App Password in place of your email password in CRM.</li>
+  </ul>
+
+  <h4><i class="fa-solid fa-circle-right text-success"></i> Steps to Generate App Password</h4>
+  <ol>
+    <li> - Go to your Email Account <b>Security Settings</b>.</li>
+    <li> - Open <b>App Passwords</b>.</li>
+    <li> - Click <b>Generate New Password</b>.</li>
+    <li> - Copy the generated password.</li>
+    <li> - Paste it into the CRM Webmail Setup password field.</li>
+  </ol>
+
+  <h4><i class="fa-solid fa-circle-right text-success"></i> If IMAP Test Fails</h4>
+  <ul>
+    <li> - Please contact your <b>SMTP/Email provider</b>.</li>
+    <li> - This may be due to:</li>
+    <ul>
+      <li> - IMAP access not enabled</li>
+      <li> - Incorrect credentials</li>
+      <li> - Permission or firewall restrictions</li>
+    </ul>
+  </ul>
+<ul>
+    <li>
+        <h5 class="text-danger">If the IMAP test fails, please contact your SMTP provider. This may be due to permission or access restrictions.</h5>
+        
+    </li>
+	</ul>
+
+
+<?php /*?><ol>
     <li class="tw-my-2">
         <h4><i class="fa-solid fa-circle-right"></i> Step-Based Instruction (Good for Setup Pages)</b></h4>
         <ul>
@@ -252,7 +304,7 @@
         
     </li>
 
-</ol>
+</ol><?php */?>
 				</div>
       </div>
       <div class="modal-footer">

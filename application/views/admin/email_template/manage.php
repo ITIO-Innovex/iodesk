@@ -259,6 +259,23 @@ Empty values will appear blank in email
             <div class="col-md-8">
 			<div class="row">
             <div class="col-md-12">
+			<div class="form-group">
+                <label>From Email <span class="text-danger">*</span></label>
+				<?php if($_SESSION['smtp_fetch_type']=='CompanySMTP'){ echo $_SESSION['STAFFSMTP']['smtp_user']; echo '<i class="fa-solid fa-circle-info tw-mx-2 text-info" title="Staff Email Not Configured – Please Add Details in Webmail Setup"></i>';
+			?>
+			<input type="hidden" name="reply_from" id="reply_from_email"  />
+			<?php
+			}else{ 
+			//echo $_SESSION['STAFFSMTP']['smtp_user'];?>
+            <select name="reply_from" id="reply_from_email" class="form-control" required>
+    <option value="">Select Email</option>
+   <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
+        <option value="<?php echo $row['id']; ?>" <?php if($row['mailer_email']==$_SESSION['STAFFSMTP']['smtp_user']){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
+    <?php } ?>
+
+</select>
+            <?php } ?>
+			</div>
               <div class="form-group">
                 <label>To Email <span class="text-danger">*</span></label>
                 <div class="email-input-wrapper">

@@ -142,6 +142,11 @@
                         <?php echo form_open(admin_url('direct_email/sendMail'), ['id' => 'directEmail', 'enctype' => 'multipart/form-data']); ?>
                             <div class="row" style="padding:20px">
                                 <div class="col">
+								<div class="form-group">
+								<div class="label">
+                                           <span class="text-dark">From : <?php echo e($smtpConfig['smtp_email'] ?? '-'); ?></span>
+                                        </div>
+								</div>
                                     <div class="form-group">
                                         <div class="label">
                                            <span class="text-dark">To <small class="req text-danger">*</small></span>
