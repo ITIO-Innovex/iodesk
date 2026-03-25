@@ -313,13 +313,31 @@ class Web_form extends AdminController
         }
 
         $companyId = get_staff_company_id();
+        $id        = (int) $id;
+        $reason    = trim((string) ($this->input->post('reason_for_delete') ?? ''));
 
-        $this->db->where('id', (int) $id);
+        if ($id <= 0) {
+            show_404();
+        }
+
+        $update = ['is_deleted' => 1];
+        if ($reason !== '') {
+            $update['reason_for_delete'] = $reason;
+        }
+
+        $this->db->where('id', $id);
         $this->db->where('company_id', $companyId);
-        $this->db->update(db_prefix() . 'web_forms', ['is_deleted' => 1]);
+        $this->db->update(db_prefix() . 'web_forms', $update);
+
+        // If AJAX, just return ok
+        if ($this->input->is_ajax_request()) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => true]);
+            return;
+        }
 
         set_alert('success', 'Form deleted successfully');
-        redirect(admin_url('web_form/create'));
+        redirect(admin_url('web_form'));
     }
 
     /**
