@@ -895,6 +895,24 @@ function exist_deal_process($deal_id,$deal_stage,$company_id)
 		return false;
 }
 
+function count_total_web_form($formID)
+{   
+        $companyId = get_staff_company_id();
+		$CI = & get_instance();
+		$CI->db->where('form_id', $formID);
+		$CI->db->where('company_id', $companyId);
+		$CI->db->where('is_deleted', 0);
+		$com = $CI->db->select('count(id) as cnt')->from(db_prefix() . 'web_form_entries')->get()->row();
+		//echo $CI->db->last_query();
+		if(isset($com)&&$com->cnt){
+		return $com->cnt;
+		}else{
+		return 0;
+		}
+	
+		return 0;
+}
+
 function get_staff_email($sid='')
 {   
         // Fetch company Name from company id

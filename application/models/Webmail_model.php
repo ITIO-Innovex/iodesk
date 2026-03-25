@@ -1590,6 +1590,11 @@ if ($folder->children->count() > 0) {
 		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
 		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
 		$recipientBCC=isset($emaildata['recipientBCC']) ? $emaildata['recipientBCC'] : "";
+		$replyID=isset($emaildata['recipientFromEmail']) ? $emaildata['recipientFromEmail'] : "";
+		$savedReplyID=$_SESSION['staff_fromemai_id'] ?? '';
+		log_message('error', 'replyID - '.$replyID );
+		log_message('error', 'savedReplyID - '.$savedReplyID );
+		
 		
 		// Form Post Data
 		//echo $recipientEmail;
@@ -1624,6 +1629,26 @@ if ($folder->children->count() > 0) {
 		$senderName=$_SESSION['STAFFSMTP']['smtp_user'];
 		$encryption=$_SESSION['STAFFSMTP']['smtp_crypto'];
 		}
+		
+		}elseif(isset($replyID)&&$replyID&&isset($savedReplyID)&&$savedReplyID&&$replyID <> $savedReplyID){
+		
+		//log_message('error', 'Mail from Other ID - '.$replyID.''.$savedReplyID );
+		
+		$mailers=$this->webmail_model->get_smtp_details($replyID);
+		if(empty($mailers)){ 
+		echo $downloadMessages="Email SMTP Details Not Found !!";
+		exit;
+		$this->db->select('mailer_username,mailer_password,mailer_smtp_host,mailer_smtp_port,encryption,');
+		}
+		
+		$mailer_smtp_host=trim($mailers[0]['mailer_smtp_host']);
+        $mailer_smtp_port=trim($mailers[0]['mailer_smtp_port']);
+        $mailer_username=trim($mailers[0]['mailer_username']);
+        $mailer_password=trim($mailers[0]['mailer_password']);
+		$senderEmail=trim($mailers[0]['mailer_email']);
+		$senderName=trim($mailers[0]['mailer_name']);
+		$encryption=trim($mailers[0]['encryption']);
+		
 		}else{
 		
 		$mailer_smtp_host=$_SESSION['STAFFSMTP']['smtp_host'];
@@ -1631,7 +1656,7 @@ if ($folder->children->count() > 0) {
         $mailer_username=$_SESSION['STAFFSMTP']['smtp_user'];
         $mailer_password=base64_decode($_SESSION['STAFFSMTP']['smtp_pass']);
 		$senderEmail=$_SESSION['STAFFSMTP']['smtp_user'];
-		$senderName=$_SESSION['STAFFSMTP']['smtp_user'];
+		$senderName=get_staff_company_name() ?? $_SESSION['STAFFSMTP']['smtp_user'];
 		$encryption=$_SESSION['STAFFSMTP']['smtp_crypto'];
 		
 		}
@@ -1669,8 +1694,8 @@ if ($folder->children->count() > 0) {
 	$mail->WordWrap = 50;               // set word wrap
 	//$mail->Priority = 1; 
 	$senderName = trim($senderName);
-    $senderName = strip_tags($senderName);
-    $senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
+    //$senderName = strip_tags($senderName);
+    //$senderName = preg_replace('/[^\p{L}\p{N}\s\.\-_]/u', '', $senderName);
 	//$mail->setFrom($senderEmail, $senderName);
 	$mail->setFrom($senderEmail, $senderName, false);
 	
@@ -1739,7 +1764,7 @@ if ($folder->children->count() > 0) {
     return true;
 	} catch (Exception $e) {
 		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
-		log_message('error', 'Email send error: ' . $mail->ErrorInfo);
+		log_message('error', 'Email Error from : '.$senderEmail. ' error' . $mail->ErrorInfo);
 		return false;
 	}
 	

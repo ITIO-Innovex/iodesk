@@ -454,9 +454,35 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
 
           <div class="alert alert-warning hide tw-mb-3" id="wfPlaceholderWarning"></div>
         </div>
+<?php
+//print_r($_SESSION['mailersdropdowns']);
+//$reply_from_email=$_SESSION['webmail']['id'] ?? '';
 
+//echo $_SESSION['smtp_fetch_type'];
+//echo $_SESSION['STAFFSMTP']['smtp_user'];  // Get Webmail Setup Email ID after login config / email.php
+//echo $_SESSION['staff_fromemai_id'] ?? ''; // Get Webmail Setup Email table ID after login config / email.php
+?>
         <hr class="tw-my-3" />
         <div id="wfCommonEmailFields">
+		  <div class="form-group">
+            <label>From : </label>
+			<?php if($_SESSION['smtp_fetch_type']=='CompanySMTP'){ echo $_SESSION['STAFFSMTP']['smtp_user']; echo '<i class="fa-solid fa-circle-info tw-mx-2 text-info" title="Staff Email Not Configured – Please Add Details in Webmail Setup"></i>';
+			?>
+			<input type="hidden" name="reply_from_email" id="reply_from_email"  />
+			<?php
+			}else{ 
+			//echo $_SESSION['STAFFSMTP']['smtp_user'];?>
+            <select name="reply_from_email" id="reply_from_email" class="form-control" required>
+    <option value="">Select Email</option>
+   <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
+        <option value="<?php echo $row['id']; ?>" <?php if($row['mailer_email']==$_SESSION['STAFFSMTP']['smtp_user']){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
+    <?php } ?>
+
+</select>
+            <?php } ?>
+			 
+          </div>
+		  
           <div class="form-group">
             <label>To <span class="text-danger">*</span></label>
             <input type="text" id="wfEmailTo" class="form-control" placeholder="recipient@example.com">
@@ -1161,6 +1187,8 @@ window.editor = Jodit.make('.editor');
         alert_float('warning', 'To is required');
         return;
       }
+	  var reply_from = $('#reply_from_email').val().trim();
+	  //alert(reply_from); return false;
       var subj = $('#wfFinalSubject').val().trim();
       var body = '';
       if (typeof window.email_editor !== 'undefined' && window.email_editor) {
@@ -1198,7 +1226,8 @@ window.editor = Jodit.make('.editor');
           dataType: 'json',
           data: {
             template_id: tid,
-            to_email: to,
+            reply_from: reply_from,
+			to_email: to,
             cc_email: $('#wfEmailCc').val(),
             bcc_email: $('#wfEmailBcc').val(),
             final_subject: subj,
@@ -1229,6 +1258,7 @@ window.editor = Jodit.make('.editor');
         dataType: 'json',
         data: {
           to_email: to,
+		  reply_from: reply_from,
           cc_email: $('#wfEmailCc').val(),
           bcc_email: $('#wfEmailBcc').val(),
           final_subject: subj,

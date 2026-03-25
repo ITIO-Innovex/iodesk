@@ -28,6 +28,7 @@ if(isset($settings['encryption'])&&$settings['encryption']&&isset($settings['mai
 			$config['smtp_port']    = trim($settings['mailer_smtp_port']);
 			$config['smtp_crypto']  = trim($settings['encryption']);
 			$_SESSION['staff_fromemai']=$settings['mailer_email'];
+			$_SESSION['staff_fromemai_id']=$settings['id'];
 			$smtp_fetch_type="StaffSMTP";
 		}else{
 		$smtp_fetch_type_status=1;

@@ -28,6 +28,23 @@ class Email_template extends AdminController
         $this->db->order_by('id', 'desc');
         $data['templates'] = $this->db->get()->result_array();
         $data['title']     = 'Email Templates';
+		
+		/// Set Email From List
+		/*$_SESSION['mailersdropdowns']="";*/
+		if(empty($_SESSION['mailersdropdowns'])){
+		$staffid=get_staff_user_id();
+		$deptid=get_departments_id();
+		$this->load->model('webmail_model');
+		$wheredata=' mailer_status=1';
+		$wheredata .=' AND ( staffid='.$staffid;
+		$wheredata .=' OR departmentid='.$deptid;
+		$wheredata .=' OR FIND_IN_SET('.$staffid.', assignto))';
+		$_SESSION['mailersdropdowns']   = $this->webmail_model->getemaillist('', $wheredata);
+		$data['webmailsetup']= $this->webmail_model->webmailsetup('', $wheredata);
+			if(isset($data['webmailsetup'])&&$data['webmailsetup']){
+			$_SESSION['webmail']=$data['webmailsetup'][0];
+			}
+		}
 
         $this->load->view('admin/email_template/manage', $data);
     }
@@ -131,10 +148,13 @@ class Email_template extends AdminController
     {
         $ajax = $this->input->is_ajax_request();
 
+        
         $templateId = (int) $this->input->post('template_id');
+		$fromEmail   = trim((string) ($this->input->post('reply_from') ?? ''));
         $toEmail    = trim((string) ($this->input->post('to_email') ?? ''));
         $ccEmail    = trim((string) ($this->input->post('cc_email') ?? ''));
         $bccEmail   = trim((string) ($this->input->post('bcc_email') ?? ''));
+		$fromEmail   = trim((string) ($this->input->post('reply_from') ?? ''));
         $subject    = trim((string) $this->input->post('final_subject'));
         $body       = $this->input->post('final_body', false);
 
@@ -199,6 +219,7 @@ class Email_template extends AdminController
             'recipientCC'    => $ccEmail,
             'recipientBCC'   => $bccEmail,
             'emailSubject'   => $subject,
+			'recipientFromEmail'    => $fromEmail,
             'emailBody'      => $body,
         ]);
 
