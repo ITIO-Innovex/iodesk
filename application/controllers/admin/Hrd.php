@@ -6503,9 +6503,13 @@ exit;
         $department_id = (int) $this->input->post('department_id');
         $field_title   = trim($this->input->post('field_title', true));
         $status        = (int) $this->input->post('status');
+        $required      = (int) $this->input->post('required');
 
         if ($status !== 0 && $status !== 1) {
             $status = 1;
+        }
+        if ($required !== 0 && $required !== 1) {
+            $required = 0;
         }
 
         if ($department_id <= 0 || $field_title === '') {
@@ -6517,6 +6521,7 @@ exit;
             'department_id' => $department_id,
             'field_title'   => $field_title,
             'status'        => $status,
+            'required'      => $required,
         ];
 
         $table = db_prefix() . 'dar_custom_fields';
