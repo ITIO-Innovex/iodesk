@@ -554,7 +554,7 @@ unset($data['id']);
                 $notifications[$i]['full_date']   = _dt($notification['date']);
                 $i++;
             } //$notifications as $notification
-			//log_message('error', 'where: ' . json_encode($notifications));
+			log_message('error', 'where: ' . json_encode($notifications));
             echo json_encode($notifications);
             die;
         }
