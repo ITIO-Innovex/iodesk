@@ -96,6 +96,9 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
 			  <button type="button" class="btn btn-default btn-sm" id="openTableSettingBtn" data-toggle="modal" data-target="#openTableSettingModal">
                 <i class="fa-solid fa-table" title="Table Setting"></i> 
               </button>
+              <button type="button" class="btn btn-default btn-sm" id="openColWidthBtn" title="Set table column width">
+                <i class="fa-solid fa-arrows-left-right-to-line"></i>
+              </button>
 			  </div>
             </div>
           </div>
@@ -141,12 +144,16 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
                                   $emailVal = trim((string) $val);
                                   $isEmailField = isset($field['type']) && $field['type'] === 'email';
                                   $isEmailValue = $isEmailField && $emailVal !== '' && filter_var($emailVal, FILTER_VALIDATE_EMAIL);
+								  $isURLField = isset($field['type']) && $field['type'] === 'url';
                                 ?>
                                 <?php if ($isEmailValue) { ?>
                                   <?php echo e($emailVal); ?>
                                   <a href="#" class="web-email-trigger tw-ml-1 tw-inline-block tw-text-primary" title="<?php echo _l('email'); ?> — Send / compose" data-email="<?php echo e($emailVal); ?>" role="button">
                                     <i class="fa-regular fa-envelope"></i>
-                                  </a>
+                                  </a> 
+								  
+								  <?php } elseif($isURLField) { ?>
+								  <a href="<?php echo (string)$val; ?>" target="_blank"><?php echo (string)$val; ?></a><br>
                                 <?php } else { ?>
                                   <?php echo (string)$val; ?>
                                 <?php } ?>
@@ -345,6 +352,70 @@ $hidecols = $_SESSION['selected_fields'][$form['id']] ?? [];
         <button type="submit" class="btn btn-primary">Save</button>
       </div>
 <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<!-- Column Width Setting Modal (single column) -->
+<div class="modal fade" id="wfColWidthModal" tabindex="-1" role="dialog" aria-labelledby="wfColWidthModalLabel">
+  <div class="modal-dialog" role="document" style="max-width:520px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="wfColWidthModalLabel">Set column width</h4>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="wfColWidthIndex" value="">
+        <div class="form-group">
+          <label>Column <span class="text-danger">*</span></label>
+          <select id="wfColWidthSelect" class="form-control"></select>
+          <p class="text-muted tw-mt-1 tw-mb-0">Selected: <strong id="wfColWidthName"></strong></p>
+        </div>
+        <div class="form-group">
+          <label>Width (px) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" id="wfColWidthPx" min="120" max="1200" step="10" value="180">
+          <small class="text-muted">Minimum 180px recommended.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="button" class="btn btn-default" id="wfColWidthResetBtn">Reset</button>
+        <button type="button" class="btn btn-info" id="wfColWidthAllBtn">Set all columns</button>
+        <button type="button" class="btn btn-primary" id="wfColWidthSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Column Width Setting Modal (all columns) -->
+<div class="modal fade" id="wfAllColWidthModal" tabindex="-1" role="dialog" aria-labelledby="wfAllColWidthModalLabel">
+  <div class="modal-dialog modal-lg" role="document" style="max-width:860px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="wfAllColWidthModalLabel">Set all column widths</h4>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Column</th>
+                <th style="width:220px;">Width (px)</th>
+              </tr>
+            </thead>
+            <tbody id="wfAllColWidthBody">
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+        <small class="text-muted">Tip: Use 180 for normal, 420 for expanded columns.</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="button" class="btn btn-default" id="wfAllColWidthResetBtn">Reset all</button>
+        <button type="button" class="btn btn-primary" id="wfAllColWidthSaveBtn">Save</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1455,10 +1526,228 @@ $('#toggleBtn').on('click', function() {
     $('#myCsvBox').slideToggle();
 });
 
-$(document).on('click', '.expand-input', function () {
-    $('th.expand-input').removeClass('active-expand');
-    $(this).addClass('active-expand');
-});
+// Column width settings (click heading to set width)
+(function() {
+  var formId = <?php echo (int)$form['id']; ?>;
+  var storageKey = 'wf_col_widths_' + formId;
+  var expandedIndex = null; // used for quick expand toggle (dblclick)
+
+  function loadMap() {
+    try {
+      var raw = localStorage.getItem(storageKey);
+      var obj = raw ? JSON.parse(raw) : {};
+      return (obj && typeof obj === 'object') ? obj : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveMap(map) {
+    try { localStorage.setItem(storageKey, JSON.stringify(map || {})); } catch (e) {}
+  }
+
+  function getTable() {
+    return $('#webFormEntriesTable');
+  }
+
+  function getExpandableThs() {
+    return getTable().find('thead th.expand-input');
+  }
+
+  function clearInlineWidths() {
+    var $t = getTable();
+    $t.find('thead th, tbody td').css({ width: '', 'min-width': '' });
+  }
+
+  function applyMap(map) {
+    var $t = getTable();
+    if (!$t.length) return;
+    var $ths = $t.find('thead th');
+    var colCount = $ths.length;
+
+    for (var i = 0; i < colCount; i++) {
+      var thSel = 'thead th:nth-child(' + (i + 1) + ')';
+      var tdSel = 'tbody td:nth-child(' + (i + 1) + ')';
+      var px = map[i];
+      if (px === undefined || px === null || px === '') continue;
+      px = parseInt(px, 10);
+      if (isNaN(px) || px < 120) continue;
+      $t.find(thSel + ',' + tdSel).css({ width: px + 'px', 'min-width': px + 'px' });
+    }
+  }
+
+  function applyExpandedToggle() {
+    var $t = getTable();
+    if (!$t.length) return;
+    $t.find('thead th').removeClass('wf-col-expanded wf-col-normal wf-col-active');
+    $t.find('tbody td').removeClass('wf-col-expanded wf-col-normal');
+
+    // default min width for all expandable headings
+    $t.find('thead th.expand-input, tbody td').each(function() {});
+
+    var $ths = $t.find('thead th');
+    var colCount = $ths.length;
+    for (var i = 0; i < colCount; i++) {
+      var thSel = 'thead th:nth-child(' + (i + 1) + ')';
+      var tdSel = 'tbody td:nth-child(' + (i + 1) + ')';
+      if (!$t.find(thSel).hasClass('expand-input')) continue;
+
+      if (expandedIndex !== null && i === expandedIndex) {
+        $t.find(thSel).addClass('wf-col-expanded wf-col-active');
+        $t.find(tdSel).addClass('wf-col-expanded');
+      } else {
+        $t.find(thSel).addClass('wf-col-normal');
+        $t.find(tdSel).addClass('wf-col-normal');
+      }
+    }
+  }
+
+  function reapplyAll() {
+    clearInlineWidths();
+    applyExpandedToggle();
+    applyMap(loadMap());
+    if ($.fn.dataTable && $.fn.dataTable.isDataTable(getTable())) {
+      getTable().DataTable().columns.adjust();
+    }
+  }
+
+  function openSingleModal(idx, name) {
+    var map = loadMap();
+    var cur = map[idx];
+    if (cur === undefined || cur === null || cur === '') cur = 180;
+    $('#wfColWidthIndex').val(idx);
+    $('#wfColWidthName').text(name || ('Column ' + (idx + 1)));
+    $('#wfColWidthPx').val(parseInt(cur, 10) || 180);
+    $('#wfColWidthModal').appendTo('body').modal('show');
+  }
+
+  function renderAllModal() {
+    var map = loadMap();
+    var $body = $('#wfAllColWidthBody');
+    $body.empty();
+    getExpandableThs().each(function() {
+      var idx = $(this).index();
+      var name = $.trim($(this).text() || '');
+      var val = map[idx];
+      if (val === undefined || val === null || val === '') val = 180;
+      var safeName = $('<div/>').text(name).html();
+      $body.append(
+        '<tr>' +
+          '<td>' + safeName + '</td>' +
+          '<td><input type="number" class="form-control input-sm wf-all-col-width" data-idx="' + idx + '" min="120" max="1200" step="10" value="' + (parseInt(val, 10) || 180) + '"></td>' +
+        '</tr>'
+      );
+    });
+  }
+
+  // Click header: quick expand/collapse (no modal)
+  $(document).on('click', '#webFormEntriesTable thead th.expand-input', function(e) {
+    e.preventDefault();
+    var idx = $(this).index();
+    expandedIndex = (expandedIndex === idx) ? null : idx;
+    reapplyAll();
+  });
+
+  // Modal actions
+  function syncSingleModalFromSelect() {
+    var idx = parseInt($('#wfColWidthSelect').val(), 10);
+    if (isNaN(idx) || idx < 0) return;
+    var name = $('#wfColWidthSelect option:selected').text() || ('Column ' + (idx + 1));
+    $('#wfColWidthIndex').val(idx);
+    $('#wfColWidthName').text(name);
+    var map = loadMap();
+    var cur = map[idx];
+    if (cur === undefined || cur === null || cur === '') cur = 180;
+    $('#wfColWidthPx').val(parseInt(cur, 10) || 180);
+  }
+
+  function openSingleModal(idx, name) {
+    // build dropdown each time (in case columns changed)
+    var $sel = $('#wfColWidthSelect');
+    $sel.empty();
+    getExpandableThs().each(function() {
+      var i = $(this).index();
+      var n = $.trim($(this).text() || ('Column ' + (i + 1)));
+      $sel.append($('<option></option>').val(i).text(n));
+    });
+    if (idx !== undefined && idx !== null) {
+      $sel.val(String(idx));
+    } else {
+      $sel.val($sel.find('option:first').val());
+    }
+    $('#wfColWidthModal').appendTo('body').modal('show');
+    syncSingleModalFromSelect();
+  }
+
+  $('#wfColWidthSelect').on('change', function() {
+    syncSingleModalFromSelect();
+  });
+
+  // Open modal from icon button (not from heading)
+  $('#openColWidthBtn').on('click', function(e) {
+    e.preventDefault();
+    openSingleModal(expandedIndex, '');
+  });
+
+  $('#wfColWidthSaveBtn').on('click', function() {
+    var idx = parseInt($('#wfColWidthIndex').val(), 10);
+    var px = parseInt($('#wfColWidthPx').val(), 10);
+    if (isNaN(idx) || idx < 0) return;
+    if (isNaN(px) || px < 120) {
+      alert_float('warning', 'Please enter a valid width (min 120px)');
+      return;
+    }
+    var map = loadMap();
+    map[idx] = px;
+    saveMap(map);
+    $('#wfColWidthModal').modal('hide');
+    reapplyAll();
+  });
+
+  $('#wfColWidthResetBtn').on('click', function() {
+    var idx = parseInt($('#wfColWidthIndex').val(), 10);
+    if (isNaN(idx) || idx < 0) return;
+    var map = loadMap();
+    delete map[idx];
+    saveMap(map);
+    $('#wfColWidthModal').modal('hide');
+    reapplyAll();
+  });
+
+  $('#wfColWidthAllBtn').on('click', function() {
+    $('#wfColWidthModal').modal('hide');
+    renderAllModal();
+    $('#wfAllColWidthModal').appendTo('body').modal('show');
+  });
+
+  $('#wfAllColWidthSaveBtn').on('click', function() {
+    var map = loadMap();
+    $('#wfAllColWidthBody .wf-all-col-width').each(function() {
+      var idx = parseInt($(this).attr('data-idx'), 10);
+      var px = parseInt($(this).val(), 10);
+      if (!isNaN(idx) && !isNaN(px) && px >= 120) {
+        map[idx] = px;
+      }
+    });
+    saveMap(map);
+    $('#wfAllColWidthModal').modal('hide');
+    reapplyAll();
+  });
+
+  $('#wfAllColWidthResetBtn').on('click', function() {
+    saveMap({});
+    $('#wfAllColWidthModal').modal('hide');
+    reapplyAll();
+  });
+
+  // Reapply after DataTables redraw
+  getTable().on('draw.dt', function() {
+    reapplyAll();
+  });
+
+  // Initial apply
+  $(function() { reapplyAll(); });
+})();
 </script>
 
 </body>

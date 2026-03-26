@@ -48,6 +48,7 @@
                   <tr>
                     <th>Department</th>
                     <th>Field Title</th>
+                    <th>Required</th>
                     <th>Status</th>
                     <th><?php echo _l('options'); ?></th>
                   </tr>
@@ -58,7 +59,8 @@
                         data-id="<?php echo (int)$f['id']; ?>"
                         data-department_id="<?php echo (int)$f['department_id']; ?>"
                         data-field_title="<?php echo htmlspecialchars($f['field_title'], ENT_QUOTES, 'UTF-8'); ?>"
-                        data-status="<?php echo (int)$f['status']; ?>">
+                        data-status="<?php echo (int)$f['status']; ?>"
+                        data-required="<?php echo (int)($f['required'] ?? 0); ?>">
                       <td>
                         <?php
                         $deptId = (int) ($f['department_id'] ?? 0);
@@ -66,6 +68,13 @@
                         ?>
                       </td>
                       <td><?php echo html_escape($f['field_title']); ?></td>
+                      <td>
+                        <?php if ((int)($f['required'] ?? 0) === 1) { ?>
+                          <span class="label label-info">Yes</span>
+                        <?php } else { ?>
+                          <span class="label label-default">No</span>
+                        <?php } ?>
+                      </td>
                       <td>
                         <?php if ((int) $f['status'] === 1) { ?>
                           <span class="label label-success">Active</span>
@@ -80,7 +89,8 @@
                              onclick="editDarField(this, <?php echo (int) $f['id']; ?>); return false;"
                              data-department_id="<?php echo (int) $f['department_id']; ?>"
                              data-field_title="<?php echo html_escape($f['field_title']); ?>"
-                             data-status="<?php echo (int) $f['status']; ?>">
+                             data-status="<?php echo (int) $f['status']; ?>"
+                             data-required="<?php echo (int)($f['required'] ?? 0); ?>">
                             <i class="fa fa-pencil"></i>
                           </a>
                           <a href="<?php echo admin_url('hrd/delete_dar_form_field/' . (int) $f['id']); ?>"
@@ -138,6 +148,12 @@
                 <option value="0">Inactive</option>
               </select>
             </div>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" name="required" id="dar_required" value="1" checked>
+                Required
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -167,6 +183,7 @@
       }
       $('#dar-field-form').find('input[name="field_title"]').val('');
       $('#dar_status').val('1');
+      $('#dar_required').prop('checked', true);
       $('.add-title').removeClass('hide');
       $('.edit-title').removeClass('hide');
     });
@@ -185,10 +202,12 @@
     var departmentId = $row.attr('data-department_id') || $(invoker).attr('data-department_id') || '';
     var fieldTitle = ($row.attr('data-field_title') || $(invoker).attr('data-field_title') || '');
     var status = String($row.attr('data-status') || $(invoker).attr('data-status') || '1');
+    var required = String($row.attr('data-required') || $(invoker).attr('data-required') || '0');
 
     $('#dar-additional').html('<input type="hidden" name="id" value="' + id + '">');
     $('#dar-field-form').find('input[name="field_title"]').val(fieldTitle);
     $('#dar_status').val(status);
+    $('#dar_required').prop('checked', required === '1');
 
     var $deptSelect = $('#department_id');
     if (!$deptSelect.length) {
