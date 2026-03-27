@@ -111,6 +111,26 @@ $list = json_decode($list, true);  // convert to array
                                   data-assign-to="<?php echo e($form['assign_to'] ?? ''); ?>">
                             <i class="fa-solid fa-share-nodes"></i>
                           </button>
+						  
+<?php if(is_admin()){ ?>
+<?php if(e($form['form_type'])==1){ ?>
+<a href="<?php echo admin_url('web_form/display_staff/' . $form['id']); ?>" class="btn btn-default btn-xs _delete" title="Hide for all staff">
+<i class="fa-solid fa-eye"></i> </a>
+<?php }else{ ?>
+<a href="<?php echo admin_url('web_form/display_staff/' . $form['id']); ?>" class="btn btn-default btn-xs _delete" title="Show for all staff">
+<i class="fa-regular fa-eye"></i></a>
+<?php } ?>
+<?php } ?>
+<?php if(e($form['display_in_menu'])==1){ ?>
+<a href="<?php echo admin_url('web_form/display_in_menu/' . $form['id']); ?>" class="_delete" title="Hide from Menu">
+<i class="fa-solid fa-toggle-on fa-xl" style="margin-top:10px;"></i> </a>
+				<?php }else{ ?>
+<a href="<?php echo admin_url('web_form/display_in_menu/' . $form['id']); ?>" class="_delete" title="Show in Menu">
+<i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
+<?php } ?>
+
+
+
                         </div>
                       </td>
                     </tr>

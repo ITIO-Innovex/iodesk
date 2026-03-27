@@ -1221,6 +1221,13 @@ h4.tw-text-neutral-700, h4.tw-text-neutral-800, h3.tw-text-neutral-900 {
   }
   
   .active-expand { width: 400px !important;}
+  /* For set Submenu margin */
+   .sidebar li .nav-second-level li.active a {
+    margin: 8px 0 8px 0px; !important;
+	}
+	.sidebar li .nav-second-level li a {
+    padding: 7px 10px 7px 30px !important;
+	}
 
 
     /* responsive */
