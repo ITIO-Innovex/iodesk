@@ -318,9 +318,9 @@ echo '<div class="tw-my-2" style="padding-left: 40px;">'. $log['description'].'<
 				   $totalsec=0;
 					foreach ($get_all_timer as $timer) {
 					$author 	= get_staff_full_name($timer['staff_id']);
-					$date  = date("d F Y",strtotime($timer['start_time']));
-                    $start_time  = date("H:i:s",strtotime($timer['start_time']));
-					$end_time    = date("H:i:s",strtotime($timer['end_time']));
+					$date  = !empty($timer['start_time']) ? date("d F Y", strtotime($timer['start_time'])) : '';
+                    $start_time  = !empty($timer['start_time']) ? date("H:i:s", strtotime($timer['start_time'])) : '--:--:--';
+					$end_time    = !empty($timer['end_time']) ? date("H:i:s", strtotime($timer['end_time'])) : '--:--:--';
 					$totalsec = ($totalsec + (int)$timer['total_seconds']) ;
 
 echo '<div class="tw-my-2">';
