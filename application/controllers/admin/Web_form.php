@@ -1143,5 +1143,47 @@ log_message('error', 'f Type - '.$type );
             'message' => $ok ? 'Email sent successfully' : 'Failed to send email',
         ]);
     }
+	
+	//Set Display in Menu
+    public function display_in_menu($id)
+    {
+        if (!$id) {
+            redirect(admin_url('web_form'));
+        }        
+            //log_message('error', 'USER ID - '.$id );
+			
+			$this->db->set('display_in_menu', 'IF(display_in_menu = 0, 1, 0)', false);
+            $this->db->where('id', $id);
+            $response = $this->db->update('it_crm_web_forms');
+            if ($response == true) {
+                set_alert('success', _l('menu display status updated', _l('menu display status priority')));
+            } else {
+                set_alert('warning', _l('problem_updating', _l('menu display status priority')));
+            }
+       
+        
+        redirect(admin_url('web_form'));
+    }
+	
+	//Set Display in Publically
+    public function display_staff($id)
+    {
+        if (!$id || !is_admin()) {
+            access_denied('Web Form');
+        }        
+            //log_message('error', 'USER ID - '.$id );
+			
+			$this->db->set('form_type', 'IF(form_type = 0, 1, 0)', false);
+            $this->db->where('id', $id);
+            $response = $this->db->update('it_crm_web_forms');
+            if ($response == true) {
+                set_alert('success', _l('Menu display status updated', _l('Menu display status priority')));
+            } else {
+                set_alert('warning', _l('problem_updating', _l('Menu display status priority')));
+            }
+       
+        
+        redirect(admin_url('web_form'));
+    }
 }
 

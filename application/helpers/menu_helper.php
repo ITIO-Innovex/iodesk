@@ -105,7 +105,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
         'badge'    => [],
         ]);
     
-	    //if (is_staff_member() && staff_can('view',  'web_form')) {
+	    // Web Forms: main link + dynamic submenu items (by staff access)
         $CI->app_menu->add_sidebar_children_item('Workspace', [
             'slug'     => 'web_form_1',
             'name'     => 'Web Form',
@@ -114,7 +114,48 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 			'icon'     => 'fa-brands fa-wpforms',
             'badge'    => [],
         ]);
-		//}
+
+        // Dynamic form links: visible only for forms created/assigned to logged-in staff
+        if (is_staff_logged_in()) {
+            $companyId = get_staff_company_id();
+            $staffId   = get_staff_user_id();
+
+            $CI->db->where('company_id', $companyId);
+            $CI->db->where('is_deleted', 0);
+			$CI->db->group_start();
+			$CI->db->where('display_in_menu', 1);
+			$CI->db->or_where('form_type', 1); // fallback
+			$CI->db->group_end();
+            $CI->db->group_start();
+            $CI->db->where('staffid', $staffId);
+            $CI->db->or_like('assign_to', '"' . $staffId . '"'); // JSON string match
+            $CI->db->or_like('assign_to', $staffId); // fallback
+			$CI->db->or_where('form_type', 1); // fallback
+            $CI->db->group_end();
+            $CI->db->order_by('name', 'asc');
+            $webFormsForMenu = $CI->db->get(db_prefix() . 'web_forms')->result_array();
+            //log_message('error', 'QUERY - '.$CI->db->last_query());
+            $pos = 16;
+            foreach ($webFormsForMenu as $wf) {
+                $fid = (int) ($wf['id'] ?? 0);
+                if ($fid <= 0) {
+                    continue;
+                }
+                $label = trim((string) ($wf['name'] ?? ''));
+                if ($label === '') {
+                    $label = 'Web Form #' . $fid;
+                }
+
+                $CI->app_menu->add_sidebar_children_item('Workspace', [
+                    'slug'     => 'web_form_manage_' . $fid,
+                    'name'     => $label,
+                    'href'     => admin_url('web_form/manage/' . $fid),
+                    'position' => $pos++,
+                    'icon'     => 'fa-regular fa-rectangle-list',
+                    'badge'    => [],
+                ]);
+            }
+        }
 		
 		if (is_admin() || staff_can('view', 'user_utility')) {
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
