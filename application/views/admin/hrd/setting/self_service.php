@@ -121,6 +121,8 @@
 		  
 		  <li> <a href="<?php echo admin_url('hrd/setting/dar_form');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>DAR Form Manager</a> 
 		  </li>
+		  <li> <a href="<?php echo admin_url('hrd/setting/dar_status');?>" class="tw-font-medium tw-px-3 tw-py-3 tw-text-neutral-100 hover:tw-text-neutral-800 active:tw-text-neutral-800 focus:tw-text-neutral-800 hover:tw-bg-neutral-200 tw-w-full tw-inline-flex tw-items-center tw-rounded-md"><i class="fa-solid fa-arrow-right-long tw-mx-2"></i>DAR Status</a> 
+		  </li>
 		 
         </ul>
       </div>

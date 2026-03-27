@@ -125,8 +125,10 @@
                 <table class="table table-bordered">
                   <thead>
                     <tr>
-                      <?php foreach ($dar_fields as $f) { ?>
-                        <th><?php echo html_escape($f['field_title']); ?> <small class="req text-danger" title="Required field">* </small></th>
+                      <?php foreach ($dar_fields as $f) {
+                          $field_required = (int) ($f['required'] ?? 0) === 1;
+                          ?>
+                        <th><?php echo html_escape($f['field_title']); ?><?php if ($field_required) { ?> <small class="req text-danger" title="Required field">*</small><?php } ?></th>
                       <?php } ?>
                       <th style="width:90px;">Action</th>
                     </tr>
@@ -156,7 +158,7 @@
                               $val = isset($valuesById[$fid]) ? $valuesById[$fid] : '';
 							  $ftype="text";
 							  $fieldcss="expand-input";
-							  
+							  $dar_req_attr = (int) ($f['required'] ?? 0) === 1 ? '1' : '0';
 							  
 							  if(strstr($f['field_title'],"Time")){
 							  $ftype="time";
@@ -170,11 +172,11 @@
                               ?>
                               <td>
 <?php if(strstr($f['field_title'],"Status")){ ?>
-  <select name="field_<?php echo $fid; ?>[]"  class="form-control <?php echo $fieldcss; ?>">
+  <select name="field_<?php echo $fid; ?>[]" class="form-control <?php echo $fieldcss; ?>" data-dar-required="<?php echo $dar_req_attr; ?>">
   <option value="">Select Status</option>
-  <option value="Completed" <?php if($val=="Completed"){ ?> selected="selected" <?php } ?>>Completed</option>
-  <option value="Pending" <?php if($val=="Pending"){ ?> selected="selected" <?php } ?>>Pending</option>
-  <option value="Working" <?php if($val=="Working"){ ?> selected="selected" <?php } ?>>Working</option>
+  <?php foreach ($dar_status_list as $list) { ?>
+  <option value="<?php echo $list['title']; ?>" <?php if($val==$list['title']){ ?> selected="selected" <?php } ?>><?php echo $list['title']; ?></option>
+  <?php } ?>
   </select>
 							  
 							  <?php }else{ ?>
@@ -182,7 +184,8 @@
                                        name="field_<?php echo $fid; ?>[]"
                                        class="form-control <?php echo $fieldcss; ?>"
                                        value="<?php echo html_escape($val); ?>"
-                                       placeholder="<?php echo html_escape($f['field_title']); ?>">
+                                       placeholder="<?php echo html_escape($f['field_title']); ?>"
+                                       data-dar-required="<?php echo $dar_req_attr; ?>">
 								<?php } ?>
                               </td>
                           <?php } ?>
@@ -255,10 +258,10 @@
         return false;
       }
 	  
-      // Validate all DAR inputs are filled
+      // Save Draft and Submit: require all * columns filled (autosave still allows partial via AJAX)
       var firstEmpty = null;
       $('#dar-rows tr.dar-row').each(function() {
-        $(this).find('input').each(function() {
+        $(this).find('input[data-dar-required="1"], select[data-dar-required="1"]').each(function() {
           var val = $.trim($(this).val());
           if (!val && !firstEmpty) {
             firstEmpty = this;
@@ -266,8 +269,13 @@
         });
       });
 
-      if (firstEmpty) {
-        alert('All DAR fields are required. Please fill in all cells before submitting.');
+      if (firstEmpty) { 
+	  
+	  var fieldName = $(firstEmpty).attr('placeholder');
+      //alert('Please fill: ' + fieldName);
+	
+        alert(fieldName + ' - Please fill in all required DAR fields (marked with *) before saving or submitting. ');
+		//$(firstEmpty).css('border', '2px solid'); // add red border
         $(firstEmpty).focus();
         return false;
       }
