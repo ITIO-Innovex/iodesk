@@ -1,5 +1,8 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-<?php init_head(); ?>
+<?php init_head(); //print_r($pending_share_requests); 
+$target_staffid=$pending_share_requests[0]['target_staffid'] ?? '';
+
+?>
 <div id="wrapper">
   <div class="content">
     <div class="row">
@@ -13,6 +16,38 @@
 
         <div class="panel_s">
           <div class="panel-body panel-table-full">
+		  <?php //if (!empty($is_admin_user) && !empty($pending_share_requests)) { ?>
+            <?php if (!empty($pending_share_requests) && ($target_staffid == get_staff_user_id()) ) { ?>
+              <h5 class="tw-mt-0 tw-font-semibold">Pending Share Approval Requests</h5>
+              <div class="table-responsive tw-mb-4">
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Form</th>
+                      <th>Requested By</th>
+                      <th>Target Staff</th>
+                      <th>Requested At</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php echo $pending_share_requests[0]['target_staffid']; foreach ($pending_share_requests as $rq) { ?>
+                      <tr>
+                        <td><?php echo e($rq['form_name'] ?? '-'); ?></td>
+                        <td><?php echo e(trim(($rq['firstname'] ?? '') . ' ' . ($rq['lastname'] ?? ''))); ?><?php if (!empty($rq['requester_email'])) { ?> (<?php echo e($rq['requester_email']); ?>)<?php } ?></td>
+                        <td><?php echo e(trim(($rq['target_firstname'] ?? '') . ' ' . ($rq['target_lastname'] ?? ''))); ?><?php if (!empty($rq['target_email'])) { ?> (<?php echo e($rq['target_email']); ?>)<?php } ?></td>
+                        <td><?php echo e($rq['created_at'] ?? ''); ?></td>
+                        <td>
+                          <button type="button" class="btn btn-success btn-xs process-share-request" data-request-id="<?php echo (int) $rq['id']; ?>" data-decision="approved">Approve</button>
+                          <button type="button" class="btn btn-danger btn-xs process-share-request" data-request-id="<?php echo (int) $rq['id']; ?>" data-decision="rejected">Reject</button>
+                        </td>
+                      </tr>
+                    <?php } ?>
+                  </tbody>
+                </table>
+              </div>
+            <?php } ?>
+
             <?php if (!empty($forms)) { 
 			
 			?>
@@ -105,6 +140,7 @@ $list = json_decode($list, true);  // convert to array
           <input type="hidden" name="form_id" id="share_form_id" value="">
 
         <div class="form-group">
+            <?php if (!empty($is_admin_user)) { ?>
             <label>Assign To (Staff)</label>
             <div class="tw-mb-2">
               <button type="button" class="btn btn-default btn-xs" id="share_select_all">Select all</button>
@@ -117,6 +153,11 @@ $list = json_decode($list, true);  // convert to array
               <?php } ?>
               <?php } ?>
             </select>
+            <?php } else { ?>
+              <label>Staff Email</label>
+              <input type="email" name="share_email" id="share_email" class="form-control" placeholder="Enter staff email for approval request" required>
+              <p class="text-muted tw-mt-2 tw-text-xs">For non-admin users, sharing requires admin approval.</p>
+            <?php } ?>
         </div>
 
           <div class="tw-text-right">
@@ -157,6 +198,9 @@ $list = json_decode($list, true);  // convert to array
 
 <script>
 (function() {
+  var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>';
+  var csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
+
   function parseAssignTo(raw) {
     if (!raw) return [];
     try {
@@ -171,9 +215,13 @@ $list = json_decode($list, true);  // convert to array
     var rawAssign = $(this).attr('data-assign-to') || '';
     $('#share_form_id').val(formId);
 
-    var selected = parseAssignTo(rawAssign);
-    $('#assign_to').selectpicker('val', selected);
-    $('#assign_to').selectpicker('refresh');
+    <?php if (!empty($is_admin_user)) { ?>
+      var selected = parseAssignTo(rawAssign);
+      $('#assign_to').selectpicker('val', selected);
+      $('#assign_to').selectpicker('refresh');
+    <?php } else { ?>
+      $('#share_email').val('');
+    <?php } ?>
 
     $('#shareFormModal').appendTo('body').modal('show');
   });
@@ -197,13 +245,39 @@ $list = json_decode($list, true);  // convert to array
         try { resp = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch(e) {}
         if (resp && resp.success) {
           $('#shareFormModal').modal('hide');
+          if (resp.message) {
+            alert_float('success', resp.message);
+          }
           location.reload();
         } else {
-          alert_float('danger', 'Failed to update assign staff');
+          alert_float('danger', (resp && resp.message) ? resp.message : 'Failed to update assign staff');
         }
       })
       .fail(function() {
         alert_float('danger', 'Failed to update assign staff');
+      });
+  });
+
+  $('body').on('click', '.process-share-request', function() {
+    var requestId = parseInt($(this).data('request-id'), 10) || 0;
+    var decision = ($(this).data('decision') || '').toString();
+    if (!requestId || (decision !== 'approved' && decision !== 'rejected')) {
+      return;
+    }
+    var reqData = { request_id: requestId, decision: decision };
+    reqData[csrfName] = csrfHash;
+    $.post(admin_url + 'web_form/process_share_request', reqData)
+      .done(function(resp) {
+        try { resp = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch(e) {}
+        if (resp && resp.success) {
+          alert_float('success', resp.message || 'Updated');
+          location.reload();
+        } else {
+          alert_float('danger', (resp && resp.message) ? resp.message : 'Failed to process request');
+        }
+      })
+      .fail(function() {
+        alert_float('danger', 'Failed to process request');
       });
   });
 
