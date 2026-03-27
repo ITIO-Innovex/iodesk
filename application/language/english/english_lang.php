@@ -4335,5 +4335,6 @@ $lang['email'] = 'email';
 $lang['No Webmail Setup Entries'] = 'No Webmail Setup Entries';
 $lang['smtp_details_wrong'] = 'SMTP details wrong - correct from webmail setup';
 $lang['Add New Staff Type'] = 'Add New Staff Type';
+$lang['share_web_form'] = 'The web form has been shared for approval';
 ?>
 

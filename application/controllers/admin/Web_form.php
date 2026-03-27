@@ -40,6 +40,22 @@ class Web_form extends AdminController
         $this->db->where('active', 1);
         $this->db->order_by('firstname', 'asc');
         $data['staff_members'] = $this->db->get(db_prefix() . 'staff')->result_array();
+        $data['is_admin_user'] = is_admin();
+
+        //if (is_admin()) {
+            $this->db->select('r.*, f.name as form_name, s.firstname, s.lastname, s.email as requester_email, ts.firstname as target_firstname, ts.lastname as target_lastname');
+            $this->db->from('it_crm_web_form_share_requests r');
+            $this->db->join(db_prefix() . 'web_forms f', 'f.id = r.form_id', 'left');
+            $this->db->join(db_prefix() . 'staff s', 's.staffid = r.requested_by_staffid', 'left');
+            $this->db->join(db_prefix() . 'staff ts', 'ts.staffid = r.target_staffid', 'left');
+            $this->db->where('r.company_id', $companyId);
+            $this->db->where('r.status', 'pending');
+			$this->db->where('r.target_staffid', get_staff_user_id());
+            $this->db->order_by('r.id', 'desc');
+            $data['pending_share_requests'] = $this->db->get()->result_array();
+        //} else {
+            //$data['pending_share_requests'] = [];
+        //}
 
         $data['title'] = 'Web Forms';
         $this->load->view('admin/web_form/index', $data);
@@ -60,36 +76,155 @@ class Web_form extends AdminController
         }
         $assignTo = array_values(array_filter(array_map('intval', $assignTo)));
 
-        $this->db->where('id', $formId);
-        $this->db->where('company_id', $companyId);
-        $this->db->where('is_deleted', 0);
-        $this->db->update(db_prefix() . 'web_forms', [
-            'assign_to'  => json_encode($assignTo),
-            'updated_at' => date('Y-m-d H:i:s'),
+        // Admin: keep current behavior (direct assign).
+        if (is_admin()) {
+            $this->db->where('id', $formId);
+            $this->db->where('company_id', $companyId);
+            $this->db->where('is_deleted', 0);
+            $this->db->update(db_prefix() . 'web_forms', [
+                'assign_to'  => json_encode($assignTo),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+    		
+    		if (!empty($assignTo)) {
+                foreach ($assignTo as $assignid) {
+    		        $notification_data = [
+                        'description'     => 'assign_web_form',
+                        'touserid'        => $assignid,
+                        'link'            => 'web_form',
+    					'fromuserid'      => 0,
+    					'additional_data' => serialize([$formId,]),
+                    ];
+                    if (add_notification($notification_data)) {
+                        pusher_trigger_notification([$assignid]);
+                    }
+    				log_activity(_l('assign_web_form') . ' -  [ Form ID: ' . $formId . ']');
+                }
+            }
+
+            echo json_encode(['success' => true, 'message' => 'Form shared successfully.']);
+            exit;
+        }
+
+        // Non-admin: email-based request to admin approval.
+        $shareEmail = trim((string) $this->input->post('share_email'));
+        if ($shareEmail === '' || !filter_var($shareEmail, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['success' => false, 'message' => 'Please enter a valid email id.']);
+            exit;
+        }
+
+        $target = $this->db->select('staffid, email, active')
+            ->where('company_id', $companyId)
+            ->where('email', $shareEmail)
+            ->limit(1)
+            ->get(db_prefix() . 'staff')
+            ->row_array();
+
+        if (!$target || (int) ($target['active'] ?? 0) !== 1) {
+            echo json_encode(['success' => false, 'message' => 'Email id not found in staff table.']);
+            exit;
+        }
+
+        $existsPending = $this->db->where('company_id', $companyId)
+            ->where('form_id', $formId)
+            ->where('requested_by_staffid', $staffId)
+            ->where('target_staffid', (int) $target['staffid'])
+            ->where('status', 'pending')
+            ->count_all_results('it_crm_web_form_share_requests');
+
+        if ($existsPending > 0) {
+            echo json_encode(['success' => false, 'message' => 'Approval request already pending for this email.']);
+            exit;
+        }
+
+        $this->db->insert('it_crm_web_form_share_requests', [
+            'company_id'            => $companyId,
+            'form_id'               => $formId,
+            'requested_by_staffid'  => $staffId,
+            'target_staffid'        => (int) $target['staffid'],
+            'target_email'          => $shareEmail,
+            'status'                => 'pending',
+            'created_at'            => date('Y-m-d H:i:s'),
+            'updated_at'            => date('Y-m-d H:i:s'),
         ]);
-		
-		if (!empty($assignTo)) {
-        foreach ($assignTo as $assignid) {
-		log_message('error', 'Display data'.$assignid );
-		
-		        /////////////////////Notification & log//////////////
-		         $notification_data = [
-                    'description'     => 'assign_web_form',
-                    'touserid'        => $assignid,
+		/////////////Add Notification and Logs ////////////
+		        $log_msg="share_web_form";
+		        $notification_data = [
+                    'description'     => $log_msg,
+                    'touserid'        => $target['staffid'],
                     'link'            => 'web_form',
-					'fromuserid'      => 0,
-					'additional_data' => serialize([$formId,]),
                 ];
                 if (add_notification($notification_data)) {
-                    pusher_trigger_notification([$assignid]);
+                    pusher_trigger_notification([$target['staffid']]);
                 }
-				log_activity(_l('assign_web_form').' -  [ Form ID: ' . $formId . ']');
-		        ////////////////////////////////////////////////
+				log_activity(_l($log_msg).' -  [ Form ID: ' . $formId . ']');
 		
-        }
-}
+		/////////////End Notification and Logs ////////////
 
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'message' => 'Request sent for admin approval.']);
+        exit;
+    }
+
+    public function process_share_request()
+    {
+        if (!is_staff_logged_in()) { ///  || !is_admin() for admin
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            exit;
+        }
+
+        $companyId = get_staff_company_id();
+        $requestId = (int) $this->input->post('request_id');
+        $decision  = trim((string) $this->input->post('decision'));
+        if (!in_array($decision, ['approved', 'rejected'], true)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid decision']);
+            exit;
+        }
+
+        $request = $this->db->where('id', $requestId)
+            ->where('company_id', $companyId)
+            ->where('status', 'pending')
+            ->get('it_crm_web_form_share_requests')
+            ->row_array();
+
+        if (!$request) {
+            echo json_encode(['success' => false, 'message' => 'Request not found']);
+            exit;
+        }
+
+        if ($decision === 'approved') {
+            $this->db->select('assign_to');
+            $form = $this->db->where('id', (int) $request['form_id'])
+                ->where('company_id', $companyId)
+                ->where('is_deleted', 0)
+                ->get(db_prefix() . 'web_forms')
+                ->row_array();
+            if ($form) {
+                $assignTo = json_decode((string) ($form['assign_to'] ?? '[]'), true);
+                if (!is_array($assignTo)) {
+                    $assignTo = [];
+                }
+                $assignTo[] = (int) $request['target_staffid'];
+                $assignTo = array_values(array_unique(array_filter(array_map('intval', $assignTo))));
+
+                $this->db->where('id', (int) $request['form_id']);
+                $this->db->where('company_id', $companyId);
+                $this->db->update(db_prefix() . 'web_forms', [
+                    'assign_to'  => json_encode($assignTo),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
+        $this->db->where('id', $requestId);
+        $this->db->where('company_id', $companyId);
+        $this->db->update('it_crm_web_form_share_requests', [
+            'status'               => $decision,
+            'approved_by_staffid'  => get_staff_user_id(),
+            'approved_at'          => date('Y-m-d H:i:s'),
+            'updated_at'           => date('Y-m-d H:i:s'),
+        ]);
+
+        echo json_encode(['success' => true, 'message' => 'Request ' . $decision . '.']);
         exit;
     }
 
