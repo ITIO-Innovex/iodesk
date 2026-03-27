@@ -777,6 +777,21 @@ class Hrd_model extends App_Model
         $this->db->order_by('id', 'asc');
         return $this->db->get(db_prefix() . 'hrd_interview_source')->result_array();
     }
+	
+	 public function get_dar_status_list($id = '', $where = [])
+    {
+        if (is_numeric($id)) {
+		    $this->db->select('title');
+            $this->db->where($where);
+            $this->db->where('id', $id);
+            return $this->db->get(db_prefix() . 'hrd_dar_status')->row();
+        }
+
+        $this->db->select('title');
+        $this->db->where($where);
+        $this->db->order_by('title', 'asc');
+        return $this->db->get(db_prefix() . 'hrd_dar_status')->result_array();
+    }
 
     /**
      * Get company policy attachments

@@ -63,6 +63,8 @@ class Hrd extends AdminController
             $this->download_dar_master_excel();
         } elseif ($type == 'dar_form') {
             $this->dar_form();
+        } elseif ($type == 'dar_status') {
+            $this->dar_status();
         } elseif ($type == 'shift_manager') {
             $this->shift_manager();
         } elseif ($type == 'awards') {
@@ -426,6 +428,90 @@ class Hrd extends AdminController
         $new_status = $this->input->post('status') == 1 ? 1 : 0;
         $this->db->where('id', $id);
         $this->db->update('it_crm_hrd_interview_source', ['status' => $new_status]);
+        echo json_encode(['success' => true, 'new_status' => $new_status]);
+    }
+
+    /* View DAR Status */
+    public function dar_status()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Status');
+        }
+
+        $companyId = get_staff_company_id();
+        if (is_super() && isset($_SESSION['super_view_company_id']) && $_SESSION['super_view_company_id']) {
+            $companyId = (int) $_SESSION['super_view_company_id'];
+        }
+
+        $data['dar_statuses'] = $this->db
+            ->where('company_id', $companyId)
+            ->order_by('id', 'desc')
+            ->get('it_crm_hrd_dar_status')
+            ->result_array();
+        $data['title'] = 'DAR Status';
+        $this->load->view('admin/hrd/setting/dar_status', $data);
+    }
+
+    // Add/Edit DAR Status
+    public function darstatus()
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Status');
+        }
+
+        $id   = (int) $this->input->post('id');
+        $name = trim((string) $this->input->post('name'));
+
+        if ($name === '') {
+            set_alert('danger', 'DAR status title is required.');
+            redirect(admin_url('hrd/setting/dar_status'));
+        }
+
+        $data = [
+            'title'      => $name,
+            'company_id' => get_staff_company_id(),
+        ];
+
+        if ($id > 0) {
+            $this->db->where('id', $id);
+            $this->db->where('company_id', get_staff_company_id());
+            $this->db->update('it_crm_hrd_dar_status', $data);
+            set_alert('success', 'DAR status updated successfully');
+            exit;
+        }
+
+        $data['status'] = 1;
+        $this->db->insert('it_crm_hrd_dar_status', $data);
+        set_alert('success', 'DAR status added successfully');
+        exit;
+    }
+
+    // Delete DAR Status (soft)
+    public function delete_dar_status($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            access_denied('DAR Status');
+        }
+
+        $this->db->where('id', (int) $id);
+        $this->db->where('company_id', get_staff_company_id());
+        $this->db->update('it_crm_hrd_dar_status', ['status' => 0]);
+        set_alert('success', 'DAR status deactivated successfully');
+        redirect(admin_url('hrd/setting/dar_status'));
+    }
+
+    // Toggle DAR Status (AJAX)
+    public function toggle_dar_status($id)
+    {
+        if (!staff_can('view_setting',  'hr_department')) {
+            echo json_encode(['success' => false]);
+            return;
+        }
+
+        $new_status = $this->input->post('status') == 1 ? 1 : 0;
+        $this->db->where('id', (int) $id);
+        $this->db->where('company_id', get_staff_company_id());
+        $this->db->update('it_crm_hrd_dar_status', ['status' => $new_status]);
         echo json_encode(['success' => true, 'new_status' => $new_status]);
     }
 
@@ -6694,6 +6780,25 @@ exit;
                 $rowCount = max($rowCount, count($values));
             }
 
+            // Manual Save Draft / Submit: enforce required fields. Skip for AJAX autosave (partial draft OK).
+            if (!$isAutoSave && $rowCount > 0) {
+                for ($i = 0; $i < $rowCount; $i++) {
+                    foreach ($dar_fields as $field) {
+                        if ((int) ($field['required'] ?? 0) !== 1) {
+                            continue;
+                        }
+                        $fid   = (int) $field['id'];
+                        $value = isset($fieldValues[$fid][$i]) ? $fieldValues[$fid][$i] : '';
+                        if ($value === '' || $value === null || (is_string($value) && trim($value) === '')) {
+                            set_alert('danger', 'Please fill all required fields: ' . $field['field_title'] . ' (row ' . ($i + 1) . ').');
+                            redirect(admin_url('hrd/daily_activity_report_dar?date=' . $date));
+
+                            return;
+                        }
+                    }
+                }
+            }
+
             for ($i = 0; $i < $rowCount; $i++) {
                 $row = [];
                 foreach ($dar_fields as $field) {
@@ -6825,6 +6930,7 @@ $emaildetails.="</table>";
         $data['existing_details'] = $existing_dar ? json_decode($existing_dar['details'], true) : [];
 		$data['existing_status'] = $existing_dar ? $existing_dar['status'] : 2;
         $data['date']             = $selected_date;
+		$data['dar_status_list'] = $this->hrd_model->get_dar_status_list();
         $data['title']      = 'Daily Activity Report (DAR)';
 
         $this->load->view('admin/hrd/daily_activity_report_dar', $data);
