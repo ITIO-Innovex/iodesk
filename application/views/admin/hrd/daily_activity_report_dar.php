@@ -88,7 +88,7 @@
         <div class="panel_s">
           <div class="panel-body">
             <h4 class="tw-mt-0 tw-font-semibold tw-text-lg">
-              Daily Activity Report (DAR) - <?php echo get_company_fields($companyId ,'email_dar') ?? '';?>
+              Daily Activity Report (DAR) 
             <a href="<?php echo admin_url('hrd/dar_list');?>" id="upgrade_plan" class="btn btn-info btn-sm pull-right"><i class="fa-regular fa-eye"></i> View Send DAR</a></h4>
             <hr class="hr-panel-heading">
 
@@ -108,8 +108,10 @@
 
             <div class="row tw-mb-3">
               <div class="col-md-12">
+			  <h5>From : <?php echo $_SESSION['STAFFSMTP']['smtp_user'];?></h4>
+			  <h5>To : <?php echo get_company_fields($companyId ,'email_dar') ?? '';?></h5>
+			  <h5>Cc : </h5>
                 <div class="form-group">
-                  <label for="cc_email">CC</label>
                   <div class="email-input-wrapper">
                     <div class="email-tags-container" id="ccEmailTagsContainer">
                       <input type="text" name="cc_email_ip" class="email-input-field" id="ccEmailInputField" placeholder="Type name or email to search and press enter" autocomplete="off">
