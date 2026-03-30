@@ -157,7 +157,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             }
         }
 		
-		if (is_admin() || staff_can('view', 'user_utility')) {
+		/*if (is_admin() || staff_can('view', 'user_utility')) {
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
             'slug'     => 'user_utility_1',
             'name'     => 'Team Document',
@@ -175,60 +175,14 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'position' => 15,
 			'icon'     => 'fa-solid fa-file-contract',
             'badge'    => [],
-        ]);
+        ]);*/
 		
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
             'slug'     => 'drive_1',
             'name'     => 'My Drive',
             'href'     => admin_url('drive'),
-            'position' => 15,
+            'position' => 20,
 			'icon'     => 'fa-brands fa-google-drive',
-            'badge'    => [],
-        ]);
-		
-		if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
-		
-		$CI->app_menu->add_sidebar_children_item('Workspace', [
-            'slug'     => 'underwriting_1',
-            'name'     => 'Under Writing',
-            'href'     => admin_url('underwriting'),
-            'position' => 15,
-			'icon'     => 'fa-solid fa-file-pen',
-            'badge'    => [],
-        ]);
-		
-      
-    }
-	
-		if (is_staff_member() && staff_can('webmail',  'webmail')) {
-		$CI->app_menu->add_sidebar_children_item('Workspace', [
-            'slug'     => 'webmail_2',
-            'name'     => 'Webmail',
-            'href'     => admin_url('webmail/inbox'),
-            'position' => 15,
-			'icon'     => 'fa-regular fa-envelope',
-            'badge'    => [],
-        ]);
-		}
-		
-		if (is_staff_member() && staff_can('view',  'direct_email')) {
-		
-		$CI->app_menu->add_sidebar_children_item('Workspace', [
-            'slug'     => 'direct_email_1',
-            'name'     => 'Direct Email',
-            'href'     => admin_url('direct_email'),
-            'position' => 15,
-			'icon'     => 'fa-solid fa-envelopes-bulk',
-            'badge'    => [],
-        ]);
-    }
-		
-		$CI->app_menu->add_sidebar_children_item('Workspace', [
-            'slug'     => 'email_template',
-            'name'     => 'Email Template',
-            'href'     => admin_url('email_template'),
-            'position' => 15,
-			'icon'     => 'fa-solid fa-envelope-open-text',
             'badge'    => [],
         ]);
 		
@@ -239,16 +193,60 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'slug'     => 'ai_content_generator_1',
             'name'     => 'AI Support',
             'href'     => admin_url('ai_content_generator'),
-            'position' => 15,
+            'position' => 20,
 			'icon'     => 'fa-regular fa-newspaper',
             'badge'    => [],
         ]);
         }
 		
+		
+	
+	//////////////////////////////
+	
+	 $CI->app_menu->add_sidebar_menu_item('EmailTemplates', [
+        'collapse' => true,
+        'name'     => 'Email & Templates',
+        'position' => 20,
+        'icon'     => 'fa-regular fa-envelope',
+        'badge'    => [],
+        ]);
+    
+	    if (is_staff_member() && staff_can('webmail',  'webmail')) {
+		$CI->app_menu->add_sidebar_children_item('EmailTemplates', [
+            'slug'     => 'webmail_X',
+            'name'     => 'Webmail',
+            'href'     => admin_url('webmail/inbox'),
+            'position' => 15,
+			'icon'     => 'fa-regular fa-envelope',
+            'badge'    => [],
+        ]);
+		}
+		
+		if (is_staff_member() && staff_can('view',  'direct_email')) {
+		
+		$CI->app_menu->add_sidebar_children_item('EmailTemplates', [
+            'slug'     => 'direct_email_X',
+            'name'     => 'Direct Email',
+            'href'     => admin_url('direct_email'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-envelopes-bulk',
+            'badge'    => [],
+        ]);
+    }
+		
+		$CI->app_menu->add_sidebar_children_item('EmailTemplates', [
+            'slug'     => 'email_template_X',
+            'name'     => 'Email Template',
+            'href'     => admin_url('email_template'),
+            'position' => 15,
+			'icon'     => 'fa-solid fa-envelope-open-text',
+            'badge'    => [],
+        ]);
+		
 		if (is_staff_member() && staff_can('webmail_setup',  'webmail')) {
 		
-		$CI->app_menu->add_sidebar_children_item('Workspace', [
-            'slug'     => 'webmail_setup_1',
+		$CI->app_menu->add_sidebar_children_item('EmailTemplates', [
+            'slug'     => 'webmail_setup_X',
             'name'     => 'Webmail Setup',
             'href'     => admin_url('webmail_setup'),
             'position' => 15,
@@ -258,8 +256,8 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		
 		
     }
-	
-	//////////////////////////////
+		
+		
 	
 	    if(isset($_SESSION['company_form_type'])&& $_SESSION['company_form_type']<>1){
 	
@@ -300,6 +298,21 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
 		]);
 	
 	}
+	
+	if (is_admin() || staff_can('adder', 'under_writing') || staff_can('approver', 'under_writing')) {
+		
+		$CI->app_menu->add_sidebar_menu_item('under_writing', [
+            'name'     => 'Under Writing',
+            'href'     => admin_url('underwriting'),
+            'position' => 90,
+			'icon'     => 'fa-solid fa-file-pen',
+            'badge'    => [],
+        ]);
+		
+      
+    }
+	
+	
 	
 ////////////////////////////////////////// User Setup Sections ////////////////	
 	
