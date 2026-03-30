@@ -250,7 +250,27 @@
         }
 
        .error { color:#CC0000; font-weight:400;}
-
+   	 /* responsive */
+    @media (max-width:562px){
+      .content-card {
+      max-width: 100% !important;
+      } 
+	  .content-card {
+      padding: 5px !important;  
+	  }
+	  .form-section {
+	  padding: 5px !important;  
+	  }
+	  .col-md-4, .col-md-8, .col-md-6, .col-md-12 {
+	  padding: 2px !important;  
+	  }
+	  .h5, h5, .h4, h4 {
+    font-size: 1.0rem !important;  
+    }
+	th {
+	font-size: 12px !important;  
+    }
+}
         
     </style>
 </head>
@@ -347,8 +367,8 @@
 			  <div class="row">
 <div class="col-md-12">
 <h5>Educational Qualifications Details</h5></div>
-
-<table class="table">
+<div class="table-responsive">
+<table class="table" style="min-width:500px;">
   <thead>
     <tr>
       <th scope="col">Degree/Diploma</th>
@@ -372,7 +392,7 @@
   <?php endfor; ?>
   </tbody>
 </table>
-               
+</div>               
               </div>
               </div>
               <hr>
@@ -381,8 +401,8 @@
 			  </div>
 			  <div class="row">
 <div class="col-md-12"><h5>Family Details</h5></div>
-
-<table class="table">
+<div class="table-responsive">
+<table class="table" style="min-width:500px;">
   <thead>
     <tr>
       <th scope="col">First & Last Name</th>
@@ -406,7 +426,7 @@
   <?php endfor; ?>
   </tbody>
 </table>
-                
+</div>               
               </div>
               </div>
               <hr>

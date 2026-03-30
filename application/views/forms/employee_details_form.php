@@ -249,8 +249,27 @@
             font-style: italic;
         }
 
-       
-
+   	 /* responsive */
+    @media (max-width:562px){
+      .content-card {
+      max-width: 100% !important;
+      } 
+	  .content-card {
+      padding: 5px !important;  
+	  }
+	  .form-section {
+	  padding: 5px !important;  
+	  }
+	   .col-md-4, .col-md-8, .col-md-6, .col-md-12 {
+	  padding: 2px !important;  
+	  }
+	  .h5, h5, .h4, h4 {
+    font-size: 1.0rem !important;  
+    }
+	th {
+	font-size: 12px !important;  
+    }
+}
         
     </style>
 </head>
@@ -261,12 +280,7 @@
         <div class="container">
             <div class="hero-content">
 				<div class="content-card">
-				<div class="company-header">
-				<h4>ITIO INNOVEX PVT LTD</h4>
-				<h5><?php echo $title ?? "";?></h5>
-				</div>
-
-<div id="wrapper">
+				  <div id="wrapper">
   <div class="content">
     <div class="row">
       <div class="col-md-12">
@@ -276,7 +290,11 @@
             <?php echo form_open_multipart(base_url('forms/employee_details_form_submit'), ['id' => 'employee-details-form']); ?>
                <input type="hidden" name="status" id="employee-details-status" value="<?php echo e($form['status'] ?? 'Draft'); ?>">
 			  
-			  <div class="top_stats_wrapper">
+			   <div class="company-header">
+                 <h4>ITIO INNOVEX PVT LTD</h4>
+			     <h5><?php echo $title ?? "";?></h5>
+			     </div>
+			   <div class="top_stats_wrapper">
               <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
               <div class="form-section">
                 <h5>Personal Information</h5>
@@ -521,7 +539,8 @@
 			  </div>
 			  <div class="form-section">
 			  <h5>References (Minimum 5 Required)</h5>
-<table class="table">
+			  <div class="table-responsive">
+<table class="table" style="min-width:500px;">
   <thead>
     <tr>
       <th scope="col">S.NO</th>
@@ -545,7 +564,7 @@
   <?php endfor; ?>  
   </tbody>
 </table>
-                
+  </div>              
 
               </div>
               </div>

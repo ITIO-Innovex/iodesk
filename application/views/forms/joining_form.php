@@ -250,7 +250,27 @@
         }
 
        
-
+   	 /* responsive */
+    @media (max-width:562px){
+      .content-card {
+      max-width: 100% !important;
+      } 
+	  .content-card {
+      padding: 5px !important;  
+	  }
+	  .form-section {
+	  padding: 5px !important;  
+	  }
+	   .col-md-4, .col-md-8, .col-md-6, .col-md-12 {
+	  padding: 2px !important;  
+	  }
+	  .h5, h5, .h4, h4 {
+    font-size: 1.0rem !important;  
+    }
+	th {
+	font-size: 12px !important;  
+    }
+}
         
     </style>
 </head>
