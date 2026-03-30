@@ -249,7 +249,30 @@
             font-style: italic;
         }
 
-       
+    /* responsive */
+    @media (max-width:562px){
+      .content-card {
+      max-width: 100% !important;
+      } 
+	  .content-card {
+      padding: 5px !important;  
+	  }
+	  .form-section {
+	  padding: 5px !important;  
+	  }
+	  .col-md-4, .col-md-8, .col-md-6, .col-md-12 {
+	  padding: 2px !important;  
+	  }
+	  .h5, h5, .h4, h4 {
+      font-size: 1.0rem !important;  
+      }
+	  th {
+	  font-size: 12px !important;  
+      }
+	  input::placeholder, select {
+      font-size: 12px !important;  
+      }
+    }   
 
         
     </style>
@@ -517,7 +540,8 @@
               <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                 <div class="row">
                   <h5>Education Qualification Details</h5>
-				  <table class="table">
+				  <div class="table-responsive">
+				  <table class="table" style="min-width:500px;">
   <thead>
     <tr>
       <th scope="col">Qualification Details</th>
@@ -578,7 +602,7 @@
   
   </tbody>
 </table>
-                  
+                  </div>
                   
                 </div>
               </div>
@@ -698,7 +722,8 @@
               <div class="tw-text-neutral-800 mtop5 tw-flex tw-items-center tw-justify-between">
                 <div class="row">
                   <h5>Professional Reference Details</h5>
-				  <table class="table">
+				  <div class="table-responsive">
+				  <table class="table" style="min-width:500px;">
   <thead>
     <tr>
       <th scope="col">Referee Details</th>
@@ -740,7 +765,7 @@
   
   </tbody>
 </table>
-
+                  </div>
 
                   
 				  
