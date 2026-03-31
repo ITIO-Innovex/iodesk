@@ -996,6 +996,8 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'badge'    => [],
         ]);
    // }
+   
+   
 
 		
 
@@ -1006,7 +1008,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
                   ]);*/
 				  
 		}
-    
+		
 	
 	 if (is_super()) {
 	if (staff_can('view',  'settings')) {
@@ -1194,6 +1196,13 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'name'     => 'Main Menu',
             'position' => 65,
             'icon'     => 'fa-solid fa-bars-staggered',
+            'badge'    => [],
+        ]);
+		$CI->app_menu->add_setup_menu_item('email-templates-internal', [
+            'href'     => admin_url('emailtemplate'),
+            'name'     => 'Email Template Internal',
+            'position' => 70,
+			'icon'     => 'fa-solid fa-at',
             'badge'    => [],
         ]);
 		

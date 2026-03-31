@@ -84,7 +84,7 @@
         <div class="panel_s">
           <div class="panel-body panel-table-full">
             <?php if (!empty($dars)) { ?>
-              <table class="table dt-table" data-order-col="0" data-order-type="asc">
+              <table class="table dt-table" data-order-col="0" data-order-type="desc">
                 <thead>
                   <tr>
                     <th>Date</th>
