@@ -1584,6 +1584,8 @@ if ($folder->children->count() > 0) {
 	
 	}
 	
+	
+	
 	    public function compose_email_super($emaildata, $id = '' )
         {
 		
@@ -1739,6 +1741,196 @@ if ($folder->children->count() > 0) {
 	
 	$mail->Subject = $subject;
 	$mail->Body = $body;
+
+	// Add attachments if provided
+	if (!empty($emaildata['attachments']) && is_array($emaildata['attachments'])) {
+		foreach ($emaildata['attachments'] as $attachment) {
+			$filePath = '';
+			$fileName = '';
+			if (is_array($attachment)) {
+				$filePath = isset($attachment['path']) ? $attachment['path'] : '';
+				$fileName = isset($attachment['name']) ? $attachment['name'] : basename($filePath);
+			} else {
+				$filePath = $attachment;
+				$fileName = basename($attachment);
+			}
+			if (!empty($filePath) && file_exists($filePath)) {
+				$mail->addAttachment($filePath, $fileName);
+			}
+		}
+	}
+
+    $mail->send();
+    //echo "Email sent successfully!";
+	//log_activity('Email Book an Appoinment With Subject Line -  [ Subject: ' . $subject . ']');
+    return true;
+	} catch (Exception $e) {
+		//echo "Email could not be sent. Error: {$mail->ErrorInfo}";
+		log_message('error', 'Email Error from : '.$senderEmail. ' error' . $mail->ErrorInfo);
+		return false;
+	}
+	
+	}
+	
+	
+	
+	    public function get_template_details($template)
+        {
+		$companyId=get_staff_company_id();
+        $this->db->select('subject, email_body');
+		$this->db->from('it_crm_email_template_internal');
+		$this->db->where('template_title', $template);
+		$this->db->where('status', 1);
+		$this->db->where_in('company_id', [1, $companyId]);
+		$this->db->order_by('(company_id = '.$companyId.')', 'DESC', false);
+		$this->db->limit(1);
+		$result = $this->db->get()->row_array();
+		//log_message('error', 'Template Query  '.$this->db->last_query() );
+		return  $result;
+        }
+	
+	
+	    public function send_email_by_template($emaildata)
+        {
+		
+		
+		//log_message('error', 'Display data  '.print_r($emaildata , true) );
+		
+		//$recipientEmail='vikashxfriday@gmail.com';//isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
+		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
+		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
+		$recipientBCC=isset($emaildata['recipientBCC']) ? $emaildata['recipientBCC'] : "";
+		
+		
+		// Fetch Dynamic Data
+		$FullDay=isset($emaildata['FullDay']) ? $emaildata['FullDay'] : "";
+		$FromDate=isset($emaildata['FromDate']) ? $emaildata['FromDate'] : "";
+		$ToDate=isset($emaildata['ToDate']) ? $emaildata['ToDate'] : "";
+		$Reason=isset($emaildata['Reason']) ? $emaildata['Reason'] : "";
+		$Reply=isset($emaildata['Reply']) ? $emaildata['Reply'] : "";
+		$Status=isset($emaildata['Status']) ? $emaildata['Status'] : "";
+		$ReceiverName=isset($emaildata['ReceiverName']) ? $emaildata['ReceiverName'] : "";
+		
+		
+		// Check Email Template 
+		if(isset($emaildata['templateTitle'])&&$emaildata['templateTitle']){
+		$templateDetails=$this->webmail_model->get_template_details($emaildata['templateTitle']);
+		$subject=$templateDetails['subject'] ?? 'No Subject';
+		$email_body=$templateDetails['email_body'] ?? 'No Body';
+		$data = [
+    	'FullDay'   		=> $FullDay,
+    	'FromDate'  		=> $FromDate,
+    	'ToDate'    		=> $ToDate,
+    	'Reason'    		=> $Reason,
+		'Reply'    			=> $Reply,
+		'Status'    		=> $Status,
+		'ReceiverName'    	=> $ReceiverName,
+		'StaffName' 		=> get_staff_full_name(),
+		'CompanyName' 		=> get_staff_company_name()
+		];
+		
+		// Replace Subject
+		foreach ($data as $key => $value) {
+			$subject = str_replace('{{' . $key . '}}', $value, $subject);
+		}
+		
+		// Replace Email Body
+		foreach ($data as $key => $value) {
+			$email_body = str_replace('{{' . $key . '}}', $value, $email_body);
+		}
+
+		//log_message('error', 'Template Details  '.print_r($templateDetails , true) );
+		}else{
+		log_message('error', 'Template Not Found');
+		return false;
+		}
+		
+		
+		
+		///////////////////SMTP DETAILS ////////////////
+		$mailer_smtp_host=$_SESSION['STAFFSMTP']['smtp_host'];
+        $mailer_smtp_port=$_SESSION['STAFFSMTP']['smtp_port'];
+        $mailer_username=$_SESSION['STAFFSMTP']['smtp_user'];
+        $mailer_password=base64_decode($_SESSION['STAFFSMTP']['smtp_pass']);
+		$senderEmail=$_SESSION['STAFFSMTP']['smtp_user'];
+		$senderName=get_staff_full_name() ?? get_staff_company_name();
+		$encryption=$_SESSION['STAFFSMTP']['smtp_crypto'];
+		///////////////////SMTP DETAILS ////////////////
+		
+		
+		
+		
+		//log_message('error', 'Display data  '.print_r($_SESSION['STAFFSMTP'] , true) );
+		
+		//echo "==========>>>>";exit;
+		
+		//echo $senderName;exit;
+		$mail = new PHPMailer(true);
+		
+		
+	try {
+    // SMTP configuration
+    $mail->isSMTP();
+    $mail->Host = $mailer_smtp_host; // Replace with your SMTP server
+    $mail->SMTPAuth = true;
+    $mail->Username = $mailer_username; // Replace with your email
+    $mail->Password = $mailer_password; // Replace with your email password or app-specific password
+	
+	if($encryption=="tls"){
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+	}else{
+	$mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+	}
+    $mail->Port = $mailer_smtp_port;
+
+    // Email settings
+	$mail->isHTML(true); // Set email format to plain text
+	$mail->CharSet = 'UTF-8';
+	$mail->Encoding = 'base64';
+	$mail->WordWrap = 50;               // set word wrap
+	//$mail->Priority = 1; 
+	$senderName = trim($senderName);
+	$mail->setFrom($senderEmail, $senderName, false);
+	// Add TO addresses from comma or semicolon separated string
+	$recipientEmail = str_replace(';', ',', $recipientEmail);
+	$toEmails = explode(',', trim($recipientEmail));
+	foreach ($toEmails as $toEmail) {
+		$toEmail = trim($toEmail);
+		if (filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+			$mail->addAddress($toEmail);
+		}
+	}
+	
+	if (isset($recipientCC) && $recipientCC != "") {
+	
+	      // Add CC addresses from comma-separated string
+		$recipientCC = str_replace(';', ',', $recipientCC);
+        $ccEmails = explode(',', trim($recipientCC));
+        foreach ($ccEmails as $ccEmail) {
+            $ccEmail = trim($ccEmail);
+            if (filter_var($ccEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addCC($ccEmail);
+            }
+        }
+		
+	}
+	
+	if (isset($recipientBCC) && $recipientBCC != "") {
+	
+	      // Add BCC addresses from comma-separated string
+		$recipientBCC = str_replace(';', ',', $recipientBCC);
+        $bccEmails = explode(',', trim($recipientBCC));
+        foreach ($bccEmails as $bccEmail) {
+            $bccEmail = trim($bccEmail);
+            if (filter_var($bccEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->addBCC($bccEmail);
+            }
+        }
+		
+	}
+	
+	$mail->Subject = $subject;
+	$mail->Body = $email_body;
 
 	// Add attachments if provided
 	if (!empty($emaildata['attachments']) && is_array($emaildata['attachments'])) {

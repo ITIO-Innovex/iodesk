@@ -199,7 +199,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
-        <button type="submit" class="btn btn-primary"><?php echo _l('submit'); ?></button>
+        <button type="submit" class="btn btn-primary" id="submitBtn"><?php echo _l('submit'); ?></button>
       </div>
     </div>
     <?php echo form_close(); ?>
@@ -248,9 +248,9 @@
     $('#leave_application').on("hidden.bs.modal", function () { $('#additional').html(''); $('#leave_application input, #leave_application textarea').val(''); $('#leave_application select').val(''); $('.add-title').removeClass('hide'); $('.edit-title').removeClass('hide'); });
   });
   function new_leave(){ $('#leave_application').modal('show'); $('.edit-title').addClass('hide'); }
-  function edit_leave(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('leave_id', it.leave_id)); $('#leave_application input[name=from_date]').val(it.from_date); $('#leave_application input[name=to_date]').val(it.to_date); $('#leave_application select[name=leave_type]').val(it.leave_type); $('#leave_application select[name=leave_for]').val(it.leave_for); $('#leave_application textarea[name=leave_reson]').val(it.leave_reson); $('#leave_application textarea[name=leave_reply]').val(it.leave_reply||''); $('#leave_application select[name=leave_status]').val(it.leave_status||0); $('#leave_application').modal('show'); $('.add-title').addClass('hide'); }
+  function edit_leave(invoker){ var it=$(invoker).data('all'); $('#additional').append(hidden_input('leave_id', it.leave_id)).append(hidden_input('staffid', it.staffid)); $('#leave_application input[name=from_date]').val(it.from_date); $('#leave_application input[name=to_date]').val(it.to_date); $('#leave_application select[name=leave_type]').val(it.leave_type); $('#leave_application select[name=leave_for]').val(it.leave_for); $('#leave_application textarea[name=leave_reson]').val(it.leave_reson); $('#leave_application textarea[name=leave_reply]').val(it.leave_reply||''); $('#leave_application select[name=leave_status]').val(it.leave_status||0); $('#leave_application').modal('show'); $('.add-title').addClass('hide'); }
   function view_leave(invoker){ var it=$(invoker).data('all'); $('#d-employee').text(it.staffid); $('#d-from').text(it.from_date); $('#d-to').text(it.to_date); $('#d-type').text(it.leave_type); $('#d-for').text((parseInt(it.leave_for,10)===2)?'Half Day':'Full Day'); var st=parseInt(it.leave_status||0,10); var label='Pending', cls='label-warning'; if(st===1){label='Approved';cls='label-success';} else if(st===2){label='Rejected';cls='label-danger';} $('#d-status').removeClass('label-warning label-success label-danger').addClass(cls).text(label); $('#d-reason').text(it.leave_reson||''); $('#d-reply').text(it.leave_reply||''); $('#leave_details').modal('show'); }
-  function manage_leave(form){ var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
+  function manage_leave(form){ $("#submitBtn").html('<i class="fa fa-spinner fa-spin"></i> Processing...'); var data=$(form).serialize(); $.post(form.action, data).done(function(){ window.location.reload(); }); return false; }
 </script>
 <?php init_tail(); ?>
 <script>

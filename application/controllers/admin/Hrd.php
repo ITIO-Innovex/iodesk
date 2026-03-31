@@ -1710,6 +1710,10 @@ class Hrd extends AdminController
         //log_message('error', 'Display data - ' . $data);
 
         $leave_id = $this->input->post('leave_id');
+		
+		$fromDate=$this->input->post('from_date');
+		$toDate=$this->input->post('to_date');
+		$reson=$this->input->post('leave_reson');
         $data = [
             'company_id'   => get_staff_company_id(),
             'from_date'    => $this->input->post('from_date'),
@@ -1729,8 +1733,31 @@ class Hrd extends AdminController
         }
 
         if ($leave_id) {
+		    $staffid = $this->input->post('staffid');
             $this->db->where('leave_id', $leave_id);
             $this->db->update('it_crm_hrd_leave_master', $data);
+			$leave_for = ($data['leave_for'] == 2) ? 'Half Day' : 'Full Day';
+			$statusArray = [0 => 'Pending', 1 => 'Approved', 2 => 'Rejected'];
+			$leave_status = $statusArray[$data['leave_status']] ?? 'Unknown';
+			//log_message('error', 'Approve data  '.$data['leave_status'].' -> '.$leave_status );
+			// Prepare email data
+                $msgdata = [
+				    'templateTitle'  => 'leave_application_reply',
+                    'recipientEmail' => get_staff_email($staffid),
+					'ReceiverName'   => get_staff_full_name($staffid),
+					'FullDay'    	 => $leave_for,
+					'FromDate'       => $data['from_date'],
+					'ToDate'         => $data['to_date'],
+					'Reply'          => $data['leave_reply'],
+					'Status'         => $leave_status,
+                ];
+				// log_message('error', 'Approve data  '.print_r($msgdata , true) );
+			    // Send email if recipient exists
+                if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+			   //log_message('error', 'Approve data  '.print_r($msgdata , true) );
             set_alert('success', 'Leave application updated successfully');
             exit;
         } else {
@@ -1749,12 +1776,35 @@ class Hrd extends AdminController
 			$hrdid=$hrdid ?? $data['staffid'];
 			$leave_for = ($data['leave_for'] == 2) ? 'Half Day' : 'Full Day';
 			//log_message('error', 'Emaill - ' . $hrdid);exit;
-			$staffemail=get_staff_email($hrdid);
-			$mail_subject=$leave_for . " Leave Application by ".get_staff_full_name($data['staffid'])." from :".$data['from_date']." to ".$data['to_date'];
+			$recipientEmail=get_staff_email($hrdid);
+			
+			//////////////Email Template ///////////////
+			// Prepare email data
+                $msgdata = [
+				    'templateTitle'  => 'leave_application',
+                    'recipientEmail' => $recipientEmail,
+                    //'recipientCC'    => $ccEmails,
+					'FullDay'    	 => $leave_for,
+					'FromDate'       => $fromDate,
+					'ToDate'         => $toDate,
+					'Reason'         => $reson,
+                ];
+                
+                // Send email if recipient exists
+                if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+			
+			
+			
+			/////////////////////////////////////////////
+			
+			/*$mail_subject=$leave_for . " Leave Application by ".get_staff_full_name($data['staffid'])." from :".$data['from_date']." to ".$data['to_date'];
 			$mail_details=$mail_subject."<br><br>".$data['leave_reson'];
             send_mail_template('project_mail', $staffemail, $hrdid, $insert_id, $mail_details, $mail_subject            );
 			set_alert('success', 'Leave application submitted successfully');
-            exit;
+            exit;*/
 			}
 			
             set_alert('success', 'Leave application submitted successfully');

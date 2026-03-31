@@ -283,7 +283,11 @@
       }
 	  
       $('#dar-status').val(status);
-      $('#dar-entry-form').submit();
+      //$('#dar-entry-form').submit();
+	  $("#dar-save-submit").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+	  setTimeout(function () {
+       $('#dar-entry-form').submit();
+       }, 3000); // 3000 ms = 3 seconds
     });
 
     // Auto save DAR as draft on leaving each field (debounced to avoid many requests)
