@@ -87,6 +87,7 @@
               <table class="table dt-table" data-order-col="0" data-order-type="desc">
                 <thead>
                   <tr>
+				   <th class="tw-hidden">Date</th>
                     <th>Date</th>
                     <th>Status</th>
                     <?php /*?><th>Description</th><?php */?>
@@ -131,6 +132,7 @@ $detailstable.="</table>";
 }
                     ?>
                     <tr>
+					<td class="tw-hidden"><?php echo (int) $dar['id']; ?></td>
                       <td><?php echo e(date('d-m-Y', strtotime($dar['addedon']))); ?></td>
                       <td>
                         <?php if ((int)$dar['status'] === 1) { ?>
