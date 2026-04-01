@@ -12,9 +12,10 @@
                         <hr class="hr-panel-heading" />
                         
                         <div class="table-responsive">
-                            <table class="table table-striped table-bordered dt-table" id="employeeDetailsTable">
+                            <table class="table table-striped table-bordered dt-table" data-order-col="0" data-order-type="desc" id="employeeDetailsTable">
                                 <thead>
                                     <tr>
+									    <th class="tw-hidden">ID</th>
                                         <th>#</th>
                                         <th>Name</th>
                                         <th>Contact Number</th>
@@ -31,6 +32,7 @@
                                     <?php if (!empty($records)) { ?>
                                         <?php $cnt = 1; foreach ($records as $record) { ?>
                                             <tr>
+											    <td class="tw-hidden"><?php echo $record['id']; ?></td>
                                                 <td><?php echo $cnt++; ?></td>
                                                 <td><?php echo htmlspecialchars($record['name'] ?? ''); ?></td>
                                                 <td><?php echo htmlspecialchars($record['contact_number'] ?? ''); ?></td>

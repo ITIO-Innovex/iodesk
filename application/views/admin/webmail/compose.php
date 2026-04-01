@@ -163,7 +163,6 @@ $messageid=$email_draft->messageid ?? '';
 	<?php if(isset($messageid)&&$messageid){ ?>
 	<input type="hidden" name="messageid" value="<?php echo $messageid; ?>">
 	<?php } ?>
-	
 	<div class="mb-3">
         <div class="email-input-wrapper">
 		
@@ -174,6 +173,11 @@ $messageid=$email_draft->messageid ?? '';
     <?php foreach ($_SESSION['mailersdropdowns'] as $row) { ?>
         <option value="<?php echo $row['id']; ?>" <?php if($row['id']==$reply_from_email){ ?> selected="selected" <?php } ?> ><?php echo $row['mailer_email']; ?> </option>
     <?php } ?>
+	<?php if(isset($aliaslist)&&$aliaslist){ ?>
+	<?php foreach ($aliaslist as $row) { ?>
+        <option value="<?php echo $row['webmail_id']; ?>,<?php echo $row['id']; ?>" ><?php echo $row['senderEmail']; ?> as (Alias) </option>
+    <?php } ?>
+	 <?php } ?>
 
 </select>
       </div>

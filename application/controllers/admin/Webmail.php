@@ -1032,7 +1032,7 @@ See you soon,<br>
 		if (!isset($_SESSION['folderlist']) || empty($_SESSION['folderlist'])) {
 		$data['inboxemail']=$this->webmail_model->getinboxemail();
 		}
-		
+		$data['aliaslist']=$this->webmail_model->getaliaslist();
 		$this->load->view('admin/webmail/compose', $data);
 		}
 	} 

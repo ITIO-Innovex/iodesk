@@ -349,21 +349,27 @@ return $result;
 
         if ($insert_id) {
 		    
-			$staffemail=get_staff_email($data['owner']);
-			$mail_subject="Assign New Project # :".$insert_id." - ".$data['project_title'];
-			$project_details=$mail_subject."<br><br>".$data['project_description'];
-            $result1=send_mail_template('project_mail', $staffemail, $data['owner'], $insert_id, $project_details, $mail_subject);
 			
-			log_message('error', 'Result: ' . ($result1 ? 'Success' : 'Failed'));
-			$CI =& get_instance();
-			log_message('error', 'Debugger: ' . $CI->email->print_debugger());
+			//log_message('error', 'Result: ' . ($result1 ? 'Success' : 'Failed'));
+			//$CI =& get_instance();
+			//log_message('error', 'Debugger: ' . $CI->email->print_debugger());
 			
+                // Prepare email data
+                $msgdata = [
+				    'templateTitle'  	=> 'new_project',
+                    'recipientEmail' 	=> get_staff_email($data['owner']),
+					'ReceiverName'   	=> get_staff_full_name($data['owner']),
+					'ProjectID'   	 	=> $insert_id,
+					'ProjectTitle'    	=> $data['project_title'],
+					'ProjectDetails'    => $data['project_description'],
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+			//log_message('error', 'msgdata: ' . print_r($msgdata, true));
 			
-			//echo "Result: " . ($result1 ? 'Success' : 'Failed') . "<br>\n";
-//echo "Log: " . $this->email->print_debugger() . "<br>\n";exit;
-			//echo "Result: " . ($result1 ? 'Success' : 'Failed') . "<br>\n";
-//echo "Log: " . $CI->email->print_debugger() . "<br>\n";
-			$project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
+            $project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
 			$this->log_project_activity($insert_id, $project_type, 'Added New Project');
             log_activity('New Project Added [ID: ' . $insert_id . ']');
 			
@@ -464,13 +470,26 @@ return $result;
 				}
             }			
 			$project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
-			//===========================
-			$mail_subject="Updated Project # :".$id;
-            $data_desc=$mail_subject."<br><br>".nl2br(implode("\n\n", $changes))."";
+			//===========================Send Email ===========
+            $data_desc="<br><br>".nl2br(implode("\n\n", $changes))."";
 			$staffid=get_staff_user_id();
-			$staffemail=get_staff_email($staffid);
-			send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject);
+			
+			$msgdata = [
+				    'templateTitle'  	=> 'update_project',
+                    'recipientEmail' 	=> get_staff_email($staffid),
+					'ReceiverName'   	=> get_staff_full_name($staffid),
+					'ProjectID'   	 	=> $id,
+					'ProjectTitle'    	=> $data['project_title'],
+					'ProjectDetails'    => nl2br(implode("\n\n", $changes)),
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+				
 			//===========================
+			$subject="Updated Project # :".$id;
+            $data_desc=$subject."<br><br>".nl2br(implode("\n\n", $changes))."";
 			$this->log_project_activity($id, $project_type, $data_desc,'',$id);
             log_activity('Project Updated [ID: ' . $id . ']');
             return true;

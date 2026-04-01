@@ -197,6 +197,18 @@ class Webmail_model extends App_Model
 		 //echo $this->db->last_query();exit;
     }
 	
+	
+		public function getaliaslist()
+        {
+		$staffid=get_staff_user_id();
+        $this->db->select('*');
+        $this->db->where('staffid', $staffid);
+		$this->db->where('verified', 1);
+		$this->db->where('status', 1);
+		$this->db->group_by('senderEmail');
+        return $this->db->get(db_prefix() . 'webmail_alias')->result_array();
+        }
+	
 	 public function webmailsetup($id = '', $where = [])
     {
         $this->db->select('*,');
@@ -1800,16 +1812,20 @@ if ($folder->children->count() > 0) {
 		$recipientEmail=isset($emaildata['recipientEmail']) ? $emaildata['recipientEmail'] : "";
 		$recipientCC=isset($emaildata['recipientCC']) ? $emaildata['recipientCC'] : "";
 		$recipientBCC=isset($emaildata['recipientBCC']) ? $emaildata['recipientBCC'] : "";
+		$ReceiverName=isset($emaildata['ReceiverName']) ? $emaildata['ReceiverName'] : "";
 		
-		
-		// Fetch Dynamic Data
+		// Fetch Dynamic Data Leave Application
 		$FullDay=isset($emaildata['FullDay']) ? $emaildata['FullDay'] : "";
 		$FromDate=isset($emaildata['FromDate']) ? $emaildata['FromDate'] : "";
 		$ToDate=isset($emaildata['ToDate']) ? $emaildata['ToDate'] : "";
 		$Reason=isset($emaildata['Reason']) ? $emaildata['Reason'] : "";
 		$Reply=isset($emaildata['Reply']) ? $emaildata['Reply'] : "";
 		$Status=isset($emaildata['Status']) ? $emaildata['Status'] : "";
-		$ReceiverName=isset($emaildata['ReceiverName']) ? $emaildata['ReceiverName'] : "";
+		
+		// Fetch Dynamic Data Project
+		$ProjectID=isset($emaildata['ProjectID']) ? $emaildata['ProjectID'] : "";
+		$ProjectTitle=isset($emaildata['ProjectTitle']) ? $emaildata['ProjectTitle'] : "";
+		$ProjectDetails=isset($emaildata['ProjectDetails']) ? $emaildata['ProjectDetails'] : "";
 		
 		
 		// Check Email Template 
@@ -1818,15 +1834,18 @@ if ($folder->children->count() > 0) {
 		$subject=$templateDetails['subject'] ?? 'No Subject';
 		$email_body=$templateDetails['email_body'] ?? 'No Body';
 		$data = [
+		'ReceiverName'    	=> $ReceiverName,
+		'StaffName' 		=> get_staff_full_name(),
+		'CompanyName' 		=> get_staff_company_name(),
     	'FullDay'   		=> $FullDay,
     	'FromDate'  		=> $FromDate,
     	'ToDate'    		=> $ToDate,
     	'Reason'    		=> $Reason,
 		'Reply'    			=> $Reply,
 		'Status'    		=> $Status,
-		'ReceiverName'    	=> $ReceiverName,
-		'StaffName' 		=> get_staff_full_name(),
-		'CompanyName' 		=> get_staff_company_name()
+		'ProjectID'    		=> $ProjectID,
+		'ProjectTitle'    	=> $ProjectTitle,
+		'ProjectDetails'    => $ProjectDetails
 		];
 		
 		// Replace Subject

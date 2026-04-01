@@ -309,16 +309,32 @@
 			</div>
 			
 			
-			<div class="row">
+			    <div class="row">
 				
                 <div class="col-md-4">
                   <div class="form-group">
-					<label for="father_husband_name" class="control-label">Father/Husband Name : <small class="req text-danger">* </small></label>
+					<label for="father_husband_name" class="control-label">Father Name : <small class="req text-danger">* </small></label>
                   </div>
                 </div>
+				
 				<div class="col-md-8">
                   <div class="form-group">
                     <input type="text" name="father_husband_name" class="form-control" value="<?php echo e($form['father_husband_name'] ?? ''); ?>">
+                  </div>
+                </div>
+				</div>
+				
+				<div class="row">
+				
+                <div class="col-md-4">
+                  <div class="form-group">
+					<label for="father_husband_name" class="control-label">Husband Name : </label>
+                  </div>
+                </div>
+				
+				<div class="col-md-8">
+                  <div class="form-group">
+                    <input type="text" name="husband_name" class="form-control" value="<?php echo e($form['husband_name'] ?? ''); ?>">
                   </div>
                 </div>
 				</div>
@@ -576,9 +592,9 @@
                     },
                     date_of_joining: {
                         required: true,
-                        date: true,
+                        <!--date: true,-->
                         joiningDateValidation: true
-                    },
+                    },s
                     current_address_line1: {
                         required: true,
                         minlength: 5,

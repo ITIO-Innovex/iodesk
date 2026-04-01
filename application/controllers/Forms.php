@@ -1044,6 +1044,7 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
             $data = [
                 'name' => $name,
                 'father_husband_name' => $this->input->post('father_husband_name'),
+				'husband_name' => $this->input->post('husband_name'),
                 'contact_number' => $contact,
                 'emergency_contact_number' => $emergency,
                 'email' => $email,
@@ -1073,6 +1074,7 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 				
 				// For Send Email
 		        $msgdata['recipientEmail']="jyotiv@itio.in";
+				//$msgdata['recipientEmail']="vikashg@itio.in";
 		        //$msgdata['recipientCC']=$customer;
 				$ref="JF-".$_SESSION['rid'];
 		        $msgdata['emailSubject']="Joining Form submitted. ".$ref;
