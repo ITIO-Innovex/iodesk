@@ -1594,8 +1594,8 @@ if ($folder->children->count() > 0) {
 		$recipientBCC=isset($emaildata['recipientBCC']) ? $emaildata['recipientBCC'] : "";
 		$replyID=isset($emaildata['recipientFromEmail']) ? $emaildata['recipientFromEmail'] : "";
 		$savedReplyID=$_SESSION['staff_fromemai_id'] ?? '';
-		log_message('error', 'replyID - '.$replyID );
-		log_message('error', 'savedReplyID - '.$savedReplyID );
+		//log_message('error', 'replyID - '.$replyID );
+		//log_message('error', 'savedReplyID - '.$savedReplyID );
 		
 		
 		// Form Post Data
