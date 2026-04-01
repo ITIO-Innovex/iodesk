@@ -673,7 +673,8 @@ class Webmail_setup extends AdminController
 
         $this->db->insert('it_crm_webmail_alias', [
             'webmail_id'  => $webmailId,
-            'senderEmail' => $senderEmail,
+            'staffid' 	  => get_staff_user_id(),
+			'senderEmail' => $senderEmail,
             'senderName'  => $senderName,
             'verified'    => $verified,
             'status'      => 1,
