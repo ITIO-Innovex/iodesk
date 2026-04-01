@@ -258,9 +258,11 @@ class Webmail_model extends App_Model
 		$body=$_POST['emailBody'];
 		$redirect=$_POST['redirect'];
 		
+$reply_from_email_get = explode(',', $this->input->post('reply_from_email'));
+$data['reply_from_email'] = $reply_from_email_get[0] ?? $_SESSION['webmail']['id'];
+$data['alias_email_id'] = $reply_from_email_get[1] ?? '';
 		
 		
-		//print_r($data);
 	
 	$replyID=$data['reply_from_email'] ?? $_SESSION['webmail']['id'];
 	$savedReplyID=$_SESSION['webmail']['id'];
@@ -296,7 +298,18 @@ class Webmail_model extends App_Model
 		$encryption=trim($mailers[0]['encryption']);
 		}
 		
+		if(isset($data['alias_email_id'])&&$data['alias_email_id']){
+		 $alias_id=$data['alias_email_id'];
+		 $alias=$this->webmail_model->get_alias_details($alias_id);
+		 //print_r($alias);
+		 
+		 $senderEmail=trim($alias[0]['senderEmail']);
+         $senderName=trim($alias[0]['senderName']);
+		 
 		
+		//echo "======>>>";exit;
+		 
+		}
 		
 		
 		
@@ -1096,6 +1109,14 @@ $this->db->select('mailer_name, mailer_email, mailer_username, mailer_password, 
         $this->db->where('id', $id);
         $this->db->limit(1);
         return $this->db->get(db_prefix() . 'webmail_setup')->result_array(); //return 
+    }
+	
+	public function get_alias_details($id)
+    {
+        $this->db->select('senderEmail, senderName');
+        $this->db->where('id', $id);
+        $this->db->limit(1);
+        return $this->db->get(db_prefix() . 'webmail_alias')->result_array(); //return 
     }
    
     public function make_isflag($mid,$fid)
