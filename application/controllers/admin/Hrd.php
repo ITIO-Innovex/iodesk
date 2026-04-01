@@ -6869,7 +6869,7 @@ exit;
             $this->db->where('staffid', get_staff_user_id());
             $this->db->where('date', $date);
             $existing_for_date = $this->db->get('it_crm_dar')->row_array();
-
+            //log_message('error', 'existing_for_date - '.print_r($existing_for_date,true) );
             $data = [
                 'details' => json_encode($details),
                 'status'  => $status,
@@ -6878,14 +6878,23 @@ exit;
 
             if ($existing_for_date) {
                 // Update existing DAR for this date
+				//log_message('error', 'Update With Status - '.$existing_for_date['status'] );
+				$darId = (int) $existing_for_date['id'];
+				if($existing_for_date['status']==2){
                 $this->db->where('id', (int) $existing_for_date['id']);
                 $success = $this->db->update('it_crm_dar', $data);
-                $darId = (int) $existing_for_date['id'];
+				//log_message('error', 'Update Query XXX - '.$this->db->last_query() );
+				
+                
                 if ($success) {
                     set_alert('success', 'Daily Activity Report updated successfully.');
                 } else {
                     set_alert('danger', 'Failed to update Daily Activity Report.');
                 }
+				
+				}else{
+				set_alert('success', 'Daily Activity Report updated successfully.');
+				}
             } else {
                 // Insert new DAR
                 $data['company_id'] = get_staff_company_id();
@@ -6898,6 +6907,7 @@ exit;
                 } else {
                     set_alert('danger', 'Failed to save Daily Activity Report.');
                 }
+				
             }
 
             // For AJAX autosave draft: return JSON and avoid redirect/emails
@@ -6907,10 +6917,12 @@ exit;
                     ->set_output(json_encode(['success' => true, 'dar_id' => (int) $darId]));
                 return;
             }
+			
+			
 			$companyId = get_staff_company_id();
 			$darEmail=get_company_fields($companyId ,'email_dar');
             if ($status === 1 && !empty($darEmail)) {
-                
+             //log_message('error', 'Approved Section @@@');   
                 
                 $staffName = get_staff_full_name() ?? 'Staff';
                 
@@ -6971,9 +6983,12 @@ $emaildetails.="</table>";
                     $this->load->model('webmail_model');
                     $this->webmail_model->compose_email_super($msgdata);
                 }
-            }
+				redirect(admin_url('hrd/daily_activity_report_dar'));exit;
+            }else{
+			redirect(admin_url('hrd/daily_activity_report_dar'));exit;
+			}
             
-            redirect(admin_url('hrd/daily_activity_report_dar?date=' . $date));
+            
         }
         //print_r($existing_dar);exit;
         $data['dar_fields']       = $dar_fields;

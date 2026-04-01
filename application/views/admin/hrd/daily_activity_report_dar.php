@@ -201,6 +201,7 @@
                   </tbody>
                 </table>
               </div>
+			  <?php if (!isset($existing_status) || (int)$existing_status !== 1) { ?>
               <div class="tw-my-2 pull-right">
                 <button type="button" class="btn btn-danger add-dar-row" id="add-dar-row" mode='new'>
                   <i class="fa fa-plus-circle tw-mr-1"></i> Add New Row
@@ -209,6 +210,7 @@
                   <i class="fa fa-plus-circle tw-mr-1"></i> Copy Same Row
                 </button>
               </div>
+			  <?php } ?>
             <?php } else { ?>
               <p>No DAR fields configured for your department. Please contact HR.</p>
             <?php } ?>
@@ -222,7 +224,7 @@
                   <button type="button" class="btn btn-default" data-status="2" id="dar-save-later" onclick="return confirm('Data will be saved as a draft. You can edit it anytime before final submission.')">Save Draft</button>
                   <button type="button" class="btn btn-primary" data-status="1" id="dar-save-submit" onclick="return confirm('Please confirm your submission. Once submitted, the data cannot be modified.')">Submit Now</button>
                 <?php } else { ?>
-                  <span class="btn btn-success">DAR Submitted </span>
+<div class="alert alert-success"> <strong>The Daily Activity Report (DAR) has been successfully submitted for <?php echo date("d F Y");?>.</strong> </div>
                 <?php } ?>
 				
               </div>
@@ -284,10 +286,16 @@
 	  
       $('#dar-status').val(status);
       //$('#dar-entry-form').submit();
-	  $("#dar-save-submit").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-	  setTimeout(function () {
-       $('#dar-entry-form').submit();
-       }, 3000); // 3000 ms = 3 seconds
+	  	if(status==1){
+		  $("#dar-save-submit").html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+		  setTimeout(function () {
+		  //alert(111);
+		   $('#dar-entry-form').submit();
+		   }, 3000); // 3000 ms = 3 seconds
+		   }else{
+		   //alert(222);
+		   $('#dar-entry-form').submit();
+		   }
     });
 
     // Auto save DAR as draft on leaving each field (debounced to avoid many requests)
@@ -319,6 +327,7 @@
 
       // Mark as autosave so controller returns JSON (no redirect)
       postData += '&dar_autosave=1';
+	  //alert(postData);
 
       $.ajax({
         url: $form.attr('action'),
@@ -335,12 +344,12 @@
         }
       });
     }
-
-    // Trigger autosave when user leaves field or changes value
-    $('#dar-rows').on('blur change mouseleave', 'input, select, textarea', function() {
+<?php if (!isset($existing_status) || (int)$existing_status !== 1) { ?>
+    // Trigger autosave when user leaves field or changes value //mouseleave
+    $('#dar-rows').on('blur change ', 'input, select, textarea', function() {
       darScheduleAutoSave();
     });
-
+<?php } ?>
     $('.add-dar-row').on('click', function () {
       var $tbody = $('#dar-rows');
       var $first = $tbody.find('tr.dar-row:first');
