@@ -33,6 +33,7 @@
         <th class="toggleable">IMAP HOST</th>
 		<th class="toggleable">Status</th>
 		<th class="toggleable">Priority</th>
+		<th class="toggleable">Alias</th>
 		<th class="">Created</th>
 		<?php /*?><th class="">Download Email</th><?php */?>
       </tr>
@@ -85,6 +86,11 @@
 <i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
 				<?php } ?>
 				<?php } ?>		</td>
+				<td>
+<a href="javascript:void(0);" class="add-alias-trigger text-muted" data-webmail-id="<?php echo (int) $entry['id']; ?>" title="Add Email Alias">Add</a> | 
+<a href="<?php echo admin_url('webmail_setup/alias/'); ?>" class="text-muted" title="Manage Email Alias">Manage</a>				    
+				  
+				</td>
 		  <td><?php echo e($entry['creator_name']); ?> - <?php echo e(time_ago($entry['date_created'])); ?><br />
 <?php echo e(_dt($entry['date_created'])); ?></td>
 <?php /*?><td><a href="<?php echo base_url('cronjob/download_email_from_cron/' . $entry['id']);?>" target="_blank" title="Download / Update Email"><i class="fa-solid fa-cloud-arrow-down"></i></a></td><?php */?>
@@ -521,6 +527,106 @@ function emailProviderChanged(value) {
 	document.getElementById("AppPass").innerText = "";
   }
 }
+</script>
+
+<!-- Alias Modal -->
+<div class="modal fade" id="aliasModal" tabindex="-1" role="dialog" aria-labelledby="aliasModalLabel">
+  <div class="modal-dialog" role="document" style="max-width:650px;">
+    <div class="modal-content">
+      <?php echo form_open(admin_url('webmail_setup/save_alias'), ['id' => 'alias-form']); ?>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="aliasModalLabel">Add Email Alias</h4>
+      </div>
+      <div class="modal-body">
+	  <div class="alert alert-warning tw-mb-2">
+  
+  <strong>Before adding an Email Alias, please ensure the following:</strong>
+  
+  <ul style="margin-top:10px; padding-left:20px;">
+    <li>Enter a valid and active email address.</li>
+    <li>Make sure the email alias is unique and not already used in the system.</li>
+    <li>Verify correct email configuration (IMAP/SMTP settings) for proper functionality.</li>
+    <li>Ensure you have permission to use this email alias.</li>
+    <li>Double-check spelling to avoid delivery or sync issues.</li>
+  </ul>
+
+  <p style="margin-top:10px;">
+    <strong>Note:</strong> Incorrect email alias or configuration may result in email sync or delivery failures.
+  </p>
+
+</div>
+        <input type="hidden" name="webmail_id" id="alias_webmail_id" value="0">
+
+        <div class="form-group">
+          <label>Sender Email <span class="text-danger">*</span></label>
+          <input type="email" name="senderEmail" id="alias_senderEmail" class="form-control" required maxlength="100" placeholder="alias@example.com">
+        </div>
+
+        <div class="form-group">
+          <label>Sender Name</label>
+          <input type="text" name="senderName" id="alias_senderName" class="form-control" maxlength="50" placeholder="Display name (optional)">
+        </div>
+
+        <div class="form-group">
+          <label>Verified</label>
+          <select name="verified" id="alias_verified" class="form-control">
+            <option value="1" selected>Verified</option>
+            <option value="0">Not Verified</option>
+          </select>
+          <p class="text-muted tw-mt-2 tw-text-xs">If verification is required, set to "Not Verified" and update later.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?php echo _l('close'); ?></button>
+        <button type="submit" class="btn btn-primary" id="aliasSubmitBtn"><?php echo _l('submit'); ?></button>
+      </div>
+      <?php echo form_close(); ?>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function() {
+  var csrfName = '<?php echo $this->security->get_csrf_token_name(); ?>';
+  var csrfHash = '<?php echo $this->security->get_csrf_hash(); ?>';
+
+  $('body').on('click', '.add-alias-trigger', function() {
+    var webmailId = parseInt($(this).data('webmail-id'), 10) || 0;
+    $('#alias_webmail_id').val(webmailId);
+    $('#alias_senderEmail').val('');
+    $('#alias_senderName').val('');
+    $('#alias_verified').val('1');
+    $('#aliasModal').appendTo('body').modal('show');
+    setTimeout(function(){ $('#alias_senderEmail').focus(); }, 150);
+  });
+
+  $('#alias-form').on('submit', function(e) {
+    e.preventDefault();
+    var $form = $(this);
+    var $btn = $('#aliasSubmitBtn');
+    var payload = $form.serializeArray();
+    payload.push({name: csrfName, value: csrfHash});
+
+    $btn.prop('disabled', true);
+    $.post($form.attr('action'), $.param(payload))
+      .done(function(resp) {
+        try { resp = typeof resp === 'string' ? JSON.parse(resp) : resp; } catch(e) {}
+        if (resp && resp.success) {
+          alert_float('success', resp.message || 'Alias saved');
+          $('#aliasModal').modal('hide');
+        } else {
+          alert_float('danger', (resp && resp.message) ? resp.message : 'Failed to save alias');
+        }
+      })
+      .fail(function() {
+        alert_float('danger', 'Failed to save alias');
+      })
+      .always(function() {
+        $btn.prop('disabled', false);
+      });
+  });
+});
 </script>
 </body>
 

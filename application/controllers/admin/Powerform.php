@@ -412,6 +412,7 @@ class Powerform extends AdminController
         $updateData = [
             'name' => trim($this->input->post('name')),
             'father_husband_name' => trim($this->input->post('father_husband_name')),
+			'husband_name' => trim($this->input->post('husband_name')),
             'contact_number' => trim($this->input->post('contact_number')),
             'emergency_contact_number' => trim($this->input->post('emergency_contact_number')),
             'email' => trim($this->input->post('email')),

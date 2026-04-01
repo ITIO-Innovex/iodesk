@@ -435,6 +435,255 @@ class Webmail_setup extends AdminController
         echo json_encode(['exists' => $existing ? true : false]);
     }
 
+    /**
+     * URL: /admin/webmail_setup/alias
+     * List email aliases.
+     */
+    public function alias()
+    {
+        if (!is_staff_logged_in()) {
+            access_denied('Webmail Alias');
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId   = (int) get_staff_user_id();
+
+        $this->db->select('a.*, w.mailer_email as webmail_email, w.mailer_name as webmail_name');
+        $this->db->from('it_crm_webmail_alias a');
+        $this->db->join(db_prefix() . 'webmail_setup w', 'w.id = a.webmail_id', 'left');
+        $this->db->where('w.company_id', $companyId);
+        $this->db->where('a.status', 1);
+
+        if (!is_admin()) {
+            $this->db->group_start();
+            $this->db->where('w.staffid', $staffId);
+            $this->db->or_where('w.staffid', 0);
+            $this->db->group_end();
+        }
+
+        $this->db->order_by('a.id', 'desc');
+        $data['aliases'] = $this->db->get()->result_array();
+        $data['title']   = 'Webmail Alias';
+
+        $this->load->view('admin/webmail_setup_alias', $data);
+    }
+
+    /**
+     * AJAX: get alias row by id
+     */
+    public function alias_entry($id)
+    {
+        if (!is_staff_logged_in()) {
+            echo json_encode([]);
+            exit;
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId   = (int) get_staff_user_id();
+        $id        = (int) $id;
+        if ($id <= 0) {
+            echo json_encode([]);
+            exit;
+        }
+
+        $this->db->select('a.*, w.company_id, w.staffid');
+        $this->db->from('it_crm_webmail_alias a');
+        $this->db->join(db_prefix() . 'webmail_setup w', 'w.id = a.webmail_id', 'inner');
+        $this->db->where('a.id', $id);
+        $this->db->where('a.status', 1);
+        $this->db->where('w.company_id', $companyId);
+        if (!is_admin()) {
+            $this->db->group_start();
+            $this->db->where('w.staffid', $staffId);
+            $this->db->or_where('w.staffid', 0);
+            $this->db->group_end();
+        }
+        $row = $this->db->get()->row_array();
+        echo json_encode($row ? $row : []);
+        exit;
+    }
+
+    /**
+     * AJAX: update alias
+     */
+    public function update_alias($id)
+    {
+        if (!is_staff_logged_in()) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            exit;
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId   = (int) get_staff_user_id();
+        $id        = (int) $id;
+
+        $senderEmail = trim((string) $this->input->post('senderEmail'));
+        $senderName  = trim((string) $this->input->post('senderName'));
+        $verified    = (int) $this->input->post('verified');
+        if ($verified !== 0 && $verified !== 1) {
+            $verified = 1;
+        }
+
+        if ($id <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid alias id']);
+            exit;
+        }
+        if ($senderEmail === '' || !filter_var($senderEmail, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['success' => false, 'message' => 'Valid sender email is required']);
+            exit;
+        }
+
+        // Load alias + permission check via join to webmail_setup
+        $this->db->select('a.id, a.webmail_id, w.company_id, w.staffid');
+        $this->db->from('it_crm_webmail_alias a');
+        $this->db->join(db_prefix() . 'webmail_setup w', 'w.id = a.webmail_id', 'inner');
+        $this->db->where('a.id', $id);
+        $this->db->where('a.status', 1);
+        $this->db->where('w.company_id', $companyId);
+        if (!is_admin()) {
+            $this->db->group_start();
+            $this->db->where('w.staffid', $staffId);
+            $this->db->or_where('w.staffid', 0);
+            $this->db->group_end();
+        }
+        $alias = $this->db->get()->row_array();
+        if (!$alias) {
+            echo json_encode(['success' => false, 'message' => 'Alias not found']);
+            exit;
+        }
+
+        // Duplicate check (same webmail_id + senderEmail)
+        $dup = $this->db->where('webmail_id', (int) $alias['webmail_id'])
+            ->where('senderEmail', $senderEmail)
+            ->where('status', 1)
+            ->where('id !=', $id)
+            ->count_all_results('it_crm_webmail_alias');
+        if ($dup > 0) {
+            echo json_encode(['success' => false, 'message' => 'Alias already exists for this webmail']);
+            exit;
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_webmail_alias', [
+            'senderEmail' => $senderEmail,
+            'senderName'  => $senderName,
+            'verified'    => $verified,
+        ]);
+
+        echo json_encode(['success' => true, 'message' => 'Alias updated successfully']);
+        exit;
+    }
+
+    /**
+     * Soft delete alias: set status=0
+     */
+    public function delete_alias($id)
+    {
+        if (!is_staff_logged_in()) {
+            access_denied('Webmail Alias');
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId   = (int) get_staff_user_id();
+        $id        = (int) $id;
+        if ($id <= 0) {
+            redirect(admin_url('webmail_setup/alias'));
+        }
+
+        // Ensure permission via join
+        $this->db->select('a.id');
+        $this->db->from('it_crm_webmail_alias a');
+        $this->db->join(db_prefix() . 'webmail_setup w', 'w.id = a.webmail_id', 'inner');
+        $this->db->where('a.id', $id);
+        $this->db->where('a.status', 1);
+        $this->db->where('w.company_id', $companyId);
+        if (!is_admin()) {
+            $this->db->group_start();
+            $this->db->where('w.staffid', $staffId);
+            $this->db->or_where('w.staffid', 0);
+            $this->db->group_end();
+        }
+        $ok = (bool) $this->db->get()->row_array();
+        if (!$ok) {
+            set_alert('warning', 'Alias not found.');
+            redirect(admin_url('webmail_setup/alias'));
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update('it_crm_webmail_alias', ['status' => 0]);
+        set_alert('success', 'Alias deleted successfully.');
+        redirect(admin_url('webmail_setup/alias'));
+    }
+
+    /**
+     * AJAX: Save email alias for a webmail setup entry.
+     * Table: it_crm_webmail_alias
+     */
+    public function save_alias()
+    {
+        if (!is_staff_logged_in()) {
+            echo json_encode(['success' => false, 'message' => 'Access denied']);
+            exit;
+        }
+
+        $companyId = get_staff_company_id();
+        $staffId   = get_staff_user_id();
+
+        $webmailId   = (int) $this->input->post('webmail_id');
+        $senderEmail = trim((string) $this->input->post('senderEmail'));
+        $senderName  = trim((string) $this->input->post('senderName'));
+        $verified    = (int) $this->input->post('verified');
+
+        if ($webmailId <= 0) {
+            echo json_encode(['success' => false, 'message' => 'Invalid webmail id']);
+            exit;
+        }
+        if ($senderEmail === '' || !filter_var($senderEmail, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['success' => false, 'message' => 'Valid sender email is required']);
+            exit;
+        }
+        if ($verified !== 0 && $verified !== 1) {
+            $verified = 1;
+        }
+
+        // Ensure the webmail setup entry belongs to company and user can access it
+        $this->db->where('company_id', $companyId);
+        $this->db->where('id', $webmailId);
+        if (!is_admin()) {
+            $this->db->group_start();
+            $this->db->where('staffid', (int) $staffId);
+            $this->db->or_where('staffid', 0);
+            $this->db->group_end();
+        }
+        $entry = $this->db->get(db_prefix() . 'webmail_setup')->row_array();
+        if (!$entry) {
+            echo json_encode(['success' => false, 'message' => 'Webmail entry not found']);
+            exit;
+        }
+
+        // Prevent duplicate alias per webmail_id
+        $dup = $this->db->where('webmail_id', $webmailId)
+            ->where('senderEmail', $senderEmail)
+            ->where('status', 1)
+            ->count_all_results('it_crm_webmail_alias');
+        if ($dup > 0) {
+            echo json_encode(['success' => false, 'message' => 'Alias already exists for this webmail']);
+            exit;
+        }
+
+        $this->db->insert('it_crm_webmail_alias', [
+            'webmail_id'  => $webmailId,
+            'senderEmail' => $senderEmail,
+            'senderName'  => $senderName,
+            'verified'    => $verified,
+            'status'      => 1,
+        ]);
+
+        $newId = (int) $this->db->insert_id();
+        echo json_encode(['success' => $newId > 0, 'id' => $newId, 'message' => 'Alias saved successfully']);
+        exit;
+    }
+
 	
 	public function folders()
     {

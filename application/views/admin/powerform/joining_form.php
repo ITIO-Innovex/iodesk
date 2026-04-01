@@ -16,7 +16,8 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Name</th>
-                                        <th>Father / Husband Name</th>
+                                        <th>Father Name</th>
+										<th>Husband Name</th>
                                         <th>Email</th>
                                         <th>Contact Number</th>
                                         <th>Status</th>
@@ -31,6 +32,7 @@
                                                 <td><?php echo $cnt++; ?></td>
                                                 <td><?php echo htmlspecialchars($record['name'] ?? ''); ?></td>
                                                 <td><?php echo htmlspecialchars($record['father_husband_name'] ?? ''); ?></td>
+												<td><?php echo htmlspecialchars($record['husband_name'] ?? ''); ?></td>
                                                 <td><?php echo htmlspecialchars($record['email'] ?? ''); ?></td>
                                                 <td><?php echo htmlspecialchars($record['contact_number'] ?? ''); ?></td>
                                                 <td>
@@ -159,25 +161,37 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Date of Birth</label>
                                         <input type="date" class="form-control" name="date_of_birth" id="jf_date_of_birth">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Date of Joining</label>
                                         <input type="date" class="form-control" name="date_of_joining" id="jf_date_of_joining">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                
+                            </div>
+							
+							<div class="row">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Designation</label>
                                         <input type="text" class="form-control" name="assigned_designation" id="jf_assigned_designation">
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Husband Name</label>
+                                        <input type="text" class="form-control" name="husband_name" id="jf_husband_name">
+                                    </div>
+                                </div>
+                                
                             </div>
+							
                             <div class="form-group">
                                 <label>Department</label>
                                 <input type="text" class="form-control" name="department" id="jf_department">
@@ -236,7 +250,7 @@ $(function() {
         var h = '<div class="row"><div class="col-md-12">';
         h += '<h5 class="tw-font-semibold tw-border-b tw-pb-2 tw-mb-3">Basic Information</h5>';
         h += '<table class="table table-bordered table-condensed">';
-        h += '<tr><th width="22%">Name</th><td>' + esc(d.name) + '</td><th width="22%">Father / Husband Name</th><td>' + esc(d.father_husband_name) + '</td></tr>';
+        h += '<tr><th width="22%">Name</th><td>' + esc(d.name) + '</td><th width="22%">Father / Husband Name</th><td>' + esc(d.father_husband_name) + ' / ' + esc(d.husband_name) + '</td></tr>';
         h += '<tr><th>Email</th><td>' + esc(d.email) + '</td><th>Contact Number</th><td>' + esc(d.contact_number) + '</td></tr>';
         h += '<tr><th>Emergency Contact</th><td>' + esc(d.emergency_contact_number) + '</td><th>Status</th><td><span class="label ' + statusClass(d.status) + '">' + esc(d.status) + '</span></td></tr>';
         h += '<tr><th>PAN Number</th><td>' + esc(d.pan_number) + '</td><th>Aadhaar Number</th><td>' + esc(d.aadhaar_number) + '</td></tr>';
@@ -262,6 +276,7 @@ $(function() {
         $('#jf_edit_id').val(d.id);
         $('#jf_name').val(d.name || '');
         $('#jf_father_husband_name').val(d.father_husband_name || '');
+		$('#jf_husband_name').val(d.husband_name || '');
         $('#jf_email').val(d.email || '');
         $('#jf_contact_number').val(d.contact_number || '');
         $('#jf_emergency_contact_number').val(d.emergency_contact_number || '');
@@ -297,7 +312,7 @@ $(function() {
             else alert_float('danger', r.message || 'Not found');
         }).fail(function() { alert_float('danger', 'Failed to load'); });
     });
-    $('#editJfForm').on('submit', function(e) {
+    $('#editJfForm').on('submit', function(e) { 
         e.preventDefault();
         var $btn = $('#jfSaveBtn');
         $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
