@@ -352,7 +352,7 @@
 <?php } ?>
     $('.add-dar-row').on('click', function () {
       var $tbody = $('#dar-rows');
-      var $first = $tbody.find('tr.dar-row:first');
+      var $first = $tbody.find('tr.dar-row:last');
       if ($first.length === 0) {
         return;
       }
@@ -362,6 +362,19 @@
       $clone.find('input').val('');
 	  }
       $tbody.append($clone);
+	  
+	   //  Get first field
+    var $firstField = $clone.find('input, textarea, select').first();
+
+    if ($firstField.length) {
+        //  Scroll horizontally
+        $('html, body').animate({
+            scrollLeft: $firstField.offset().left - 50
+        }, 400);
+
+        $firstField.focus();
+    }
+	
     });
 
     // Delete row (keep at least one)
