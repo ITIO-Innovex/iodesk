@@ -1443,5 +1443,33 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
     $this->load->view('forms/form_submitted', $data);
 	}
 	
+	// Web Form Display
+	
+	 public function handle($token = null, $method = null)
+    {
+        if (!$token || !$method) {
+            show_404();
+        }
+	// Get Form Details
+	    $this->db->where('powerform_id', $token);
+        $web_form = $this->db->get(db_prefix() . 'web_forms')->row();
+		//print_r($web_form);
+		
+		$this->db->where('powerform_id', $token);
+        $web_form = $this->db->get(db_prefix() . 'web_forms')->row();
+		//print_r($web_form);
+		
+			if(empty($web_form)) {
+			show_404();
+			}
+		
+
+        
+    $data['title'] = ucwords(str_replace("_"," ",$method));
+	$data['token'] = $token;
+	$data['companyname'] = get_staff_company_name($web_form->company_id);
+    $this->load->view('forms/power_form', $data);
+    }
+	
 	
 }

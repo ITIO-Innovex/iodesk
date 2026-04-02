@@ -1580,8 +1580,8 @@ class Leads_model extends App_Model
         // Direct IP address
         $ip = $_SERVER['REMOTE_ADDR'];
     }
-	
-	if($ip=="::1" || $ip==""){
+	//echo $ip;
+	if($ip=="::1" || $ip=="127.0.0.1" || $ip==""){
 	$ip="66.249.79.194";
 	}
 	

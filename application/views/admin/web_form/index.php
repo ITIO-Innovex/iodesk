@@ -112,7 +112,17 @@ $list = json_decode($list, true);  // convert to array
                             <i class="fa-solid fa-share-nodes"></i>
                           </button>
 						  
+
+<?php if(e($form['display_in_menu'])==1){ ?>
+<a href="<?php echo admin_url('web_form/display_in_menu/' . $form['id']); ?>" class="_delete" title="Hide from Menu">
+<i class="fa-solid fa-toggle-on fa-xl" style="margin-top:10px;"></i> </a>
+				<?php }else{ ?>
+<a href="<?php echo admin_url('web_form/display_in_menu/' . $form['id']); ?>" class="_delete" title="Show in Menu">
+<i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
+<?php } ?>
+
 <?php if(is_admin()){ ?>
+
 <?php if(e($form['form_type'])==1){ ?>
 <a href="<?php echo admin_url('web_form/display_staff/' . $form['id']); ?>" class="btn btn-default btn-xs _delete" title="Hide for all staff">
 <i class="fa-solid fa-eye"></i> </a>
@@ -120,13 +130,14 @@ $list = json_decode($list, true);  // convert to array
 <a href="<?php echo admin_url('web_form/display_staff/' . $form['id']); ?>" class="btn btn-default btn-xs _delete" title="Show for all staff">
 <i class="fa-regular fa-eye"></i></a>
 <?php } ?>
+
+<?php if(e($form['powerform_id'])==""){ ?>
+<a href="<?php echo admin_url('web_form/create_powerform/' . $form['id']); ?>" class="btn btn-default btn-xs" title="make power Form">
+<i class="fa-solid fa-link"></i> </a>
+<?php }else{ ?>
+<a href="<?php echo base_url('forms/'.$form['powerform_id'].'/').make_url_slug($form['name']); ?>" class="btn btn-default btn-xs" title="make power Form" target="_blank"><i class="fa-solid fa-square-arrow-up-right"></i></a>
+
 <?php } ?>
-<?php if(e($form['display_in_menu'])==1){ ?>
-<a href="<?php echo admin_url('web_form/display_in_menu/' . $form['id']); ?>" class="_delete" title="Hide from Menu">
-<i class="fa-solid fa-toggle-on fa-xl" style="margin-top:10px;"></i> </a>
-				<?php }else{ ?>
-<a href="<?php echo admin_url('web_form/display_in_menu/' . $form['id']); ?>" class="_delete" title="Show in Menu">
-<i class="fa-solid fa-toggle-off fa-xl " style="margin-top:10px;"></i></a>
 <?php } ?>
 
 

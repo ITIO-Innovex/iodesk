@@ -190,6 +190,7 @@ $route['admin/modules/(:any)/(:any)'] = 'admin/mods/$1/$2';
 
 // Public single ticket route
 $route['forms/tickets/(:any)'] = 'forms/public_ticket/$1';
+$route['forms/(:any)/(:any)'] = 'forms/handle/$1/$2';
 /**
  * @since  2.3.0
  * Route for clients set password URL, because it's using the same controller for staff to

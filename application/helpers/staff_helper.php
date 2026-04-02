@@ -1745,6 +1745,19 @@ function get_maintenance_notice() {
 	return $maintenance_notice ?? [];
 }
 
+function make_url_slug($string)
+{
+    // Convert to lowercase
+    $string = strtolower($string);
+
+    // Replace non-alphanumeric characters with underscore
+    $string = preg_replace('/[^a-z0-9]+/', '_', $string);
+
+    // Remove extra underscores from start/end
+    $string = trim($string, '_');
+
+    return $string;
+}
 	
 function amountInWords($number)
 {
