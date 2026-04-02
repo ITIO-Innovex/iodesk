@@ -1165,6 +1165,27 @@ log_message('error', 'f Type - '.$type );
         redirect(admin_url('web_form'));
     }
 	
+	//Set Display in Menu
+    public function create_powerform($id)
+    {
+        if (!$id) {
+            redirect(admin_url('web_form'));
+        }        
+            //log_message('error', 'USER ID - '.$id );
+			
+			$powerform_id = bin2hex(random_bytes(16));
+            $this->db->where('id', $id);
+            $response = $this->db->update('it_crm_web_forms' , ['powerform_id'  => $powerform_id],);
+            if ($response == true) {
+                set_alert('success', _l('Powerform Generated', _l('Powerform Generated')));
+            } else {
+                set_alert('warning', _l('problem_updating', _l('Powerform Generated')));
+            }
+       
+        
+        redirect(admin_url('web_form'));
+    }
+	
 	//Set Display in Publically
     public function display_staff($id)
     {
