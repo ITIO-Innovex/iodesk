@@ -60,7 +60,7 @@
 		<div class="panel_s">
           <div class="panel-body">
 		  <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">
-  <p><strong>Instruction for Dynamic Variables</strong></p>
+  <p style="color: #d9534f; font-weight: bold;">Instruction for Dynamic Variables</p>
 
   <p>
     <code>{{ }}</code> these types of words are dynamic variables. 
@@ -72,10 +72,38 @@
     <li>Do not modify or remove these variables.</li>
     <li>Do not change their position while editing the email template.</li>
   </ul>
+    <p style="color: #000000; font-weight: bold;">Global Variable:</p>
+  <ul>
+  <?php $staffid=get_staff_user_id();?>
+    <li>{{CompanyName}} - <?php echo get_staff_company_name();?> </li>
+    <li>{{StaffName}} - <?php echo get_staff_full_name();?></li>
+	<li>{{StaffEmail}} - <?php echo get_staff_email($staffid);?></li>
+	<li>{{StaffID}} - <?php echo $staffid;?></li>
+  </ul>
   <p style="color: #000000; font-weight: bold;">Leave Application:</p>
   <ul>
-    <li>Do not modify or remove these variables.</li>
-    <li>Do not change their position while editing the email template.</li>
+    <li>{{LeaveFor}} - for Full Day / Half Day </li>
+    <li>{{FromDate}} - Leave Start Date</li>
+	<li>{{ToDate}}   - Leave End Date</li>
+	<li>{{Reason}}   - Leave Reason</li>
+	<li>{{Status}}   - Leave Status (Approved / Rejected)</li>
+  </ul>
+  
+    <p style="color: #000000; font-weight: bold;">Project:</p>
+  <ul>
+    <li>{{ProjectID}} - Get Project ID </li>
+    <li>{{ProjectTitle}} - Get Project Title</li>
+	<li>{{ProjectDetails}}  - Get Project Description</li>
+	<li>{{ProjectURL}}   - Get Project URL</li>
+  </ul>
+  
+<p style="color: #000000; font-weight: bold;">Project Task:</p>
+  <ul>
+    <li>{{TaskID}} - Get Task ID </li>
+    <li>{{TaskTitle}} - Get Project Task Title</li>
+	<li>{{TaskDetails}}  - Get Project Task Description</li>
+	<li>{{TaskURL}}   - Get Project Task URL</li>
+	<li>{{TaskComments}}   - Get Project Task Comments</li>
   </ul>
 </div>
 		  </div></div>
