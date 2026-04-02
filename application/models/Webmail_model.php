@@ -1836,7 +1836,7 @@ if ($folder->children->count() > 0) {
 		$ReceiverName=isset($emaildata['ReceiverName']) ? $emaildata['ReceiverName'] : "";
 		
 		// Fetch Dynamic Data Leave Application
-		$FullDay=isset($emaildata['FullDay']) ? $emaildata['FullDay'] : "";
+		$LeaveFor=isset($emaildata['LeaveFor']) ? $emaildata['LeaveFor'] : "";
 		$FromDate=isset($emaildata['FromDate']) ? $emaildata['FromDate'] : "";
 		$ToDate=isset($emaildata['ToDate']) ? $emaildata['ToDate'] : "";
 		$Reason=isset($emaildata['Reason']) ? $emaildata['Reason'] : "";
@@ -1847,6 +1847,13 @@ if ($folder->children->count() > 0) {
 		$ProjectID=isset($emaildata['ProjectID']) ? $emaildata['ProjectID'] : "";
 		$ProjectTitle=isset($emaildata['ProjectTitle']) ? $emaildata['ProjectTitle'] : "";
 		$ProjectDetails=isset($emaildata['ProjectDetails']) ? $emaildata['ProjectDetails'] : "";
+		$ProjectURL=isset($emaildata['ProjectURL']) ? $emaildata['ProjectURL'] : "";
+		
+		$TaskID=isset($emaildata['TaskID']) ? $emaildata['TaskID'] : "";
+		$TaskTitle=isset($emaildata['TaskTitle']) ? $emaildata['TaskTitle'] : "";
+		$TaskDetails=isset($emaildata['TaskDetails']) ? $emaildata['TaskDetails'] : "";
+		$TaskURL=isset($emaildata['TaskURL']) ? $emaildata['TaskURL'] : "";
+		$TaskComments=isset($emaildata['TaskComments']) ? $emaildata['TaskComments'] : "";
 		
 		
 		// Check Email Template 
@@ -1854,11 +1861,14 @@ if ($folder->children->count() > 0) {
 		$templateDetails=$this->webmail_model->get_template_details($emaildata['templateTitle']);
 		$subject=$templateDetails['subject'] ?? 'No Subject';
 		$email_body=$templateDetails['email_body'] ?? 'No Body';
+		$staffid=get_staff_user_id();
 		$data = [
 		'ReceiverName'    	=> $ReceiverName,
 		'StaffName' 		=> get_staff_full_name(),
+		'StaffEmail' 		=> get_staff_email($staffid),
+		'StaffID' 			=> $staffid,
 		'CompanyName' 		=> get_staff_company_name(),
-    	'FullDay'   		=> $FullDay,
+    	'LeaveFor'   		=> $LeaveFor,
     	'FromDate'  		=> $FromDate,
     	'ToDate'    		=> $ToDate,
     	'Reason'    		=> $Reason,
@@ -1866,7 +1876,13 @@ if ($folder->children->count() > 0) {
 		'Status'    		=> $Status,
 		'ProjectID'    		=> $ProjectID,
 		'ProjectTitle'    	=> $ProjectTitle,
-		'ProjectDetails'    => $ProjectDetails
+		'ProjectDetails'    => $ProjectDetails,
+		'ProjectURL'    	=> $ProjectURL,
+		'TaskID'    		=> $TaskID,
+		'TaskTitle'    		=> $TaskTitle,
+		'TaskDetails'    	=> $TaskDetails,
+		'TaskComments'    	=> $TaskComments,
+		'TaskURL'    		=> $TaskURL
 		];
 		
 		// Replace Subject

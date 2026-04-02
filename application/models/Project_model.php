@@ -353,7 +353,8 @@ return $result;
 			//log_message('error', 'Result: ' . ($result1 ? 'Success' : 'Failed'));
 			//$CI =& get_instance();
 			//log_message('error', 'Debugger: ' . $CI->email->print_debugger());
-			
+			$ProjectURL=admin_url('project/view/').$insert_id;
+			$ProjectURL="<a href='".$ProjectURL."' target='_blank'>".$ProjectURL."</a>";
                 // Prepare email data
                 $msgdata = [
 				    'templateTitle'  	=> 'new_project',
@@ -361,6 +362,7 @@ return $result;
 					'ReceiverName'   	=> get_staff_full_name($data['owner']),
 					'ProjectID'   	 	=> $insert_id,
 					'ProjectTitle'    	=> $data['project_title'],
+					'ProjectURL'    	=> $ProjectURL,
 					'ProjectDetails'    => $data['project_description'],
                 ];
 				if (!empty($msgdata['recipientEmail'])) {
@@ -427,10 +429,29 @@ return $result;
 			$mail_subject="Create New Task # :".$insert_id." - ".$data['task_name'];
             //$data_desc=$mail_subject."<br><br>".implode(', ', $changes);
 			$data_desc=$mail_subject."<br><br>".nl2br(implode("\n\n", $changes))."";
-			
 			$staffid=get_staff_user_id();
-			$staffemail=get_staff_email($staffid);
-			send_mail_template('project_mail', $staffemail, $staffid, $insert_id, $data_desc, $mail_subject,$emailString);
+			//$staffemail=get_staff_email($staffid);
+			//send_mail_template('project_mail', $staffemail, $staffid, $insert_id, $data_desc, $mail_subject,$emailString);
+			
+			$data_desc="<br><br>".nl2br(implode("\n\n", $changes))."";
+			$staffid=get_staff_user_id();
+			$TaskURL=admin_url('project/tasks_details/').$insert_id;
+			$TaskURL="<a href='".$TaskURL."' target='_blank'>".$TaskURL."</a>";
+			$msgdata = [
+				    'templateTitle'  	=> 'new_project_task',
+                    'recipientEmail' 	=> get_staff_email($staffid),
+					'recipientCC' 		=> $emailString,
+					'ReceiverName'   	=> get_staff_full_name($staffid),
+					'TaskID'   	 		=> $insert_id,
+					'TaskTitle'    		=> $data['task_name'],
+					'TaskURL'    		=> $TaskURL,
+					'TaskDetails'    	=> nl2br(implode("\n\n", $changes)),
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+				
 			//===============================
 			$this->log_project_activity($project_id, $project_type, $mail_subject,'',$insert_id);
             log_activity('New Task Added [ID: ' . $insert_id . ']');
@@ -561,12 +582,7 @@ return $result;
         $this->db->update(db_prefix() . 'project_master', ['project_status' => $status, 'date_finished' => $currdate, 'progress' => 100 ]);
 		//log_message('error', 'Status - '.$this->db->last_query() );
 		}
-		
-		/*else{
-		$this->db->where('id', $id);
-		$this->db->update(db_prefix() . 'project_master', ['project_status' => $status, 'date_finished' => NULL ]);
-		log_message('error', 'Status - '.$this->db->last_query() );
-		}*/
+
 		
 
         if ($this->db->affected_rows() > 0) {
@@ -578,16 +594,39 @@ return $result;
         $this->db->update(db_prefix() . 'project_task', ['task_status' => 10, 'date_finished' => $currdate]);
 		}
 		
-			$project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
+			
 			//////////////////////////////EMAIL////////////////
-			$mail_subject="Change Project Status - ".get_proj_statush($status)." - Project ID :".$id;
-            $data_desc="Change Project Status - ".get_proj_statush($status);
+			
+            //$data_desc="Change Project Status - ".get_proj_statush($status);
+			////$staffid=get_staff_user_id();
+			//$staffemail=get_staff_email($staffid);
+			//send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject);
+			
+			//===========================Send Email ===========
 			$staffid=get_staff_user_id();
-			$staffemail=get_staff_email($staffid);
-			send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject);
+			$ProjectURL=admin_url('project/view/').$id;
+			$ProjectURL="<a href='".$ProjectURL."' target='_blank'>".$ProjectURL."</a>";
+			
+			$msgdata = [
+				    'templateTitle'  	=> 'update_project_status',
+                    'recipientEmail' 	=> get_staff_email($staffid),
+					'ReceiverName'   	=> get_staff_full_name($staffid),
+					'ProjectID'   	 	=> $id,
+					'ProjectURL'   	 	=> $ProjectURL,
+					'Status'    	    => get_proj_statush($status),
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+				
+			//===========================
+			
 			//////////////////////////////END EMAIL////////////
+			$project_type=1; //Project=1, Task=2, Issues=3, Milestone=4
+			$subject="Change Project Status - ".get_proj_statush($status)." - Project ID :".$id;
 			$project_details="Change Project Status - ".get_proj_statush($status)." - Project ID :".$id;
-			$this->log_project_activity($id, $project_type, $mail_subject,'',$id);
+			$this->log_project_activity($id, $project_type, $subject,'',$id);
             log_activity('Project Status Changed [ID: ' . $id . ' Status: ' . $status . ']');
             return true;
         }
@@ -930,8 +969,29 @@ return $result;
 			$mail_subject="Updated Task Status # :".$id." - ".get_proj_statush($status);
             $data_desc="Updated Task Status - ".get_proj_statush($status);
 			$staffid=get_staff_user_id();
-			$staffemail=get_staff_email($staffid);
-			send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject,$emailString);
+			//$staffemail=get_staff_email($staffid);
+			//send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject,$emailString);
+			
+			//===========================Send Email ===========
+			$staffid=get_staff_user_id();
+			$TaskURL=admin_url('project/tasks_details/').$id;
+			$TaskURL="<a href='".$TaskURL."' target='_blank'>".$TaskURL."</a>";
+			//log_message('error', 'TaskURL : ' . $TaskURL);
+			$msgdata = [
+				    'templateTitle'  	=> 'update_task_status',
+                    'recipientEmail' 	=> get_staff_email($staffid),
+					'recipientCC' 		=> $emailString,
+					'ReceiverName'   	=> get_staff_full_name($staffid),
+					'TaskID'   	 		=> $id,
+					'TaskURL'   	 	=> $TaskURL,
+					'Status'    	    => get_proj_statush($status),
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+				
+			//===========================
 			//////////////////////////////END EMAIL////////////
 			$this->log_project_activity('', $project_type, $mail_subject,'',$id);
             log_activity('Change Task Status [ID: ' . $id . ']');
@@ -983,17 +1043,36 @@ return $result;
 	        $task_owner=get_task_owner($id);
 			$emails=get_cc_mail_list($task_owner);
 			$emailString = implode(',', $emails);	
-			$mail_subject="Updated Task # :".$id;
-           // $data_desc=$mail_subject."<br><br>".implode(', ', $changes);
-			$data_desc=$mail_subject."<br><br>".nl2br(implode("\n\n", $changes))."";
 			$staffid=get_staff_user_id();
-			$staffemail=get_staff_email($staffid);
-			send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject,$emailString);
+			//$staffemail=get_staff_email($staffid);
+			//send_mail_template('project_mail', $staffemail, $staffid, $id, $data_desc, $mail_subject,$emailString);
+			
+			//===========================Send Email ===========
+            $data_desc="<br><br>".nl2br(implode("\n\n", $changes))."";
+			$staffid=get_staff_user_id();
+			
+			$msgdata = [
+				    'templateTitle'  	=> 'update_project_task',
+                    'recipientEmail' 	=> get_staff_email($staffid),
+					'ReceiverName'   	=> get_staff_full_name($staffid),
+					'recipientCC' 		=> $emailString,
+					'TaskID'   	 		=> $id,
+					'TaskTitle'    		=> $data['task_name'],
+					'TaskDetails'    	=> nl2br(implode("\n\n", $changes))
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+				
+			//===========================
+			
             /////////////////////////////////////////
             // Get project ID for logging
             $task = $this->get_task($id);
             $project_id = $task ? $task['project_id'] : '';
-            
+            $subject="Updated Task # :".$id;
+			$data_desc=$subject."<br><br>".nl2br(implode("\n\n", $changes))."";
             $this->log_project_activity($project_id, $project_type, $data_desc, '', $id);
             log_activity('Task Updated [ID: ' . $id . ']');
             return true;
@@ -1043,8 +1122,30 @@ return $result;
 			$mail_subject="Added New Comment # :".$insert_id;
             $data_desc=$mail_subject."<br><br>".$data['comments'];
 			$staffid=get_staff_user_id();
-			$staffemail=get_staff_email($staffid);
-			send_mail_template('project_mail', $staffemail, $staffid, $insert_id, $data_desc, $mail_subject,$emailString);
+			//$staffemail=get_staff_email($staffid);
+			//send_mail_template('project_mail', $staffemail, $staffid, $insert_id, $data_desc, $mail_subject,$emailString);
+			
+			//===========================Send Email ===========
+			$staffid=get_staff_user_id();
+			$TaskURL=admin_url('project/tasks_details/').$task_id;
+			$TaskURL="<a href='".$TaskURL."' target='_blank'>".$TaskURL."</a>";
+			//log_message('error', 'TaskURL : ' . $TaskURL);
+			$msgdata = [
+				    'templateTitle'  	=> 'project_task_comments',
+                    'recipientEmail' 	=> get_staff_email($staffid),
+					'recipientCC' 		=> $emailString,
+					'ReceiverName'   	=> get_staff_full_name($staffid),
+					'TaskID'   	 		=> $task_id,
+					'TaskComments'   	=> $data['comments'],
+					'TaskURL'   	 	=> $TaskURL
+                ];
+				if (!empty($msgdata['recipientEmail'])) {
+                    $this->load->model('webmail_model');
+                    $this->webmail_model->send_email_by_template($msgdata);
+                }
+				
+			//===========================
+			
             /////////////////////////////////////////
 	
 			$this->log_project_activity($project_id, $project_type, $data_desc,'',$task_id);
