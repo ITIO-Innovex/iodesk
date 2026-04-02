@@ -627,8 +627,8 @@
                     },
                     date_of_joining: {
                         required: true,
-                        date: true,
-                        joiningDateValidation: true
+                        <!--date: true,-->
+                        <!--joiningDateValidation: true-->
                     },
                     current_address_line1: {
                         required: true,

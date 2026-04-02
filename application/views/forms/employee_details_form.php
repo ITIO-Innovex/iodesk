@@ -653,7 +653,7 @@
                     date_of_joining: {
                         required: true,
                         <!--date: true,-->
-                        joiningDateValidation: true
+                        <!--joiningDateValidation: true-->
                     },
                     current_address: {
                         required: true,
