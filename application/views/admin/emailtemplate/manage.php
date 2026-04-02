@@ -121,11 +121,18 @@ $(function () {
     toolbar_sticky: true
   });
 
-  appValidateForm($('#internal-email-template-form'), {
-    template_title: 'required',
-    subject: 'required',
-    email_body: 'required'
-  });
+	  appValidateForm($('#internal-email-template-form'), {
+	  template_title: 'required',
+	  subject: 'required',
+	  email_body: {
+		required: function () {
+		  if (typeof tinymce !== 'undefined') {
+			return tinymce.get('email_body').getContent({ format: 'text' }).trim() === '';
+		  }
+		  return $('#email_body').val().trim() === '';
+		}
+	  }
+	});
 });
 </script>
 </body>
