@@ -1443,6 +1443,142 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
     $this->load->view('forms/form_submitted', $data);
 	}
 	
+	// Submit Web Form
+	public function power_form_submit($token = null)
+    {
+	
+	
+	 $post_data  = $this->input->post();
+	 print_r($post_data);
+	 $token=$post_data['token'] ?? '';
+	 	if (!$token) { show_404();}
+	    $this->db->where('powerform_id', $token);
+        $web_form = $this->db->get(db_prefix() . 'web_forms')->row();
+		//print_r($web_form);
+		echo $id=$web_form->id;
+		echo $company_id=$web_form->company_id;
+		echo $powerform_id=$web_form->powerform_id;
+		
+		
+		$companyId = $web_form->company_id;
+        $formId    = (int) $web_form->id;
+       
+
+        // Load fields
+        $this->db->where('form_id', $formId);
+        $this->db->where('is_deleted', 0);
+        $this->db->order_by('sort_order', 'asc');
+        $fields = $this->db->get(db_prefix() . 'web_form_fields')->result_array();
+
+        // Existing data (for edit, to preserve uploaded files if user doesn't re-upload)
+        $existingData = [];
+        
+
+        $data = [];
+        foreach ($fields as $field) {
+            echo $name = $field['name'];
+            $type = $field['type'];
+log_message('error', 'f Type - '.$type );
+
+
+            // File fields handled via $_FILES below
+            if ($type === 'file') {
+                // Keep current files unless user uploads new ones
+                $data[$name] = isset($existingData[$name]) ? $existingData[$name] : [];
+                continue;
+            }
+            if ($type === 'editor') {
+			$val  = $this->input->post($name, false);
+			}else{
+            $val  = $this->input->post($name);
+			}
+
+            // Normalize checkbox/radio/select values
+            if (is_array($val)) {
+                $val = implode(', ', array_map('trim', $val));
+            }
+
+            $data[$name] = $val;
+        }
+
+        $row = [
+            'form_id'    => $formId,
+            'company_id' => $companyId,
+            'is_deleted' => 0,
+			'is_power_form' => 1,
+        ];
+
+       
+            $row['created_at'] = date('Y-m-d H:i:s');
+            $row['created_by'] = get_staff_user_id();
+            // Insert first to get entry ID for file folder
+            $row['data_json'] = json_encode($data);
+            $this->db->insert(db_prefix() . 'web_form_entries', $row);
+            $entryId = (int) $this->db->insert_id();
+            set_alert('success', 'Entry added successfully');
+        
+
+        // Handle multi file uploads
+        $uploadDir = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . 'web_forms' . DIRECTORY_SEPARATOR . (int)$companyId . DIRECTORY_SEPARATOR . (int)$formId . DIRECTORY_SEPARATOR . (int)$entryId . DIRECTORY_SEPARATOR;
+        if (!is_dir($uploadDir)) {
+            @mkdir($uploadDir, 0755, true);
+        }
+
+        $uploadedAny = false;
+        foreach ($fields as $field) {
+            if ($field['type'] !== 'file') {
+                continue;
+            }
+            $fname = $field['name'];
+            if (!isset($_FILES[$fname])) {
+                continue;
+            }
+
+            $files = $_FILES[$fname];
+            // Normalize to arrays
+            $names = is_array($files['name']) ? $files['name'] : [$files['name']];
+            $tmp   = is_array($files['tmp_name']) ? $files['tmp_name'] : [$files['tmp_name']];
+            $err   = is_array($files['error']) ? $files['error'] : [$files['error']];
+
+            $savedPaths = is_array($data[$fname] ?? null) ? $data[$fname] : [];
+
+            for ($i = 0; $i < count($names); $i++) {
+                if (!isset($err[$i]) || $err[$i] !== UPLOAD_ERR_OK) {
+                    continue;
+                }
+                $original = (string) $names[$i];
+                $ext = pathinfo($original, PATHINFO_EXTENSION);
+                $base = pathinfo($original, PATHINFO_FILENAME);
+                $base = preg_replace('/[^a-zA-Z0-9\-_]+/', '_', $base);
+                $base = trim($base, '_');
+                if ($base === '') {
+                    $base = 'file';
+                }
+                $newName = $base . '_' . time() . '_' . $i . ($ext ? '.' . $ext : '');
+                $dest = $uploadDir . $newName;
+                if (@move_uploaded_file($tmp[$i], $dest)) {
+                    $uploadedAny = true;
+                    $relative = 'uploads/web_forms/' . (int)$companyId . '/' . (int)$formId . '/' . (int)$entryId . '/' . $newName;
+                    $savedPaths[] = $relative;
+                }
+            }
+
+            $data[$fname] = $savedPaths;
+        }
+
+        // Update entry data_json (for edit, and after uploads)
+        $this->db->where('id', $entryId);
+        $this->db->where('form_id', $formId);
+        $this->db->where('company_id', $companyId);
+        $this->db->update(db_prefix() . 'web_form_entries', [
+            'data_json' => json_encode($data),
+        ]);
+
+        redirect(base_url('forms/thanks/' . $entryId));
+
+	}
+	
+	
 	// Web Form Display
 	
 	 public function handle($token = null, $method = null)
@@ -1450,11 +1586,8 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
         if (!$token || !$method) {
             show_404();
         }
-	// Get Form Details
-	    $this->db->where('powerform_id', $token);
-        $web_form = $this->db->get(db_prefix() . 'web_forms')->row();
-		//print_r($web_form);
 		
+	    // Get Form Details
 		$this->db->where('powerform_id', $token);
         $web_form = $this->db->get(db_prefix() . 'web_forms')->row();
 		//print_r($web_form);
@@ -1462,13 +1595,43 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 			if(empty($web_form)) {
 			show_404();
 			}
+			$formId=$web_form -> id;
+	// Load fields
+        $this->db->where('form_id', $formId);
+        $this->db->where('is_deleted', 0);
+        $this->db->order_by('sort_order', 'asc');
 		
-
-        
+    $data['fields'] = $this->db->get(db_prefix() . 'web_form_fields')->result_array();
+	//print_r($data['fields']);
     $data['title'] = ucwords(str_replace("_"," ",$method));
 	$data['token'] = $token;
 	$data['companyname'] = get_staff_company_name($web_form->company_id);
     $this->load->view('forms/power_form', $data);
+    }
+	
+// Thank You Page
+public function thanks($entryId = null)
+{
+if (!$entryId) {show_404();}
+// Get Form Details
+$this->db->select('it_crm_web_form_entries.company_id, it_crm_web_forms.name');
+$this->db->from('it_crm_web_form_entries');
+$this->db->join('it_crm_web_forms', 'it_crm_web_form_entries.form_id = it_crm_web_forms.id');
+$this->db->where('it_crm_web_form_entries.id', $entryId);
+
+       $web_form = $this->db->get()->row();
+
+
+		if($web_form){
+			$data['title'] = ucwords(str_replace("_"," ",$web_form->name));
+			$data['token'] = $entryId + 100000000;
+			$data['companyname'] = get_staff_company_name($web_form->company_id);
+			$this->load->view('forms/thanks', $data);
+		}else{
+		   redirect(site_url('/'));
+		}
+		
+			
     }
 	
 	
