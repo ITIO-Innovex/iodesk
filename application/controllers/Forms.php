@@ -1449,16 +1449,18 @@ $values=json_decode(get_option('lead_auto_assign_to_staff'));
 	
 	
 	 $post_data  = $this->input->post();
-	 print_r($post_data);
+	 //print_r($post_data);
 	 $token=$post_data['token'] ?? '';
 	 	if (!$token) { show_404();}
 	    $this->db->where('powerform_id', $token);
         $web_form = $this->db->get(db_prefix() . 'web_forms')->row();
 		//print_r($web_form);
-		echo $id=$web_form->id;
-		echo $company_id=$web_form->company_id;
-		echo $powerform_id=$web_form->powerform_id;
-		
+		$id=$web_form->id;
+		$company_id=$web_form->company_id;
+		$powerform_id=$web_form->powerform_id;
+		$staffid=$web_form->staffid;
+		$form_title=$web_form->name;
+		//exit;
 		
 		$companyId = $web_form->company_id;
         $formId    = (int) $web_form->id;
@@ -1573,6 +1575,39 @@ log_message('error', 'f Type - '.$type );
         $this->db->update(db_prefix() . 'web_form_entries', [
             'data_json' => json_encode($data),
         ]);
+		
+		        // For Send Email
+		        
+				$ref=$entryId + 100000000;
+		        //$msgdata['emailSubject']=$form_title." Form submitted. ".$ref." StaffName : ".get_staff_full_name($created_by)."StaffEmail ".get_staff_email($created_by);
+		        //$msgdata['emailBody']="Hi this is test Email";
+				$this->load->model('webmail_model');
+				$templateDetails=$this->webmail_model->get_template_details('powerform_submit_confirmation');
+		        $msgdata['recipientEmail']=get_staff_email($staffid);
+				$subject=$templateDetails['subject'] ?? 'No Subject';
+		        $email_body=$templateDetails['email_body'] ?? 'No Body';
+				$datax = [
+		        'FormName'    	=> $form_title,
+		        'RefNo' 		=> $ref,
+		        'StaffName' 	=> get_staff_full_name($staffid),
+		        'FormURL' 		=> admin_url('web_form/manage/').$formId,
+				'CompanyName' 	=> get_staff_company_name($company_id),
+		        ];
+				
+				// Replace Subject
+				foreach ($datax as $key => $value) {
+					$subject = str_replace('{{' . $key . '}}', $value, $subject);
+				}
+				
+				// Replace Email Body
+				foreach ($datax as $key => $value) {
+					$email_body = str_replace('{{' . $key . '}}', $value, $email_body);
+				}
+				
+				$msgdata['emailSubject']=$subject ?? 'No Subject';
+				$msgdata['emailBody']=$email_body ?? 'No Body';
+                
+		        $this->webmail_model->compose_email_super($msgdata);
 
         redirect(base_url('forms/thanks/' . $entryId));
 

@@ -1809,13 +1809,14 @@ if ($folder->children->count() > 0) {
 	
 	    public function get_template_details($template)
         {
-		$companyId=get_staff_company_id();
+		$companyId=get_staff_company_id() ?? 1;
         $this->db->select('subject, email_body');
 		$this->db->from('it_crm_email_template_internal');
 		$this->db->where('template_title', $template);
 		$this->db->where('status', 1);
 		$this->db->where_in('company_id', [1, $companyId]);
-		$this->db->order_by('(company_id = '.$companyId.')', 'DESC', false);
+		//$this->db->order_by('(company_id = '.$companyId.')', 'DESC', false);
+		$this->db->order_by("company_id = " . $this->db->escape($companyId), 'DESC', false);
 		$this->db->limit(1);
 		$result = $this->db->get()->row_array();
 		//log_message('error', 'Template Query  '.$this->db->last_query() );
