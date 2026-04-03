@@ -128,11 +128,60 @@ class Authentication extends ClientsController
         $this->db->where('company_id', $company_id)->update(db_prefix().'company_master', ['active' => 1]);
 		//echo $this->db->last_query();exit;
         if ($this->db->affected_rows() > 0) {
-            log_activity('Company Status Updated [CompanyID: ' . $company_id . ']');
+		
+		/////////////////!!! Redirect to login After Activation !!! /////////////
+	    $email = $_SESSION['registered_login_username'] ?? '';
+        $password = $_SESSION['registered_login_password'] ?? '';
+        $remember = true;
+		
+		if(isset($email)&&$email&&isset($password)&&$password) {
+		
+        $this->load->model('Authentication_model');
+        $result = $this->Authentication_model->login($email, $password, $remember, true);
+		if (is_array($data) && isset($data['memberinactive'])) {
+                    set_alert('danger', _l('admin_auth_inactive_account'));
+                    redirect(admin_url('authentication'));
+                } elseif (is_array($data) && isset($data['two_factor_auth'])) {
+                    $this->session->set_userdata('_two_factor_auth_established', true);
+                    if ($data['user']->two_factor_auth_enabled == 1) {
+                        $this->Authentication_model->set_two_factor_auth_code($data['user']->staffid);
+                        $sent = send_mail_template('staff_two_factor_auth_key', $data['user']);
+
+                        if (!$sent) {
+                            set_alert('danger', _l('two_factor_auth_failed_to_send_code'));
+                            redirect(admin_url('authentication'));
+                        } else {
+                            $this->session->set_userdata('_two_factor_auth_staff_email', $email);
+                            set_alert('success', _l('two_factor_auth_code_sent_successfully', $email));
+                            redirect(admin_url('authentication/two_factor'));
+                        }
+                    } else {
+                        set_alert('success', _l('enter_two_factor_auth_code_from_mobile'));
+                        redirect(admin_url('authentication/two_factor/app'));
+                    }
+                } elseif ($data == false) {
+                    set_alert('danger', _l('admin_auth_invalid_email_or_password'));
+                    redirect(admin_url('authentication'));
+                }
+				
+
+                $this->Authentication_model->set_remember_me_pref($remember, $email, $password);
+                $this->load->model('announcements_model');
+                $this->announcements_model->set_announcements_as_read_except_last_one(get_staff_user_id(), true);
+
+                // is logged in
+                maybe_redirect_to_previous_url();
+
+                hooks()->do_action('after_staff_login');
+                redirect(admin_url());
+				
+		}
+		//////////////////////////// !!! Redirect to login After Activation !!! //////////////////////		
+		log_activity('Company Status Updated [CompanyID: ' . $company_id . ']');
         }else{
 		//$data['title'] = '404';
 		}
-		
+		//echo $this->db->last_query();exit;
 		
 		}
 		
@@ -166,6 +215,8 @@ class Authentication extends ClientsController
 				$data_staff['role']=0;
 				$data_staff['send_welcome_email']=0;
 				$data_staff['password']=rand(100000,999999);
+				$_SESSION['registered_login_username']=$data_staff['email'];
+				$_SESSION['registered_login_password']=$data_staff['password'];
 				
                 $id = $this->staff_model->add($data_staff);
 				

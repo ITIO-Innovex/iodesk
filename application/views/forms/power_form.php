@@ -27,7 +27,7 @@
         <div class="panel_s">
           <div class="panel-body mail-bg">
             
-            <?php echo form_open_multipart(base_url('forms/power_form_submit'), ['id' => 'joining-form']); ?>
+            <?php echo form_open_multipart(base_url('forms/power_form_submit'), ['id' => 'power-form']); ?>
               <input type="hidden" name="token" id="token" value="<?php echo $token; ?>">
 			  
 			  <div class="top_stats_wrapper">
@@ -114,7 +114,7 @@
 			  
 
               <div class="tw-flex tw-gap-2">
-                <button type="submit" class="btn btn-primary" data-status="Submitted" id="save-submit">Submit</button>
+                <button type="submit" class="btn btn-primary" data-status="Submitted" >Submit</button>
               </div>
             <?php echo form_close(); ?>
           </div>
@@ -137,43 +137,11 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
 	<link rel="stylesheet" href="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.css"/>
 <script src="https://unpkg.com/jodit@4.7.6/es2021/jodit.min.js"></script>
-
 <script>
 //window.email_editor = Jodit.make('#wfFinalBody');
 window.editor = Jodit.make('.editor');
 </script>
-    <script>
-        $(document).ready(function() {
-            // Form validation
-           
 
-            // Form submission
-            $('#save-submitxx').on('click', function(e) {
-                e.preventDefault();
-                
-                if ($('#joining-form').valid()) {
-                    var status = $(this).data('status');
-                    $('#joining-status').val(status);
-                    
-                    // Show loading state
-                    $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Submitting...');
-                    
-                    // Submit form
-                    $('#joining-form').submit();
-                } else {
-                    // Scroll to first error
-                    var firstError = $('.error-message').first();
-                    if (firstError.length) {
-                        $('html, body').animate({
-                            scrollTop: firstError.offset().top - 100
-                        }, 500);
-                    }
-                }
-            });
-
-            
-        });
-    </script>
 
 </body>
 </html>
