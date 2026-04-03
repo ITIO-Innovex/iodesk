@@ -22,7 +22,13 @@ $end_date   = $endDate->format('F d, Y');
 <div id="wrapper">
   <div class="content">
     <div class="row">
+	
       <div class="col-md-12">
+	  <?php if(isset($password_message)&&$password_message) { ?>
+	  <div class="alert alert-success">
+    <strong><i class="fa-solid fa-circle-info text-warning"></i> <?php echo $password_message;?></strong>
+</div>
+      <?php } ?>
         <div class="panel_s">
           <div class="panel-body">
             <h4 class="tw-mb-6 tw-font-semibold tw-text-lg"><i class="fa-solid fa-credit-card"></i> Subscription Plan Details</h4>

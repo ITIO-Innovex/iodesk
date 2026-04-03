@@ -323,6 +323,12 @@ $_SESSION['cms_subscription_created_at']=$subs['created_at'];
 		if(isset($_SESSION['registered_subscription_id'])&&$_SESSION['registered_subscription_id']){
 	    $_SESSION['registered_subscription_id']="";
         }
+		
+		if(isset($_SESSION['registered_login_password'])&&$_SESSION['registered_login_password']){
+	    $data['password_message'] = 'You have successfully registered. Welcome! Please check your email for login details.';
+		$_SESSION['registered_login_username']="";
+		$_SESSION['registered_login_password']="";
+        }
 
         $plan = $this->services_subscriptions_model->get((int) $id);
         if (!$plan) {
