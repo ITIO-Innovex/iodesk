@@ -380,7 +380,7 @@ class Staff_model extends App_Model
             if (!empty($fetch_via_staff_id)) {
                 $todos_where .= $fetch_via_staff_id;
             }
-            echo $todos_where;
+            //echo $todos_where;
             // Add safety check for company_id
             if ($companyid > 0) {
                 $select_str .= ',(SELECT COUNT(*) FROM ' . db_prefix() . 'notifications WHERE ' . $notifications_where . ') as total_unread_notifications, (SELECT COUNT(*) FROM ' . db_prefix() . 'todos WHERE ' . $todos_where . ') as total_unfinished_todos';

@@ -157,7 +157,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             }
         }
 		
-		/*if (is_admin() || staff_can('view', 'user_utility')) {
+		if (is_admin() || staff_can('view', 'user_utility')) {
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
             'slug'     => 'user_utility_1',
             'name'     => 'Team Document',
@@ -167,7 +167,7 @@ if (is_staff_member()&& staff_can('view',  'leads')) {
             'badge'    => [],
         ]);
 		}
-		
+		/*
 		$CI->app_menu->add_sidebar_children_item('Workspace', [
             'slug'     => 'important_document_1',
             'name'     => 'My Document',

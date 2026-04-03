@@ -149,7 +149,7 @@ $messageid=$email_draft->messageid ?? '';
 <div class="panel_s">
 <div class="panel-body panel-table-full mail-bg">
 <div class="tw-flex tw-justify-between tw-items-center tw-mb-2">
-<h4 class="tw-mt-0 tw-font-semibold tw-text-lg"><i class="fa-solid fa-file-pen tw-mr-2"></i> Sent New Email</h4>
+<h4 class="tw-mt-0 tw-font-semibold tw-text-lg"><i class="fa-solid fa-file-pen tw-mr-2"></i> Compose Email</h4>
 <a href="#" class="btn btn-primary btn-sm" onclick="$('#template_modal').modal('show');return false;" title="Choose Template to Send">Send Template Email</a>
             </div>
 <form action="<?=  admin_url('webmail/reply') ?>" method="post" enctype="multipart/form-data" id="compose-form-data">
